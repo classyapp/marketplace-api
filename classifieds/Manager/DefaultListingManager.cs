@@ -73,7 +73,7 @@ namespace classy.Manager
             }
             if (includeFavoritedByProfiles)
             {
-                var favProfileIds = TripleStore.GetActivitySubjectList(appId, ActivityPredicate.Like, listing.Id).ToArray();
+                var favProfileIds = TripleStore.GetActivitySubjectList(appId, Classy.Models.ActivityPredicate.Like, listing.Id).ToArray();
                 var favProfiles = ProfileRepository.GetByIds(appId, favProfileIds);
                 listingView.FavoritedBy = new List<ProfileView>();
                 foreach (var p in favProfiles)
@@ -84,7 +84,7 @@ namespace classy.Manager
             if (logImpression)
             {
                 var exists = false;
-                TripleStore.LogActivity(appId, requestedByProfileId.IsNullOrEmpty() ? "guest" : requestedByProfileId, ActivityPredicate.View, listing.Id, ref exists);
+                TripleStore.LogActivity(appId, requestedByProfileId.IsNullOrEmpty() ? "guest" : requestedByProfileId, Classy.Models.ActivityPredicate.View, listing.Id, ref exists);
             }
             return listingView;
         }
@@ -309,13 +309,13 @@ namespace classy.Manager
 
             // log a comment activity
             var exists = false;
-            TripleStore.LogActivity(appId, profileId, ActivityPredicate.Comment, listingId, ref exists);
+            TripleStore.LogActivity(appId, profileId, Classy.Models.ActivityPredicate.Comment, listingId, ref exists);
 
             // save mentions
             foreach (var mentionedUsername in comment.Content.ExtractUsernames())
             {
                 var mentionedProfile = ProfileRepository.GetByUsername(appId, mentionedUsername, false);
-                TripleStore.LogActivity(appId, profileId, ActivityPredicate.Mention, mentionedProfile.Id, ref exists);
+                TripleStore.LogActivity(appId, profileId, Classy.Models.ActivityPredicate.Mention, mentionedProfile.Id, ref exists);
 
                 // increase rank of mentioned profile
                 ProfileRepository.IncreaseCounter(appId, mentionedProfile.Id, ProfileCounters.Rank, 1);
@@ -335,7 +335,7 @@ namespace classy.Manager
             var listing = GetVerifiedListing(appId, listingId);
 
             bool tripleExists = false;
-            TripleStore.LogActivity(appId, profileId, ActivityPredicate.Like, listingId, ref tripleExists);
+            TripleStore.LogActivity(appId, profileId, Classy.Models.ActivityPredicate.Like, listingId, ref tripleExists);
             ListingRepository.IncreaseCounter(listingId, appId, ListingCounters.Favorites, 1);
             ProfileRepository.IncreaseCounter(appId, listing.ProfileId, ProfileCounters.Rank, 1);
         }
@@ -357,7 +357,7 @@ namespace classy.Manager
                 case FlagReason.Dislike:
                 default:
                     bool tripleExists = false;
-                    TripleStore.LogActivity(appId, profileId, ActivityPredicate.Flag, listingId, ref tripleExists);
+                    TripleStore.LogActivity(appId, profileId, Classy.Models.ActivityPredicate.Flag, listingId, ref tripleExists);
                     break;
             }
         }

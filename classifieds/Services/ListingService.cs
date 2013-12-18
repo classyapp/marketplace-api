@@ -26,6 +26,7 @@ namespace classy.Services
         public IListingManager ListingManager { get; set; }
         public IProfileManager ProfileManager { get; set; }
         public IReviewManager ReviewManager { get; set; }
+        public IAnalyticsManager AnalyticsManager { get; set; }
 
         [CustomAuthenticate]
         public object Post(CreateProfileProxy request)
@@ -1063,6 +1064,24 @@ namespace classy.Services
                 return new HttpError(HttpStatusCode.Unauthorized, uex.Message);
             }
             catch (Exception ex)
+            {
+                return new HttpError(ex.Message);
+            }
+        }
+
+        // 
+        // POST: /stats/push
+        // log an activity 
+        public object Post(LogActivity request)
+        {
+            try
+            {
+                var session = SessionAs<CustomUserSession>();
+                if (!session.IsAuthenticated && request.SubjectId != "guest") throw new ApplicationException("when no user logged in, SubjectId must be 'guest'");
+                var tripleView = AnalyticsManager.LogActivity(request.AppId, request.SubjectId, Classy.Models.ActivityPredicate.ProContact, request.ObjectId);
+                return new HttpResult(tripleView, HttpStatusCode.OK);
+            }
+            catch(Exception ex)
             {
                 return new HttpError(ex.Message);
             }

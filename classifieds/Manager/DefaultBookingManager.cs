@@ -68,7 +68,7 @@ namespace classy.Manager
 
                 // log the booking activity
                 var tripleExists = false;
-                TripleStore.LogActivity(appId, profileId, ActivityPredicate.Book, listingId, ref tripleExists);
+                TripleStore.LogActivity(appId, profileId, Classy.Models.ActivityPredicate.Book, listingId, ref tripleExists);
 
                 // return the transaction
                 return bookedTimeslot;

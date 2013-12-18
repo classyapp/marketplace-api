@@ -22,7 +22,7 @@ namespace Classy.Repository
             TripleCollection = Db.GetCollection<Triple>("triples");
         }
 
-        public void LogActivity(string appId, string subjectObjectId, ActivityPredicate predicate, string objectObjectId, ref bool tripleAlreadyExists)
+        public Triple LogActivity(string appId, string subjectObjectId, ActivityPredicate predicate, string objectObjectId, ref bool tripleAlreadyExists)
         {
             var triple = new Triple
             {
@@ -42,10 +42,11 @@ namespace Classy.Repository
             if (existingTriple != null)
             {
                 tripleAlreadyExists = true;
-                return;
+                return null;
             }
 
             TripleCollection.Save(triple);
+            return triple;
         }
 
         public IList<string> GetActivitySubjectList(string appId, ActivityPredicate predicate, string objectObjectId)

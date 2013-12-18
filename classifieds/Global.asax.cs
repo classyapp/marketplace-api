@@ -48,7 +48,7 @@ namespace classy
             {
                 // CORS
                 //Plugins.Add(new CorsFeature(
-                //    allowedOrigins: "http://www.realpop.com",
+                //    allowedOrigins: "http://www.thisisclassy.com",
                 //    allowedMethods: "GET, POST, PUT, DELETE, OPTIONS",
                 //    allowedHeaders: "Content-Type, X-ApiKey, Control-Type, Accept, Origin",
                 //    allowCredentials: true
@@ -112,6 +112,9 @@ namespace classy
                         c.TryResolve<IProfileRepository>(),
                         c.TryResolve<IListingRepository>(),
                         c.TryResolve<IReviewRepository>(),
+                        c.TryResolve<ITripleStore>()));
+                container.Register<IAnalyticsManager>(c =>
+                    new DefaultAnalyticsManager(
                         c.TryResolve<ITripleStore>()));
 
                 // configure service routes
@@ -206,6 +209,9 @@ namespace classy
                     .Add<GetReviewsByProfileId>("/profile/{ProfileId}/reviews", "GET")
                     .Add<PublishOrDeleteReview>("/profile/reviews/{ReviewId}/publish", "POST")
                     .Add<PublishOrDeleteReview>("/profile/reviews/{ReviewId}", "DELETE")
+
+                    // Analytics
+                    .Add<LogActivity>("/stats/push", "POST")
                 ;
             }
         }

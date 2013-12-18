@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Web;
 
-namespace Classy.Models
+namespace Classy.Models.Response
 {
     [Flags]
     public enum ActivityPredicate
@@ -21,7 +21,7 @@ namespace Classy.Models
         ProContact = 1024
     }
 
-    public class Triple : BaseObject
+    public class TripleView
     {
         public string ObjectId { get; set; }
         public string Predicate { get; set; }

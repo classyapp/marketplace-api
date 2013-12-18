@@ -91,7 +91,7 @@ namespace classy.Manager
 
                 // log the purchase activity
                 var tripleExists = false;
-                TripleStore.LogActivity(appId, profileId, ActivityPredicate.Purchase, listingId, ref tripleExists);
+                TripleStore.LogActivity(appId, profileId, Classy.Models.ActivityPredicate.Purchase, listingId, ref tripleExists);
 
                 // increase purchase counter
                 ListingRepository.IncreaseCounter(listingId, appId, ListingCounters.Purchases, quantity);
