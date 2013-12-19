@@ -10,7 +10,8 @@ namespace Classy.Repository
     public interface IStorageRepository
     {
         string KeyToUrl(string key);
-        void SaveFile(string key, byte[] content, string contentType); // returns a url to the saved file
+        void SaveFile(string key, byte[] content, string contentType);
+        void SaveFileFromUrl(string key, string url, string contentType); 
         void DeleteFile(string key); // deletes the file located at the url
     }
 }

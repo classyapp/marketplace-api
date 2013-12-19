@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Configuration;
 using System.IO;
 using System.Linq;
+using System.Net;
 using System.Web;
 
 namespace Classy.Repository
@@ -22,6 +23,13 @@ namespace Classy.Repository
             request.Key = key;
             request.InputStream = new MemoryStream(content);
             s3Client.PutObject(request);
+        }
+
+        public void SaveFileFromUrl(string key, string url, string contentType)
+        {
+            var client = new WebClient();
+            byte[] img = client.DownloadData(url);
+            SaveFile(key, img, contentType);
         }
 
         public void DeleteFile(string key)

@@ -18,6 +18,11 @@ namespace Classy.Repository
             var filename = string.Concat(@"c:\img\", key, ".gif");
         }
 
+        public void SaveFileFromUrl(string key, string url, string contentType)
+        {
+            throw new NotImplementedException();
+        }
+
         public void DeleteFile(string key)
         {
             File.Delete(string.Concat(@"c:\img\", key, ".gif"));

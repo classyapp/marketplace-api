@@ -16,7 +16,7 @@ namespace Classy.Models.Response
         public string Id { get; set; }
         public string UserName { get; set; }
         public ExtendedContactInfoView ContactInfo { get; set; }
-        public string GravatarImageUrl64 { get; set; }
+        public string ImageUrl { get; set; }
         public int FollowerCount { get; set; }
         public int FollowingCount { get; set; }
         public int ListingCount { get; set; }

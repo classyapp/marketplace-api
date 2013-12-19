@@ -31,7 +31,9 @@ namespace Classy.Auth
             base.OnAuthenticated(authService, session, tokens, authInfo);
 
             var isNew = false;
+            // TODO: does this get called on eveyr call? if so find a different way.
             var repo = authService.TryResolve<IProfileRepository>();
+            var storage = authService.TryResolve<IStorageRepository>();
             var profile = repo.GetById(AppId, session.UserAuthId, false);
             if (profile == null)
             {
@@ -43,13 +45,6 @@ namespace Classy.Auth
                 profile.ContactInfo.Email = session.Email;
             }
 
-            // Resolve the user repository from the IOC and persist the user info
-            // Populate all matching fields from this session to your own custom User table
-            // TODO: does this get called on eveyr call? if so find a different way.
-            profile.GravatarImageUrl64 = !session.Email.IsNullOrEmpty()
-                ? CreateGravatarUrl(session.Email, 64)
-                : null;
-
             foreach (var authToken in session.ProviderOAuthAccess)
             {
                 if (authToken.Provider == FacebookAuthProvider.Name)
@@ -58,27 +53,33 @@ namespace Classy.Auth
                     profile.FacebookFirstName = authToken.FirstName;
                     profile.FacebookLastName = authToken.LastName;
                     profile.FacebookEmail = authToken.Email;
+                    if (isNew)
+                    {
+                        profile.ImageUrl = SaveFileFromUrl(storage, session.UserAuthId,  
+                            string.Format("http://graph.facebook.com/{0}/picture?type=large", authToken.UserName));
+                    }
                 }
                 else if (authToken.Provider == TwitterAuthProvider.Name)
                 {
                     profile.TwitterName = authToken.DisplayName;
                 }
             }
+
+            // still no profile pic?
+            if (isNew && string.IsNullOrEmpty(profile.ImageUrl))
+            {
+                profile.ImageUrl = SaveFileFromUrl(storage, session.UserAuthId, "http://www.gravatar.com/avatar/?f=y&d=mm");
+            }
+
             //
             repo.Save(profile);
         }
 
-        private static string CreateGravatarUrl(string email, int size = 64)
+        public string SaveFileFromUrl(IStorageRepository storage, string profileId, string url)
         {
-            var md5 = MD5.Create();
-            var md5HadhBytes = md5.ComputeHash(email.ToUtf8Bytes());
-
-            var sb = new StringBuilder();
-            for (var i = 0; i < md5HadhBytes.Length; i++)
-                sb.Append(md5HadhBytes[i].ToString("x2"));
-
-            string gravatarUrl = "http://www.gravatar.com/avatar/{0}?d=mm&s={1}".Fmt(sb, size);
-            return gravatarUrl;
+            string key = string.Concat("profile_img_", profileId);
+            storage.SaveFileFromUrl(key, url, "image/jpeg");
+            return storage.KeyToUrl(key);
         }
     }
 
