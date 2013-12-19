@@ -213,11 +213,15 @@ namespace Classy.Repository
             throw new NotImplementedException();
         }
 
-        public IList<Listing> Search(string tag, IEnumerable<CustomAttribute> metadata, double? priceMin, double? priceMax, Location location, string appId, bool includeDrafts, bool increaseViewCounter)
+        public IList<Listing> Search(string tag, string listingType, IEnumerable<CustomAttribute> metadata, double? priceMin, double? priceMax, Location location, string appId, bool includeDrafts, bool increaseViewCounter)
         {
             var queries = new List<IMongoQuery>() {
                 Query<Listing>.EQ(x => x.AppId, appId)
             };
+            if (!string.IsNullOrEmpty(listingType))
+            {
+                queries.Add(Query<Listing>.EQ(x => x.ListingType, listingType));
+            }
             if (!string.IsNullOrEmpty(tag))
             {
                 queries.Add(Query<Listing>.In(x => x.Hashtags, new string[] { tag }));

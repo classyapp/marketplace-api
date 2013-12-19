@@ -118,6 +118,7 @@ namespace classy.Manager
         public IList<ListingView> SearchListings(
             string appId,
             string tag, 
+            string listingType,
             IList<CustomAttribute> metadata, 
             double? priceMin, 
             double? priceMax, 
@@ -127,7 +128,7 @@ namespace classy.Manager
         {
             // TODO: cache listings
             tag = string.IsNullOrEmpty(tag) ? null : string.Concat("#", tag.TrimEnd(new char[] { '#' }));
-            var listings = ListingRepository.Search(tag, metadata, priceMin, priceMax, location, appId, false, true);
+            var listings = ListingRepository.Search(tag, listingType, metadata, priceMin, priceMax, location, appId, false, true);
             var comments = includeComments ?
                 CommentRepository.GetByListingIds(listings.Select(x => x.Id).AsEnumerable(), formatCommentsAsHtml) : null;
             var listingViews = new List<ListingView>();

@@ -126,6 +126,7 @@ namespace classy.Services
                 var listingViews = ListingManager.SearchListings(
                     request.AppId,
                     request.Tag,
+                    request.ListingType,
                     request.Metadata,
                     request.PriceMin,
                     request.PriceMax,

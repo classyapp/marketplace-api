@@ -56,6 +56,7 @@ namespace classy.Manager
         /// </summary>
         /// <param name="appId"></param>
         /// <param name="tag"></param>
+        /// <param name="listingType"></param>
         /// <param name="metadata"></param>
         /// <param name="priceMin"></param>
         /// <param name="priceMax"></param>
@@ -66,6 +67,7 @@ namespace classy.Manager
         IList<ListingView> SearchListings(
             string appId,
             string tag,
+            string listingType,
             IList<CustomAttribute> metadata,
             double? priceMin,
             double? priceMax,

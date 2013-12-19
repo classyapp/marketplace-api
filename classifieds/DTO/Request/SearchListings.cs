@@ -10,6 +10,7 @@ namespace Classy.Models.Request
     public class SearchListings : BaseRequestDto
     {
         public string Tag { get; set; }
+        public string ListingType { get; set; }
         public IList<CustomAttribute> Metadata { get; set; }
         public double? PriceMin { get; set; }
         public double? PriceMax { get; set; }
