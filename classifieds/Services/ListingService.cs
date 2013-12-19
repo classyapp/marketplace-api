@@ -164,7 +164,7 @@ namespace classy.Services
                     request.Pricing,
                     request.ContactInfo,
                     request.SchedulingTemplate,
-                    request.CustomAttributes);
+                    request.Metadata);
 
                 return new HttpResult
                 {
@@ -292,7 +292,7 @@ namespace classy.Services
                     request.Pricing,
                     request.ContactInfo,
                     request.SchedulingTemplate,
-                    request.CustomAttributes);
+                    request.Metadata);
                     
                 return new HttpResult(listing, HttpStatusCode.OK);
             }

@@ -17,7 +17,7 @@ namespace Classy.Models.Request
         public PricingInfo Pricing { get; set; }
         public ContactInfo ContactInfo { get; set; }
         public TimeslotSchedule SchedulingTemplate { get; set; }
-        public IList<CustomAttribute> CustomAttributes { get; set; }
+        public IList<CustomAttribute> Metadata { get; set; }
     }
 
     public class PostListingValidator : AbstractValidator<PostListing>
