@@ -24,16 +24,22 @@ namespace Classy.Models.Request
     {
         public PostListingValidator()
         {
-            RuleFor(x => x.ListingId).NotEmpty();
-            RuleFor(x => x.AppId).NotEmpty();
-            RuleFor(x => x.Title).NotEmpty();
-            RuleFor(x => x.Content).NotEmpty();
-            RuleFor(x => x.ListingType).NotEmpty();
-            RuleFor(x => x.ContactInfo).NotNull();
-            RuleFor(x => x.ContactInfo.Location).SetValidator(new LocationValidator())
-                .WithErrorCode("Invalid Location");
-            RuleFor(x => x.Pricing).SetValidator(new PricingInfoValidator())
-                .WithErrorCode("Invalid Pricing Information");
+            When(x => string.IsNullOrEmpty(x.ListingId), () =>
+            {
+                RuleFor(x => x.Title).NotEmpty();
+                RuleFor(x => x.Content).NotEmpty();
+                RuleFor(x => x.ListingType).NotEmpty();
+                When(x => x.ContactInfo != null, () =>
+                {
+                    RuleFor(x => x.ContactInfo.Location).SetValidator(new LocationValidator())
+                        .WithErrorCode("Invalid Location");
+                });
+                When(x => x.Pricing != null, () =>
+                {
+                    RuleFor(x => x.Pricing).SetValidator(new PricingInfoValidator())
+                        .WithErrorCode("Invalid Pricing Information");
+                });
+            });
         }
     }
 }

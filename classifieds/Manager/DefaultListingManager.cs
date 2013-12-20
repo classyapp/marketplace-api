@@ -227,7 +227,7 @@ namespace classy.Manager
         {
             Listing listing;
             bool isNewListing = listingId.IsNullOrEmpty();
-            if (isNewListing) {
+            if (!isNewListing) {
                 listing = GetVerifiedListing(appId, listingId);
             }
             else {
