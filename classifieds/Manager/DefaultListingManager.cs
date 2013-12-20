@@ -62,7 +62,7 @@ namespace classy.Manager
                     var comment = c.TranslateTo<CommentView>();
                     if (commenterProfiles != null)
                     {
-                        comment.Profile = (from p in commenterProfiles where p.Id == comment.ProfileId select p).Single().TranslateTo<ProfileView>();
+                        comment.Profile = (from p in commenterProfiles where p.Id == comment.ProfileId select p).Single().ToProfileView();
                     }
                     listingView.Comments.Add(comment.TranslateTo<CommentView>());
                 }
@@ -78,7 +78,7 @@ namespace classy.Manager
                 listingView.FavoritedBy = new List<ProfileView>();
                 foreach (var p in favProfiles)
                 {
-                    listingView.FavoritedBy.Add(p.TranslateTo<ProfileView>());
+                    listingView.FavoritedBy.Add(p.ToProfileView());
                 }
             }
             if (logImpression)
@@ -300,7 +300,7 @@ namespace classy.Manager
             ProfileRepository.IncreaseCounter(appId, profileId, ProfileCounters.Comments, 1);
 
             // increase rank of listing owner
-            ProfileRepository.IncreaseCounter(appId, profileId, ProfileCounters.Rank, 1);
+            ProfileRepository.IncreaseCounter(appId, listing.ProfileId, ProfileCounters.Rank, 1);
 
             // add hashtags to listing if the comment is by the listing owner
             if (profileId == listing.ProfileId)
@@ -315,7 +315,7 @@ namespace classy.Manager
             // save mentions
             foreach (var mentionedUsername in comment.Content.ExtractUsernames())
             {
-                var mentionedProfile = ProfileRepository.GetByUsername(appId, mentionedUsername, false);
+                var mentionedProfile = ProfileRepository.GetByUsername(appId, mentionedUsername.TrimStart('@'), false);
                 TripleStore.LogActivity(appId, profileId, Classy.Models.ActivityPredicate.Mention, mentionedProfile.Id, ref exists);
 
                 // increase rank of mentioned profile

@@ -14,7 +14,7 @@ namespace classy
         {
             var to = from.TranslateTo<ProfileView>();
             // contact info
-            to.ContactInfo = from.ContactInfo.TranslateTo<ExtendedContactInfoView>();
+            to.ContactInfo = from.ContactInfo.ToExtendedContactInfoView();
             // add merchant info
             if (from.SellerInfo != null)
             {
