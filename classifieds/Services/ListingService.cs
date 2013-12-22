@@ -121,6 +121,11 @@ namespace classy.Services
 
         public object Get(SearchListings request)
         {
+            return Post(request);
+        }
+
+        public object Post(SearchListings request)
+        {
             try
             {
                 var listingViews = ListingManager.SearchListings(
@@ -546,6 +551,11 @@ namespace classy.Services
 
         // search profiles
         public object Get(SearchProfiles request)
+        {
+            return Post(request);
+        }
+
+        public object Post(SearchProfiles request)
         {
             try
             {

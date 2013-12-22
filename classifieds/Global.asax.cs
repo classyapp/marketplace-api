@@ -162,7 +162,7 @@ namespace classy
                     .Add<DeleteExternalMedia>("/listings/{ListingId}/media", "DELETE")
                     .Add<PublishListing>("/listings/{ListingId}/publish", "POST") // publish a post to the public
                     .Add<PostListing>("/listings/{ListingId}", "PUT") // update listing
-                    .Add<SearchListings>("/listings/search", "GET") // search listings by tag and/or metadata
+                    .Add<SearchListings>("/listings/search", ApplyTo.Get | ApplyTo.Post) // search listings by tag and/or metadata
                     .Add<SearchListings>("/tags/{tag}", "GET") // search with a nicer url for tag
                     .Add<GetListingsByUsername>("/profile/{Username}/listings", "GET") // get list of listing for profile
 
@@ -201,7 +201,7 @@ namespace classy
                     .Add<ApproveProxyClaim>("/profile/{ClaimId}/approve", "POST")
                     .Add<RejectProxyClaim>("/profile/{ClaimId}/reject", "POST")
                     .Add<CreateProfileProxy>("/profile/new", "POST")
-                    .Add<SearchProfiles>("/profile/search", "GET")
+                    .Add<SearchProfiles>("/profile/search", ApplyTo.Get | ApplyTo.Post)
 
                     // Reviews
                     .Add<PostReviewForListing>("/listings/{ListingId}/reviews/new", "POST")

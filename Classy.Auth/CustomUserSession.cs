@@ -8,6 +8,7 @@ using ServiceStack.Text;
 using System.Linq;
 using Classy.Repository;
 using Classy.Models;
+using System.Net;
 
 namespace Classy.Auth
 {
@@ -68,7 +69,14 @@ namespace Classy.Auth
             // still no profile pic?
             if (isNew && string.IsNullOrEmpty(profile.ImageUrl))
             {
-                profile.ImageUrl = SaveFileFromUrl(storage, session.UserAuthId, "http://www.gravatar.com/avatar/?f=y&d=mm");
+                try
+                {
+                    profile.ImageUrl = SaveFileFromUrl(storage, session.UserAuthId, "http://www.gravatar.com/avatar/?f=y&d=mm");
+                }
+                catch(WebException)
+                {
+                    // sink
+                }
             }
 
             //

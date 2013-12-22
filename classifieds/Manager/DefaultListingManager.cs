@@ -337,8 +337,11 @@ namespace classy.Manager
 
             bool tripleExists = false;
             TripleStore.LogActivity(appId, profileId, Classy.Models.ActivityPredicate.Like, listingId, ref tripleExists);
-            ListingRepository.IncreaseCounter(listingId, appId, ListingCounters.Favorites, 1);
-            ProfileRepository.IncreaseCounter(appId, listing.ProfileId, ProfileCounters.Rank, 1);
+            if (!tripleExists)
+            {
+                ListingRepository.IncreaseCounter(listingId, appId, ListingCounters.Favorites, 1);
+                ProfileRepository.IncreaseCounter(appId, listing.ProfileId, ProfileCounters.Rank, 1);
+            }
         }
 
         public void FlagListing(
