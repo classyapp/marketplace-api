@@ -307,12 +307,17 @@ namespace classy.Manager
             // get the merchant profile
             var revieweeProfile = GetVerifiedProfile(appId, revieweeProfileId);
             if (!revieweeProfile.IsSeller && !revieweeProfile.IsProxy)
-                throw new ApplicationException("can only post profile reviews for seller or proxy profiles");
+                throw new HttpException(400, "can only post profile reviews for seller or proxy profiles");
             if (!revieweeProfile.IsProxy && (contactInfo != null || metadata != null))
-                throw new ApplicationException("can only update contact info and metadata for proxy profiles. this profile is live and can onlyl be update by the owner.");
+                throw new HttpException(400, "can only update contact info and metadata for proxy profiles. this profile is live and can onlyl be update by the owner.");
 
             // get app info
             var app = AppManager.GetAppById(appId);
+
+            // log activity
+            var exists = false;
+            TripleStore.LogActivity(appId, reviewerProfileId, Classy.Models.ActivityPredicate.Review, revieweeProfileId, ref exists);
+            if (exists) throw new HttpException(400, "AlreadyReviewed");
 
             // save the review
             var review = new Review
@@ -326,11 +331,6 @@ namespace classy.Manager
                 IsPublished = app.AllowUnmoderatedReviews
             };
             ReviewRepository.Save(review);
-
-            // log activity
-            var exists = false;
-            TripleStore.LogActivity(appId, reviewerProfileId, Classy.Models.ActivityPredicate.Review, revieweeProfileId, ref exists);
-            if (exists) throw new ApplicationException("this user already submitted a review for this profile");
 
             // update contact info and metadata (if this is a proxy, otherwise exception was thrown above)
             if (contactInfo != null) revieweeProfile.ContactInfo = contactInfo;
