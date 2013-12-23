@@ -995,9 +995,9 @@ namespace classy.Services
             {
                 return new HttpError(HttpStatusCode.NotFound, kex.Message);
             }
-            catch (Exception ex)
+            catch (HttpException hex)
             {
-                return new HttpError(ex.Message);
+                return new HttpError(hex.GetHttpCode(), hex.Message);
             }
         }
 
