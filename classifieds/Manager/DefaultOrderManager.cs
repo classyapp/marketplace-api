@@ -191,15 +191,7 @@ namespace classy.Manager
         /// <returns></returns>
         private Listing GetVerifiedListing(string appId, string listingId, string profileId)
         {
-            Listing listing;
-            try
-            {
-                listing = GetVerifiedListing(appId, listingId);
-            }
-            catch (KeyNotFoundException kex)
-            {
-                throw;
-            }
+            var listing = GetVerifiedListing(appId, listingId);
             if (listing.ProfileId != profileId) throw new UnauthorizedAccessException("not authorized");
             return listing;
         }
@@ -226,15 +218,7 @@ namespace classy.Manager
         /// <returns></returns>
         private Order GetVerifiedOrder(string appId, string orderId, string profileId)
         {
-            Order order;
-            try
-            {
-                order = GetVerifiedOrder(appId, orderId);
-            }
-            catch (KeyNotFoundException)
-            {
-                throw;
-            }
+            var order = GetVerifiedOrder(appId, orderId);
             if (order.ProfileId != profileId) throw new UnauthorizedAccessException("not authorized");
             return order;
         }
@@ -248,7 +232,7 @@ namespace classy.Manager
         private Order GetVerifiedOrder(string appId, string orderId)
         {
             var order = OrderRepository.GetById(appId, orderId, false);
-            if (order == null) throw new KeyNotFoundException("invalid order");
+            if (order == null) throw new ArgumentException("invalid order");
             return order;
         }
     }

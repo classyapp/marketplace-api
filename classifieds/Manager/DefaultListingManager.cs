@@ -378,14 +378,7 @@ namespace classy.Manager
         private Listing GetVerifiedListing(string appId, string listingId, string profileId, bool increaseViewCounter)
         {
             Listing listing;
-            try
-            {
-                listing = GetVerifiedListing(appId, listingId, increaseViewCounter);
-            }
-            catch (KeyNotFoundException kex)
-            {
-                throw;
-            }
+            listing = GetVerifiedListing(appId, listingId, increaseViewCounter);
             if (listing.ProfileId != profileId) throw new UnauthorizedAccessException("not authorized");
             return listing;
         }
@@ -423,7 +416,7 @@ namespace classy.Manager
         private Listing GetVerifiedListing(string appId, string listingId, bool increaseViewCounter)
         {
             var listing = ListingRepository.GetById(listingId, appId, true, increaseViewCounter);
-            if (listing == null) throw new KeyNotFoundException("invalid listing");
+            if (listing == null) throw new ArgumentException("invalid listing id");
             return listing;
         }
     }

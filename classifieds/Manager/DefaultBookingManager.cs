@@ -190,7 +190,7 @@ namespace classy.Manager
         private BookedTimeslot GetVerifiedBooking(string appId, string bookingId)
         {
             var booking = BookingRepository.GetById(appId, bookingId, false);
-            if (booking == null) throw new KeyNotFoundException("invalid booking");
+            if (booking == null) throw new ArgumentException("invalid booking");
             return booking;
         }
 
@@ -203,15 +203,7 @@ namespace classy.Manager
         /// <returns></returns>
         private Listing GetVerifiedListing(string appId, string listingId, string profileId)
         {
-            Listing listing;
-            try
-            {
-                listing = GetVerifiedListing(appId, listingId);
-            }
-            catch (KeyNotFoundException kex)
-            {
-                throw;
-            }
+            var listing = GetVerifiedListing(appId, listingId);
             if (listing.ProfileId != profileId) throw new UnauthorizedAccessException("not authorized");
             return listing;
         }
@@ -225,7 +217,7 @@ namespace classy.Manager
         private Listing GetVerifiedListing(string appId, string listingId)
         {
             var listing = ListingRepository.GetById(listingId, appId, false, false);
-            if (listing == null) throw new KeyNotFoundException("invalid listing");
+            if (listing == null) throw new ArgumentException("Invalid Listing");
             return listing;
         }
     }

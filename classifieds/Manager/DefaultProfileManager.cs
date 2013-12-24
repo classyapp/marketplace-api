@@ -307,9 +307,9 @@ namespace classy.Manager
             // get the merchant profile
             var revieweeProfile = GetVerifiedProfile(appId, revieweeProfileId);
             if (!revieweeProfile.IsSeller && !revieweeProfile.IsProxy)
-                throw new HttpException(400, "can only post profile reviews for seller or proxy profiles");
+                throw new ArgumentException("ProfileNotProxy");
             if (!revieweeProfile.IsProxy && (contactInfo != null || metadata != null))
-                throw new HttpException(400, "can only update contact info and metadata for proxy profiles. this profile is live and can onlyl be update by the owner.");
+                throw new ArgumentException("ProfileNotProxy");
 
             // get app info
             var app = AppManager.GetAppById(appId);
@@ -317,7 +317,7 @@ namespace classy.Manager
             // log activity
             var exists = false;
             TripleStore.LogActivity(appId, reviewerProfileId, Classy.Models.ActivityPredicate.Review, revieweeProfileId, ref exists);
-            if (exists) throw new HttpException(400, "AlreadyReviewed");
+            if (exists) throw new ArgumentException("AlreadyReviewed");
 
             // save the review
             var review = new Review
@@ -398,7 +398,7 @@ namespace classy.Manager
         private Profile GetVerifiedProfile(string appId, string profileId)
         {
             var profile = ProfileRepository.GetById(appId, profileId, false);
-            if (profile == null) throw new KeyNotFoundException("invalid profile");
+            if (profile == null) throw new ArgumentException("invalid profile");
             return profile;
         }
 
@@ -411,7 +411,7 @@ namespace classy.Manager
         private Listing GetVerifiedListing(string appId, string listingId)
         {
             var listing = ListingRepository.GetById(listingId, appId, false, false);
-            if (listing == null) throw new KeyNotFoundException("invalid listing");
+            if (listing == null) throw new ArgumentException("invalid listing");
             return listing;
         }
 
@@ -425,7 +425,7 @@ namespace classy.Manager
         private Review GetVerifiedReview(string appId, string reviewId, string profileId)
         {
             var review = ReviewRepository.GetById(appId, reviewId);
-            if (review == null) throw new KeyNotFoundException("invalid review");
+            if (review == null) throw new ArgumentException("invalid review");
             if (review.RevieweeProfileId != profileId) throw new UnauthorizedAccessException("unauthorized");
             return review;
         }
