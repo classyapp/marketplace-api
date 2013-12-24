@@ -195,6 +195,7 @@ namespace classy
                     .Add<CancelSingleItemOrder>("/profile/orders/{OrderId}", "DELETE")
 
                     // Profiles
+                    .Add<GetAutenticatedProfile>("/profile", "GET")
                     .Add<GetProfileById>("/profile/{ProfileId}", "GET")
                     .Add<UpdateProfile>("/profile/{ProfileId}", "PUT")
                     .Add<ClaimProxyProfile>("/profile/{ProxyProfileId}/claim", "POST")

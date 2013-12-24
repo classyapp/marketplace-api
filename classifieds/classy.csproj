@@ -84,6 +84,7 @@
     <Compile Include="DTO\Request\CancelBooking.cs" />
     <Compile Include="DTO\Request\CancelSingleItemOrder.cs" />
     <Compile Include="DTO\Request\ClaimProxyProfile.cs" />
+    <Compile Include="DTO\Request\GetSessionProfile.cs" />
     <Compile Include="DTO\Request\LogActivity.cs" />
     <Compile Include="DTO\Request\UpdateProfile.cs" />
     <Compile Include="DTO\Request\CreateProfileProxy.cs" />

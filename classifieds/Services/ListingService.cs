@@ -298,6 +298,27 @@ namespace classy.Services
             return new HttpResult(claim, HttpStatusCode.OK);
         }
 
+        // get profile form session
+        [CustomAuthenticate]
+        public object Get(GetAutenticatedProfile request)
+        {
+            var session = SessionAs<CustomUserSession>();
+            if (!session.IsAuthenticated) return new HttpError(HttpStatusCode.Unauthorized, "No Session");
+            else 
+            {
+                var profile = ProfileManager.GetProfileById(
+                    request.AppId,
+                    session.UserAuthId,
+                    session.UserAuthId,
+                    false,
+                    false,
+                    false,
+                    false,
+                    false);
+                return new HttpResult(profile);
+            }
+        }
+
         // get profile
         public object Get(GetProfileById request)
         {
