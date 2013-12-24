@@ -118,7 +118,6 @@
     <Compile Include="Extentions\MediaFileViewExtensions.cs" />
     <Compile Include="Extentions\LocationViewExtensions.cs" />
     <Compile Include="Extentions\ReviewViewExtensions.cs" />
-    <Compile Include="Extentions\CustomAttributeViewExtensions.cs" />
     <Compile Include="Extentions\SellerViewExtentions.cs" />
     <Compile Include="Extentions\ProxyClaimViewExtentions.cs" />
     <Compile Include="Extentions\ListingViewExtensions.cs" />

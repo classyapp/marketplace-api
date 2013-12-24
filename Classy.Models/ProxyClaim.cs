@@ -18,7 +18,7 @@ namespace Classy.Models
         public string ProfileId { get; set; }
         public string ProxyProfileId { get; set; }
         public Seller SellerInfo { get; set; }
-        public IList<CustomAttribute> Metadata { get; set; }
+        public IDictionary<string, string> Metadata { get; set; }
         public ProxyClaimStatus Status { get; set; }
     }
 }

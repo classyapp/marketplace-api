@@ -9,7 +9,7 @@ namespace Classy.Models.Response
     {
         public ProfileView()
         {
-            Metadata = new List<CustomAttributeView>();
+            Metadata = new Dictionary<string, string>();
             FolloweeUsernames = new List<string>();
         }
 
@@ -35,6 +35,6 @@ namespace Classy.Models.Response
         public IList<ProfileView> FollowedBy { get; set; }
         public IList<ReviewView> Reviews { get; set; }
         public IList<ListingView> Listings { get; set; }
-        public IList<CustomAttributeView> Metadata { get; set; }
+        public IDictionary<string, string> Metadata { get; set; }
     }
 }

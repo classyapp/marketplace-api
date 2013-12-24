@@ -14,7 +14,7 @@ namespace Classy.Models.Request
         public decimal Score { get; set; }
         public IDictionary<string, decimal> SubCriteria { get; set; }
         public ContactInfo ContactInfo { get; set; }
-        public IList<CustomAttribute> Metadata { get; set; }
+        public IDictionary<string, string> Metadata { get; set; }
         public bool ReturnReviewerProfile { get; set; }
         public bool ReturnRevieweeProfile { get; set; }
     }

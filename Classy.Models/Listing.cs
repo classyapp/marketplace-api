@@ -16,7 +16,7 @@ namespace Classy.Models
         public Listing()
         {
             ExternalMedia = new List<MediaFile>();
-            Metadata = new List<CustomAttribute>();
+            Metadata = new Dictionary<string, string>();
             Hashtags = new List<string>();
             ContactInfo = new ContactInfo();
         }
@@ -47,6 +47,6 @@ namespace Classy.Models
         public IList<BookedTimeslot> BookedTimeslots { get; set; }
 
         // custom metadata
-        public IList<CustomAttribute> Metadata { get; set; }
+        public IDictionary<string, string> Metadata { get; set; }
     }
 }

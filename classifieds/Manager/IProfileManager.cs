@@ -21,7 +21,7 @@ namespace classy.Manager
         ProfileView CreateProfileProxy(
             string appId,
             Seller sellerInfo,
-            IList<CustomAttribute> metadata);
+            IDictionary<string, string> metadata);
 
         /// <summary>
         /// 
@@ -37,7 +37,7 @@ namespace classy.Manager
             string profileId,
             string proxyProfileId,
             Seller sellerInfo,
-            IList<CustomAttribute> metadata);
+            IDictionary<string, string> metadata);
         
         /// <summary>
         /// 
@@ -73,7 +73,7 @@ namespace classy.Manager
             string partialUserName,
             string category,
             Location location,
-            IList<CustomAttribute> metadata);
+            IDictionary<string, string> metadata);
 
         /// <summary>
         /// 
@@ -120,6 +120,6 @@ namespace classy.Manager
             string appId,
             string profileId,
             Seller sellerInfo,
-            IList<CustomAttribute> metadata);
+            IDictionary<string, string> metadata);
     }
 }

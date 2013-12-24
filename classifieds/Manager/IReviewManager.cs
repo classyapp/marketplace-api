@@ -49,7 +49,7 @@ namespace classy.Manager
             decimal score,
             IDictionary<string, decimal> subCriteria,
             ContactInfo contactInfo,
-            IList<CustomAttribute> metadata);
+            IDictionary<string, string> metadata);
 
         /// <summary>
         /// 

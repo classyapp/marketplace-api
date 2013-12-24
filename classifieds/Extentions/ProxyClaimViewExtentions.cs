@@ -14,7 +14,6 @@ namespace classy
         {
             var to = from.TranslateTo<ProxyClaimView>();
             to.SellerInfo = from.SellerInfo.ToSellerView();
-            to.Metadata = from.Metadata.ToCustomAttributeViewList();
             return to;
         }
     }

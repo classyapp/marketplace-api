@@ -48,7 +48,7 @@ namespace Classy.Models.Response
         public ProfileView Profile { get; set; }
         public IList<ProfileView> FavoritedBy { get; set; }
         //
-        public IList<CustomAttributeView> Metadata { get; set; }
+        public IDictionary<string, string> Metadata { get; set; }
         //
         public bool HasSchedulingInfo { get; set; }
         public TimeslotScheduleView SchedulingTemplate { get; set; }

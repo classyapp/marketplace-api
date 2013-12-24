@@ -20,7 +20,7 @@ namespace Classy.Models
         {
             ContactInfo = new ContactInfo();
             FolloweeUsernames = new List<string>();
-            Metadata = new List<CustomAttribute>();
+            Metadata = new Dictionary<string, string>();
             Created = DateTime.UtcNow;
         }
 
@@ -46,7 +46,7 @@ namespace Classy.Models
         public decimal ReviewAverageScore { get; set; }
         public IDictionary<string, decimal> ReviewAverageSubCriteria { get; set; }
         public IList<string> FolloweeUsernames { get; set; }
-        public IList<CustomAttribute> Metadata { get; set; }
+        public IDictionary<string, string> Metadata { get; set; }
         public Seller SellerInfo { get; set; }
 
         //

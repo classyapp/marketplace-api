@@ -92,7 +92,7 @@ namespace Classy.Repository
             ProfilesCollection.Update(query, update);
         }
 
-        public IList<Profile> Search(string appId, string displayName, string category, Location location, IEnumerable<CustomAttribute> metadata)
+        public IList<Profile> Search(string appId, string displayName, string category, Location location, IDictionary<string, string> metadata)
         {
             var queries = new List<IMongoQuery>() {
                 Query<Profile>.EQ(x => x.AppId, appId)

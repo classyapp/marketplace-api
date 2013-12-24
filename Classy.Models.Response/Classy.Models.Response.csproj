@@ -44,7 +44,6 @@
     <Compile Include="CancelOrderResponse.cs" />
     <Compile Include="CommentView.cs" />
     <Compile Include="ContactInfoView.cs" />
-    <Compile Include="CustomAttributeView.cs" />
     <Compile Include="ListingView.cs" />
     <Compile Include="LocationView.cs" />
     <Compile Include="MediaFileView.cs" />

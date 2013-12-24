@@ -24,8 +24,6 @@ namespace classy
             }
             //proxy
             to.IsProxy = from.IsProxy;
-            //metadata
-            to.Metadata = from.Metadata.ToCustomAttributeViewList();
             return to;
         }
 

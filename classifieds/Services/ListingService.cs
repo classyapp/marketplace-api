@@ -47,9 +47,8 @@ namespace classy.Services
                             Name = content[0]
                         } 
                     },
-                    new List<CustomAttribute>() { 
-                        new CustomAttribute { Key = "LicenseNo", Value = content[1] }
-                    });
+                    new Dictionary<string, string>());
+                profile.Metadata.Add("LicenseNo", content[1]);
             }
 
             //var profile = ProfileManager.CreateProfileProxy(

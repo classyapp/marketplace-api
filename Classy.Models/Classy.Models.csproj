@@ -61,7 +61,6 @@
     <Compile Include="BaseObject.cs" />
     <Compile Include="BookableTimeslot.cs" />
     <Compile Include="Comment.cs" />
-    <Compile Include="CustomAttribute.cs" />
     <Compile Include="BaseRequestDto.cs" />
     <Compile Include="FlagReason.cs" />
     <Compile Include="Listing.cs" />

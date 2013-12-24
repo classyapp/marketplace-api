@@ -35,13 +35,13 @@ namespace classy.Manager
         public ProfileView CreateProfileProxy(
             string appId,
             Seller sellerInfo,
-            IList<CustomAttribute> metadata)
+            IDictionary<string, string> metadata)
         {
             if (metadata == null)
             {
-                metadata = new List<CustomAttribute>();
+                metadata = new Dictionary<string, string>();
             }
-            metadata.Add(new CustomAttribute { Key = Profile.PROXY_METADATA_KEY, Value = "1" });
+            metadata.Add(Profile.PROXY_METADATA_KEY, "1");
             var profile = new Profile
             {
                 AppId = appId,
@@ -59,7 +59,7 @@ namespace classy.Manager
             string partialUserName,
             string category,
             Location location,
-            IList<CustomAttribute> metadata)
+            IDictionary<string, string> metadata)
         {
             var profileList = ProfileRepository.Search(appId, partialUserName, category, location, metadata);
             IList<ProfileView> results = new List<ProfileView>();
@@ -150,7 +150,7 @@ namespace classy.Manager
             string appId,
             string profileId,
             Seller sellerInfo,
-            IList<CustomAttribute> metadata)
+            IDictionary<string, string> metadata)
         {
             var profile = GetVerifiedProfile(appId, profileId);
 
@@ -163,7 +163,7 @@ namespace classy.Manager
                 {
                     foreach (var attribute in metadata)
                     {
-                        profile.Metadata.SetValue(attribute.Key, attribute.Value);
+                        profile.Metadata[attribute.Key] = attribute.Value;
                     }
                 }
             }
@@ -178,7 +178,7 @@ namespace classy.Manager
             string profileId,
             string proxyProfileId,
             Seller sellerInfo,
-            IList<CustomAttribute> metadata)
+            IDictionary<string, string> metadata)
         {
             var proxyProfile = GetVerifiedProfile(appId, proxyProfileId);
             if (!proxyProfile.IsProxy) throw new ApplicationException("can't claim. not a proxy.");
@@ -219,7 +219,7 @@ namespace classy.Manager
                 {
                     foreach (var attribute in claim.Metadata)
                     {
-                        profile.Metadata.SetValue(attribute.Key, attribute.Value);
+                        profile.Metadata[attribute.Key] = attribute.Value;
                     }
                 }
             }
@@ -307,7 +307,7 @@ namespace classy.Manager
             decimal score,
             IDictionary<string, decimal> subCriteria,
             ContactInfo contactInfo,
-            IList<CustomAttribute> metadata)
+            IDictionary<string, string> metadata)
         {
             // get the merchant profile
             var revieweeProfile = GetVerifiedProfile(appId, revieweeProfileId);
@@ -346,7 +346,7 @@ namespace classy.Manager
                 {
                     foreach (var attribute in metadata)
                     {
-                        revieweeProfile.Metadata.SetValue(attribute.Key, attribute.Value);
+                        revieweeProfile.Metadata[attribute.Key] = attribute.Value;
                     }
                 }
                 else revieweeProfile.Metadata = metadata;

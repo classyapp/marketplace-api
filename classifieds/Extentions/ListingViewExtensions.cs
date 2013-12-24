@@ -39,7 +39,6 @@ namespace classy
                 }; 
                 to.SchedulingTemplate = from.SchedulingTemplate.TranslateTo<TimeslotScheduleView>();
             }
-            to.Metadata = from.Metadata.ToCustomAttributeViewList();
             return to;
         }
 

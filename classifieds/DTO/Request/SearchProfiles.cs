@@ -10,7 +10,7 @@ namespace Classy.Models.Request
     public class SearchProfiles : BaseRequestDto
     {
         public string DisplayName { get; set; }
-        public IList<CustomAttribute> Metadata { get; set; }
+        public IDictionary<string, string> Metadata { get; set; }
         public Location Location { get; set; }
         public string Category { get; set; }
     }

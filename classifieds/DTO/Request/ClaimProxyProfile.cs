@@ -10,7 +10,7 @@ namespace Classy.Models.Request
     {
         public string ProxyProfileId { get; set; }
         public Seller SellerInfo { get; set; }
-        public IList<CustomAttribute> Metadata { get; set; }
+        public IDictionary<string, string> Metadata { get; set; }
     }
 
     public class ClaimProxyProfileValidator : AbstractValidator<ClaimProxyProfile>

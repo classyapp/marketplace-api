@@ -119,7 +119,7 @@ namespace classy.Manager
             string appId,
             string tag, 
             string listingType,
-            IList<CustomAttribute> metadata, 
+            IDictionary<string, string> metadata, 
             double? priceMin, 
             double? priceMax, 
             Location location, 
@@ -223,7 +223,7 @@ namespace classy.Manager
             PricingInfo pricingInfo,
             ContactInfo contactInfo,
             TimeslotSchedule timeslotSchedule,
-            IList<CustomAttribute> customAttributes)
+            IDictionary<string, string> customAttributes)
         {
             Listing listing;
             bool isNewListing = listingId.IsNullOrEmpty();
