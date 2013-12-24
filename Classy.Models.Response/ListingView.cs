@@ -28,9 +28,7 @@ namespace Classy.Models.Response
         public IList<CommentView> Comments { get; set; }
         //
         public bool HasPricingInfo { get; set; }
-        public string SKU { get; set; }
-        public double? Price { get; set; }
-        public double? CompareAtPrice { get; set; }
+        public PricingInfoView PricingInfo { get; set; }
         //
         public bool HasContactInfo { get; set; }
         public ContactInfoView ContactInfo { get; set; }

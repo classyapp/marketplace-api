@@ -86,7 +86,7 @@ namespace Classy.Repository
                     .Set(x => x.Title, listing.Title)
                     .Set(x => x.Content, listing.Content);
                 if (listing.ContactInfo != null) update.Set(x => x.ContactInfo, listing.ContactInfo);
-                if (listing.Pricing != null) update.Set(x => x.Pricing, listing.Pricing);
+                if (listing.PricingInfo != null) update.Set(x => x.PricingInfo, listing.PricingInfo);
                 if (listing.SchedulingTemplate != null) update.Set(x => x.SchedulingTemplate, listing.SchedulingTemplate);
                 if (listing.Metadata != null) update.Set(x => x.Metadata, listing.Metadata);
 
@@ -235,11 +235,11 @@ namespace Classy.Repository
             }
             if (priceMin.HasValue)
             {
-                queries.Add(Query<Listing>.GTE(x => x.Pricing.Price, priceMin));
+                queries.Add(Query<Listing>.GTE(x => x.PricingInfo.Price, priceMin));
             }
             if (priceMax.HasValue)
             {
-                queries.Add(Query<Listing>.LTE(x => x.Pricing.Price, priceMax));
+                queries.Add(Query<Listing>.LTE(x => x.PricingInfo.Price, priceMax));
             }
             if (location != null)
             {

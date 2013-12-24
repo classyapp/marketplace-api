@@ -49,9 +49,11 @@
     <Compile Include="MediaFileView.cs" />
     <Compile Include="PhysicalAddressView.cs" />
     <Compile Include="PostReviewResponse.cs" />
+    <Compile Include="PricingInfoView.cs" />
     <Compile Include="ProfileView.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="ProxyClaimView.cs" />
+    <Compile Include="PurchaseOptionView.cs" />
     <Compile Include="ReviewView.cs" />
     <Compile Include="ProfessionalInfoView.cs" />
     <Compile Include="SubTransactionView.cs" />

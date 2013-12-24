@@ -40,7 +40,7 @@ namespace Classy.Models
         public ContactInfo ContactInfo { get; set; }
 
         // pricing info
-        public PricingInfo Pricing { get; set; }
+        public PricingInfo PricingInfo { get; set; }
 
         // booking and scheduling
         public TimeslotSchedule SchedulingTemplate { get; set; }

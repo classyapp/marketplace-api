@@ -14,15 +14,10 @@ namespace classy
         {
             var to = from.TranslateTo<ListingView>();
             if (from.ExternalMedia != null) to.ExternalMedia = from.ExternalMedia.ToMediaFileList();
-            to.HasPricingInfo = from.Pricing != null;
+            to.HasPricingInfo = from.PricingInfo != null;
             if (to.HasPricingInfo)
             {
-                to.Price = from.Pricing.Price;
-                to.CompareAtPrice = from.Pricing.CompareAtPrice;
-                to.DomesticRadius = from.Pricing.DomesticRadius;
-                to.DomesticShippingPrice = from.Pricing.DomesticShippingPrice;
-                to.InternationalShippingPrice = from.Pricing.InternationalShippingPrice;
-                to.Quantity = from.Pricing.Quantity;
+                to.PricingInfo = from.PricingInfo.ToPricingInfoView();
             }
             to.HasContactInfo = from.ContactInfo != null;
             if (to.HasContactInfo)

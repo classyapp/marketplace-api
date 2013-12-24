@@ -51,11 +51,11 @@ namespace classy.Manager
         {
             // get the listing
             var listing = GetVerifiedListing(appId, listingId);
-            if (listing.Pricing == null) throw new ApplicationException("this listing cannot be purchased");
+            if (listing.PricingInfo == null) throw new ApplicationException("this listing cannot be purchased");
             var profile = ProfileRepository.GetById(appId, listing.ProfileId, false);
 
             // calculate the price of the sku
-            var price = listing.Pricing.GetPriceForSKU(sku);
+            var price = listing.PricingInfo.GetPriceForSKU(sku);
             var shipping = ShippingCalculator.GetShippingPrice(profile, listing.ContactInfo.Location, shippingAddress);
             var tax = TaxCalculator.CalculateTax(profile, price, shippingAddress);
             var orderTotal = (price * quantity) + shipping + tax;

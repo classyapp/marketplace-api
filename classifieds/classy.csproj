@@ -115,6 +115,7 @@
     <Compile Include="DTO\Request\UpdateSingleItemOrder.cs" />
     <Compile Include="Extentions\CommentViewExtensions.cs" />
     <Compile Include="Extentions\ContactInfoViewExtensions.cs" />
+    <Compile Include="Extentions\PricingInfoViewExtensions.cs" />
     <Compile Include="Extentions\MediaFileViewExtensions.cs" />
     <Compile Include="Extentions\LocationViewExtensions.cs" />
     <Compile Include="Extentions\ReviewViewExtensions.cs" />
