@@ -256,7 +256,8 @@ namespace classy.Manager
             string reviewerProfileId,
             string listingId,
             string content,
-            int score)
+            decimal score,
+            IDictionary<string, decimal> subCriteria)
         {
             // get the listing
             var listing = GetVerifiedListing(appId, listingId);
@@ -276,6 +277,7 @@ namespace classy.Manager
                 ListingId = listingId,
                 Content = content,
                 Score = score,
+                SubCriteria = subCriteria,
                 IsPublished = app.AllowUnmoderatedReviews
             };
             ReviewRepository.Save(review);
@@ -285,9 +287,11 @@ namespace classy.Manager
             TripleStore.LogActivity(appId, reviewerProfileId, Classy.Models.ActivityPredicate.Review, listing.Id, ref exists);
             if (exists) throw new ApplicationException("this user already submitted a review for this listing");
 
-            // increase the review count for the merchant, and the average score
+            // increase the review count for the merchant, and the average score + avg score for all sub criteria
+            // TODO : does this eve belog here? what about sub criteria for listings? for each listing type? aaaarghhh!!!
             revieweeProfile.ReviewAverageScore =
                 ((revieweeProfile.ReviewAverageScore * revieweeProfile.ReviewCount) + score) / (++revieweeProfile.ReviewCount);
+           
             ProfileRepository.IncreaseCounter(appId, revieweeProfile.Id, ProfileCounters.Reviews, 1);
             ProfileRepository.Save(revieweeProfile);
 
@@ -300,7 +304,8 @@ namespace classy.Manager
             string reviewerProfileId,
             string revieweeProfileId,
             string content,
-            int score,
+            decimal score,
+            IDictionary<string, decimal> subCriteria,
             ContactInfo contactInfo,
             IList<CustomAttribute> metadata)
         {
@@ -328,6 +333,7 @@ namespace classy.Manager
                 ListingId = null,
                 Content = content,
                 Score = score,
+                SubCriteria = subCriteria,
                 IsPublished = app.AllowUnmoderatedReviews
             };
             ReviewRepository.Save(review);
@@ -349,6 +355,23 @@ namespace classy.Manager
             // increase the review count for the merchant, and the average score
             revieweeProfile.ReviewAverageScore =
                 ((revieweeProfile.ReviewAverageScore * revieweeProfile.ReviewCount) + score) / (++revieweeProfile.ReviewCount);
+            // increase the review count for the merchant, and the average score + avg score for all sub criteria
+            revieweeProfile.ReviewAverageScore =
+                ((revieweeProfile.ReviewAverageScore * revieweeProfile.ReviewCount) + score) / (++revieweeProfile.ReviewCount);
+            if (revieweeProfile.ReviewAverageSubCriteria == null)
+                revieweeProfile.ReviewAverageSubCriteria = new Dictionary<string, decimal>();
+            foreach (var k in subCriteria.Keys)
+            {
+                decimal subScore = subCriteria[k];
+                if (revieweeProfile.ReviewAverageSubCriteria.ContainsKey(k))
+                {
+                    revieweeProfile.ReviewAverageSubCriteria[k] = ((revieweeProfile.ReviewAverageSubCriteria[k] * revieweeProfile.ReviewCount) + subScore) / (revieweeProfile.ReviewCount);
+                }
+                else
+                {
+                    revieweeProfile.ReviewAverageSubCriteria.Add(k, subScore);
+                }
+            }
             ProfileRepository.IncreaseCounter(appId, revieweeProfile.Id, ProfileCounters.Reviews, 1);
             ProfileRepository.Save(revieweeProfile);
 

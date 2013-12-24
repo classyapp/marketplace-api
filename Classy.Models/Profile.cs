@@ -44,6 +44,7 @@ namespace Classy.Models
         public int ViewCount { get; set; }
         public int ReviewCount { get; set; }
         public decimal ReviewAverageScore { get; set; }
+        public IDictionary<string, decimal> ReviewAverageSubCriteria { get; set; }
         public IList<string> FolloweeUsernames { get; set; }
         public IList<CustomAttribute> Metadata { get; set; }
         public Seller SellerInfo { get; set; }

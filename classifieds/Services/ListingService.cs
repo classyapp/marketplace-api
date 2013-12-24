@@ -538,7 +538,8 @@ namespace classy.Services
                 session.UserAuthId,
                 request.ListingId,
                 request.Content,
-                request.Score);
+                request.Score,
+                request.SubCriteria);
             return new HttpResult(review, HttpStatusCode.OK);
         }
 
@@ -553,6 +554,7 @@ namespace classy.Services
                 request.RevieweeProfileId,
                 request.Content,
                 request.Score,
+                request.SubCriteria,
                 request.ContactInfo,
                 request.Metadata);
             var response = new PostReviewResponse

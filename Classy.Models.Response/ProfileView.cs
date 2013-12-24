@@ -24,6 +24,7 @@ namespace Classy.Models.Response
         public int ViewCount { get; set; }
         public int ReviewCount { get; set; }
         public decimal ReviewAverageScore { get; set; }
+        public IDictionary<string, decimal> ReviewAverageSubCriteria { get; set; }
         public bool IsVerified { get; set; }
         public bool IsSeller { get; set; }
         public bool IsProxy { get; set; }
