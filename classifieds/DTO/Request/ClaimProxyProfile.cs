@@ -9,7 +9,7 @@ namespace Classy.Models.Request
     public class ClaimProxyProfile : BaseRequestDto
     {
         public string ProxyProfileId { get; set; }
-        public Seller SellerInfo { get; set; }
+        public ProfessionalInfo ProfessionalInfo { get; set; }
         public IDictionary<string, string> Metadata { get; set; }
     }
 
@@ -17,7 +17,7 @@ namespace Classy.Models.Request
     {
         public ClaimProxyProfileValidator()
         {
-            RuleFor(x => x.SellerInfo).NotEmpty();
+            RuleFor(x => x.ProfessionalInfo).NotEmpty();
         }
     }
 }

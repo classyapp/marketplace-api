@@ -56,7 +56,7 @@
     <Compile Include="ContactInfo.cs" />
     <Compile Include="Profile.cs" />
     <Compile Include="ProxyClaim.cs" />
-    <Compile Include="Seller.cs" />
+    <Compile Include="ProfessionalInfo.cs" />
     <Compile Include="BankAccount.cs" />
     <Compile Include="BaseObject.cs" />
     <Compile Include="BookableTimeslot.cs" />

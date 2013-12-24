@@ -34,7 +34,7 @@ namespace classy.Manager
 
         public ProfileView CreateProfileProxy(
             string appId,
-            Seller sellerInfo,
+            ProfessionalInfo ProfessionalInfo,
             IDictionary<string, string> metadata)
         {
             if (metadata == null)
@@ -45,7 +45,7 @@ namespace classy.Manager
             var profile = new Profile
             {
                 AppId = appId,
-                SellerInfo = sellerInfo,
+                ProfessionalInfo = ProfessionalInfo,
                 Metadata = metadata
             };
 
@@ -59,9 +59,10 @@ namespace classy.Manager
             string partialUserName,
             string category,
             Location location,
-            IDictionary<string, string> metadata)
+            IDictionary<string, string> metadata,
+            bool professionalsOnly)
         {
-            var profileList = ProfileRepository.Search(appId, partialUserName, category, location, metadata);
+            var profileList = ProfileRepository.Search(appId, partialUserName, category, location, metadata, professionalsOnly);
             IList<ProfileView> results = new List<ProfileView>();
             foreach(var profile in profileList)
             {
@@ -149,13 +150,13 @@ namespace classy.Manager
         public ProfileView UpdateProfile(
             string appId,
             string profileId,
-            Seller sellerInfo,
+            ProfessionalInfo ProfessionalInfo,
             IDictionary<string, string> metadata)
         {
             var profile = GetVerifiedProfile(appId, profileId);
 
             // copy seller info
-            profile.SellerInfo = sellerInfo;
+            profile.ProfessionalInfo = ProfessionalInfo;
             // copy metadata 
             if (profile.Metadata != null)
             {
@@ -177,7 +178,7 @@ namespace classy.Manager
             string appId,
             string profileId,
             string proxyProfileId,
-            Seller sellerInfo,
+            ProfessionalInfo ProfessionalInfo,
             IDictionary<string, string> metadata)
         {
             var proxyProfile = GetVerifiedProfile(appId, proxyProfileId);
@@ -187,7 +188,7 @@ namespace classy.Manager
                 AppId = appId,
                 ProfileId = profileId,
                 ProxyProfileId = proxyProfileId,
-                SellerInfo = sellerInfo,
+                ProfessionalInfo = ProfessionalInfo,
                 Metadata = metadata
             };
             ProfileRepository.SaveProxyClaim(claim);
@@ -212,7 +213,7 @@ namespace classy.Manager
             var proxyProfile = GetVerifiedProfile(appId, claim.ProxyProfileId);
 
             // copy seller info from proxy to profile
-            profile.SellerInfo = claim.SellerInfo;
+            profile.ProfessionalInfo = claim.ProfessionalInfo;
             // copy metadata from proxy to profile
             if (profile.Metadata != null) {
                 if (claim.Metadata != null)
@@ -311,8 +312,8 @@ namespace classy.Manager
         {
             // get the merchant profile
             var revieweeProfile = GetVerifiedProfile(appId, revieweeProfileId);
-            if (!revieweeProfile.IsSeller && !revieweeProfile.IsProxy)
-                throw new ArgumentException("ProfileNotProxy");
+            if (!revieweeProfile.IsProfessional && !revieweeProfile.IsProxy)
+                throw new ArgumentException("ProfileNotProfessionalOrProxy");
             if (!revieweeProfile.IsProxy && (contactInfo != null || metadata != null))
                 throw new ArgumentException("ProfileNotProxy");
 

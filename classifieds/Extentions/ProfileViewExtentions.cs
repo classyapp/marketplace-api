@@ -16,11 +16,12 @@ namespace classy
             // contact info
             to.ContactInfo = from.ContactInfo.ToExtendedContactInfoView();
             // add merchant info
-            if (from.SellerInfo != null)
+            if (from.ProfessionalInfo != null)
             {
-                to.IsVerified = from.IsVerifiedSeller;
-                to.IsSeller = from.IsSeller;
-                to.SellerInfo = from.SellerInfo.ToSellerView();
+                to.IsVerifiedProfessional = from.IsVerifiedProfessional;
+                to.IsVendor = from.IsVendor;
+                to.IsProfessional = from.IsProfessional;
+                to.ProfessionalInfo = from.ProfessionalInfo.ToSellerView();
             }
             //proxy
             to.IsProxy = from.IsProxy;

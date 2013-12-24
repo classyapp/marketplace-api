@@ -204,7 +204,7 @@ namespace classy.Manager
             var profile = ProfileRepository.GetById(appId, listing.ProfileId, false);
 
             // can't publish a purchasable listing if 
-            if ((listing.Pricing != null || listing.SchedulingTemplate != null) && !profile.IsVerifiedSeller)
+            if ((listing.Pricing != null || listing.SchedulingTemplate != null) && !profile.IsVendor)
                 throw new ApplicationException("a listing with pricing or scheduling information can only be published by a merchant profile");
             
             // publish

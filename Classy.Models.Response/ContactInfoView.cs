@@ -7,7 +7,6 @@ namespace Classy.Models.Response
 {
     public class ContactInfoView
     {
-        public string Name { get; set; }
         public string FirstName { get; set; }
         public string LastName { get; set; }
         public LocationView Location { get; set; }
@@ -15,6 +14,8 @@ namespace Classy.Models.Response
         public string FacebookUrl { get; set; }
         public string TwitterUsername { get; set; }
         public string LinkedInProfileUrl { get; set; }
+
+        public string Name { get { return string.Concat(FirstName, " ", LastName); } }
     }
 
     public class ExtendedContactInfoView : ContactInfoView

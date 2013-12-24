@@ -42,10 +42,8 @@ namespace classy.Services
 
                 profile = ProfileManager.CreateProfileProxy(
                     request.AppId,
-                    new Seller {
-                        ContactInfo = new ContactInfo {
-                            Name = content[0]
-                        } 
+                    new ProfessionalInfo {
+                        CompanyName = content[0]
                     },
                     new Dictionary<string, string>());
                 profile.Metadata.Add("LicenseNo", content[1]);
@@ -53,7 +51,7 @@ namespace classy.Services
 
             //var profile = ProfileManager.CreateProfileProxy(
             //    request.AppId,
-            //    request.SellerInfo,
+            //    request.ProfessionalInfo,
             //    request.Metadata);
                 
             return new HttpResult(profile, HttpStatusCode.OK);
@@ -272,7 +270,7 @@ namespace classy.Services
                 request.AppId,
                 session.UserAuthId,
                 request.ProxyProfileId,
-                request.SellerInfo,
+                request.ProfessionalInfo,
                 request.Metadata);
 
             return new HttpResult(claim, HttpStatusCode.OK);
@@ -328,7 +326,7 @@ namespace classy.Services
             var profile = ProfileManager.UpdateProfile(
                 request.AppId,
                 request.ProfileId,
-                request.SellerInfo,
+                request.ProfessionalInfo,
                 request.Metadata);
 
             return new HttpResult(profile, HttpStatusCode.OK);
@@ -347,7 +345,8 @@ namespace classy.Services
                 request.DisplayName,
                 request.Category,
                 request.Location,
-                request.Metadata);
+                request.Metadata,
+                request.ProfessionalsOnly);
 
             return new HttpResult(profiles.Take(150), HttpStatusCode.OK);
         }

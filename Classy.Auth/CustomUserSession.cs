@@ -40,7 +40,6 @@ namespace Classy.Auth
             {
                 isNew = true;
                 profile = (session as CustomUserSession).TranslateTo<Profile>();
-                profile.ContactInfo.Name = session.DisplayName;
                 profile.ContactInfo.FirstName = session.FirstName;
                 profile.ContactInfo.LastName = session.LastName;
                 profile.ContactInfo.Email = session.Email;
@@ -50,10 +49,9 @@ namespace Classy.Auth
             {
                 if (authToken.Provider == FacebookAuthProvider.Name)
                 {
-                    profile.FacebookName = authToken.DisplayName;
-                    profile.FacebookFirstName = authToken.FirstName;
-                    profile.FacebookLastName = authToken.LastName;
-                    profile.FacebookEmail = authToken.Email;
+                    profile.ContactInfo.FirstName = authToken.FirstName;
+                    profile.ContactInfo.LastName = authToken.LastName;
+                    profile.ContactInfo.Email = authToken.Email;
                     if (isNew)
                     {
                         profile.ImageUrl = SaveFileFromUrl(storage, session.UserAuthId,  
@@ -62,7 +60,7 @@ namespace Classy.Auth
                 }
                 else if (authToken.Provider == TwitterAuthProvider.Name)
                 {
-                    profile.TwitterName = authToken.DisplayName;
+                    
                 }
             }
 

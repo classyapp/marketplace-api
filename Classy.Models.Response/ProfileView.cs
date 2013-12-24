@@ -25,10 +25,11 @@ namespace Classy.Models.Response
         public int ReviewCount { get; set; }
         public decimal ReviewAverageScore { get; set; }
         public IDictionary<string, decimal> ReviewAverageSubCriteria { get; set; }
-        public bool IsVerified { get; set; }
-        public bool IsSeller { get; set; }
+        public bool IsVerifiedProfessional { get; set; }
+        public bool IsProfessional { get; set; }
+        public bool IsVendor { get; set; }
         public bool IsProxy { get; set; }
-        public SellerView SellerInfo { get; set; }
+        public ProfessionalInfoView ProfessionalInfo { get; set; }
         public int Rank { get; set; }
         public IList<string> FolloweeUsernames { get; set; }
         public IList<ProfileView> Following { get; set; }

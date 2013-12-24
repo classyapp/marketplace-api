@@ -28,13 +28,8 @@ namespace Classy.Models
         public string UserName { get; set; }
         public string TwitterUserId { get; set; }
         public string TwitterScreenName { get; set; }
-        public string TwitterName { get; set; }
-        public string FacebookName { get; set; }
-        public string FacebookFirstName { get; set; }
-        public string FacebookLastName { get; set; }
         public string FacebookUserId { get; set; }
         public string FacebookUserName { get; set; }
-        public string FacebookEmail { get; set; }
         public string ImageUrl { get; set; }
         public int Rank { get; set; }
         public int FollowerCount { get; set; }
@@ -47,24 +42,33 @@ namespace Classy.Models
         public IDictionary<string, decimal> ReviewAverageSubCriteria { get; set; }
         public IList<string> FolloweeUsernames { get; set; }
         public IDictionary<string, string> Metadata { get; set; }
-        public Seller SellerInfo { get; set; }
+        public ProfessionalInfo ProfessionalInfo { get; set; }
 
         //
-        public bool IsSeller {
+        public bool IsProfessional {
             get {
-                return this.SellerInfo != null;
+                return this.ProfessionalInfo != null;
             }
         }
 
         //
-        public bool IsVerifiedSeller
+        public bool IsVendor
+        {
+            get
+            {
+                return this.ProfessionalInfo != null &&
+                    this.ProfessionalInfo.PaymentDetails != null;
+            }
+        }
+
+        //
+        public bool IsVerifiedProfessional
         {
             get
             {
                 return
-                    this.IsSeller &&
-                    this.ReviewAverageScore >= 2 &&
-                    this.SellerInfo.PaymentDetails != null;
+                    this.IsProfessional &&
+                    this.ReviewAverageScore >= 2;
             }
         }
 

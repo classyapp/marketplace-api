@@ -10,10 +10,10 @@ namespace classy
 {
     public static class SellerViewExtentions
     {
-        public static SellerView ToSellerView(this Seller from)
+        public static ProfessionalInfoView ToSellerView(this ProfessionalInfo from)
         {
-            var to = from.TranslateTo<SellerView>();
-            to.ContactInfo = from.ContactInfo.ToExtendedContactInfoView();
+            var to = from.TranslateTo<ProfessionalInfoView>();
+            to.CompanyContactInfo = from.CompanyContactInfo.ToExtendedContactInfoView();
             return to;
         }
     }
