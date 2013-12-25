@@ -416,7 +416,7 @@ namespace classy.Manager
         private Listing GetVerifiedListing(string appId, string listingId, bool increaseViewCounter)
         {
             var listing = ListingRepository.GetById(listingId, appId, true, increaseViewCounter);
-            if (listing == null) throw new ArgumentException("invalid listing id");
+            if (listing == null) throw new KeyNotFoundException("invalid listing id");
             return listing;
         }
     }

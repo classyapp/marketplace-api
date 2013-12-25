@@ -422,7 +422,7 @@ namespace classy.Manager
         private Profile GetVerifiedProfile(string appId, string profileId)
         {
             var profile = ProfileRepository.GetById(appId, profileId, false);
-            if (profile == null) throw new ArgumentException("invalid profile");
+            if (profile == null) throw new KeyNotFoundException("invalid profile");
             return profile;
         }
 
@@ -435,7 +435,7 @@ namespace classy.Manager
         private Listing GetVerifiedListing(string appId, string listingId)
         {
             var listing = ListingRepository.GetById(listingId, appId, false, false);
-            if (listing == null) throw new ArgumentException("invalid listing");
+            if (listing == null) throw new KeyNotFoundException("invalid listing");
             return listing;
         }
 
@@ -449,7 +449,7 @@ namespace classy.Manager
         private Review GetVerifiedReview(string appId, string reviewId, string profileId)
         {
             var review = ReviewRepository.GetById(appId, reviewId);
-            if (review == null) throw new ArgumentException("invalid review");
+            if (review == null) throw new KeyNotFoundException("invalid review");
             if (review.RevieweeProfileId != profileId) throw new UnauthorizedAccessException("unauthorized");
             return review;
         }

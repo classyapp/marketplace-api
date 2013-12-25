@@ -232,7 +232,7 @@ namespace classy.Manager
         private Order GetVerifiedOrder(string appId, string orderId)
         {
             var order = OrderRepository.GetById(appId, orderId, false);
-            if (order == null) throw new ArgumentException("invalid order");
+            if (order == null) throw new KeyNotFoundException("invalid order");
             return order;
         }
     }
