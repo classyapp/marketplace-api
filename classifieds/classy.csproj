@@ -131,7 +131,6 @@
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
     <Compile Include="Manager\DefaultAnalyticsManager.cs" />
-    <Compile Include="Manager\DefaultCollectionManager.cs" />
     <Compile Include="Manager\IAnalyticsManager.cs" />
     <Compile Include="Manager\ICollectionManager.cs" />
     <Compile Include="Manager\IReviewManager.cs" />

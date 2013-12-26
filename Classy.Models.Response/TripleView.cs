@@ -18,7 +18,8 @@ namespace Classy.Models.Response
         Comment = 128,
         PostListing = 256,
         Review = 512,
-        ProContact = 1024
+        ProContact = 1024,
+        SaveToCollection = 2048
     }
 
     public class TripleView

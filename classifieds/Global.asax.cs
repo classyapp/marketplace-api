@@ -98,6 +98,7 @@ namespace classy
                         c.TryResolve<IListingRepository>(),
                         c.TryResolve<ICommentRepository>(),
                         c.TryResolve<IProfileRepository>(),
+                        c.TryResolve<ICollectionRepository>(),
                         c.TryResolve<ITripleStore>(),
                         c.TryResolve<IStorageRepository>()));
                 container.Register<IProfileManager>(c =>
@@ -117,11 +118,13 @@ namespace classy
                         c.TryResolve<ICollectionRepository>(),
                         c.TryResolve<ITripleStore>()));
                 container.Register<ICollectionManager>(c =>
-                    new DefaultCollectionManager(
-                        c.TryResolve<ICollectionRepository>(),
+                    new DefaultListingManager(
                         c.TryResolve<IListingRepository>(),
+                        c.TryResolve<ICommentRepository>(),
                         c.TryResolve<IProfileRepository>(),
-                        c.TryResolve<ITripleStore>()));
+                        c.TryResolve<ICollectionRepository>(),
+                        c.TryResolve<ITripleStore>(),
+                        c.TryResolve<IStorageRepository>()));
                 container.Register<IAnalyticsManager>(c =>
                     new DefaultAnalyticsManager(
                         c.TryResolve<ITripleStore>()));
