@@ -53,6 +53,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="App.cs" />
+    <Compile Include="Collection.cs" />
     <Compile Include="ContactInfo.cs" />
     <Compile Include="Profile.cs" />
     <Compile Include="ProxyClaim.cs" />

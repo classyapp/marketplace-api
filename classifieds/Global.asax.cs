@@ -156,39 +156,49 @@ namespace classy
             {
                 Routes
                     // Listings
-                    .Add<GetListingById>("/listings/{ListingId}", "GET") // get listing by id, update listing
-                    .Add<PostListing>("/listings/new", "POST") // post new listing
-                    .Add<AddExternalMedia>("/listings/{ListingId}/media", "POST") // add media files and associate with listing
-                    .Add<DeleteExternalMedia>("/listings/{ListingId}/media", "DELETE")
-                    .Add<PublishListing>("/listings/{ListingId}/publish", "POST") // publish a post to the public
-                    .Add<PostListing>("/listings/{ListingId}", "PUT") // update listing
-                    .Add<SearchListings>("/listings/search", ApplyTo.Get | ApplyTo.Post) // search listings by tag and/or metadata
+                    .Add<GetListingById>("/listing/{ListingId}", "GET") // get listing by id, update listing
+                    .Add<PostListing>("/listing/new", "POST") // post new listing
+                    .Add<AddExternalMedia>("/listing/{ListingId}/media", "POST") // add media files and associate with listing
+                    .Add<DeleteExternalMedia>("/listing/{ListingId}/media", "DELETE")
+                    .Add<PublishListing>("/listing/{ListingId}/publish", "POST") // publish a post to the public
+                    .Add<PostListing>("/listing/{ListingId}", "PUT") // update listing
+                    .Add<SearchListings>("/listing/search", ApplyTo.Get | ApplyTo.Post) // search listings by tag and/or metadata
                     .Add<SearchListings>("/tags/{tag}", "GET") // search with a nicer url for tag
-                    .Add<GetListingsByUsername>("/profile/{Username}/listings", "GET") // get list of listing for profile
+                    .Add<GetListingsByUsername>("/profile/{Username}/listing/all", "GET") // get list of listing for profile
+
+                    // Collections
+                    //.Add(CreateCollection)("/collection/new", "POST") // create a new collection
+                    //.Add(AddListingsToCollection)("/collection/{collectionId}/listing", "POST") // add listings to collection
+                    //.Add(RemoveListingsFromCollection)("/collection/{collectionId}/listing", "DELETE") // remove listings to collection
+                    //.Add(AddCollaboratorsToCollection)("/collection/{collectionId}/collaborator", "POST") // add collaborators to collection
+                    //.Add(RemoveCollaboratorsFromCollection)("/collection/{collectionId}/collaborator", "DELETE") // remove collaborators to collection
+                    //.Add(AddPermittedViewersToCollection)("/collection/{collectionId}/viewer", "POST") // add view premissions to profiles
+                    //.Add(RemovePermittedViewersFromCollection)("/collection/{collectionId}/viewer", "DELETE") // remove view permissions
+                    //.Add(UpdateCollection)("/collection/{collectionId}", "PUT") // update collection details
 
                     // Comments
-                    .Add<PostComment>("/listings/{ListingId}/comments/new", "POST") // post new comment
-                    //.Add<PublishComment>("/listings/{ListingId}}/comments/{CommentId}/publish", "POST")
-                    //.Add<DeleteComment>("/listings/{ListingId}/comment/{CommentId}", "DELETE")
+                    .Add<PostComment>("/listing/{ListingId}/comment/new", "POST") // post new comment
+                    //.Add<PublishComment>("/listing/{ListingId}}/comment/{CommentId}/publish", "POST")
+                    //.Add<DeleteComment>("/listing/{ListingId}/comment/{CommentId}", "DELETE")
 
                     // Social Actions
-                    .Add<FavoriteListing>("/listings/{ListingId}/favorite", "POST") // favorite
-                    //.Add<FavoriteListing>("/listings/{ListingId}/favorite", "DELETE") // un-favorite
+                    .Add<FavoriteListing>("/listing/{ListingId}/favorite", "POST") // favorite
+                    //.Add<FavoriteListing>("/listing/{ListingId}/favorite", "DELETE") // un-favorite
                     .Add<FollowProfile>("/profile/{FolloweeUsername}/follow", "POST") // follow
                     //.Add<FollowProfile>("/profile/{FolloweeUsername/follow", "DELETE") // un-follow
-                    .Add<FlagListing>("/listings/{ListingId}/flag", "POST") // flag a listing
+                    .Add<FlagListing>("/listing/{ListingId}/flag", "POST") // flag a listing
 
                     // Scheduling and Booking
-                    .Add<BookListing>("/listings/{ListingId}/schedule/book", "POST")
-                    .Add<GetBookingsForListing>("/listings/{ListingId}/schedule", "GET")
+                    .Add<BookListing>("/listing/{ListingId}/schedule/book", "POST")
+                    .Add<GetBookingsForListing>("/listing/{ListingId}/schedule", "GET")
                     .Add<GetBookingsForProfileListings>("/profile/schedule", "GET") // get all the entire calendar for the profile's listing portfolio
                     .Add<GetBookingsForProfile>("/profile/schedule/my", "GET") // get all bookings made by the user
                     .Add<UpdateBooking>("/profile/schedule/booking/{BookingId}", "PUT")
                     .Add<CancelBooking>("/profile/schedule/booking/{BookingId}", "DELETE")
 
                     // Purchasing
-                    .Add<PurchaseSingleItem>("/listings/{ListingId}/buy", "POST")
-                    .Add<GetOrdersForListing>("/listings/{ListingId}/orders", "GET")
+                    .Add<PurchaseSingleItem>("/listing/{ListingId}/buy", "POST")
+                    .Add<GetOrdersForListing>("/listing/{ListingId}/orders", "GET")
                     .Add<GetOrdersForProfile>("/profile/me/purchases", "GET")
                     .Add<GetOrdersForProfileListings>("/profile/me/orders", "GET")
                     .Add<UpdateSingleItemOrder>("/profile/orders/{OrderId}", "PUT")
@@ -205,7 +215,7 @@ namespace classy
                     .Add<SearchProfiles>("/profile/search", ApplyTo.Get | ApplyTo.Post)
 
                     // Reviews
-                    .Add<PostReviewForListing>("/listings/{ListingId}/reviews/new", "POST")
+                    .Add<PostReviewForListing>("/listing/{ListingId}/reviews/new", "POST")
                     .Add<PostReviewForProfile>("/profile/{RevieweeProfileId}/reviews/new", "POST")
                     .Add<GetReviewsByProfileId>("/profile/{ProfileId}/reviews", "GET")
                     .Add<PublishOrDeleteReview>("/profile/reviews/{ReviewId}/publish", "POST")
