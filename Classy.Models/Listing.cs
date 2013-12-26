@@ -44,7 +44,7 @@ namespace Classy.Models
 
         // booking and scheduling
         public TimeslotSchedule SchedulingTemplate { get; set; }
-        public IList<BookedTimeslot> BookedTimeslots { get; set; }
+        //public IList<BookedTimeslot> BookedTimeslots { get; set; }
 
         // custom metadata
         public IDictionary<string, string> Metadata { get; set; }

@@ -25,13 +25,8 @@ namespace classy
                 to.ContactInfo = from.ContactInfo.ToExtendedContactInfoView();
             }
             to.HasSchedulingInfo = from.SchedulingTemplate != null;
-            if (to.HasSchedulingInfo && from.BookedTimeslots != null)
-            {
-                to.BookedTimeslots = new List<BookedTimeslotView>();
-                foreach (var b in from.BookedTimeslots)
-                {
-                    to.BookedTimeslots.Add(b.TranslateTo<BookedTimeslotView>());
-                }; 
+            if (to.HasSchedulingInfo)
+            {   
                 to.SchedulingTemplate = from.SchedulingTemplate.TranslateTo<TimeslotScheduleView>();
             }
             return to;
