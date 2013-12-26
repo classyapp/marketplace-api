@@ -143,7 +143,7 @@ namespace classy.Manager
             if (includeCollections)
             {
                 var collections = CollectionRepository.GetByProfileId(appId, profileId);
-                profileView.Collections = collections.TranslateTo<List<CollectionView>>();
+                profileView.Collections = collections.ToCollectionViewList();
             }
 
             if (logImpression)
