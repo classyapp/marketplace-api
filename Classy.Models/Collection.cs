@@ -12,7 +12,7 @@ namespace Classy.Models
     public class Collection : BaseObject
     {
         /// <summary>
-        /// the owner
+        /// the profile id of the collection owner
         /// </summary>
         public string ProfileId { get; set; }
         /// <summary>
@@ -40,5 +40,17 @@ namespace Classy.Models
         /// when the collection is public, this list is irrelevant
         /// </summary>
         public IList<string> PermittedViewers { get; set; }
+        /// <summary>
+        /// the number of comments for this collection
+        /// </summary>
+        public int CommentCount { get; set; }
+        /// <summary>
+        /// the number of times users viewed this collection
+        /// </summary>
+        public int ViewCount { get; set; }
+        /// <summary>
+        /// the number of times people favorited this collection
+        /// </summary>
+        public int FavoriteCount { get; set; }
     }
 }

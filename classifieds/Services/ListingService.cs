@@ -26,6 +26,7 @@ namespace classy.Services
         public IListingManager ListingManager { get; set; }
         public IProfileManager ProfileManager { get; set; }
         public IReviewManager ReviewManager { get; set; }
+        public ICollectionManager CollectionManager { get; set; }
         public IAnalyticsManager AnalyticsManager { get; set; }
 
         [CustomAuthenticate]
@@ -405,6 +406,7 @@ namespace classy.Services
                     false,
                     false,
                     false,
+                    false,
                     false);
                 return new HttpResult(profile);
             }
@@ -425,6 +427,7 @@ namespace classy.Services
                     request.IncludeFollowingProfiles,
                     request.IncludeReviews,
                     request.IncludeListings,
+                    request.IncludeCollections,
                     request.LogImpression);
 
                 return new HttpResult(profile, HttpStatusCode.OK);
@@ -787,12 +790,14 @@ namespace classy.Services
                         false,
                         false,
                         false,
+                        false,
                         false);
                 if (request.ReturnReviewerProfile)
                     response.ReviewerProfile = ProfileManager.GetProfileById(
                         request.AppId,
                         session.UserAuthId,
                         null,
+                        false,
                         false,
                         false,
                         false,
@@ -874,6 +879,50 @@ namespace classy.Services
             if (!session.IsAuthenticated && request.SubjectId != "guest") throw new ApplicationException("when no user logged in, SubjectId must be 'guest'");
             var tripleView = AnalyticsManager.LogActivity(request.AppId, request.SubjectId, Classy.Models.ActivityPredicate.ProContact, request.ObjectId);
             return new HttpResult(tripleView, HttpStatusCode.OK);
+        }
+
+        //
+        // POST: /collection/new
+        // create a new collection
+        [CustomAuthenticate]
+        public object Post(CreateCollection request)
+        {
+            try
+            {
+                var session = SessionAs<CustomUserSession>();
+                var collection = CollectionManager.CreateCollection(
+                    request.AppId,
+                    session.UserAuthId,
+                    request.Title,
+                    request.Content,
+                    request.IsPublic,
+                    request.IncludedListings,
+                    request.Collaborators,
+                    request.PermittedViewers);
+                return new HttpResult(collection, HttpStatusCode.OK);
+            }
+            catch(KeyNotFoundException kex)
+            {
+                return new HttpError(HttpStatusCode.NotFound, kex.Message);
+            }
+        }
+
+        //
+        // GET: /collection/{CollectionId}
+        // get collection by id
+        public object Get(GetCollectionById request)
+        {
+            try
+            {
+                var collection = CollectionManager.GetCollectionById(
+                    request.AppId,
+                    request.CollectionId);
+                return new HttpResult(collection, HttpStatusCode.OK);
+            }
+            catch (KeyNotFoundException kex)
+            {
+                return new HttpError(HttpStatusCode.NotFound, kex.Message);
+            }
         }
     }
 }

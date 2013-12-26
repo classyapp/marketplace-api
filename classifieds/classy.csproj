@@ -84,6 +84,8 @@
     <Compile Include="DTO\Request\CancelBooking.cs" />
     <Compile Include="DTO\Request\CancelSingleItemOrder.cs" />
     <Compile Include="DTO\Request\ClaimProxyProfile.cs" />
+    <Compile Include="DTO\Request\GetCollectionById.cs" />
+    <Compile Include="DTO\Request\CreateCollection.cs" />
     <Compile Include="DTO\Request\GetSessionProfile.cs" />
     <Compile Include="DTO\Request\LogActivity.cs" />
     <Compile Include="DTO\Request\UpdateProfile.cs" />
@@ -128,7 +130,9 @@
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
     <Compile Include="Manager\DefaultAnalyticsManager.cs" />
+    <Compile Include="Manager\DefaultCollectionManager.cs" />
     <Compile Include="Manager\IAnalyticsManager.cs" />
+    <Compile Include="Manager\ICollectionManager.cs" />
     <Compile Include="Manager\IReviewManager.cs" />
     <Compile Include="Manager\DefaultAppManager.cs" />
     <Compile Include="Manager\DefaultBookingManager.cs" />

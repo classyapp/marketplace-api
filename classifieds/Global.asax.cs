@@ -71,6 +71,7 @@ namespace classy
                 container.Register<IBookingRepository>(new MongoBookingRepository());
                 container.Register<ITransactionRepository>(new MongoTransactionRepository());
                 container.Register<IOrderRepository>(new MongoOrderRepository());
+                container.Register<ICollectionRepository>(new MongoCollectionRepository());
                 container.Register<IAppManager>(c =>
                     new DefaultAppManager());
                 container.Register<IPaymentGateway>(c => 
@@ -105,6 +106,7 @@ namespace classy
                         c.TryResolve<IProfileRepository>(),
                         c.TryResolve<IListingRepository>(),
                         c.TryResolve<IReviewRepository>(),
+                        c.TryResolve<ICollectionRepository>(),
                         c.TryResolve<ITripleStore>()));
                 container.Register<IReviewManager>(c =>
                     new DefaultProfileManager(
@@ -112,6 +114,13 @@ namespace classy
                         c.TryResolve<IProfileRepository>(),
                         c.TryResolve<IListingRepository>(),
                         c.TryResolve<IReviewRepository>(),
+                        c.TryResolve<ICollectionRepository>(),
+                        c.TryResolve<ITripleStore>()));
+                container.Register<ICollectionManager>(c =>
+                    new DefaultCollectionManager(
+                        c.TryResolve<ICollectionRepository>(),
+                        c.TryResolve<IListingRepository>(),
+                        c.TryResolve<IProfileRepository>(),
                         c.TryResolve<ITripleStore>()));
                 container.Register<IAnalyticsManager>(c =>
                     new DefaultAnalyticsManager(
@@ -167,14 +176,15 @@ namespace classy
                     .Add<GetListingsByUsername>("/profile/{Username}/listing/all", "GET") // get list of listing for profile
 
                     // Collections
-                    //.Add(CreateCollection)("/collection/new", "POST") // create a new collection
-                    //.Add(AddListingsToCollection)("/collection/{collectionId}/listing", "POST") // add listings to collection
-                    //.Add(RemoveListingsFromCollection)("/collection/{collectionId}/listing", "DELETE") // remove listings to collection
-                    //.Add(AddCollaboratorsToCollection)("/collection/{collectionId}/collaborator", "POST") // add collaborators to collection
-                    //.Add(RemoveCollaboratorsFromCollection)("/collection/{collectionId}/collaborator", "DELETE") // remove collaborators to collection
-                    //.Add(AddPermittedViewersToCollection)("/collection/{collectionId}/viewer", "POST") // add view premissions to profiles
-                    //.Add(RemovePermittedViewersFromCollection)("/collection/{collectionId}/viewer", "DELETE") // remove view permissions
-                    //.Add(UpdateCollection)("/collection/{collectionId}", "PUT") // update collection details
+                    .Add<CreateCollection>("/collection/new", "POST") // create a new collection
+                    //.Add<AddListingsToCollection>("/collection/{CollectionId}/listing", "POST") // add listings to collection
+                    //.Add<RemoveListingsFromCollection>("/collection/{CollectionId}/listing", "DELETE") // remove listings to collection
+                    //.Add<AddCollaboratorsToCollection>("/collection/{CollectionId}/collaborator", "POST") // add collaborators to collection
+                    //.Add<RemoveCollaboratorsFromCollection>("/collection/{CollectionId}/collaborator", "DELETE") // remove collaborators to collection
+                    //.Add<AddPermittedViewersToCollection>("/collection/{CollectionId}/viewer", "POST") // add view premissions to profiles
+                    //.Add<RemovePermittedViewersFromCollection>("/collection/{CollectionId}/viewer", "DELETE") // remove view permissions
+                    //.Add<UpdateCollection>("/collection/{CollectionId}", "PUT") // update collection details
+                    .Add<GetCollectionById>("/collection/{CollectionId}", "GET") // get a collection by id
 
                     // Comments
                     .Add<PostComment>("/listing/{ListingId}/comment/new", "POST") // post new comment

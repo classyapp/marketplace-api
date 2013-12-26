@@ -42,6 +42,7 @@
     <Compile Include="BaseDeleteResponse.cs" />
     <Compile Include="CancelBookingResponse.cs" />
     <Compile Include="CancelOrderResponse.cs" />
+    <Compile Include="CollectionView.cs" />
     <Compile Include="CommentView.cs" />
     <Compile Include="ContactInfoView.cs" />
     <Compile Include="ListingView.cs" />

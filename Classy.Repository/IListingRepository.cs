@@ -17,7 +17,8 @@ namespace Classy.Repository
         Views = 8,
         Clicks = 16,
         Bookings = 32,
-        Purchases = 64
+        Purchases = 64,
+        AddToCollection = 128
     }
 
     public interface IListingRepository

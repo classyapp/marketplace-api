@@ -97,6 +97,7 @@ namespace classy.Manager
             bool includeFollowingProfiles,
             bool includeReviews,
             bool includeListings,
+            bool includeCollections,
             bool logImpression);
         
         /// <summary>

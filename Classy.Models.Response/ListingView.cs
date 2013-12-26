@@ -23,6 +23,7 @@ namespace Classy.Models.Response
         public int ClickCount { get; set; }
         public int BookingCount { get; set; }
         public int PurchaseCount { get; set; }
+        public int AddToCollectionCount { get; set; }
         public bool IsPublished { get; set; }
         //
         public IList<CommentView> Comments { get; set; }

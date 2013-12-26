@@ -36,6 +36,7 @@ namespace Classy.Models.Response
         public IList<ProfileView> FollowedBy { get; set; }
         public IList<ReviewView> Reviews { get; set; }
         public IList<ListingView> Listings { get; set; }
+        public IList<CollectionView> Collections { get; set; }
         public IDictionary<string, string> Metadata { get; set; }
     }
 }

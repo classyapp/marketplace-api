@@ -16,6 +16,7 @@ namespace classy.Manager
         private IProfileRepository ProfileRepository;
         private IListingRepository ListingRepository;
         private IReviewRepository ReviewRepository;
+        private ICollectionRepository CollectionRepository;
         private ITripleStore TripleStore;
 
         public DefaultProfileManager(
@@ -23,12 +24,14 @@ namespace classy.Manager
             IProfileRepository profileRepository,
             IListingRepository listingRepository,
             IReviewRepository reviewRepository,
+            ICollectionRepository collectionRepository,
             ITripleStore tripleStore)
         {
             AppManager = appManager;
             ProfileRepository = profileRepository;
             ListingRepository = listingRepository;
             ReviewRepository = reviewRepository;
+            CollectionRepository = collectionRepository;
             TripleStore = tripleStore;
         }
 
@@ -103,6 +106,7 @@ namespace classy.Manager
             bool includeFollowingProfiles,
             bool includeReviews,
             bool includeListings,
+            bool includeCollections,
             bool logImpression)
         {
             var profile = ProfileRepository.GetById(appId, profileId, logImpression);
@@ -134,6 +138,12 @@ namespace classy.Manager
             {
                 var listings = ListingRepository.GetByProfileId(appId, profileId, false);
                 profileView.Listings = listings.ToListingViewList();
+            }
+
+            if (includeCollections)
+            {
+                var collections = CollectionRepository.GetByProfileId(appId, profileId);
+                profileView.Collections = collections.TranslateTo<List<CollectionView>>();
             }
 
             if (logImpression)
