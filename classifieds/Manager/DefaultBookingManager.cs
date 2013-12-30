@@ -68,7 +68,7 @@ namespace classy.Manager
 
                 // log the booking activity
                 var tripleExists = false;
-                TripleStore.LogActivity(appId, profileId, Classy.Models.ActivityPredicate.Book, listingId, ref tripleExists);
+                TripleStore.LogActivity(appId, profileId, ActivityPredicate.BOOK_LISTING, listingId, ref tripleExists);
 
                 // return the transaction
                 return bookedTimeslot;
@@ -208,7 +208,7 @@ namespace classy.Manager
         /// <returns></returns>
         private Listing GetVerifiedListing(string appId, string listingId)
         {
-            var listing = ListingRepository.GetById(listingId, appId, false, false);
+            var listing = ListingRepository.GetById(listingId, appId, false);
             if (listing == null) throw new KeyNotFoundException("Invalid Listing");
             return listing;
         }

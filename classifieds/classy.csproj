@@ -84,6 +84,7 @@
     <Compile Include="DTO\Request\CancelBooking.cs" />
     <Compile Include="DTO\Request\CancelSingleItemOrder.cs" />
     <Compile Include="DTO\Request\ClaimProxyProfile.cs" />
+    <Compile Include="DTO\Request\AddListingToCollection.cs" />
     <Compile Include="DTO\Request\GetCollectionById.cs" />
     <Compile Include="DTO\Request\CreateCollection.cs" />
     <Compile Include="DTO\Request\GetSessionProfile.cs" />
@@ -127,6 +128,7 @@
     <Compile Include="Extentions\ProxyClaimViewExtentions.cs" />
     <Compile Include="Extentions\ListingViewExtensions.cs" />
     <Compile Include="Extentions\ProfileViewExtentions.cs" />
+    <Compile Include="DTO\Request\GetCollectionByProfileId.cs" />
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>

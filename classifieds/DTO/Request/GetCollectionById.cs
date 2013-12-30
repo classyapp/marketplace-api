@@ -13,5 +13,8 @@ namespace Classy.Models.Request
         public bool IncludeListings { get; set; }
         public bool IncludeCollaboratorProfiles { get; set; }
         public bool IncludePermittedViewersProfiles { get; set; }
+        public bool IncludeDrafts { get; set; }
+        public bool IncreaseViewCounter { get; set; }
+        public bool IncreaseViewCounterOnListings { get; set; }
     }
 }

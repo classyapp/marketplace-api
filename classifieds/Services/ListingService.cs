@@ -877,7 +877,7 @@ namespace classy.Services
         {
             var session = SessionAs<CustomUserSession>();
             if (!session.IsAuthenticated && request.SubjectId != "guest") throw new ApplicationException("when no user logged in, SubjectId must be 'guest'");
-            var tripleView = AnalyticsManager.LogActivity(request.AppId, request.SubjectId, Classy.Models.ActivityPredicate.ProContact, request.ObjectId);
+            var tripleView = AnalyticsManager.LogActivity(request.AppId, request.SubjectId, ActivityPredicate.CONTACT_PROFILE, request.ObjectId);
             return new HttpResult(tripleView, HttpStatusCode.OK);
         }
 
@@ -908,15 +908,61 @@ namespace classy.Services
         }
 
         //
+        // POST: /collection/{CollectionId}/listings
+        // add listings to a collection
+        [CustomAuthenticate]
+        public object Post(AddListingsToCollection request)
+        {
+            try
+            {
+                var session = SessionAs<CustomUserSession>();
+                var collection = CollectionManager.AddListingsToCollection(
+                    request.AppId,
+                    session.UserAuthId,
+                    request.CollectionId,
+                    request.IncludedListings);
+                return new HttpResult(collection, HttpStatusCode.OK);
+            }
+            catch(KeyNotFoundException kex)
+            {
+                return new HttpError(HttpStatusCode.NotFound, kex.Message);
+            }
+        }
+
+        //
         // GET: /collection/{CollectionId}
         // get collection by id
         public object Get(GetCollectionById request)
         {
             try
             {
+                var session = SessionAs<CustomUserSession>();
                 var collection = CollectionManager.GetCollectionById(
                     request.AppId,
-                    request.CollectionId);
+                    request.CollectionId,
+                    session.UserAuthId,
+                    request.IncludeDrafts,
+                    request.IncludeListings,
+                    request.IncreaseViewCounter,
+                    request.IncreaseViewCounterOnListings);
+                return new HttpResult(collection, HttpStatusCode.OK);
+            }
+            catch (KeyNotFoundException kex)
+            {
+                return new HttpError(HttpStatusCode.NotFound, kex.Message);
+            }
+        }
+
+        //
+        // GET: /profile/{ProfileId}/collection/list
+        // get collections by profile id
+        public object Get(GetCollectionByProfileId request)
+        {
+            try
+            {
+                var collection = CollectionManager.GetCollectionsByProfileId(
+                    request.AppId,
+                    request.ProfileId);
                 return new HttpResult(collection, HttpStatusCode.OK);
             }
             catch (KeyNotFoundException kex)

@@ -51,7 +51,7 @@ namespace classy.Manager
             bool includeFavoritedByProfiles)
         {
             // TODO: cache listings
-            var listing = GetVerifiedListing(appId, listingId, logImpression);
+            var listing = GetVerifiedListing(appId, listingId, requestedByProfileId);
             var listingView = listing.ToListingView();
 
             if (includeComments)
@@ -76,7 +76,7 @@ namespace classy.Manager
             }
             if (includeFavoritedByProfiles)
             {
-                var favProfileIds = TripleStore.GetActivitySubjectList(appId, Classy.Models.ActivityPredicate.Like, listing.Id).ToArray();
+                var favProfileIds = TripleStore.GetActivitySubjectList(appId, ActivityPredicate.FAVORITE_LISTING, listing.Id).ToArray();
                 var favProfiles = ProfileRepository.GetByIds(appId, favProfileIds);
                 listingView.FavoritedBy = new List<ProfileView>();
                 foreach (var p in favProfiles)
@@ -87,7 +87,7 @@ namespace classy.Manager
             if (logImpression)
             {
                 var exists = false;
-                TripleStore.LogActivity(appId, requestedByProfileId.IsNullOrEmpty() ? "guest" : requestedByProfileId, Classy.Models.ActivityPredicate.View, listing.Id, ref exists);
+                TripleStore.LogActivity(appId, requestedByProfileId.IsNullOrEmpty() ? "guest" : requestedByProfileId, ActivityPredicate.VIEW_LISTING, listing.Id, ref exists);
             }
             return listingView;
         }
@@ -313,13 +313,13 @@ namespace classy.Manager
 
             // log a comment activity
             var exists = false;
-            TripleStore.LogActivity(appId, profileId, Classy.Models.ActivityPredicate.Comment, listingId, ref exists);
+            TripleStore.LogActivity(appId, profileId, ActivityPredicate.COMMENT_ON_LISTING, listingId, ref exists);
 
             // save mentions
             foreach (var mentionedUsername in comment.Content.ExtractUsernames())
             {
                 var mentionedProfile = ProfileRepository.GetByUsername(appId, mentionedUsername.TrimStart('@'), false);
-                TripleStore.LogActivity(appId, profileId, Classy.Models.ActivityPredicate.Mention, mentionedProfile.Id, ref exists);
+                TripleStore.LogActivity(appId, profileId, ActivityPredicate.MENTION_PROFILE, mentionedProfile.Id, ref exists);
 
                 // increase rank of mentioned profile
                 ProfileRepository.IncreaseCounter(appId, mentionedProfile.Id, ProfileCounters.Rank, 1);
@@ -339,7 +339,7 @@ namespace classy.Manager
             var listing = GetVerifiedListing(appId, listingId);
 
             bool tripleExists = false;
-            TripleStore.LogActivity(appId, profileId, Classy.Models.ActivityPredicate.Like, listingId, ref tripleExists);
+            TripleStore.LogActivity(appId, profileId, ActivityPredicate.FAVORITE_LISTING, listingId, ref tripleExists);
             if (!tripleExists)
             {
                 ListingRepository.IncreaseCounter(listingId, appId, ListingCounters.Favorites, 1);
@@ -364,12 +364,12 @@ namespace classy.Manager
                 case FlagReason.Dislike:
                 default:
                     bool tripleExists = false;
-                    TripleStore.LogActivity(appId, profileId, Classy.Models.ActivityPredicate.Flag, listingId, ref tripleExists);
+                    TripleStore.LogActivity(appId, profileId, ActivityPredicate.FLAG_LISTING, listingId, ref tripleExists);
                     break;
             }
         }
 
-        public Collection CreateCollection(
+        public CollectionView CreateCollection(
             string appId,
             string profileId,
             string title,
@@ -399,12 +399,12 @@ namespace classy.Manager
                 var exists = false;
                 foreach (var listingId in includedListings)
                 {
-                    TripleStore.LogActivity(appId, profileId, Classy.Models.ActivityPredicate.SaveToCollection, listingId, ref exists);
+                    TripleStore.LogActivity(appId, profileId, ActivityPredicate.ADD_LISTING_TO_COLLECTION, listingId, ref exists);
                     if (!exists) ListingRepository.IncreaseCounter(listingId, appId, ListingCounters.AddToCollection, 1);
                 }
 
                 // return
-                return collection;
+                return collection.ToCollectionView();
             }
             catch (Exception)
             {
@@ -412,14 +412,36 @@ namespace classy.Manager
             }
         }
 
-        public Collection GetCollectionById(
+        public CollectionView GetCollectionById(
             string appId,
-            string collectionId)
+            string collectionId,
+            string profileId,
+            bool includeListings,
+            bool includeDrafts,
+            bool increaseViewCounter,
+            bool increaseViewCounterOnListings)
         {
             try
             {
                 var collection = GetVerifiedCollection(appId, collectionId);
-                return collection;
+                var collectionView = collection.ToCollectionView();
+                if (includeListings)
+                {
+                    collectionView.Listings = ListingRepository.GetById(collection.IncludedListings.ToArray(), appId, includeDrafts).ToListingViewList();
+                }
+                if (increaseViewCounter)
+                {
+                    var exists = false;
+                    TripleStore.LogActivity(appId, profileId, ActivityPredicate.VIEW_COLLECTION, collectionId, ref exists);
+                    //CollectionRepository.IncreaseCounter(appId, collectionId);
+                    if (increaseViewCounterOnListings)
+                    {
+                        ListingRepository.IncreaseCounter(collection.IncludedListings.ToArray(), appId, ListingCounters.Views, 1);
+                    }
+                //    var update = Update<Listing>.Inc(x => x.ViewCount, 1);
+                //    ListingsCollection.Update(query, update, new MongoUpdateOptions { Flags = UpdateFlags.Multi });
+                }
+                return collectionView;
             }
             catch (Exception)
             {
@@ -427,7 +449,7 @@ namespace classy.Manager
             }
         }
 
-        public IList<Collection> GetCollectionsByProfileId(
+        public IList<CollectionView> GetCollectionsByProfileId(
             string appId,
             string profileId)
         {
@@ -435,9 +457,41 @@ namespace classy.Manager
             {
                 var profile = GetVerifiedProfile(appId, profileId);
                 var collections = CollectionRepository.GetByProfileId(appId, profileId);
-                return collections;
+                return collections.ToCollectionViewList();
             }
             catch (Exception)
+            {
+                throw;
+            }
+        }
+
+        public CollectionView AddListingsToCollection(
+            string appId,
+            string profileId,
+            string collectionId,
+            string[] listingIds)
+        {
+            try
+            {
+                var collection = GetVerifiedCollection(appId, collectionId);
+                if (collection.ProfileId != profileId) throw new UnauthorizedAccessException();
+                // TODO: verify all listings exist
+                if (collection.IncludedListings == null) collection.IncludedListings = new List<string>();
+                // log an activity, and increase the counter for the listings that were included
+                var exists = false;
+                foreach (var listingId in listingIds)
+                {
+                    TripleStore.LogActivity(appId, profileId, ActivityPredicate.ADD_LISTING_TO_COLLECTION, listingId, ref exists);
+                    if (!exists)
+                    {
+                        collection.IncludedListings.Add(listingId);
+                        ListingRepository.IncreaseCounter(listingId, appId, ListingCounters.AddToCollection, 1);
+                    }
+                }
+                CollectionRepository.Update(collection);
+                return collection.ToCollectionView();
+            }
+            catch(Exception)
             {
                 throw;
             }
@@ -465,10 +519,10 @@ namespace classy.Manager
         /// <param name="profileId"></param>
         /// <param name="logImpression"></param>
         /// <returns></returns>
-        private Listing GetVerifiedListing(string appId, string listingId, string profileId, bool increaseViewCounter)
+        private Listing GetVerifiedListing(string appId, string listingId, string profileId, bool includeDrafts)
         {
             Listing listing;
-            listing = GetVerifiedListing(appId, listingId, increaseViewCounter);
+            listing = GetVerifiedListing(appId, listingId, includeDrafts);
             if (listing.ProfileId != profileId) throw new UnauthorizedAccessException("not authorized");
             return listing;
         }
@@ -491,23 +545,16 @@ namespace classy.Manager
         /// <param name="appId"></param>
         /// <param name="listingId"></param>
         /// <returns></returns>
-        private Listing GetVerifiedListing(string appId, string listingId)
+        private Listing GetVerifiedListing(string appId, string listingId, bool includeDrafts)
         {
-            return GetVerifiedListing(appId, listingId, false);
-        }
-
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="appId"></param>
-        /// <param name="listingId"></param>
-        /// <param name="logImpression"></param>
-        /// <returns></returns>
-        private Listing GetVerifiedListing(string appId, string listingId, bool increaseViewCounter)
-        {
-            var listing = ListingRepository.GetById(listingId, appId, true, increaseViewCounter);
+            var listing = ListingRepository.GetById(listingId, appId, includeDrafts);
             if (listing == null) throw new KeyNotFoundException("invalid listing id");
             return listing;
+        }
+
+        private Listing GetVerifiedListing(string appId, string listingId)
+        {
+            return ListingRepository.GetById(listingId, appId, false);
         }
     }
 }

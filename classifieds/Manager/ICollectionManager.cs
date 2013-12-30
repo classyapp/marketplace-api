@@ -1,4 +1,5 @@
 ﻿using Classy.Models;
+using Classy.Models.Response;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -24,7 +25,7 @@ namespace classy.Manager
         /// <param name="collaborators"></param>
         /// <param name="permittedViewers"></param>
         /// <returns>the created <see cref="Collection"/></returns>
-        Collection CreateCollection(
+        CollectionView CreateCollection(
             string appId,
             string profileId,
             string title,
@@ -35,22 +36,46 @@ namespace classy.Manager
             IList<string> permittedViewers);
 
         /// <summary>
-        /// get a specific <see cref="Collection"/> by id
-        /// </summary>
-        /// <param name="appId"></param>
-        /// <param name="collectionId"></param>
-        /// <returns>a <see cref="Collection"/> object</returns>
-        Collection GetCollectionById(
-            string appId,
-            string collectionId);
-
-        /// <summary>
-        /// get a list of a user's <see cref="Collection"/>s
+        /// adds listings to an existing collection
         /// </summary>
         /// <param name="appId"></param>
         /// <param name="profileId"></param>
-        /// <returns>a list of <see cref="Collection"/> objects</returns>
-        IList<Collection> GetCollectionsByProfileId(
+        /// <param name="collectionId"></param>
+        /// <param name="listingIds"></param>
+        /// <returns>the collection with the new listings added to the IncludedListings param</returns>
+        CollectionView AddListingsToCollection(
+            string appId,
+            string profileId,
+            string collectionId,
+            string[] listingIds);
+
+        /// <summary>
+        /// get a specific <see cref="CollectionView"/> by id
+        /// </summary>
+        /// <param name="appId"></param>
+        /// <param name="collectionId"></param>
+        /// <param name="profileId">the profile id of the authenticated user</param>
+        /// <param name="includeListings"></param>
+        /// <param name="includeDrafts"></param>
+        /// <param name="increaseViewCounter"></param>
+        /// <param name="increaseViewCounterOnListings"></param>
+        /// <returns>a <see cref="CollectionView"/> object</returns>
+        CollectionView GetCollectionById(
+            string appId,
+            string collectionId,
+            string profileId,
+            bool includeListings,
+            bool includeDrafts,
+            bool increaseViewCounter,
+            bool increaseViewCounterOnListings);
+
+        /// <summary>
+        /// get a list of a user's <see cref="CollectionView"/>s
+        /// </summary>
+        /// <param name="appId"></param>
+        /// <param name="profileId"></param>
+        /// <returns>a list of <see cref="CollectionView"/> objects</returns>
+        IList<CollectionView> GetCollectionsByProfileId(
             string appId,
             string profileId);
     }

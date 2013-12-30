@@ -85,7 +85,7 @@ namespace classy.Manager
 
             // save triple
             bool tripleExists = false;
-            TripleStore.LogActivity(appId, follower.Id, Classy.Models.ActivityPredicate.Follow, followee.Id, ref tripleExists);
+            TripleStore.LogActivity(appId, follower.Id, ActivityPredicate.FOLLOW_PROFILE, followee.Id, ref tripleExists);
             if (!tripleExists)
             {
                 // increase follower count
@@ -116,14 +116,14 @@ namespace classy.Manager
 
             if (includeFollowedByProfiles) 
             {
-                var profileIds = TripleStore.GetActivitySubjectList(appId, Classy.Models.ActivityPredicate.Follow, profileId);
+                var profileIds = TripleStore.GetActivitySubjectList(appId, ActivityPredicate.FOLLOW_PROFILE, profileId);
                 var followedby = ProfileRepository.GetByIds(appId, profileIds.ToArray());
                 profileView.FollowedBy = followedby.ToProfileViewList();
             }
 
             if (includeFollowingProfiles)
             {
-                var profileIds = TripleStore.GetActivityObjectList(appId, Classy.Models.ActivityPredicate.Follow, profileId);
+                var profileIds = TripleStore.GetActivityObjectList(appId, ActivityPredicate.FOLLOW_PROFILE, profileId);
                 var following = ProfileRepository.GetByIds(appId, profileIds.ToArray());
                 profileView.Following = following.ToProfileViewList();
             }
@@ -149,7 +149,7 @@ namespace classy.Manager
             if (logImpression)
             {
                 var exists = false;
-                TripleStore.LogActivity(appId, requestedByProfileId.IsNullOrEmpty() ? "guest" : requestedByProfileId, Classy.Models.ActivityPredicate.View, profileId, ref exists);
+                TripleStore.LogActivity(appId, requestedByProfileId.IsNullOrEmpty() ? "guest" : requestedByProfileId, ActivityPredicate.VIEW_PROFILE, profileId, ref exists);
             }
 
             // TODO: if requested by someone other than the profile owner, remove all non-public data!!
@@ -295,7 +295,7 @@ namespace classy.Manager
 
             // log activity
             var exists = false;
-            TripleStore.LogActivity(appId, reviewerProfileId, Classy.Models.ActivityPredicate.Review, listing.Id, ref exists);
+            TripleStore.LogActivity(appId, reviewerProfileId, ActivityPredicate.REVIEW_PROFILE, listing.Id, ref exists);
             if (exists) throw new ApplicationException("this user already submitted a review for this listing");
 
             // increase the review count for the merchant, and the average score + avg score for all sub criteria
@@ -332,7 +332,7 @@ namespace classy.Manager
 
             // log activity
             var exists = false;
-            TripleStore.LogActivity(appId, reviewerProfileId, Classy.Models.ActivityPredicate.Review, revieweeProfileId, ref exists);
+            TripleStore.LogActivity(appId, reviewerProfileId, ActivityPredicate.REVIEW_PROFILE, revieweeProfileId, ref exists);
             if (exists) throw new ArgumentException("AlreadyReviewed");
 
             // save the review
@@ -444,7 +444,7 @@ namespace classy.Manager
         /// <returns></returns>
         private Listing GetVerifiedListing(string appId, string listingId)
         {
-            var listing = ListingRepository.GetById(listingId, appId, false, false);
+            var listing = ListingRepository.GetById(listingId, appId, false);
             if (listing == null) throw new KeyNotFoundException("invalid listing");
             return listing;
         }
