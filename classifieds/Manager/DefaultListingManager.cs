@@ -153,7 +153,7 @@ namespace classy.Manager
             string profileId, 
             IFile[] files)
         {
-            var listing = GetVerifiedListing(appId, listingId, profileId);
+            var listing = GetVerifiedListing(appId, listingId, profileId, true);
             var mediaFiles = new List<MediaFile>();
 
             if (files != null && files.Count() > 0)
@@ -188,7 +188,7 @@ namespace classy.Manager
             string profileId, 
             string url)
         {
-            var listing = GetVerifiedListing(appId, listingId, profileId);
+            var listing = GetVerifiedListing(appId, listingId, profileId, true);
 
             ListingRepository.DeleteExternalMedia(listingId, appId, url);
             StorageRepository.DeleteFile(url);
@@ -203,7 +203,7 @@ namespace classy.Manager
             string listingId,
             string profileId)
         {
-            var listing = GetVerifiedListing(appId, listingId, profileId);
+            var listing = GetVerifiedListing(appId, listingId, profileId, true);
             var profile = ProfileRepository.GetById(appId, listing.ProfileId, false);
 
             // can't publish a purchasable listing if 
@@ -231,7 +231,7 @@ namespace classy.Manager
             Listing listing;
             bool isNewListing = listingId.IsNullOrEmpty();
             if (!isNewListing) {
-                listing = GetVerifiedListing(appId, listingId);
+                listing = GetVerifiedListing(appId, listingId, true);
             }
             else {
                 listing = new Listing
