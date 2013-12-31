@@ -51,11 +51,11 @@ namespace classy.Manager
         {
             // get the listing
             var listing = GetVerifiedListing(appId, listingId);
-            if (listing.Pricing == null) throw new ApplicationException("this listing cannot be purchased");
+            if (listing.PricingInfo == null) throw new ApplicationException("this listing cannot be purchased");
             var profile = ProfileRepository.GetById(appId, listing.ProfileId, false);
 
             // calculate the price of the sku
-            var price = listing.Pricing.GetPriceForSKU(sku);
+            var price = listing.PricingInfo.GetPriceForSKU(sku);
             var shipping = ShippingCalculator.GetShippingPrice(profile, listing.ContactInfo.Location, shippingAddress);
             var tax = TaxCalculator.CalculateTax(profile, price, shippingAddress);
             var orderTotal = (price * quantity) + shipping + tax;
@@ -91,7 +91,7 @@ namespace classy.Manager
 
                 // log the purchase activity
                 var tripleExists = false;
-                TripleStore.LogActivity(appId, profileId, Classy.Models.ActivityPredicate.Purchase, listingId, ref tripleExists);
+                TripleStore.LogActivity(appId, profileId, ActivityPredicate.PURCHASE_LISTING, listingId, ref tripleExists);
 
                 // increase purchase counter
                 ListingRepository.IncreaseCounter(listingId, appId, ListingCounters.Purchases, quantity);
@@ -191,15 +191,7 @@ namespace classy.Manager
         /// <returns></returns>
         private Listing GetVerifiedListing(string appId, string listingId, string profileId)
         {
-            Listing listing;
-            try
-            {
-                listing = GetVerifiedListing(appId, listingId);
-            }
-            catch (KeyNotFoundException kex)
-            {
-                throw;
-            }
+            var listing = GetVerifiedListing(appId, listingId);
             if (listing.ProfileId != profileId) throw new UnauthorizedAccessException("not authorized");
             return listing;
         }
@@ -212,7 +204,7 @@ namespace classy.Manager
         /// <returns></returns>
         private Listing GetVerifiedListing(string appId, string listingId)
         {
-            var listing = ListingRepository.GetById(listingId, appId, false, false);
+            var listing = ListingRepository.GetById(listingId, appId, false);
             if (listing == null) throw new KeyNotFoundException("invalid listing");
             return listing;
         }
@@ -226,15 +218,7 @@ namespace classy.Manager
         /// <returns></returns>
         private Order GetVerifiedOrder(string appId, string orderId, string profileId)
         {
-            Order order;
-            try
-            {
-                order = GetVerifiedOrder(appId, orderId);
-            }
-            catch (KeyNotFoundException)
-            {
-                throw;
-            }
+            var order = GetVerifiedOrder(appId, orderId);
             if (order.ProfileId != profileId) throw new UnauthorizedAccessException("not authorized");
             return order;
         }

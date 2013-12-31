@@ -8,7 +8,7 @@ namespace Classy.Models.Request
 {
     public class CreateProfileProxy : BaseRequestDto
     {
-        public IList<CustomAttribute> Metadata { get; set; }
-        public Seller SellerInfo { get; set; }
+        public IDictionary<string, string> Metadata { get; set; }
+        public ProfessionalInfo ProfessionalInfo { get; set; }
     }
 }

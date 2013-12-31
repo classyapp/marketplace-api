@@ -26,45 +26,36 @@ namespace classy.Services
         public IListingManager ListingManager { get; set; }
         public IProfileManager ProfileManager { get; set; }
         public IReviewManager ReviewManager { get; set; }
+        public ICollectionManager CollectionManager { get; set; }
         public IAnalyticsManager AnalyticsManager { get; set; }
 
         [CustomAuthenticate]
         public object Post(CreateProfileProxy request)
         {
-            try
+            ProfileView profile = null;
+
+            string[] content;
+            var f = File.OpenText(@"C:\Users\YUVAL\Downloads\metavchim.csv");
+            while (!f.EndOfStream)
             {
-                ProfileView profile = null;
+                var line = f.ReadLine();
+                content = line.Split(',');
 
-                string[] content;
-                var f = File.OpenText(@"C:\Users\YUVAL\Downloads\metavchim.csv");
-                while (!f.EndOfStream)
-                {
-                    var line = f.ReadLine();
-                    content = line.Split(',');
+                profile = ProfileManager.CreateProfileProxy(
+                    request.Environment.AppId,
+                    new ProfessionalInfo {
+                        CompanyName = content[0]
+                    },
+                    new Dictionary<string, string>());
+                profile.Metadata.Add("LicenseNo", content[1]);
+            }
 
-                    profile = ProfileManager.CreateProfileProxy(
-                        request.AppId,
-                        new Seller {
-                            ContactInfo = new ContactInfo {
-                                Name = content[0]
-                            } 
-                        },
-                        new List<CustomAttribute>() { 
-                            new CustomAttribute { Key = "LicenseNo", Value = content[1] }
-                        });
-                }
-
-                //var profile = ProfileManager.CreateProfileProxy(
-                //    request.AppId,
-                //    request.SellerInfo,
-                //    request.Metadata);
+            //var profile = ProfileManager.CreateProfileProxy(
+            //    request.Environment.AppId,
+            //    request.ProfessionalInfo,
+            //    request.Metadata);
                 
-                return new HttpResult(profile, HttpStatusCode.OK);
-            }
-            catch (Exception ex)
-            {
-                return new HttpError(ex.Message);
-            }
+            return new HttpResult(profile, HttpStatusCode.OK);
         }
 
         public object Get(GetListingById request)
@@ -74,7 +65,7 @@ namespace classy.Services
                 var session = SessionAs<CustomUserSession>();
 
                 var listingView = ListingManager.GetListingById(
-                    request.AppId,
+                    request.Environment.AppId,
                     request.ListingId,
                     session.UserAuthId,
                     request.LogImpression,
@@ -91,10 +82,6 @@ namespace classy.Services
             {
                 return new HttpError(HttpStatusCode.NotFound, kex.Message);
             }
-            catch(Exception ex)
-            {
-                return new HttpError(ex.Message);
-            }
         }
 
         public object Get(GetListingsByUsername request)
@@ -102,7 +89,7 @@ namespace classy.Services
             try
             {
                 var listingViews = ListingManager.GetListingsByUsername(
-                    request.AppId,
+                    request.Environment.AppId,
                     request.Username,
                     request.IncludeComments,
                     request.FormatCommentsAsHtml);
@@ -113,76 +100,55 @@ namespace classy.Services
             {
                 return new HttpError(HttpStatusCode.NotFound, kex.Message);
             }
-            catch(Exception ex)
-            {
-                return new HttpError(ex.Message);
-            }
         }
 
         public object Get(SearchListings request)
         {
-            try
-            {
-                var listingViews = ListingManager.SearchListings(
-                    request.AppId,
-                    request.Tag,
-                    request.ListingType,
-                    request.Metadata,
-                    request.PriceMin,
-                    request.PriceMax,
-                    request.Location,
-                    request.IncludeComments,
-                    request.FormatCommentsAsHtml);
+            return Post(request);
+        }
 
-                return new HttpResult(listingViews, HttpStatusCode.OK);
-            }
-            catch (KeyNotFoundException kex)
-            {
-                return new HttpError(HttpStatusCode.NotFound, kex.Message);
-            }
-            catch (Exception ex)
-            {
-                return new HttpError(ex.Message);
-            }
+        public object Post(SearchListings request)
+        {
+            var listingViews = ListingManager.SearchListings(
+                request.Environment.AppId,
+                request.Tag,
+                request.ListingType,
+                request.Metadata,
+                request.PriceMin,
+                request.PriceMax,
+                request.Location,
+                request.IncludeComments,
+                request.FormatCommentsAsHtml);
+
+            return new HttpResult(listingViews, HttpStatusCode.OK);
         }
 
         // create new listing
         [CustomAuthenticate]
         public object Post(PostListing request)
         {
-            try
-            {
-                var session = SessionAs<CustomUserSession>();
+            var session = SessionAs<CustomUserSession>();
 
-                var listing = ListingManager.SaveListing(
-                    request.AppId,
-                    null,
-                    session.UserAuthId,
-                    request.Title,
-                    request.Content,
-                    request.ListingType,
-                    request.Pricing,
-                    request.ContactInfo,
-                    request.SchedulingTemplate,
-                    request.Metadata);
+            var listing = ListingManager.SaveListing(
+                request.Environment.AppId,
+                null,
+                session.UserAuthId,
+                request.Title,
+                request.Content,
+                request.ListingType,
+                request.Pricing,
+                request.ContactInfo,
+                request.SchedulingTemplate,
+                request.Metadata);
 
-                return new HttpResult
-                {
-                    StatusCode = HttpStatusCode.Created,
-                    Response = listing,
-                    Headers = {
-                        { HttpHeaders.Location, string.Concat("/l/", listing.Id) }
-                    }
-                };
-            }
-            catch(UnauthorizedAccessException uex)
+            return new HttpResult
             {
-                return new HttpError(HttpStatusCode.Unauthorized, uex.Message);
-            }
-            catch(Exception ex)
-            {
-                return new HttpError(ex.Message);
-            }
+                StatusCode = HttpStatusCode.Created,
+                Response = listing,
+                Headers = {
+                    { HttpHeaders.Location, string.Concat("/l/", listing.Id) }
+                }
+            };
         }
 
         // add media files
@@ -194,7 +160,7 @@ namespace classy.Services
                 var session = SessionAs<CustomUserSession>();
 
                 var listing = ListingManager.AddExternalMediaToListing(
-                    request.AppId,
+                    request.Environment.AppId,
                     request.ListingId,
                     session.UserAuthId,
                     Request.Files);
@@ -204,14 +170,6 @@ namespace classy.Services
             catch (KeyNotFoundException kex)
             {
                 return new HttpError(HttpStatusCode.NotFound, kex.Message);
-            }
-            catch (UnauthorizedAccessException uex)
-            {
-                return new HttpError(HttpStatusCode.Unauthorized, uex.Message);
-            }
-            catch(Exception ex)
-            {
-                return new HttpError(ex.Message);
             }
         }
 
@@ -224,9 +182,9 @@ namespace classy.Services
                 var session = SessionAs<CustomUserSession>();
 
                 var listing = ListingManager.DeleteExternalMediaFromListing(
-                    request.AppId, 
-                    request.ListingId, 
-                    session.UserAuthId, 
+                    request.Environment.AppId,
+                    request.ListingId,
+                    session.UserAuthId,
                     request.Url);
 
                 return new HttpResult(listing, HttpStatusCode.OK);
@@ -234,14 +192,6 @@ namespace classy.Services
             catch (KeyNotFoundException kex)
             {
                 return new HttpError(HttpStatusCode.NotFound, kex.Message);
-            }
-            catch (UnauthorizedAccessException uex)
-            {
-                return new HttpError(HttpStatusCode.Unauthorized, uex.Message);
-            }
-            catch (Exception ex)
-            {
-                return new HttpError(ex.Message);
             }
         }
 
@@ -254,7 +204,7 @@ namespace classy.Services
                 var session = SessionAs<CustomUserSession>();
 
                 var listing = ListingManager.PublishListing(
-                    request.AppId,
+                    request.Environment.AppId,
                     request.ListingId,
                     session.UserAuthId);
 
@@ -263,14 +213,6 @@ namespace classy.Services
             catch (KeyNotFoundException kex)
             {
                 return new HttpError(HttpStatusCode.NotFound, kex.Message);
-            }
-            catch (UnauthorizedAccessException uex)
-            {
-                return new HttpError(HttpStatusCode.Unauthorized, uex.Message);
-            }
-            catch (Exception ex)
-            {
-                return new HttpError(ex.Message);
             }
         }
 
@@ -283,7 +225,7 @@ namespace classy.Services
                 var session = SessionAs<CustomUserSession>();
 
                 var listing = ListingManager.SaveListing(
-                    request.AppId,
+                    request.Environment.AppId,
                     request.ListingId,
                     session.UserAuthId,
                     request.Title,
@@ -293,20 +235,12 @@ namespace classy.Services
                     request.ContactInfo,
                     request.SchedulingTemplate,
                     request.Metadata);
-                    
+
                 return new HttpResult(listing, HttpStatusCode.OK);
             }
             catch (KeyNotFoundException kex)
             {
                 return new HttpError(HttpStatusCode.NotFound, kex.Message);
-            }
-            catch (UnauthorizedAccessException uex)
-            {
-                return new HttpError(HttpStatusCode.Unauthorized, uex.Message);
-            }
-            catch (Exception ex)
-            {
-                return new HttpError(ex.Message);
             }
         }
 
@@ -319,7 +253,7 @@ namespace classy.Services
                 var session = SessionAs<CustomUserSession>();
 
                 var comment = ListingManager.AddCommentToListing(
-                    request.AppId,
+                    request.Environment.AppId,
                     request.ListingId,
                     session.UserAuthId,
                     request.Content,
@@ -330,10 +264,6 @@ namespace classy.Services
             catch (KeyNotFoundException kex)
             {
                 return new HttpError(HttpStatusCode.NotFound, kex.Message);
-            }
-            catch (Exception ex)
-            {
-                return new HttpError(ex.Message);
             }
         }
 
@@ -346,7 +276,7 @@ namespace classy.Services
                 var session = SessionAs<CustomUserSession>();
 
                 ListingManager.FavoriteListing(
-                    request.AppId,
+                    request.Environment.AppId,
                     request.ListingId,
                     session.UserAuthId);
 
@@ -355,10 +285,6 @@ namespace classy.Services
             catch (KeyNotFoundException kex)
             {
                 return new HttpError(HttpStatusCode.NotFound, kex.Message);
-            }
-            catch (Exception ex)
-            {
-                return new HttpError(ex.Message);
             }
         }
 
@@ -371,7 +297,7 @@ namespace classy.Services
                 var session = SessionAs<CustomUserSession>();
 
                 ListingManager.FlagListing(
-                    request.AppId,
+                    request.Environment.AppId,
                     request.ListingId,
                     session.UserAuthId,
                     request.FlagReason);
@@ -381,10 +307,6 @@ namespace classy.Services
             catch (KeyNotFoundException kex)
             {
                 return new HttpError(HttpStatusCode.NotFound, kex.Message);
-            }
-            catch (Exception ex)
-            {
-                return new HttpError(ex.Message);
             }
         }
 
@@ -397,7 +319,7 @@ namespace classy.Services
                 var session = SessionAs<CustomUserSession>();
 
                 ProfileManager.FollowProfile(
-                    request.AppId,
+                    request.Environment.AppId,
                     session.UserAuthId,
                     request.FolloweeUsername);
 
@@ -406,10 +328,6 @@ namespace classy.Services
             catch (KeyNotFoundException kex)
             {
                 return new HttpError(HttpStatusCode.NotFound, kex.Message);
-            }
-            catch (Exception ex)
-            {
-                return new HttpError(ex.Message);
             }
         }
 
@@ -422,21 +340,17 @@ namespace classy.Services
                 var session = SessionAs<CustomUserSession>();
 
                 var claim = ProfileManager.SubmitProxyClaim(
-                    request.AppId,
+                    request.Environment.AppId,
                     session.UserAuthId,
                     request.ProxyProfileId,
-                    request.SellerInfo,
+                    request.ProfessionalInfo,
                     request.Metadata);
 
                 return new HttpResult(claim, HttpStatusCode.OK);
             }
-            catch(KeyNotFoundException kex)
+            catch (KeyNotFoundException kex)
             {
                 return new HttpError(HttpStatusCode.NotFound, kex.Message);
-            }
-            catch(Exception ex)
-            {
-                return new HttpError(ex.Message);
             }
         }
 
@@ -447,7 +361,7 @@ namespace classy.Services
             try
             {
                 var claim = ProfileManager.ApproveProxyClaim(
-                    request.AppId,
+                    request.Environment.AppId,
                     request.ClaimId);
 
                 return new HttpResult(claim, HttpStatusCode.OK);
@@ -455,10 +369,6 @@ namespace classy.Services
             catch (KeyNotFoundException kex)
             {
                 return new HttpError(HttpStatusCode.NotFound, kex.Message);
-            }
-            catch (Exception ex)
-            {
-                return new HttpError(ex.Message);
             }
         }
 
@@ -469,7 +379,7 @@ namespace classy.Services
             try
             {
                 var claim = ProfileManager.RejectProxyClaim(
-                    request.AppId,
+                    request.Environment.AppId,
                     request.ClaimId);
 
                 return new HttpResult(claim, HttpStatusCode.OK);
@@ -478,9 +388,27 @@ namespace classy.Services
             {
                 return new HttpError(HttpStatusCode.NotFound, kex.Message);
             }
-            catch (Exception ex)
+        }
+
+        // get profile form session
+        [CustomAuthenticate]
+        public object Get(GetAutenticatedProfile request)
+        {
+            var session = SessionAs<CustomUserSession>();
+            if (!session.IsAuthenticated) return new HttpError(HttpStatusCode.Unauthorized, "No Session");
+            else 
             {
-                return new HttpError(ex.Message);
+                var profile = ProfileManager.GetProfileById(
+                    request.Environment.AppId,
+                    session.UserAuthId,
+                    session.UserAuthId,
+                    false,
+                    false,
+                    false,
+                    false,
+                    false,
+                    false);
+                return new HttpResult(profile);
             }
         }
 
@@ -492,13 +420,14 @@ namespace classy.Services
                 var session = SessionAs<CustomUserSession>();
 
                 var profile = ProfileManager.GetProfileById(
-                    request.AppId,
+                    request.Environment.AppId,
                     request.ProfileId,
                     session.UserAuthId,
                     request.IncludeFollowedByProfiles,
                     request.IncludeFollowingProfiles,
                     request.IncludeReviews,
                     request.IncludeListings,
+                    request.IncludeCollections,
                     request.LogImpression);
 
                 return new HttpResult(profile, HttpStatusCode.OK);
@@ -506,10 +435,6 @@ namespace classy.Services
             catch (KeyNotFoundException kex)
             {
                 return new HttpError(HttpStatusCode.NotFound, kex.Message);
-            }
-            catch (Exception ex)
-            {
-                return new HttpError(ex.Message);
             }
         }
 
@@ -523,9 +448,9 @@ namespace classy.Services
                 if (session.UserAuthId != request.ProfileId) throw new UnauthorizedAccessException("not yours to update");
 
                 var profile = ProfileManager.UpdateProfile(
-                    request.AppId,
+                    request.Environment.AppId,
                     request.ProfileId,
-                    request.SellerInfo,
+                    request.ProfessionalInfo,
                     request.Metadata);
 
                 return new HttpResult(profile, HttpStatusCode.OK);
@@ -534,34 +459,25 @@ namespace classy.Services
             {
                 return new HttpError(HttpStatusCode.NotFound, kex.Message);
             }
-            catch (UnauthorizedAccessException uex)
-            {
-                return new HttpError(HttpStatusCode.Unauthorized, uex.Message);
-            }
-            catch (Exception ex)
-            {
-                return new HttpError(ex.Message);
-            }
         }
 
         // search profiles
         public object Get(SearchProfiles request)
         {
-            try
-            {
-                var profiles = ProfileManager.SearchProfiles(
-                    request.AppId,
-                    request.DisplayName,
-                    request.Category,
-                    request.Location,
-                    request.Metadata);
+            return Post(request);
+        }
 
-                return new HttpResult(profiles.Take(150), HttpStatusCode.OK);
-            }
-            catch(Exception ex)
-            {
-                return new HttpError(ex.Message);
-            }
+        public object Post(SearchProfiles request)
+        {
+            var profiles = ProfileManager.SearchProfiles(
+                request.Environment.AppId,
+                request.DisplayName,
+                request.Category,
+                request.Location,
+                request.Metadata,
+                request.ProfessionalsOnly);
+
+            return new HttpResult(profiles.Take(150), HttpStatusCode.OK);
         }
 
         // book timelost within listing
@@ -572,23 +488,19 @@ namespace classy.Services
             {
                 var session = SessionAs<CustomUserSession>();
                 var timeslot = BookingManager.BookListing(
-                    request.AppId, 
-                    request.ListingId, 
-                    session.UserAuthId, 
-                    request.PaymentMethod, 
-                    request.DateRange, 
-                    request.Comment, 
+                    request.Environment.AppId,
+                    request.ListingId,
+                    session.UserAuthId,
+                    request.PaymentMethod,
+                    request.DateRange,
+                    request.Comment,
                     request.MaxDoubleBookings);
 
                 return new HttpResult(timeslot, HttpStatusCode.OK);
             }
-            catch(KeyNotFoundException kex)
+            catch (KeyNotFoundException kex)
             {
                 return new HttpError(HttpStatusCode.NotFound, kex.Message);
-            }
-            catch(Exception ex)
-            {
-                return new HttpError(ex.Message);
             }
         }
 
@@ -600,8 +512,8 @@ namespace classy.Services
             {
                 var session = SessionAs<CustomUserSession>();
                 var bookings = BookingManager.GetBookingsForListing(
-                    request.AppId, 
-                    request.ListingId, 
+                    request.Environment.AppId,
+                    request.ListingId,
                     session.UserAuthId,
                     new DateRange { Start = request.Start, End = request.End },
                     request.InculdeCancelled);
@@ -611,14 +523,6 @@ namespace classy.Services
             catch (KeyNotFoundException kex)
             {
                 return new HttpError(HttpStatusCode.NotFound, kex.Message);
-            }
-            catch (UnauthorizedAccessException uex)
-            {
-                return new HttpError(HttpStatusCode.Unauthorized, uex.Message);
-            }
-            catch (Exception ex)
-            {
-                return new HttpError(ex.Message);
             }
         }
 
@@ -629,7 +533,7 @@ namespace classy.Services
                 var session = SessionAs<CustomUserSession>();
                 if (!session.IsAuthenticated) throw new UnauthorizedAccessException("you must be logged in");
                 var bookings = BookingManager.GetBookingsForProfileListings(
-                    request.AppId,
+                    request.Environment.AppId,
                     session.UserAuthId,
                     new DateRange { Start = request.Start, End = request.End },
                     request.InculdeCancelled);
@@ -640,14 +544,6 @@ namespace classy.Services
             {
                 return new HttpError(HttpStatusCode.NotFound, kex.Message);
             }
-            catch (UnauthorizedAccessException uex)
-            {
-                return new HttpError(HttpStatusCode.Unauthorized, uex.Message);
-            }
-            catch (Exception ex)
-            {
-                return new HttpError(ex.Message);
-            }
         }
 
         public object Get(GetBookingsForProfile request)
@@ -657,8 +553,8 @@ namespace classy.Services
                 var session = SessionAs<CustomUserSession>();
                 if (!session.IsAuthenticated) throw new UnauthorizedAccessException("you must be logged in");
                 var bookings = BookingManager.GetBookingsForProfile(
-                    request.AppId, 
-                    session.UserAuthId, 
+                    request.Environment.AppId,
+                    session.UserAuthId,
                     new DateRange { Start = request.Start, End = request.End },
                     request.InculdeCancelled);
 
@@ -667,14 +563,6 @@ namespace classy.Services
             catch (KeyNotFoundException kex)
             {
                 return new HttpError(HttpStatusCode.NotFound, kex.Message);
-            }
-            catch (UnauthorizedAccessException uex)
-            {
-                return new HttpError(HttpStatusCode.Unauthorized, uex.Message);
-            }
-            catch (Exception ex)
-            {
-                return new HttpError(ex.Message);
             }
         }
 
@@ -686,7 +574,7 @@ namespace classy.Services
                 var session = SessionAs<CustomUserSession>();
 
                 var booking = BookingManager.UpdateBooking(
-                    request.AppId,
+                    request.Environment.AppId,
                     request.BookingId,
                     session.UserAuthId,
                     request.DateRange,
@@ -695,17 +583,9 @@ namespace classy.Services
 
                 return new HttpResult(booking, HttpStatusCode.OK);
             }
-            catch(KeyNotFoundException kex)
+            catch (KeyNotFoundException kex)
             {
                 return new HttpError(HttpStatusCode.NotFound, kex.Message);
-            }
-            catch(UnauthorizedAccessException uex)
-            {
-                return new HttpError(HttpStatusCode.Unauthorized, uex.Message);
-            }
-            catch(Exception ex)
-            {
-                return new HttpError(ex.Message);
             }
         }
 
@@ -717,27 +597,15 @@ namespace classy.Services
             {
                 var session = SessionAs<CustomUserSession>();
                 var response = BookingManager.CancelBooking(
-                    request.AppId, 
-                    request.BookingId, 
+                    request.Environment.AppId,
+                    request.BookingId,
                     session.UserAuthId,
                     request.DoRefund);
                 return new HttpResult(response, HttpStatusCode.OK);
             }
-            catch(KeyNotFoundException kex)
+            catch (KeyNotFoundException kex)
             {
                 return new HttpError(HttpStatusCode.NotFound, kex.Message);
-            }
-            catch(UnauthorizedAccessException uex)
-            {
-                return new HttpError(HttpStatusCode.Unauthorized, uex.Message);
-            }
-            catch(PaymentGatewayException pex)
-            {
-                return new HttpError(pex.Message);
-            }
-            catch(Exception ex)
-            {
-                return new HttpError(ex.Message);
             }
         }
 
@@ -750,7 +618,7 @@ namespace classy.Services
                 var session = SessionAs<CustomUserSession>();
 
                 var order = OrderManager.PlaceSingleItemOrder(
-                    request.AppId, 
+                    request.Environment.AppId,
                     request.ListingId,
                     session.UserAuthId,
                     request.PaymentMethod,
@@ -764,10 +632,6 @@ namespace classy.Services
             {
                 return new HttpError(HttpStatusCode.NotFound, kex.Message);
             }
-            catch (Exception ex)
-            {
-                return new HttpError(ex.Message);
-            }
         }
 
         // update quantity on single item order
@@ -777,7 +641,7 @@ namespace classy.Services
             {
                 var session = SessionAs<CustomUserSession>();
                 var order = OrderManager.UpdateSingleItemOrder(
-                    request.AppId,
+                    request.Environment.AppId,
                     request.OrderId,
                     session.UserAuthId,
                     request.SKU,
@@ -785,17 +649,9 @@ namespace classy.Services
 
                 return new HttpResult(order, HttpStatusCode.OK);
             }
-            catch(KeyNotFoundException kex)
+            catch (KeyNotFoundException kex)
             {
                 return new HttpError(HttpStatusCode.NotFound, kex.Message);
-            }
-            catch(UnauthorizedAccessException uex)
-            {
-                return new HttpError(HttpStatusCode.Unauthorized, uex.Message);
-            }
-            catch(Exception ex)
-            {
-                return new HttpError(ex.Message);
             }
         }
 
@@ -807,7 +663,7 @@ namespace classy.Services
             {
                 var session = SessionAs<CustomUserSession>();
                 var response = OrderManager.CancelSingleItemOrder(
-                    request.AppId,
+                    request.Environment.AppId,
                     request.OrderId,
                     session.UserAuthId,
                     request.DoRefund);
@@ -817,14 +673,6 @@ namespace classy.Services
             catch (KeyNotFoundException kex)
             {
                 return new HttpError(HttpStatusCode.NotFound, kex.Message);
-            }
-            catch (UnauthorizedAccessException uex)
-            {
-                return new HttpError(HttpStatusCode.Unauthorized, uex.Message);
-            }
-            catch (Exception ex)
-            {
-                return new HttpError(ex.Message);
             }
         }
 
@@ -836,7 +684,7 @@ namespace classy.Services
             {
                 var session = SessionAs<CustomUserSession>();
                 var orders = OrderManager.GetOrdersForListing(
-                    request.AppId,
+                    request.Environment.AppId,
                     request.ListingId,
                     session.UserAuthId,
                     request.IncludeCancelled);
@@ -846,14 +694,6 @@ namespace classy.Services
             catch (KeyNotFoundException kex)
             {
                 return new HttpError(HttpStatusCode.NotFound, kex.Message);
-            }
-            catch(UnauthorizedAccessException uex)
-            {
-                return new HttpError(HttpStatusCode.Unauthorized, uex.Message);
-            }
-            catch (Exception ex)
-            {
-                return new HttpError(ex.Message);
             }
         }
 
@@ -866,7 +706,7 @@ namespace classy.Services
                 var session = SessionAs<CustomUserSession>();
                 if (!session.IsAuthenticated) throw new UnauthorizedAccessException("you must be logged in");
                 var orders = OrderManager.GetOrdersForProfile(
-                    request.AppId,
+                    request.Environment.AppId,
                     session.UserAuthId,
                     request.IncludeCancelled);
 
@@ -875,14 +715,6 @@ namespace classy.Services
             catch (KeyNotFoundException kex)
             {
                 return new HttpError(HttpStatusCode.NotFound, kex.Message);
-            }
-            catch (UnauthorizedAccessException uex)
-            {
-                return new HttpError(HttpStatusCode.Unauthorized, uex.Message);
-            }
-            catch (Exception ex)
-            {
-                return new HttpError(ex.Message);
             }
         }
 
@@ -895,7 +727,7 @@ namespace classy.Services
                 var session = SessionAs<CustomUserSession>();
                 if (!session.IsAuthenticated) throw new UnauthorizedAccessException("you must be logged in");
                 var orders = OrderManager.GetOrdersForProfileListings(
-                    request.AppId,
+                    request.Environment.AppId,
                     session.UserAuthId,
                     request.IncludeCancelled);
 
@@ -904,14 +736,6 @@ namespace classy.Services
             catch (KeyNotFoundException kex)
             {
                 return new HttpError(HttpStatusCode.NotFound, kex.Message);
-            }
-            catch (UnauthorizedAccessException uex)
-            {
-                return new HttpError(HttpStatusCode.Unauthorized, uex.Message);
-            }
-            catch (Exception ex)
-            {
-                return new HttpError(ex.Message);
             }
         }
 
@@ -923,20 +747,17 @@ namespace classy.Services
             {
                 var session = SessionAs<CustomUserSession>();
                 var review = ReviewManager.PostReviewForListing(
-                    request.AppId,
+                    request.Environment.AppId,
                     session.UserAuthId,
                     request.ListingId,
                     request.Content,
-                    request.Score);
+                    request.Score,
+                    request.SubCriteria);
                 return new HttpResult(review, HttpStatusCode.OK);
             }
             catch (KeyNotFoundException kex)
             {
                 return new HttpError(HttpStatusCode.NotFound, kex.Message);
-            }
-            catch (Exception ex)
-            {
-                return new HttpError(ex.Message);
             }
         }
 
@@ -948,11 +769,12 @@ namespace classy.Services
             {
                 var session = SessionAs<CustomUserSession>();
                 var review = ReviewManager.PostReviewForProfile(
-                    request.AppId,
+                    request.Environment.AppId,
                     session.UserAuthId,
                     request.RevieweeProfileId,
                     request.Content,
                     request.Score,
+                    request.SubCriteria,
                     request.ContactInfo,
                     request.Metadata);
                 var response = new PostReviewResponse
@@ -961,9 +783,10 @@ namespace classy.Services
                 };
                 if (request.ReturnRevieweeProfile)
                     response.RevieweeProfile = ProfileManager.GetProfileById(
-                        request.AppId,
+                        request.Environment.AppId,
                         request.RevieweeProfileId,
                         null,
+                        false,
                         false,
                         false,
                         false,
@@ -971,9 +794,10 @@ namespace classy.Services
                         false);
                 if (request.ReturnReviewerProfile)
                     response.ReviewerProfile = ProfileManager.GetProfileById(
-                        request.AppId,
+                        request.Environment.AppId,
                         session.UserAuthId,
                         null,
+                        false,
                         false,
                         false,
                         false,
@@ -985,10 +809,6 @@ namespace classy.Services
             {
                 return new HttpError(HttpStatusCode.NotFound, kex.Message);
             }
-            catch (Exception ex)
-            {
-                return new HttpError(ex.Message);
-            }
         }
 
         // get a list of reviews for profile
@@ -998,7 +818,7 @@ namespace classy.Services
             try
             {
                 var reviews = ReviewManager.GetReviews(
-                    request.AppId,
+                    request.Environment.AppId,
                     request.ProfileId,
                     request.IncludeDrafts,
                     request.IncludeOnlyDrafts);
@@ -1008,10 +828,6 @@ namespace classy.Services
             catch (KeyNotFoundException kex)
             {
                 return new HttpError(HttpStatusCode.NotFound, kex.Message);
-            }
-            catch (Exception ex)
-            {
-                return new HttpError(ex.Message);
             }
         }
 
@@ -1023,7 +839,7 @@ namespace classy.Services
             {
                 var session = SessionAs<CustomUserSession>();
                 var review = ReviewManager.PublishReview(
-                    request.AppId, 
+                    request.Environment.AppId,
                     request.ReviewId,
                     session.UserAuthId);
 
@@ -1032,14 +848,6 @@ namespace classy.Services
             catch (KeyNotFoundException kex)
             {
                 return new HttpError(HttpStatusCode.NotFound, kex.Message);
-            }
-            catch (UnauthorizedAccessException uex)
-            {
-                return new HttpError(HttpStatusCode.Unauthorized, uex.Message);
-            }
-            catch (Exception ex)
-            {
-                return new HttpError(ex.Message);
             }
         }
     
@@ -1050,7 +858,7 @@ namespace classy.Services
             {
                 var session = SessionAs<CustomUserSession>();
                 var review = ReviewManager.DeleteReview(
-                    request.AppId,
+                    request.Environment.AppId,
                     request.ReviewId,
                     session.UserAuthId);
 
@@ -1060,14 +868,6 @@ namespace classy.Services
             {
                 return new HttpError(HttpStatusCode.NotFound, kex.Message);
             }
-            catch (UnauthorizedAccessException uex)
-            {
-                return new HttpError(HttpStatusCode.Unauthorized, uex.Message);
-            }
-            catch (Exception ex)
-            {
-                return new HttpError(ex.Message);
-            }
         }
 
         // 
@@ -1075,16 +875,99 @@ namespace classy.Services
         // log an activity 
         public object Post(LogActivity request)
         {
+            var session = SessionAs<CustomUserSession>();
+            if (!session.IsAuthenticated && request.SubjectId != "guest") throw new ApplicationException("when no user logged in, SubjectId must be 'guest'");
+            var tripleView = AnalyticsManager.LogActivity(request.Environment.AppId, request.SubjectId, ActivityPredicate.CONTACT_PROFILE, request.ObjectId);
+            return new HttpResult(tripleView, HttpStatusCode.OK);
+        }
+
+        //
+        // POST: /collection/new
+        // create a new collection
+        [CustomAuthenticate]
+        public object Post(CreateCollection request)
+        {
             try
             {
                 var session = SessionAs<CustomUserSession>();
-                if (!session.IsAuthenticated && request.SubjectId != "guest") throw new ApplicationException("when no user logged in, SubjectId must be 'guest'");
-                var tripleView = AnalyticsManager.LogActivity(request.AppId, request.SubjectId, Classy.Models.ActivityPredicate.ProContact, request.ObjectId);
-                return new HttpResult(tripleView, HttpStatusCode.OK);
+                var collection = CollectionManager.CreateCollection(
+                    request.Environment.AppId,
+                    session.UserAuthId,
+                    request.Title,
+                    request.Content,
+                    request.IsPublic,
+                    request.IncludedListings,
+                    request.Collaborators,
+                    request.PermittedViewers);
+                return new HttpResult(collection, HttpStatusCode.OK);
             }
-            catch(Exception ex)
+            catch(KeyNotFoundException kex)
             {
-                return new HttpError(ex.Message);
+                return new HttpError(HttpStatusCode.NotFound, kex.Message);
+            }
+        }
+
+        //
+        // POST: /collection/{CollectionId}/listings
+        // add listings to a collection
+        [CustomAuthenticate]
+        public object Post(AddListingsToCollection request)
+        {
+            try
+            {
+                var session = SessionAs<CustomUserSession>();
+                var collection = CollectionManager.AddListingsToCollection(
+                    request.Environment.AppId,
+                    session.UserAuthId,
+                    request.CollectionId,
+                    request.IncludedListings);
+                return new HttpResult(collection, HttpStatusCode.OK);
+            }
+            catch(KeyNotFoundException kex)
+            {
+                return new HttpError(HttpStatusCode.NotFound, kex.Message);
+            }
+        }
+
+        //
+        // GET: /collection/{CollectionId}
+        // get collection by id
+        public object Get(GetCollectionById request)
+        {
+            try
+            {
+                var session = SessionAs<CustomUserSession>();
+                var collection = CollectionManager.GetCollectionById(
+                    request.Environment.AppId,
+                    request.CollectionId,
+                    session.UserAuthId,
+                    request.IncludeDrafts,
+                    request.IncludeListings,
+                    request.IncreaseViewCounter,
+                    request.IncreaseViewCounterOnListings);
+                return new HttpResult(collection, HttpStatusCode.OK);
+            }
+            catch (KeyNotFoundException kex)
+            {
+                return new HttpError(HttpStatusCode.NotFound, kex.Message);
+            }
+        }
+
+        //
+        // GET: /profile/{ProfileId}/collection/list
+        // get collections by profile id
+        public object Get(GetCollectionByProfileId request)
+        {
+            try
+            {
+                var collection = CollectionManager.GetCollectionsByProfileId(
+                    request.Environment.AppId,
+                    request.ProfileId);
+                return new HttpResult(collection, HttpStatusCode.OK);
+            }
+            catch (KeyNotFoundException kex)
+            {
+                return new HttpError(HttpStatusCode.NotFound, kex.Message);
             }
         }
     }

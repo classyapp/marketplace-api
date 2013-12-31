@@ -16,6 +16,7 @@ namespace classy.Manager
         private IProfileRepository ProfileRepository;
         private IListingRepository ListingRepository;
         private IReviewRepository ReviewRepository;
+        private ICollectionRepository CollectionRepository;
         private ITripleStore TripleStore;
 
         public DefaultProfileManager(
@@ -23,29 +24,31 @@ namespace classy.Manager
             IProfileRepository profileRepository,
             IListingRepository listingRepository,
             IReviewRepository reviewRepository,
+            ICollectionRepository collectionRepository,
             ITripleStore tripleStore)
         {
             AppManager = appManager;
             ProfileRepository = profileRepository;
             ListingRepository = listingRepository;
             ReviewRepository = reviewRepository;
+            CollectionRepository = collectionRepository;
             TripleStore = tripleStore;
         }
 
         public ProfileView CreateProfileProxy(
             string appId,
-            Seller sellerInfo,
-            IList<CustomAttribute> metadata)
+            ProfessionalInfo ProfessionalInfo,
+            IDictionary<string, string> metadata)
         {
             if (metadata == null)
             {
-                metadata = new List<CustomAttribute>();
+                metadata = new Dictionary<string, string>();
             }
-            metadata.Add(new CustomAttribute { Key = Profile.PROXY_METADATA_KEY, Value = "1" });
+            metadata.Add(Profile.PROXY_METADATA_KEY, "1");
             var profile = new Profile
             {
                 AppId = appId,
-                SellerInfo = sellerInfo,
+                ProfessionalInfo = ProfessionalInfo,
                 Metadata = metadata
             };
 
@@ -59,9 +62,10 @@ namespace classy.Manager
             string partialUserName,
             string category,
             Location location,
-            IList<CustomAttribute> metadata)
+            IDictionary<string, string> metadata,
+            bool professionalsOnly)
         {
-            var profileList = ProfileRepository.Search(appId, partialUserName, category, location, metadata);
+            var profileList = ProfileRepository.Search(appId, partialUserName, category, location, metadata, professionalsOnly);
             IList<ProfileView> results = new List<ProfileView>();
             foreach(var profile in profileList)
             {
@@ -81,7 +85,7 @@ namespace classy.Manager
 
             // save triple
             bool tripleExists = false;
-            TripleStore.LogActivity(appId, follower.Id, Classy.Models.ActivityPredicate.Follow, followee.Id, ref tripleExists);
+            TripleStore.LogActivity(appId, follower.Id, ActivityPredicate.FOLLOW_PROFILE, followee.Id, ref tripleExists);
             if (!tripleExists)
             {
                 // increase follower count
@@ -102,6 +106,7 @@ namespace classy.Manager
             bool includeFollowingProfiles,
             bool includeReviews,
             bool includeListings,
+            bool includeCollections,
             bool logImpression)
         {
             var profile = ProfileRepository.GetById(appId, profileId, logImpression);
@@ -111,14 +116,14 @@ namespace classy.Manager
 
             if (includeFollowedByProfiles) 
             {
-                var profileIds = TripleStore.GetActivitySubjectList(appId, Classy.Models.ActivityPredicate.Follow, profileId);
+                var profileIds = TripleStore.GetActivitySubjectList(appId, ActivityPredicate.FOLLOW_PROFILE, profileId);
                 var followedby = ProfileRepository.GetByIds(appId, profileIds.ToArray());
                 profileView.FollowedBy = followedby.ToProfileViewList();
             }
 
             if (includeFollowingProfiles)
             {
-                var profileIds = TripleStore.GetActivityObjectList(appId, Classy.Models.ActivityPredicate.Follow, profileId);
+                var profileIds = TripleStore.GetActivityObjectList(appId, ActivityPredicate.FOLLOW_PROFILE, profileId);
                 var following = ProfileRepository.GetByIds(appId, profileIds.ToArray());
                 profileView.Following = following.ToProfileViewList();
             }
@@ -135,10 +140,16 @@ namespace classy.Manager
                 profileView.Listings = listings.ToListingViewList();
             }
 
+            if (includeCollections)
+            {
+                var collections = CollectionRepository.GetByProfileId(appId, profileId);
+                profileView.Collections = collections.ToCollectionViewList();
+            }
+
             if (logImpression)
             {
                 var exists = false;
-                TripleStore.LogActivity(appId, requestedByProfileId.IsNullOrEmpty() ? "guest" : requestedByProfileId, Classy.Models.ActivityPredicate.View, profileId, ref exists);
+                TripleStore.LogActivity(appId, requestedByProfileId.IsNullOrEmpty() ? "guest" : requestedByProfileId, ActivityPredicate.VIEW_PROFILE, profileId, ref exists);
             }
 
             // TODO: if requested by someone other than the profile owner, remove all non-public data!!
@@ -149,13 +160,13 @@ namespace classy.Manager
         public ProfileView UpdateProfile(
             string appId,
             string profileId,
-            Seller sellerInfo,
-            IList<CustomAttribute> metadata)
+            ProfessionalInfo ProfessionalInfo,
+            IDictionary<string, string> metadata)
         {
             var profile = GetVerifiedProfile(appId, profileId);
 
             // copy seller info
-            profile.SellerInfo = sellerInfo;
+            profile.ProfessionalInfo = ProfessionalInfo;
             // copy metadata 
             if (profile.Metadata != null)
             {
@@ -163,7 +174,7 @@ namespace classy.Manager
                 {
                     foreach (var attribute in metadata)
                     {
-                        profile.Metadata.SetValue(attribute.Key, attribute.Value);
+                        profile.Metadata[attribute.Key] = attribute.Value;
                     }
                 }
             }
@@ -177,8 +188,8 @@ namespace classy.Manager
             string appId,
             string profileId,
             string proxyProfileId,
-            Seller sellerInfo,
-            IList<CustomAttribute> metadata)
+            ProfessionalInfo ProfessionalInfo,
+            IDictionary<string, string> metadata)
         {
             var proxyProfile = GetVerifiedProfile(appId, proxyProfileId);
             if (!proxyProfile.IsProxy) throw new ApplicationException("can't claim. not a proxy.");
@@ -187,7 +198,7 @@ namespace classy.Manager
                 AppId = appId,
                 ProfileId = profileId,
                 ProxyProfileId = proxyProfileId,
-                SellerInfo = sellerInfo,
+                ProfessionalInfo = ProfessionalInfo,
                 Metadata = metadata
             };
             ProfileRepository.SaveProxyClaim(claim);
@@ -212,14 +223,14 @@ namespace classy.Manager
             var proxyProfile = GetVerifiedProfile(appId, claim.ProxyProfileId);
 
             // copy seller info from proxy to profile
-            profile.SellerInfo = claim.SellerInfo;
+            profile.ProfessionalInfo = claim.ProfessionalInfo;
             // copy metadata from proxy to profile
             if (profile.Metadata != null) {
                 if (claim.Metadata != null)
                 {
                     foreach (var attribute in claim.Metadata)
                     {
-                        profile.Metadata.SetValue(attribute.Key, attribute.Value);
+                        profile.Metadata[attribute.Key] = attribute.Value;
                     }
                 }
             }
@@ -256,7 +267,8 @@ namespace classy.Manager
             string reviewerProfileId,
             string listingId,
             string content,
-            int score)
+            decimal score,
+            IDictionary<string, decimal> subCriteria)
         {
             // get the listing
             var listing = GetVerifiedListing(appId, listingId);
@@ -276,18 +288,21 @@ namespace classy.Manager
                 ListingId = listingId,
                 Content = content,
                 Score = score,
+                SubCriteria = subCriteria,
                 IsPublished = app.AllowUnmoderatedReviews
             };
             ReviewRepository.Save(review);
 
             // log activity
             var exists = false;
-            TripleStore.LogActivity(appId, reviewerProfileId, Classy.Models.ActivityPredicate.Review, listing.Id, ref exists);
+            TripleStore.LogActivity(appId, reviewerProfileId, ActivityPredicate.REVIEW_PROFILE, listing.Id, ref exists);
             if (exists) throw new ApplicationException("this user already submitted a review for this listing");
 
-            // increase the review count for the merchant, and the average score
+            // increase the review count for the merchant, and the average score + avg score for all sub criteria
+            // TODO : does this eve belog here? what about sub criteria for listings? for each listing type? aaaarghhh!!!
             revieweeProfile.ReviewAverageScore =
                 ((revieweeProfile.ReviewAverageScore * revieweeProfile.ReviewCount) + score) / (++revieweeProfile.ReviewCount);
+           
             ProfileRepository.IncreaseCounter(appId, revieweeProfile.Id, ProfileCounters.Reviews, 1);
             ProfileRepository.Save(revieweeProfile);
 
@@ -300,19 +315,25 @@ namespace classy.Manager
             string reviewerProfileId,
             string revieweeProfileId,
             string content,
-            int score,
+            decimal score,
+            IDictionary<string, decimal> subCriteria,
             ContactInfo contactInfo,
-            IList<CustomAttribute> metadata)
+            IDictionary<string, string> metadata)
         {
             // get the merchant profile
             var revieweeProfile = GetVerifiedProfile(appId, revieweeProfileId);
-            if (!revieweeProfile.IsSeller && !revieweeProfile.IsProxy)
-                throw new ApplicationException("can only post profile reviews for seller or proxy profiles");
+            if (!revieweeProfile.IsProfessional && !revieweeProfile.IsProxy)
+                throw new ArgumentException("ProfileNotProfessionalOrProxy");
             if (!revieweeProfile.IsProxy && (contactInfo != null || metadata != null))
-                throw new ApplicationException("can only update contact info and metadata for proxy profiles. this profile is live and can onlyl be update by the owner.");
+                throw new ArgumentException("ProfileNotProxy");
 
             // get app info
             var app = AppManager.GetAppById(appId);
+
+            // log activity
+            var exists = false;
+            TripleStore.LogActivity(appId, reviewerProfileId, ActivityPredicate.REVIEW_PROFILE, revieweeProfileId, ref exists);
+            if (exists) throw new ArgumentException("AlreadyReviewed");
 
             // save the review
             var review = new Review
@@ -323,14 +344,10 @@ namespace classy.Manager
                 ListingId = null,
                 Content = content,
                 Score = score,
+                SubCriteria = subCriteria,
                 IsPublished = app.AllowUnmoderatedReviews
             };
             ReviewRepository.Save(review);
-
-            // log activity
-            var exists = false;
-            TripleStore.LogActivity(appId, reviewerProfileId, Classy.Models.ActivityPredicate.Review, revieweeProfileId, ref exists);
-            if (exists) throw new ApplicationException("this user already submitted a review for this profile");
 
             // update contact info and metadata (if this is a proxy, otherwise exception was thrown above)
             if (contactInfo != null) revieweeProfile.ContactInfo = contactInfo;
@@ -340,7 +357,7 @@ namespace classy.Manager
                 {
                     foreach (var attribute in metadata)
                     {
-                        revieweeProfile.Metadata.SetValue(attribute.Key, attribute.Value);
+                        revieweeProfile.Metadata[attribute.Key] = attribute.Value;
                     }
                 }
                 else revieweeProfile.Metadata = metadata;
@@ -349,6 +366,23 @@ namespace classy.Manager
             // increase the review count for the merchant, and the average score
             revieweeProfile.ReviewAverageScore =
                 ((revieweeProfile.ReviewAverageScore * revieweeProfile.ReviewCount) + score) / (++revieweeProfile.ReviewCount);
+            // increase the review count for the merchant, and the average score + avg score for all sub criteria
+            revieweeProfile.ReviewAverageScore =
+                ((revieweeProfile.ReviewAverageScore * revieweeProfile.ReviewCount) + score) / (++revieweeProfile.ReviewCount);
+            if (revieweeProfile.ReviewAverageSubCriteria == null)
+                revieweeProfile.ReviewAverageSubCriteria = new Dictionary<string, decimal>();
+            foreach (var k in subCriteria.Keys)
+            {
+                decimal subScore = subCriteria[k];
+                if (revieweeProfile.ReviewAverageSubCriteria.ContainsKey(k))
+                {
+                    revieweeProfile.ReviewAverageSubCriteria[k] = ((revieweeProfile.ReviewAverageSubCriteria[k] * revieweeProfile.ReviewCount) + subScore) / (revieweeProfile.ReviewCount);
+                }
+                else
+                {
+                    revieweeProfile.ReviewAverageSubCriteria.Add(k, subScore);
+                }
+            }
             ProfileRepository.IncreaseCounter(appId, revieweeProfile.Id, ProfileCounters.Reviews, 1);
             ProfileRepository.Save(revieweeProfile);
 
@@ -410,7 +444,7 @@ namespace classy.Manager
         /// <returns></returns>
         private Listing GetVerifiedListing(string appId, string listingId)
         {
-            var listing = ListingRepository.GetById(listingId, appId, false, false);
+            var listing = ListingRepository.GetById(listingId, appId, false);
             if (listing == null) throw new KeyNotFoundException("invalid listing");
             return listing;
         }

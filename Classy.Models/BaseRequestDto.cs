@@ -7,6 +7,6 @@ namespace Classy.Models
 {
     public class BaseRequestDto
     {
-        public string AppId { get; set; }
+        public Env Environment { get; set; }
     }
 }

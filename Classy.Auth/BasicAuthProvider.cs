@@ -32,7 +32,7 @@ namespace Classy.Auth
             var userName = basicAuth.Value.Key;
             var password = basicAuth.Value.Value;
 
-            return Authenticate(authService, session, request.AppId, userName, password, request.Continue);
+            return Authenticate(authService, session, request.Environment, userName, password, request.Continue);
         }
 
 

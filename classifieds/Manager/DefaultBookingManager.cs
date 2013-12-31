@@ -68,7 +68,7 @@ namespace classy.Manager
 
                 // log the booking activity
                 var tripleExists = false;
-                TripleStore.LogActivity(appId, profileId, Classy.Models.ActivityPredicate.Book, listingId, ref tripleExists);
+                TripleStore.LogActivity(appId, profileId, ActivityPredicate.BOOK_LISTING, listingId, ref tripleExists);
 
                 // return the transaction
                 return bookedTimeslot;
@@ -168,15 +168,7 @@ namespace classy.Manager
         /// <returns></returns>
         private BookedTimeslot GetVerifiedBooking(string appId, string bookingId, string profileId)
         {
-            BookedTimeslot booking;
-            try
-            {
-                booking = GetVerifiedBooking(appId, bookingId);
-            }
-            catch(KeyNotFoundException kex)
-            {
-                throw;
-            }
+            var booking = GetVerifiedBooking(appId, bookingId);
             if (booking.ProfileId != profileId) throw new UnauthorizedAccessException("access denied");
             return booking;
         }
@@ -203,15 +195,7 @@ namespace classy.Manager
         /// <returns></returns>
         private Listing GetVerifiedListing(string appId, string listingId, string profileId)
         {
-            Listing listing;
-            try
-            {
-                listing = GetVerifiedListing(appId, listingId);
-            }
-            catch (KeyNotFoundException kex)
-            {
-                throw;
-            }
+            var listing = GetVerifiedListing(appId, listingId);
             if (listing.ProfileId != profileId) throw new UnauthorizedAccessException("not authorized");
             return listing;
         }
@@ -224,8 +208,8 @@ namespace classy.Manager
         /// <returns></returns>
         private Listing GetVerifiedListing(string appId, string listingId)
         {
-            var listing = ListingRepository.GetById(listingId, appId, false, false);
-            if (listing == null) throw new KeyNotFoundException("invalid listing");
+            var listing = ListingRepository.GetById(listingId, appId, false);
+            if (listing == null) throw new KeyNotFoundException("Invalid Listing");
             return listing;
         }
     }

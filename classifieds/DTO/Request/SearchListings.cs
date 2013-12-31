@@ -11,7 +11,7 @@ namespace Classy.Models.Request
     {
         public string Tag { get; set; }
         public string ListingType { get; set; }
-        public IList<CustomAttribute> Metadata { get; set; }
+        public IDictionary<string, string> Metadata { get; set; }
         public double? PriceMin { get; set; }
         public double? PriceMax { get; set; }
         public Location Location { get; set; }

@@ -26,25 +26,24 @@ namespace Classy.Repository
             ListingsCollection = Db.GetCollection<Listing>("classifieds");
         }
 
-        public Listing GetById(string listingId, string appId, bool includeDrafts, bool increaseViewCounter)
+        public Listing GetById(string listingId, string appId, bool includeDrafts)
+        {
+            var listings = GetById(new string[] { listingId }, appId, includeDrafts);
+            if (listings == null || listings.Count() == 0) return null;
+            return listings[0];
+        }
+
+        public IList<Listing> GetById(string[] listingId, string appId, bool includeDrafts)
         {
             var query = Query.And(
-                    Query<Listing>.EQ(x => x.Id, listingId),
+                    Query<Listing>.In(x => x.Id, listingId),
                     Query<Listing>.EQ(x => x.AppId, appId));
             if (!includeDrafts)
             {
                 query = Query.And(query, Query<Listing>.EQ(x => x.IsPublished, true));
             }
-            if (increaseViewCounter)
-            {
-                var listing = ListingsCollection.FindAndModify(query, null, Update<Listing>.Inc(x => x.ViewCount, 1), true);
-                return listing.GetModifiedDocumentAs<Listing>();
-            }
-            else
-            {
-                var listing = ListingsCollection.FindOne(query);
-                return listing;
-            }   
+            var listings = ListingsCollection.Find(query);
+            return listings.ToList(); 
         }
 
         public IList<Listing> GetByProfileId(string appId, string profileId, bool includeDrafts)
@@ -86,7 +85,7 @@ namespace Classy.Repository
                     .Set(x => x.Title, listing.Title)
                     .Set(x => x.Content, listing.Content);
                 if (listing.ContactInfo != null) update.Set(x => x.ContactInfo, listing.ContactInfo);
-                if (listing.Pricing != null) update.Set(x => x.Pricing, listing.Pricing);
+                if (listing.PricingInfo != null) update.Set(x => x.PricingInfo, listing.PricingInfo);
                 if (listing.SchedulingTemplate != null) update.Set(x => x.SchedulingTemplate, listing.SchedulingTemplate);
                 if (listing.Metadata != null) update.Set(x => x.Metadata, listing.Metadata);
 
@@ -141,27 +140,17 @@ namespace Classy.Repository
             }
         }
 
-
-        public void IncreaseCommentCounter(string listingId, string appId, int value)
+        public void IncreaseCounter(string listingId, string appId, ListingCounters counters, int value)
         {
-            try
-            {
-                ListingsCollection.Update(Query.And(
-                    Query<Listing>.EQ(x => x.Id, listingId),
-                    Query<Listing>.EQ(x => x.AppId, appId)), Update<Listing>.Inc(x => x.CommentCount, value));
-            }
-            catch (MongoException mex)
-            {
-                throw;
-            }
+            IncreaseCounter(new string[] { listingId }, appId, counters, value);
         }
 
-        public void IncreaseCounter(string listingId, string appId, ListingCounters counters, int value)
+        public void IncreaseCounter(string[] listingId, string appId, ListingCounters counters, int value)
         {
             try
             {
                 var query = Query.And(
-                    Query<Listing>.EQ(x => x.Id, listingId),
+                    Query<Listing>.In(x => x.Id, listingId),
                     Query<Listing>.EQ(x => x.AppId, appId)
                     );
                 var update = new UpdateBuilder<Listing>();
@@ -172,7 +161,8 @@ namespace Classy.Repository
                 if (counters.HasFlag(ListingCounters.Clicks)) update.Inc(x => x.ClickCount, value);
                 if (counters.HasFlag(ListingCounters.Bookings)) update.Inc(x => x.BookingCount, value);
                 if (counters.HasFlag(ListingCounters.Purchases)) update.Inc(x => x.PurchaseCount, value);
-                ListingsCollection.Update(query, update);
+                if (counters.HasFlag(ListingCounters.AddToCollection)) update.Inc(x => x.AddToCollectionCount, value);
+                ListingsCollection.Update(query, update, new MongoUpdateOptions { Flags = UpdateFlags.Multi });
             }
             catch (MongoException mex)
             {
@@ -213,7 +203,7 @@ namespace Classy.Repository
             throw new NotImplementedException();
         }
 
-        public IList<Listing> Search(string tag, string listingType, IEnumerable<CustomAttribute> metadata, double? priceMin, double? priceMax, Location location, string appId, bool includeDrafts, bool increaseViewCounter)
+        public IList<Listing> Search(string tag, string listingType, IDictionary<string, string> metadata, double? priceMin, double? priceMax, Location location, string appId, bool includeDrafts, bool increaseViewCounter)
         {
             var queries = new List<IMongoQuery>() {
                 Query<Listing>.EQ(x => x.AppId, appId)
@@ -235,11 +225,11 @@ namespace Classy.Repository
             }
             if (priceMin.HasValue)
             {
-                queries.Add(Query<Listing>.GTE(x => x.Pricing.Price, priceMin));
+                queries.Add(Query<Listing>.GTE(x => x.PricingInfo.Price, priceMin));
             }
             if (priceMax.HasValue)
             {
-                queries.Add(Query<Listing>.LTE(x => x.Pricing.Price, priceMax));
+                queries.Add(Query<Listing>.LTE(x => x.PricingInfo.Price, priceMax));
             }
             if (location != null)
             {

@@ -11,8 +11,8 @@ namespace Classy.Models.Response
         public string Id { get; set; }
         public string ProfileId { get; set; }
         public string ProxyProfileId { get; set; }
-        public SellerView SellerInfo { get; set; }
-        public IList<CustomAttributeView> Metadata { get; set; }
+        public ProfessionalInfoView ProfessionalInfo { get; set; }
+        public IDictionary<string, string> Metadata { get; set; }
         public int Status { get; set; }
     }
 }

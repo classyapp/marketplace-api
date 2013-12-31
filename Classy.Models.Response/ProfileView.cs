@@ -9,7 +9,7 @@ namespace Classy.Models.Response
     {
         public ProfileView()
         {
-            Metadata = new List<CustomAttributeView>();
+            Metadata = new Dictionary<string, string>();
             FolloweeUsernames = new List<string>();
         }
 
@@ -24,16 +24,19 @@ namespace Classy.Models.Response
         public int ViewCount { get; set; }
         public int ReviewCount { get; set; }
         public decimal ReviewAverageScore { get; set; }
-        public bool IsVerified { get; set; }
-        public bool IsSeller { get; set; }
+        public IDictionary<string, decimal> ReviewAverageSubCriteria { get; set; }
+        public bool IsVerifiedProfessional { get; set; }
+        public bool IsProfessional { get; set; }
+        public bool IsVendor { get; set; }
         public bool IsProxy { get; set; }
-        public SellerView SellerInfo { get; set; }
+        public ProfessionalInfoView ProfessionalInfo { get; set; }
         public int Rank { get; set; }
         public IList<string> FolloweeUsernames { get; set; }
         public IList<ProfileView> Following { get; set; }
         public IList<ProfileView> FollowedBy { get; set; }
         public IList<ReviewView> Reviews { get; set; }
         public IList<ListingView> Listings { get; set; }
-        public IList<CustomAttributeView> Metadata { get; set; }
+        public IList<CollectionView> Collections { get; set; }
+        public IDictionary<string, string> Metadata { get; set; }
     }
 }

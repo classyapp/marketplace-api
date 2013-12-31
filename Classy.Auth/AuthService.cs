@@ -23,7 +23,7 @@ namespace Classy.Auth
     public delegate object ValidateFn(IServiceBase service, string httpMethod, object requestDto);
 
     [DataContract]
-    public class Auth : IReturn<AuthResponse>
+    public class Auth : Classy.Models.BaseRequestDto, IReturn<AuthResponse>
     {
         [DataMember(Order = 1)]
         public string provider { get; set; }
@@ -54,8 +54,6 @@ namespace Classy.Auth
         public string nc { get; set; }
         [DataMember(Order = 14)]
         public string cnonce { get; set; }
-        [DataMember(Order = 15)]
-        public string AppId { get; set; }
     }
 
     [DataContract]

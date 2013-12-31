@@ -29,6 +29,15 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'AppHarbor|AnyCPU'">
+    <OutputPath>bin\AppHarbor\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <Optimize>true</Optimize>
+    <DebugType>pdbonly</DebugType>
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <ErrorReport>prompt</ErrorReport>
+    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
+  </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
     <Reference Include="System.Core" />
@@ -42,19 +51,21 @@
     <Compile Include="BaseDeleteResponse.cs" />
     <Compile Include="CancelBookingResponse.cs" />
     <Compile Include="CancelOrderResponse.cs" />
+    <Compile Include="CollectionView.cs" />
     <Compile Include="CommentView.cs" />
     <Compile Include="ContactInfoView.cs" />
-    <Compile Include="CustomAttributeView.cs" />
     <Compile Include="ListingView.cs" />
     <Compile Include="LocationView.cs" />
     <Compile Include="MediaFileView.cs" />
     <Compile Include="PhysicalAddressView.cs" />
     <Compile Include="PostReviewResponse.cs" />
+    <Compile Include="PricingInfoView.cs" />
     <Compile Include="ProfileView.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="ProxyClaimView.cs" />
+    <Compile Include="PurchaseOptionView.cs" />
     <Compile Include="ReviewView.cs" />
-    <Compile Include="SellerView.cs" />
+    <Compile Include="ProfessionalInfoView.cs" />
     <Compile Include="SubTransactionView.cs" />
     <Compile Include="TimeslotScheduleView.cs" />
     <Compile Include="TripleView.cs" />

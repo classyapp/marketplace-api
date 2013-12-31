@@ -19,13 +19,15 @@ namespace classy.Manager
         /// <param name="listingId"></param>
         /// <param name="content"></param>
         /// <param name="score"></param>
+        /// <param name="subCriteria"></param>
         /// <returns></returns>
         ReviewView PostReviewForListing(
             string appId,
             string reviewerProfileId,
             string listingId,
             string content,
-            int score);
+            decimal score,
+            IDictionary<string, decimal> subCriteria);
 
         /// <summary>
         /// 
@@ -35,6 +37,7 @@ namespace classy.Manager
         /// <param name="revieweeProfileId"></param>
         /// <param name="content"></param>
         /// <param name="score"></param>
+        /// <param name="subCriteria"></param>
         /// <param name="contactInfo"></param>
         /// <param name="metadata"></param>
         /// <returns></returns>
@@ -43,9 +46,10 @@ namespace classy.Manager
             string reviewerProfileId,
             string revieweeProfileId,
             string content,
-            int score,
+            decimal score,
+            IDictionary<string, decimal> subCriteria,
             ContactInfo contactInfo,
-            IList<CustomAttribute> metadata);
+            IDictionary<string, string> metadata);
 
         /// <summary>
         /// 

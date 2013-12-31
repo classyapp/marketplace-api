@@ -10,7 +10,7 @@ namespace Classy.Models
     {
         public string Name { get; set; }
         public string Provider { get; set; }
-        public IList<CustomAttribute> Data { get; set; }
+        public IDictionary<string, string> Data { get; set; }
     }
 
     public class PaymentMethodValidator : AbstractValidator<PaymentMethod>

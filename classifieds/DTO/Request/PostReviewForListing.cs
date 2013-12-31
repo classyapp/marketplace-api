@@ -11,7 +11,8 @@ namespace Classy.Models.Request
     {
         public string ListingId { get; set; }
         public string Content { get; set; }
-        public int Score { get; set; }
+        public decimal Score { get; set; }
+        public IDictionary<string, decimal> SubCriteria { get; set; }
     }
 
     public class PostReviewForListingValidator : AbstractValidator<PostReviewForListing>

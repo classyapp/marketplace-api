@@ -92,28 +92,31 @@ namespace Classy.Repository
             ProfilesCollection.Update(query, update);
         }
 
-        public IList<Profile> Search(string appId, string displayName, string category, Location location, IEnumerable<CustomAttribute> metadata)
+        public IList<Profile> Search(string appId, string displayName, string category, Location location, IDictionary<string, string> metadata, bool professionalsOnly)
         {
             var queries = new List<IMongoQuery>() {
                 Query<Profile>.EQ(x => x.AppId, appId)
             };
             if (!string.IsNullOrEmpty(displayName))
             {
+                // search for professional with matching company name, or contact name
                 var nameQuery = Query.Or(
-                    // search in contact info of user 
-                    Query<Profile>.Matches(x => x.ContactInfo.Name, BsonRegularExpression.Create(new Regex(displayName))),
-                    // search in contact info of seller (for business entities)
-                    Query<Profile>.Matches(x => x.SellerInfo.ContactInfo.Name, BsonRegularExpression.Create(new Regex(displayName))),
-                    // search in legal entity name
-                    Query<Profile>.Matches(x => x.SellerInfo.LegalEntityName, BsonRegularExpression.Create(new Regex(displayName))),
-                    // search in seller display name
-                    Query<Profile>.Matches(x => x.SellerInfo.DisplayName, BsonRegularExpression.Create(new Regex(displayName)))
+                    Query<Profile>.Matches(x => x.ProfessionalInfo.CompanyContactInfo.FirstName, BsonRegularExpression.Create(new Regex(displayName, RegexOptions.IgnoreCase))),
+                    Query<Profile>.Matches(x => x.ProfessionalInfo.CompanyContactInfo.LastName, BsonRegularExpression.Create(new Regex(displayName, RegexOptions.IgnoreCase))),
+                    Query<Profile>.Matches(x => x.ProfessionalInfo.CompanyName, BsonRegularExpression.Create(new Regex(displayName, RegexOptions.IgnoreCase)))
+                    );
+                if (!professionalsOnly)
+                    nameQuery = Query.Or(
+                        nameQuery,
+                        // search in contact info of user 
+                        Query<Profile>.Matches(x => x.ContactInfo.FirstName, BsonRegularExpression.Create(new Regex(displayName, RegexOptions.IgnoreCase))),
+                        Query<Profile>.Matches(x => x.ContactInfo.LastName, BsonRegularExpression.Create(new Regex(displayName, RegexOptions.IgnoreCase)))
                 );
                 queries.Add(nameQuery);
             }
             if (!string.IsNullOrEmpty(category))
             {
-                queries.Add(Query<Profile>.EQ(x => x.SellerInfo.Category, category));
+                queries.Add(Query<Profile>.EQ(x => x.ProfessionalInfo.Category, category));
             }
             if (metadata != null)
             {

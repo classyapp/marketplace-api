@@ -13,8 +13,7 @@ namespace classy
         public static ProxyClaimView ToProxyClaimView(this ProxyClaim from)
         {
             var to = from.TranslateTo<ProxyClaimView>();
-            to.SellerInfo = from.SellerInfo.ToSellerView();
-            to.Metadata = from.Metadata.ToCustomAttributeViewList();
+            to.ProfessionalInfo = from.ProfessionalInfo.ToSellerView();
             return to;
         }
     }

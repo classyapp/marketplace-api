@@ -14,15 +14,10 @@ namespace classy
         {
             var to = from.TranslateTo<ListingView>();
             if (from.ExternalMedia != null) to.ExternalMedia = from.ExternalMedia.ToMediaFileList();
-            to.HasPricingInfo = from.Pricing != null;
+            to.HasPricingInfo = from.PricingInfo != null;
             if (to.HasPricingInfo)
             {
-                to.Price = from.Pricing.Price;
-                to.CompareAtPrice = from.Pricing.CompareAtPrice;
-                to.DomesticRadius = from.Pricing.DomesticRadius;
-                to.DomesticShippingPrice = from.Pricing.DomesticShippingPrice;
-                to.InternationalShippingPrice = from.Pricing.InternationalShippingPrice;
-                to.Quantity = from.Pricing.Quantity;
+                to.PricingInfo = from.PricingInfo.ToPricingInfoView();
             }
             to.HasContactInfo = from.ContactInfo != null;
             if (to.HasContactInfo)
@@ -30,16 +25,10 @@ namespace classy
                 to.ContactInfo = from.ContactInfo.ToExtendedContactInfoView();
             }
             to.HasSchedulingInfo = from.SchedulingTemplate != null;
-            if (to.HasSchedulingInfo && from.BookedTimeslots != null)
-            {
-                to.BookedTimeslots = new List<BookedTimeslotView>();
-                foreach (var b in from.BookedTimeslots)
-                {
-                    to.BookedTimeslots.Add(b.TranslateTo<BookedTimeslotView>());
-                }; 
+            if (to.HasSchedulingInfo)
+            {   
                 to.SchedulingTemplate = from.SchedulingTemplate.TranslateTo<TimeslotScheduleView>();
             }
-            to.Metadata = from.Metadata.ToCustomAttributeViewList();
             return to;
         }
 

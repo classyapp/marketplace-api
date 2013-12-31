@@ -23,14 +23,13 @@ namespace Classy.Models.Response
         public int ClickCount { get; set; }
         public int BookingCount { get; set; }
         public int PurchaseCount { get; set; }
+        public int AddToCollectionCount { get; set; }
         public bool IsPublished { get; set; }
         //
         public IList<CommentView> Comments { get; set; }
         //
         public bool HasPricingInfo { get; set; }
-        public string SKU { get; set; }
-        public double? Price { get; set; }
-        public double? CompareAtPrice { get; set; }
+        public PricingInfoView PricingInfo { get; set; }
         //
         public bool HasContactInfo { get; set; }
         public ContactInfoView ContactInfo { get; set; }
@@ -48,7 +47,7 @@ namespace Classy.Models.Response
         public ProfileView Profile { get; set; }
         public IList<ProfileView> FavoritedBy { get; set; }
         //
-        public IList<CustomAttributeView> Metadata { get; set; }
+        public IDictionary<string, string> Metadata { get; set; }
         //
         public bool HasSchedulingInfo { get; set; }
         public TimeslotScheduleView SchedulingTemplate { get; set; }

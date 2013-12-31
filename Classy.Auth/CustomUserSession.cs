@@ -8,6 +8,7 @@ using ServiceStack.Text;
 using System.Linq;
 using Classy.Repository;
 using Classy.Models;
+using System.Net;
 
 namespace Classy.Auth
 {
@@ -18,7 +19,7 @@ namespace Classy.Auth
     /// </summary>
     public class CustomUserSession : AuthUserSession
     {
-        public string AppId { get; set; }
+        public Classy.Models.Env Environment { get; set; }
 
         public override bool IsAuthorized(string provider)
         {
@@ -34,12 +35,12 @@ namespace Classy.Auth
             // TODO: does this get called on eveyr call? if so find a different way.
             var repo = authService.TryResolve<IProfileRepository>();
             var storage = authService.TryResolve<IStorageRepository>();
-            var profile = repo.GetById(AppId, session.UserAuthId, false);
+            var profile = repo.GetById(Environment.AppId, session.UserAuthId, false);
             if (profile == null)
             {
                 isNew = true;
                 profile = (session as CustomUserSession).TranslateTo<Profile>();
-                profile.ContactInfo.Name = session.DisplayName;
+                profile.AppId = Environment.AppId;
                 profile.ContactInfo.FirstName = session.FirstName;
                 profile.ContactInfo.LastName = session.LastName;
                 profile.ContactInfo.Email = session.Email;
@@ -49,10 +50,9 @@ namespace Classy.Auth
             {
                 if (authToken.Provider == FacebookAuthProvider.Name)
                 {
-                    profile.FacebookName = authToken.DisplayName;
-                    profile.FacebookFirstName = authToken.FirstName;
-                    profile.FacebookLastName = authToken.LastName;
-                    profile.FacebookEmail = authToken.Email;
+                    profile.ContactInfo.FirstName = authToken.FirstName;
+                    profile.ContactInfo.LastName = authToken.LastName;
+                    profile.ContactInfo.Email = authToken.Email;
                     if (isNew)
                     {
                         profile.ImageUrl = SaveFileFromUrl(storage, session.UserAuthId,  
@@ -61,14 +61,21 @@ namespace Classy.Auth
                 }
                 else if (authToken.Provider == TwitterAuthProvider.Name)
                 {
-                    profile.TwitterName = authToken.DisplayName;
+                    
                 }
             }
 
             // still no profile pic?
             if (isNew && string.IsNullOrEmpty(profile.ImageUrl))
             {
-                profile.ImageUrl = SaveFileFromUrl(storage, session.UserAuthId, "http://www.gravatar.com/avatar/?f=y&d=mm");
+                try
+                {
+                    profile.ImageUrl = SaveFileFromUrl(storage, session.UserAuthId, "http://www.gravatar.com/avatar/?f=y&d=mm");
+                }
+                catch(WebException)
+                {
+                    // sink
+                }
             }
 
             //
@@ -84,17 +91,17 @@ namespace Classy.Auth
     }
 
     public static class IAuthSessionExtensions {
-        public static string GetAppId (this IAuthSession session)
+        public static Classy.Models.Env GetEnvironment (this IAuthSession session)
         {
             var custom = session as CustomUserSession;
             if (custom == null) return null;
-            else return custom.AppId;
+            else return custom.Environment;
         }
 
-        public static void SetAppId(this IAuthSession session, string appId)
+        public static void SetEnvironment(this IAuthSession session, Classy.Models.Env env)
         {
             var custom = session as CustomUserSession;
-            if (custom != null) custom.AppId = appId;
+            if (custom != null) custom.Environment = env;
         }
     }
 }

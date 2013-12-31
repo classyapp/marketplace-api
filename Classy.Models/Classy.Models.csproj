@@ -29,6 +29,15 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'AppHarbor|AnyCPU'">
+    <OutputPath>bin\AppHarbor\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <Optimize>true</Optimize>
+    <DebugType>pdbonly</DebugType>
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <ErrorReport>prompt</ErrorReport>
+    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
+  </PropertyGroup>
   <ItemGroup>
     <Reference Include="MongoDB.Bson">
       <HintPath>..\packages\mongocsharpdriver.1.8.3\lib\net35\MongoDB.Bson.dll</HintPath>
@@ -53,15 +62,16 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="App.cs" />
+    <Compile Include="Collection.cs" />
     <Compile Include="ContactInfo.cs" />
+    <Compile Include="Env.cs" />
     <Compile Include="Profile.cs" />
     <Compile Include="ProxyClaim.cs" />
-    <Compile Include="Seller.cs" />
+    <Compile Include="ProfessionalInfo.cs" />
     <Compile Include="BankAccount.cs" />
     <Compile Include="BaseObject.cs" />
     <Compile Include="BookableTimeslot.cs" />
     <Compile Include="Comment.cs" />
-    <Compile Include="CustomAttribute.cs" />
     <Compile Include="BaseRequestDto.cs" />
     <Compile Include="FlagReason.cs" />
     <Compile Include="Listing.cs" />

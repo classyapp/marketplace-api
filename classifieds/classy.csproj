@@ -75,7 +75,9 @@
   <ItemGroup>
     <Content Include="default.html" />
     <Content Include="Global.asax" />
-    <Content Include="Web.config" />
+    <Content Include="Web.config">
+      <SubType>Designer</SubType>
+    </Content>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="DTO\Request\AddExternalMedia.cs" />
@@ -84,6 +86,10 @@
     <Compile Include="DTO\Request\CancelBooking.cs" />
     <Compile Include="DTO\Request\CancelSingleItemOrder.cs" />
     <Compile Include="DTO\Request\ClaimProxyProfile.cs" />
+    <Compile Include="DTO\Request\AddListingToCollection.cs" />
+    <Compile Include="DTO\Request\GetCollectionById.cs" />
+    <Compile Include="DTO\Request\CreateCollection.cs" />
+    <Compile Include="DTO\Request\GetSessionProfile.cs" />
     <Compile Include="DTO\Request\LogActivity.cs" />
     <Compile Include="DTO\Request\UpdateProfile.cs" />
     <Compile Include="DTO\Request\CreateProfileProxy.cs" />
@@ -115,19 +121,22 @@
     <Compile Include="DTO\Request\UpdateSingleItemOrder.cs" />
     <Compile Include="Extentions\CommentViewExtensions.cs" />
     <Compile Include="Extentions\ContactInfoViewExtensions.cs" />
+    <Compile Include="Extentions\CollectionViewExtensions.cs" />
+    <Compile Include="Extentions\PricingInfoViewExtensions.cs" />
     <Compile Include="Extentions\MediaFileViewExtensions.cs" />
     <Compile Include="Extentions\LocationViewExtensions.cs" />
     <Compile Include="Extentions\ReviewViewExtensions.cs" />
-    <Compile Include="Extentions\CustomAttributeViewExtensions.cs" />
     <Compile Include="Extentions\SellerViewExtentions.cs" />
     <Compile Include="Extentions\ProxyClaimViewExtentions.cs" />
     <Compile Include="Extentions\ListingViewExtensions.cs" />
     <Compile Include="Extentions\ProfileViewExtentions.cs" />
+    <Compile Include="DTO\Request\GetCollectionByProfileId.cs" />
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
     <Compile Include="Manager\DefaultAnalyticsManager.cs" />
     <Compile Include="Manager\IAnalyticsManager.cs" />
+    <Compile Include="Manager\ICollectionManager.cs" />
     <Compile Include="Manager\IReviewManager.cs" />
     <Compile Include="Manager\DefaultAppManager.cs" />
     <Compile Include="Manager\DefaultBookingManager.cs" />
@@ -144,6 +153,10 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="packages.config" />
+    <None Include="Web.AppHarbor.config">
+      <DependentUpon>Web.config</DependentUpon>
+      <SubType>Designer</SubType>
+    </None>
     <None Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>
     </None>
@@ -173,6 +186,15 @@
   <PropertyGroup>
     <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">10.0</VisualStudioVersion>
     <VSToolsPath Condition="'$(VSToolsPath)' == ''">$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)</VSToolsPath>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'AppHarbor|AnyCPU'">
+    <OutputPath>bin\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <Optimize>true</Optimize>
+    <DebugType>pdbonly</DebugType>
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <ErrorReport>prompt</ErrorReport>
+    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
   </PropertyGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <Import Project="$(VSToolsPath)\WebApplications\Microsoft.WebApplication.targets" Condition="'$(VSToolsPath)' != ''" />

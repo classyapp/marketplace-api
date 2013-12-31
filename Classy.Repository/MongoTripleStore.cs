@@ -22,7 +22,7 @@ namespace Classy.Repository
             TripleCollection = Db.GetCollection<Triple>("triples");
         }
 
-        public Triple LogActivity(string appId, string subjectObjectId, ActivityPredicate predicate, string objectObjectId, ref bool tripleAlreadyExists)
+        public Triple LogActivity(string appId, string subjectObjectId, string predicate, string objectObjectId, ref bool tripleAlreadyExists)
         {
             var triple = new Triple
             {
@@ -49,7 +49,7 @@ namespace Classy.Repository
             return triple;
         }
 
-        public IList<string> GetActivitySubjectList(string appId, ActivityPredicate predicate, string objectObjectId)
+        public IList<string> GetActivitySubjectList(string appId, string predicate, string objectObjectId)
         {
             var query = Query.And(
                     Query<Triple>.EQ(x => x.AppId, appId),
@@ -60,7 +60,7 @@ namespace Classy.Repository
             return subjectList;
         }
 
-        public IList<string> GetActivityObjectList(string appId, ActivityPredicate predicate, string subjectObjectId)
+        public IList<string> GetActivityObjectList(string appId, string predicate, string subjectObjectId)
         {
             var query = Query.And(
                     Query<Triple>.EQ(x => x.AppId, appId),

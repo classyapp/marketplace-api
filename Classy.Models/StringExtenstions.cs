@@ -42,11 +42,11 @@ namespace Classy.Models
         public static string[] ExtractUsernames(this string from)
         {
             var tagRegex = new Regex(@"\B@\w\w+");
-            var hashtags = tagRegex.Matches(from)
+            var usernames = tagRegex.Matches(from)
                 .Cast<Match>()
                 .Select(m => m.Value)
                 .ToArray();
-            return hashtags;
+            return usernames;
         }
     }
 }
