@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 2013
-VisualStudioVersion = 12.0.20623.1 VSUPREVIEW
+VisualStudioVersion = 12.0.21005.1
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "classy", "classifieds\classy.csproj", "{F03039CF-DC12-4A37-A2B6-9E9B78E59FB1}"
 EndProject
@@ -15,26 +15,37 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Classy.Models.Response", "C
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		AppHarbor|Any CPU = AppHarbor|Any CPU
 		Debug|Any CPU = Debug|Any CPU
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{F03039CF-DC12-4A37-A2B6-9E9B78E59FB1}.AppHarbor|Any CPU.ActiveCfg = AppHarbor|Any CPU
+		{F03039CF-DC12-4A37-A2B6-9E9B78E59FB1}.AppHarbor|Any CPU.Build.0 = AppHarbor|Any CPU
 		{F03039CF-DC12-4A37-A2B6-9E9B78E59FB1}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{F03039CF-DC12-4A37-A2B6-9E9B78E59FB1}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{F03039CF-DC12-4A37-A2B6-9E9B78E59FB1}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{F03039CF-DC12-4A37-A2B6-9E9B78E59FB1}.Release|Any CPU.Build.0 = Release|Any CPU
+		{AC13DF42-51BB-4798-A0AB-9B2776B4844F}.AppHarbor|Any CPU.ActiveCfg = AppHarbor|Any CPU
+		{AC13DF42-51BB-4798-A0AB-9B2776B4844F}.AppHarbor|Any CPU.Build.0 = AppHarbor|Any CPU
 		{AC13DF42-51BB-4798-A0AB-9B2776B4844F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{AC13DF42-51BB-4798-A0AB-9B2776B4844F}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{AC13DF42-51BB-4798-A0AB-9B2776B4844F}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{AC13DF42-51BB-4798-A0AB-9B2776B4844F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C40E22DB-95CD-4E86-BF84-718AEADF064C}.AppHarbor|Any CPU.ActiveCfg = AppHarbor|Any CPU
+		{C40E22DB-95CD-4E86-BF84-718AEADF064C}.AppHarbor|Any CPU.Build.0 = AppHarbor|Any CPU
 		{C40E22DB-95CD-4E86-BF84-718AEADF064C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{C40E22DB-95CD-4E86-BF84-718AEADF064C}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{C40E22DB-95CD-4E86-BF84-718AEADF064C}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{C40E22DB-95CD-4E86-BF84-718AEADF064C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{8BB8C610-FFDB-49DE-AF0C-0E4CB37E4B1E}.AppHarbor|Any CPU.ActiveCfg = AppHarbor|Any CPU
+		{8BB8C610-FFDB-49DE-AF0C-0E4CB37E4B1E}.AppHarbor|Any CPU.Build.0 = AppHarbor|Any CPU
 		{8BB8C610-FFDB-49DE-AF0C-0E4CB37E4B1E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{8BB8C610-FFDB-49DE-AF0C-0E4CB37E4B1E}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{8BB8C610-FFDB-49DE-AF0C-0E4CB37E4B1E}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{8BB8C610-FFDB-49DE-AF0C-0E4CB37E4B1E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{7DBA45E3-CB30-4F3C-9577-27E955DD3F49}.AppHarbor|Any CPU.ActiveCfg = AppHarbor|Any CPU
+		{7DBA45E3-CB30-4F3C-9577-27E955DD3F49}.AppHarbor|Any CPU.Build.0 = AppHarbor|Any CPU
 		{7DBA45E3-CB30-4F3C-9577-27E955DD3F49}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{7DBA45E3-CB30-4F3C-9577-27E955DD3F49}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{7DBA45E3-CB30-4F3C-9577-27E955DD3F49}.Release|Any CPU.ActiveCfg = Release|Any CPU
