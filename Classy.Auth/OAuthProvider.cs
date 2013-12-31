@@ -81,7 +81,7 @@ namespace Classy.Auth
                     tokens.AccessToken = OAuthUtils.AccessToken;
                     tokens.AccessTokenSecret = OAuthUtils.AccessTokenSecret;
                     session.IsAuthenticated = true;
-                    session.SetAppId(request.AppId);
+                    session.SetEnvironment(request.Environment);
                     OnAuthenticated(authService, session, tokens, OAuthUtils.AuthInfo);
                     authService.SaveSession(session, SessionExpiry);
 

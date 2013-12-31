@@ -91,7 +91,7 @@ namespace classy.Manager
 
                 // log the purchase activity
                 var tripleExists = false;
-                TripleStore.LogActivity(appId, profileId, Classy.Models.ActivityPredicate.Purchase, listingId, ref tripleExists);
+                TripleStore.LogActivity(appId, profileId, ActivityPredicate.PURCHASE_LISTING, listingId, ref tripleExists);
 
                 // increase purchase counter
                 ListingRepository.IncreaseCounter(listingId, appId, ListingCounters.Purchases, quantity);
@@ -204,7 +204,7 @@ namespace classy.Manager
         /// <returns></returns>
         private Listing GetVerifiedListing(string appId, string listingId)
         {
-            var listing = ListingRepository.GetById(listingId, appId, false, false);
+            var listing = ListingRepository.GetById(listingId, appId, false);
             if (listing == null) throw new KeyNotFoundException("invalid listing");
             return listing;
         }

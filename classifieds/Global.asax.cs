@@ -20,6 +20,7 @@ using System.Linq;
 using System.Web;
 using System.Web.Security;
 using System.Web.SessionState;
+using ServiceStack.Text;
 
 namespace classy
 {
@@ -30,7 +31,7 @@ namespace classy
             public ListingServiceHost() : base("Listing Service Endpoint, Hello", typeof(Services.ListingService).Assembly) 
             {
                 // request filter to verify api key
-                RequestFilters.Add(CustomAuthenticateAttribute.ApiKeyFilter);
+                RequestFilters.Add(CustomAuthenticateAttribute.SetEnvironment);
 
                 SetConfig(new EndpointHostConfig()
                 {
@@ -176,11 +177,11 @@ namespace classy
                     .Add<PostListing>("/listing/{ListingId}", "PUT") // update listing
                     .Add<SearchListings>("/listing/search", ApplyTo.Get | ApplyTo.Post) // search listings by tag and/or metadata
                     .Add<SearchListings>("/tags/{tag}", "GET") // search with a nicer url for tag
-                    .Add<GetListingsByUsername>("/profile/{Username}/listing/all", "GET") // get list of listing for profile
+                    .Add<GetListingsByUsername>("/profile/{Username}/listing/list", "GET") // get list of listing for profile
 
                     // Collections
                     .Add<CreateCollection>("/collection/new", "POST") // create a new collection
-                    //.Add<AddListingsToCollection>("/collection/{CollectionId}/listing", "POST") // add listings to collection
+                    .Add<AddListingsToCollection>("/collection/{CollectionId}/listing/new", "POST") // add listings to collection
                     //.Add<RemoveListingsFromCollection>("/collection/{CollectionId}/listing", "DELETE") // remove listings to collection
                     //.Add<AddCollaboratorsToCollection>("/collection/{CollectionId}/collaborator", "POST") // add collaborators to collection
                     //.Add<RemoveCollaboratorsFromCollection>("/collection/{CollectionId}/collaborator", "DELETE") // remove collaborators to collection
@@ -188,6 +189,7 @@ namespace classy
                     //.Add<RemovePermittedViewersFromCollection>("/collection/{CollectionId}/viewer", "DELETE") // remove view permissions
                     //.Add<UpdateCollection>("/collection/{CollectionId}", "PUT") // update collection details
                     .Add<GetCollectionById>("/collection/{CollectionId}", "GET") // get a collection by id
+                    .Add<GetCollectionByProfileId>("/profile/{ProfileId}/collection/list", "GET") // get a collection by id
 
                     // Comments
                     .Add<PostComment>("/listing/{ListingId}/comment/new", "POST") // post new comment

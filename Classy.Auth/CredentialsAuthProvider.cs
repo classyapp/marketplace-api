@@ -53,7 +53,7 @@ namespace Classy.Auth
                 session.PopulateWith(userAuth);
                 session.IsAuthenticated = true;
                 session.UserAuthId = userAuth.Id.ToString(CultureInfo.InvariantCulture);
-                session.ProviderOAuthAccess = authRepo.GetUserOAuthProviders(session.GetAppId(), session.UserAuthId)
+                session.ProviderOAuthAccess = authRepo.GetUserOAuthProviders(appId, session.UserAuthId)
                     .ConvertAll(x => (IOAuthTokens)x);
 
                 return true;
@@ -74,10 +74,10 @@ namespace Classy.Auth
         public override object Authenticate(IServiceBase authService, IAuthSession session, Auth request)
         {
             new CredentialsAuthValidator().ValidateAndThrow(request);
-            return Authenticate(authService, session, request.AppId, request.UserName, request.Password, request.Continue);
+            return Authenticate(authService, session, request.Environment, request.UserName, request.Password, request.Continue);
         }
 
-        protected object Authenticate(IServiceBase authService, IAuthSession session, string appId, string userName, string password, string referrerUrl)
+        protected object Authenticate(IServiceBase authService, IAuthSession session, Classy.Models.Env env, string userName, string password, string referrerUrl)
         {
             if (!LoginMatchesSession(session, userName))
             {
@@ -85,11 +85,12 @@ namespace Classy.Auth
                 session = authService.GetSession();
             }
 
-            if (TryAuthenticate(authService, appId, userName, password))
+            if (TryAuthenticate(authService, env.AppId, userName, password))
             {
                 if (session.UserAuthName == null)
                     session.UserAuthName = userName;
 
+                session.SetEnvironment(env);
                 OnAuthenticated(authService, session, null, null);
 
                 return new AuthResponse
@@ -136,7 +137,6 @@ namespace Classy.Auth
                 {
                     httpRes.Cookies.AddPermanentCookie(HttpHeaders.XUserAuthId, session.UserAuthId);
                 }
-
             }
 
             authService.SaveSession(session, SessionExpiry ?? TimeSpan.FromDays(7 * 2));

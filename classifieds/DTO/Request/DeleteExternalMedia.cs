@@ -16,8 +16,6 @@ namespace Classy.Models.Request
     {
         public DeleteExternalMediaValidator()
         {
-            RuleFor(x => x.ListingId).NotEmpty();
-            RuleFor(x => x.AppId).NotEmpty();
             RuleFor(x => x.Url).NotNull();
         }
     }

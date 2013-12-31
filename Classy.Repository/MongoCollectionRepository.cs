@@ -45,7 +45,14 @@ namespace Classy.Repository
 
         public void Update(Collection collection)
         {
-            throw new NotImplementedException();
+            try
+            {
+                CollectionsCollection.Save(collection);
+            }
+            catch (MongoException)
+            {
+                throw;
+            }
         }
 
         public Collection GetById(string appId, string collectionId)

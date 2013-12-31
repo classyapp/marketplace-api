@@ -9,8 +9,8 @@ namespace Classy.Repository
 {
     public interface ITripleStore
     {
-        Triple LogActivity(string appId, string subjectObjectId, ActivityPredicate predicate, string objectObjectId, ref bool tripleAlreadyExists);
-        IList<string> GetActivitySubjectList(string appId, ActivityPredicate predicate, string objectObjectId);
-        IList<string> GetActivityObjectList(string appId, ActivityPredicate predicate, string subjectObjectId);
+        Triple LogActivity(string appId, string subjectObjectId, string predicate, string objectObjectId, ref bool tripleAlreadyExists);
+        IList<string> GetActivitySubjectList(string appId, string predicate, string objectObjectId);
+        IList<string> GetActivityObjectList(string appId, string predicate, string subjectObjectId);
     }
 }

@@ -14,13 +14,11 @@ using ServiceStack.ServiceInterface;
 namespace Classy.Auth
 {
     [DataContract]
-    public class Registration : IReturn<RegistrationResponse>
+    public class Registration : Classy.Models.BaseRequestDto, IReturn<RegistrationResponse>
     {
         [DataMember(Order = 1)]
         public string UserName { get; set; }
         [DataMember(Order = 8)]
-        public string AppId { get; set; }
-        [DataMember(Order = 2)]
         public string FirstName { get; set; }
         [DataMember(Order = 3)]
         public string LastName { get; set; }
@@ -149,7 +147,7 @@ namespace Classy.Auth
                 {
                     var authResponse = authService.Post(new Auth
                     {
-                        AppId = request.AppId,
+                        Environment = request.Environment,
                         UserName = request.UserName ?? request.Email,
                         Password = request.Password,
                         Continue = request.Continue
@@ -200,6 +198,7 @@ namespace Classy.Auth
         {
             var to = request.TranslateTo<UserAuth>();
             to.PrimaryEmail = request.Email;
+            to.AppId = request.Environment.AppId;
             return to;
         }
 

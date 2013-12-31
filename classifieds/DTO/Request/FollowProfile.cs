@@ -10,13 +10,4 @@ namespace Classy.Models.Request
     {
         public string FolloweeUsername { get; set; }
     }
-
-    public class FollowProfileValidator : AbstractValidator<FollowProfile>
-    {
-        public FollowProfileValidator()
-        {
-            RuleFor(x => x.AppId).NotEmpty();
-            RuleFor(x => x.FolloweeUsername).NotEmpty();
-        }
-    }
 }

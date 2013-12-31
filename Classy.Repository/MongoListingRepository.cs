@@ -26,25 +26,24 @@ namespace Classy.Repository
             ListingsCollection = Db.GetCollection<Listing>("classifieds");
         }
 
-        public Listing GetById(string listingId, string appId, bool includeDrafts, bool increaseViewCounter)
+        public Listing GetById(string listingId, string appId, bool includeDrafts)
+        {
+            var listings = GetById(new string[] { listingId }, appId, includeDrafts);
+            if (listings == null || listings.Count() == 0) return null;
+            return listings[0];
+        }
+
+        public IList<Listing> GetById(string[] listingId, string appId, bool includeDrafts)
         {
             var query = Query.And(
-                    Query<Listing>.EQ(x => x.Id, listingId),
+                    Query<Listing>.In(x => x.Id, listingId),
                     Query<Listing>.EQ(x => x.AppId, appId));
             if (!includeDrafts)
             {
                 query = Query.And(query, Query<Listing>.EQ(x => x.IsPublished, true));
             }
-            if (increaseViewCounter)
-            {
-                var listing = ListingsCollection.FindAndModify(query, null, Update<Listing>.Inc(x => x.ViewCount, 1), true);
-                return listing.GetModifiedDocumentAs<Listing>();
-            }
-            else
-            {
-                var listing = ListingsCollection.FindOne(query);
-                return listing;
-            }   
+            var listings = ListingsCollection.Find(query);
+            return listings.ToList(); 
         }
 
         public IList<Listing> GetByProfileId(string appId, string profileId, bool includeDrafts)
@@ -141,27 +140,17 @@ namespace Classy.Repository
             }
         }
 
-
-        public void IncreaseCommentCounter(string listingId, string appId, int value)
+        public void IncreaseCounter(string listingId, string appId, ListingCounters counters, int value)
         {
-            try
-            {
-                ListingsCollection.Update(Query.And(
-                    Query<Listing>.EQ(x => x.Id, listingId),
-                    Query<Listing>.EQ(x => x.AppId, appId)), Update<Listing>.Inc(x => x.CommentCount, value));
-            }
-            catch (MongoException mex)
-            {
-                throw;
-            }
+            IncreaseCounter(new string[] { listingId }, appId, counters, value);
         }
 
-        public void IncreaseCounter(string listingId, string appId, ListingCounters counters, int value)
+        public void IncreaseCounter(string[] listingId, string appId, ListingCounters counters, int value)
         {
             try
             {
                 var query = Query.And(
-                    Query<Listing>.EQ(x => x.Id, listingId),
+                    Query<Listing>.In(x => x.Id, listingId),
                     Query<Listing>.EQ(x => x.AppId, appId)
                     );
                 var update = new UpdateBuilder<Listing>();
@@ -173,7 +162,7 @@ namespace Classy.Repository
                 if (counters.HasFlag(ListingCounters.Bookings)) update.Inc(x => x.BookingCount, value);
                 if (counters.HasFlag(ListingCounters.Purchases)) update.Inc(x => x.PurchaseCount, value);
                 if (counters.HasFlag(ListingCounters.AddToCollection)) update.Inc(x => x.AddToCollectionCount, value);
-                ListingsCollection.Update(query, update);
+                ListingsCollection.Update(query, update, new MongoUpdateOptions { Flags = UpdateFlags.Multi });
             }
             catch (MongoException mex)
             {

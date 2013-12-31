@@ -41,7 +41,7 @@ namespace Classy.Auth
 
                 tokens.AccessToken = request.oauth_token;
                 session.IsAuthenticated = true;
-                session.SetAppId(request.AppId);
+                session.SetEnvironment(request.Environment);
 
                 var json = AuthHttpGateway.DownloadFacebookUserInfo(request.oauth_token);
                 var authInfo = JsonSerializer.DeserializeFromString<Dictionary<string, string>>(json);

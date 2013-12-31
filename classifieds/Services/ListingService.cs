@@ -42,7 +42,7 @@ namespace classy.Services
                 content = line.Split(',');
 
                 profile = ProfileManager.CreateProfileProxy(
-                    request.AppId,
+                    request.Environment.AppId,
                     new ProfessionalInfo {
                         CompanyName = content[0]
                     },
@@ -51,7 +51,7 @@ namespace classy.Services
             }
 
             //var profile = ProfileManager.CreateProfileProxy(
-            //    request.AppId,
+            //    request.Environment.AppId,
             //    request.ProfessionalInfo,
             //    request.Metadata);
                 
@@ -65,7 +65,7 @@ namespace classy.Services
                 var session = SessionAs<CustomUserSession>();
 
                 var listingView = ListingManager.GetListingById(
-                    request.AppId,
+                    request.Environment.AppId,
                     request.ListingId,
                     session.UserAuthId,
                     request.LogImpression,
@@ -89,7 +89,7 @@ namespace classy.Services
             try
             {
                 var listingViews = ListingManager.GetListingsByUsername(
-                    request.AppId,
+                    request.Environment.AppId,
                     request.Username,
                     request.IncludeComments,
                     request.FormatCommentsAsHtml);
@@ -110,7 +110,7 @@ namespace classy.Services
         public object Post(SearchListings request)
         {
             var listingViews = ListingManager.SearchListings(
-                request.AppId,
+                request.Environment.AppId,
                 request.Tag,
                 request.ListingType,
                 request.Metadata,
@@ -130,7 +130,7 @@ namespace classy.Services
             var session = SessionAs<CustomUserSession>();
 
             var listing = ListingManager.SaveListing(
-                request.AppId,
+                request.Environment.AppId,
                 null,
                 session.UserAuthId,
                 request.Title,
@@ -160,7 +160,7 @@ namespace classy.Services
                 var session = SessionAs<CustomUserSession>();
 
                 var listing = ListingManager.AddExternalMediaToListing(
-                    request.AppId,
+                    request.Environment.AppId,
                     request.ListingId,
                     session.UserAuthId,
                     Request.Files);
@@ -182,7 +182,7 @@ namespace classy.Services
                 var session = SessionAs<CustomUserSession>();
 
                 var listing = ListingManager.DeleteExternalMediaFromListing(
-                    request.AppId,
+                    request.Environment.AppId,
                     request.ListingId,
                     session.UserAuthId,
                     request.Url);
@@ -204,7 +204,7 @@ namespace classy.Services
                 var session = SessionAs<CustomUserSession>();
 
                 var listing = ListingManager.PublishListing(
-                    request.AppId,
+                    request.Environment.AppId,
                     request.ListingId,
                     session.UserAuthId);
 
@@ -225,7 +225,7 @@ namespace classy.Services
                 var session = SessionAs<CustomUserSession>();
 
                 var listing = ListingManager.SaveListing(
-                    request.AppId,
+                    request.Environment.AppId,
                     request.ListingId,
                     session.UserAuthId,
                     request.Title,
@@ -253,7 +253,7 @@ namespace classy.Services
                 var session = SessionAs<CustomUserSession>();
 
                 var comment = ListingManager.AddCommentToListing(
-                    request.AppId,
+                    request.Environment.AppId,
                     request.ListingId,
                     session.UserAuthId,
                     request.Content,
@@ -276,7 +276,7 @@ namespace classy.Services
                 var session = SessionAs<CustomUserSession>();
 
                 ListingManager.FavoriteListing(
-                    request.AppId,
+                    request.Environment.AppId,
                     request.ListingId,
                     session.UserAuthId);
 
@@ -297,7 +297,7 @@ namespace classy.Services
                 var session = SessionAs<CustomUserSession>();
 
                 ListingManager.FlagListing(
-                    request.AppId,
+                    request.Environment.AppId,
                     request.ListingId,
                     session.UserAuthId,
                     request.FlagReason);
@@ -319,7 +319,7 @@ namespace classy.Services
                 var session = SessionAs<CustomUserSession>();
 
                 ProfileManager.FollowProfile(
-                    request.AppId,
+                    request.Environment.AppId,
                     session.UserAuthId,
                     request.FolloweeUsername);
 
@@ -340,7 +340,7 @@ namespace classy.Services
                 var session = SessionAs<CustomUserSession>();
 
                 var claim = ProfileManager.SubmitProxyClaim(
-                    request.AppId,
+                    request.Environment.AppId,
                     session.UserAuthId,
                     request.ProxyProfileId,
                     request.ProfessionalInfo,
@@ -361,7 +361,7 @@ namespace classy.Services
             try
             {
                 var claim = ProfileManager.ApproveProxyClaim(
-                    request.AppId,
+                    request.Environment.AppId,
                     request.ClaimId);
 
                 return new HttpResult(claim, HttpStatusCode.OK);
@@ -379,7 +379,7 @@ namespace classy.Services
             try
             {
                 var claim = ProfileManager.RejectProxyClaim(
-                    request.AppId,
+                    request.Environment.AppId,
                     request.ClaimId);
 
                 return new HttpResult(claim, HttpStatusCode.OK);
@@ -399,7 +399,7 @@ namespace classy.Services
             else 
             {
                 var profile = ProfileManager.GetProfileById(
-                    request.AppId,
+                    request.Environment.AppId,
                     session.UserAuthId,
                     session.UserAuthId,
                     false,
@@ -420,7 +420,7 @@ namespace classy.Services
                 var session = SessionAs<CustomUserSession>();
 
                 var profile = ProfileManager.GetProfileById(
-                    request.AppId,
+                    request.Environment.AppId,
                     request.ProfileId,
                     session.UserAuthId,
                     request.IncludeFollowedByProfiles,
@@ -448,7 +448,7 @@ namespace classy.Services
                 if (session.UserAuthId != request.ProfileId) throw new UnauthorizedAccessException("not yours to update");
 
                 var profile = ProfileManager.UpdateProfile(
-                    request.AppId,
+                    request.Environment.AppId,
                     request.ProfileId,
                     request.ProfessionalInfo,
                     request.Metadata);
@@ -470,7 +470,7 @@ namespace classy.Services
         public object Post(SearchProfiles request)
         {
             var profiles = ProfileManager.SearchProfiles(
-                request.AppId,
+                request.Environment.AppId,
                 request.DisplayName,
                 request.Category,
                 request.Location,
@@ -488,7 +488,7 @@ namespace classy.Services
             {
                 var session = SessionAs<CustomUserSession>();
                 var timeslot = BookingManager.BookListing(
-                    request.AppId,
+                    request.Environment.AppId,
                     request.ListingId,
                     session.UserAuthId,
                     request.PaymentMethod,
@@ -512,7 +512,7 @@ namespace classy.Services
             {
                 var session = SessionAs<CustomUserSession>();
                 var bookings = BookingManager.GetBookingsForListing(
-                    request.AppId,
+                    request.Environment.AppId,
                     request.ListingId,
                     session.UserAuthId,
                     new DateRange { Start = request.Start, End = request.End },
@@ -533,7 +533,7 @@ namespace classy.Services
                 var session = SessionAs<CustomUserSession>();
                 if (!session.IsAuthenticated) throw new UnauthorizedAccessException("you must be logged in");
                 var bookings = BookingManager.GetBookingsForProfileListings(
-                    request.AppId,
+                    request.Environment.AppId,
                     session.UserAuthId,
                     new DateRange { Start = request.Start, End = request.End },
                     request.InculdeCancelled);
@@ -553,7 +553,7 @@ namespace classy.Services
                 var session = SessionAs<CustomUserSession>();
                 if (!session.IsAuthenticated) throw new UnauthorizedAccessException("you must be logged in");
                 var bookings = BookingManager.GetBookingsForProfile(
-                    request.AppId,
+                    request.Environment.AppId,
                     session.UserAuthId,
                     new DateRange { Start = request.Start, End = request.End },
                     request.InculdeCancelled);
@@ -574,7 +574,7 @@ namespace classy.Services
                 var session = SessionAs<CustomUserSession>();
 
                 var booking = BookingManager.UpdateBooking(
-                    request.AppId,
+                    request.Environment.AppId,
                     request.BookingId,
                     session.UserAuthId,
                     request.DateRange,
@@ -597,7 +597,7 @@ namespace classy.Services
             {
                 var session = SessionAs<CustomUserSession>();
                 var response = BookingManager.CancelBooking(
-                    request.AppId,
+                    request.Environment.AppId,
                     request.BookingId,
                     session.UserAuthId,
                     request.DoRefund);
@@ -618,7 +618,7 @@ namespace classy.Services
                 var session = SessionAs<CustomUserSession>();
 
                 var order = OrderManager.PlaceSingleItemOrder(
-                    request.AppId,
+                    request.Environment.AppId,
                     request.ListingId,
                     session.UserAuthId,
                     request.PaymentMethod,
@@ -641,7 +641,7 @@ namespace classy.Services
             {
                 var session = SessionAs<CustomUserSession>();
                 var order = OrderManager.UpdateSingleItemOrder(
-                    request.AppId,
+                    request.Environment.AppId,
                     request.OrderId,
                     session.UserAuthId,
                     request.SKU,
@@ -663,7 +663,7 @@ namespace classy.Services
             {
                 var session = SessionAs<CustomUserSession>();
                 var response = OrderManager.CancelSingleItemOrder(
-                    request.AppId,
+                    request.Environment.AppId,
                     request.OrderId,
                     session.UserAuthId,
                     request.DoRefund);
@@ -684,7 +684,7 @@ namespace classy.Services
             {
                 var session = SessionAs<CustomUserSession>();
                 var orders = OrderManager.GetOrdersForListing(
-                    request.AppId,
+                    request.Environment.AppId,
                     request.ListingId,
                     session.UserAuthId,
                     request.IncludeCancelled);
@@ -706,7 +706,7 @@ namespace classy.Services
                 var session = SessionAs<CustomUserSession>();
                 if (!session.IsAuthenticated) throw new UnauthorizedAccessException("you must be logged in");
                 var orders = OrderManager.GetOrdersForProfile(
-                    request.AppId,
+                    request.Environment.AppId,
                     session.UserAuthId,
                     request.IncludeCancelled);
 
@@ -727,7 +727,7 @@ namespace classy.Services
                 var session = SessionAs<CustomUserSession>();
                 if (!session.IsAuthenticated) throw new UnauthorizedAccessException("you must be logged in");
                 var orders = OrderManager.GetOrdersForProfileListings(
-                    request.AppId,
+                    request.Environment.AppId,
                     session.UserAuthId,
                     request.IncludeCancelled);
 
@@ -747,7 +747,7 @@ namespace classy.Services
             {
                 var session = SessionAs<CustomUserSession>();
                 var review = ReviewManager.PostReviewForListing(
-                    request.AppId,
+                    request.Environment.AppId,
                     session.UserAuthId,
                     request.ListingId,
                     request.Content,
@@ -769,7 +769,7 @@ namespace classy.Services
             {
                 var session = SessionAs<CustomUserSession>();
                 var review = ReviewManager.PostReviewForProfile(
-                    request.AppId,
+                    request.Environment.AppId,
                     session.UserAuthId,
                     request.RevieweeProfileId,
                     request.Content,
@@ -783,7 +783,7 @@ namespace classy.Services
                 };
                 if (request.ReturnRevieweeProfile)
                     response.RevieweeProfile = ProfileManager.GetProfileById(
-                        request.AppId,
+                        request.Environment.AppId,
                         request.RevieweeProfileId,
                         null,
                         false,
@@ -794,7 +794,7 @@ namespace classy.Services
                         false);
                 if (request.ReturnReviewerProfile)
                     response.ReviewerProfile = ProfileManager.GetProfileById(
-                        request.AppId,
+                        request.Environment.AppId,
                         session.UserAuthId,
                         null,
                         false,
@@ -818,7 +818,7 @@ namespace classy.Services
             try
             {
                 var reviews = ReviewManager.GetReviews(
-                    request.AppId,
+                    request.Environment.AppId,
                     request.ProfileId,
                     request.IncludeDrafts,
                     request.IncludeOnlyDrafts);
@@ -839,7 +839,7 @@ namespace classy.Services
             {
                 var session = SessionAs<CustomUserSession>();
                 var review = ReviewManager.PublishReview(
-                    request.AppId,
+                    request.Environment.AppId,
                     request.ReviewId,
                     session.UserAuthId);
 
@@ -858,7 +858,7 @@ namespace classy.Services
             {
                 var session = SessionAs<CustomUserSession>();
                 var review = ReviewManager.DeleteReview(
-                    request.AppId,
+                    request.Environment.AppId,
                     request.ReviewId,
                     session.UserAuthId);
 
@@ -877,7 +877,7 @@ namespace classy.Services
         {
             var session = SessionAs<CustomUserSession>();
             if (!session.IsAuthenticated && request.SubjectId != "guest") throw new ApplicationException("when no user logged in, SubjectId must be 'guest'");
-            var tripleView = AnalyticsManager.LogActivity(request.AppId, request.SubjectId, Classy.Models.ActivityPredicate.ProContact, request.ObjectId);
+            var tripleView = AnalyticsManager.LogActivity(request.Environment.AppId, request.SubjectId, ActivityPredicate.CONTACT_PROFILE, request.ObjectId);
             return new HttpResult(tripleView, HttpStatusCode.OK);
         }
 
@@ -891,7 +891,7 @@ namespace classy.Services
             {
                 var session = SessionAs<CustomUserSession>();
                 var collection = CollectionManager.CreateCollection(
-                    request.AppId,
+                    request.Environment.AppId,
                     session.UserAuthId,
                     request.Title,
                     request.Content,
@@ -908,15 +908,61 @@ namespace classy.Services
         }
 
         //
+        // POST: /collection/{CollectionId}/listings
+        // add listings to a collection
+        [CustomAuthenticate]
+        public object Post(AddListingsToCollection request)
+        {
+            try
+            {
+                var session = SessionAs<CustomUserSession>();
+                var collection = CollectionManager.AddListingsToCollection(
+                    request.Environment.AppId,
+                    session.UserAuthId,
+                    request.CollectionId,
+                    request.IncludedListings);
+                return new HttpResult(collection, HttpStatusCode.OK);
+            }
+            catch(KeyNotFoundException kex)
+            {
+                return new HttpError(HttpStatusCode.NotFound, kex.Message);
+            }
+        }
+
+        //
         // GET: /collection/{CollectionId}
         // get collection by id
         public object Get(GetCollectionById request)
         {
             try
             {
+                var session = SessionAs<CustomUserSession>();
                 var collection = CollectionManager.GetCollectionById(
-                    request.AppId,
-                    request.CollectionId);
+                    request.Environment.AppId,
+                    request.CollectionId,
+                    session.UserAuthId,
+                    request.IncludeDrafts,
+                    request.IncludeListings,
+                    request.IncreaseViewCounter,
+                    request.IncreaseViewCounterOnListings);
+                return new HttpResult(collection, HttpStatusCode.OK);
+            }
+            catch (KeyNotFoundException kex)
+            {
+                return new HttpError(HttpStatusCode.NotFound, kex.Message);
+            }
+        }
+
+        //
+        // GET: /profile/{ProfileId}/collection/list
+        // get collections by profile id
+        public object Get(GetCollectionByProfileId request)
+        {
+            try
+            {
+                var collection = CollectionManager.GetCollectionsByProfileId(
+                    request.Environment.AppId,
+                    request.ProfileId);
                 return new HttpResult(collection, HttpStatusCode.OK);
             }
             catch (KeyNotFoundException kex)

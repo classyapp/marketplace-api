@@ -293,7 +293,7 @@ namespace Classy.Auth
 
             session.PopulateWith(userAuth);
             session.UserAuthId = userAuth.Id.ToString(CultureInfo.InvariantCulture);
-            session.ProviderOAuthAccess = GetUserOAuthProviders(session.GetAppId(), session.UserAuthId)
+            session.ProviderOAuthAccess = GetUserOAuthProviders(session.GetEnvironment().AppId, session.UserAuthId)
                 .ConvertAll(x => (IOAuthTokens)x);
 
         }
@@ -308,7 +308,7 @@ namespace Classy.Auth
         public void SaveUserAuth(IAuthSession authSession)
         {
             var userAuth = !authSession.UserAuthId.IsNullOrEmpty()
-                ? GetUserAuth(authSession.GetAppId(), authSession.UserAuthId)
+                ? GetUserAuth(authSession.GetEnvironment().AppId, authSession.UserAuthId)
                 : authSession.TranslateTo<UserAuth>();
 
             if (userAuth.Id == default(int) && !authSession.UserAuthId.IsNullOrEmpty())
@@ -350,12 +350,12 @@ namespace Classy.Auth
         {
             if (!authSession.UserAuthId.IsNullOrEmpty())
             {
-                var userAuth = GetUserAuth(authSession.GetAppId(), authSession.UserAuthId);
+                var userAuth = GetUserAuth(authSession.GetEnvironment().AppId, authSession.UserAuthId);
                 if (userAuth != null) return userAuth;
             }
             if (!authSession.UserAuthName.IsNullOrEmpty())
             {
-                var userAuth = GetUserAuthByUserName(authSession.GetAppId(), authSession.UserAuthName);
+                var userAuth = GetUserAuthByUserName(authSession.GetEnvironment().AppId, authSession.UserAuthName);
                 if (userAuth != null) return userAuth;
             }
 
@@ -365,7 +365,7 @@ namespace Classy.Auth
             var query = Query.And(
                             Query.EQ("Provider", tokens.Provider),
                             Query.EQ("UserId", tokens.UserId),
-                            Query.EQ("AppId", authSession.GetAppId())
+                            Query.EQ("AppId", authSession.GetEnvironment().AppId)
                         );
 
             var providerCollection = mongoDatabase.GetCollection<UserOAuthProvider>(UserOAuthProvider_Col);
@@ -388,7 +388,7 @@ namespace Classy.Auth
             var query = Query.And(
                             Query.EQ("Provider", tokens.Provider),
                             Query.EQ("UserId", tokens.UserId),
-                            Query.EQ("AppId", authSession.GetAppId())
+                            Query.EQ("AppId", authSession.GetEnvironment().AppId)
                         );
             var providerCollection = mongoDatabase.GetCollection<UserOAuthProvider>(UserOAuthProvider_Col);
             var oAuthProvider = providerCollection.FindOne(query);
@@ -399,7 +399,7 @@ namespace Classy.Auth
                 {
                     Provider = tokens.Provider,
                     UserId = tokens.UserId,
-                    AppId = authSession.GetAppId()
+                    AppId = authSession.GetEnvironment().AppId
                 };
             }
 

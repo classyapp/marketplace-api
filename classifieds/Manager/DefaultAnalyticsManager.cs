@@ -20,7 +20,7 @@ namespace classy.Manager
         public TripleView LogActivity(
             string appId, 
             string subjectId, 
-            Classy.Models.ActivityPredicate predicate, 
+            string predicate, 
             string objectId)
         {
             var exists = false;

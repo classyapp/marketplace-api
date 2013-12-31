@@ -21,7 +21,7 @@ namespace classy.Manager
         TripleView LogActivity(
             string appId, 
             string subjectId, 
-            Classy.Models.ActivityPredicate predicate, 
+            string predicate, 
             string objectId);
     }
 }
