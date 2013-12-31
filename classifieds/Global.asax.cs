@@ -20,6 +20,7 @@ using System.Linq;
 using System.Web;
 using System.Web.Security;
 using System.Web.SessionState;
+using ServiceStack.Text;
 
 namespace classy
 {
@@ -30,7 +31,7 @@ namespace classy
             public ListingServiceHost() : base("Listing Service Endpoint, Hello", typeof(Services.ListingService).Assembly) 
             {
                 // request filter to verify api key
-                RequestFilters.Add(CustomAuthenticateAttribute.ApiKeyFilter);
+                RequestFilters.Add(CustomAuthenticateAttribute.SetEnvironment);
 
                 SetConfig(new EndpointHostConfig()
                 {

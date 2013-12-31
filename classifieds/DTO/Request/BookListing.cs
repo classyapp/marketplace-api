@@ -24,8 +24,6 @@ namespace Classy.Models.Request
     {
         public BookListingValidator()
         {
-            RuleFor(x => x.ListingId).NotEmpty();
-            RuleFor(x => x.AppId).NotEmpty();
             RuleFor(x => x.DateRange).NotNull();
             RuleFor(x => x.PaymentMethod)
                 .Cascade(CascadeMode.StopOnFirstFailure)

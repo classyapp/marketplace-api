@@ -16,8 +16,6 @@ namespace Classy.Models.Request
     {
         public FlagListingValidator()
         {
-            RuleFor(x => x.ListingId).NotEmpty();
-            RuleFor(x => x.AppId).NotEmpty();
             RuleFor(x => x.FlagReason).NotEqual(FlagReason.Invalid);
         }
     }

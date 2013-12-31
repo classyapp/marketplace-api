@@ -19,8 +19,6 @@ namespace Classy.Models.Request
     {
         public PurchaseSingleItemValidator()
         {
-            RuleFor(x => x.ListingId).NotEmpty();
-            RuleFor(x => x.AppId).NotEmpty();
             RuleFor(x => x.Quantity)
                 .GreaterThan(0)
                 .WithMessage("'quantity' larger than 0 is required");

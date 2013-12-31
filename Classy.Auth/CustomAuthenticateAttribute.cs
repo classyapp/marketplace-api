@@ -123,7 +123,7 @@ namespace ServiceStack.ServiceInterface
                     Password = userPass.Value.Value
                 };
 
-                ApiKeyFilter(req, res, auth);
+                SetEnvironment(req, res, auth);
 
                 var response = authService.Post(auth);
             }
@@ -152,18 +152,17 @@ namespace ServiceStack.ServiceInterface
             }
         }
 
-        public static void ApiKeyFilter(IHttpRequest req, IHttpResponse res, object dto)
+        public static void SetEnvironment(IHttpRequest req, IHttpResponse res, object dto)
         {
             if (req.HttpMethod != HttpMethods.Options)
             {
-                var apiKey = req.Headers["X-ApiKey"];
-                if (!VerifyApiKey(apiKey))
+                var json = req.Headers["X-Classy-Env"];
+                var env = json.FromJson<Classy.Models.Env>();
+                if (!VerifyApiKey(env.AppId))
                 {
                     throw HttpError.Unauthorized("Invalid API Key");
                 }
-                if (dto != null && dto is Classy.Models.BaseRequestDto) (dto as Classy.Models.BaseRequestDto).AppId = apiKey;
-                if (dto != null && dto is Classy.Auth.Auth) (dto as Classy.Auth.Auth).AppId = apiKey;
-                if (dto != null && dto is Classy.Auth.Registration) (dto as Classy.Auth.Registration).AppId = apiKey;
+                if (dto != null && dto is Classy.Models.BaseRequestDto) (dto as Classy.Models.BaseRequestDto).Environment = env;
             }
         }
 

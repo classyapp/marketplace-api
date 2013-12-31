@@ -20,6 +20,10 @@ namespace Classy.Models
         }
 
         /// <summary>
+        /// The id of the calling application. 
+        /// </summary>
+        public string AppId { get; set; }
+        /// <summary>
         /// The full culture code. Defaults to en-US.
         /// </summary>
         public string CultureCode { get; set; }
