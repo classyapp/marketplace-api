@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Configuration;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
@@ -54,10 +55,11 @@ namespace Classy.Auth
 
         public MongoDBAuthRepository(bool createMissingCollections)
         {
-            var client = new MongoClient("mongodb://localhost");
+            var connectionString = ConfigurationManager.ConnectionStrings["MongoDB"].ConnectionString;
+            var client = new MongoClient(connectionString);
+            var databaseName = MongoUrl.Create(connectionString).DatabaseName;
             var server = client.GetServer();
-            var db = server.GetDatabase("classifieds");
-
+            var db = server.GetDatabase(databaseName);
             this.mongoDatabase = db;
 
             if (createMissingCollections)
