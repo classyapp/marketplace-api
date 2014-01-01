@@ -156,6 +156,7 @@ namespace Classy.Auth
             }
 
             //OnSaveUserAuth(authService, session);
+            session.SetEnvironment(authService.RequestContext.Get<Classy.Models.BaseRequestDto>().Environment);
             authService.SaveSession(session, SessionExpiry);
             session.OnAuthenticated(authService, session, tokens, authInfo);
         }

@@ -73,6 +73,7 @@ namespace classy
                 container.Register<ITransactionRepository>(new MongoTransactionRepository());
                 container.Register<IOrderRepository>(new MongoOrderRepository());
                 container.Register<ICollectionRepository>(new MongoCollectionRepository());
+                container.Register<ILocalizationRepository>(new MongoLocalizationProvider());
                 container.Register<IAppManager>(c =>
                     new DefaultAppManager());
                 container.Register<IPaymentGateway>(c => 
@@ -129,6 +130,9 @@ namespace classy
                 container.Register<IAnalyticsManager>(c =>
                     new DefaultAnalyticsManager(
                         c.TryResolve<ITripleStore>()));
+                container.Register<ILocalizationManager>(c =>
+                    new DefaultLocalizationManager(
+                        c.TryResolve<ILocalizationRepository>()));
 
                 // configure service routes
                 ConfigureServiceRoutes();
@@ -238,6 +242,10 @@ namespace classy
 
                     // Analytics
                     .Add<LogActivity>("/stats/push", "POST")
+
+                    // Localization
+                    .Add<GetResourceByKey>("/resource/{Key}", "GET")
+                    .Add<SetResourceValues>("/resource/{Key}", "POST")
                 ;
             }
         }

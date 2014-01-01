@@ -55,6 +55,7 @@
     <Compile Include="CommentView.cs" />
     <Compile Include="ContactInfoView.cs" />
     <Compile Include="ListingView.cs" />
+    <Compile Include="LocalizationResourceView.cs" />
     <Compile Include="LocationView.cs" />
     <Compile Include="MediaFileView.cs" />
     <Compile Include="PhysicalAddressView.cs" />

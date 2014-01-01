@@ -61,6 +61,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="AmazonS3StorageRepository.cs" />
+    <Compile Include="ILocalizationRepository.cs" />
     <Compile Include="MongoCollectionRepository.cs" />
     <Compile Include="ICollectionRepository.cs" />
     <Compile Include="DummyCalculators.cs" />
@@ -80,6 +81,7 @@
     <Compile Include="MongoBookingRepository.cs" />
     <Compile Include="MongoCommentRepository.cs" />
     <Compile Include="MongoListingRepository.cs" />
+    <Compile Include="MongoLocalizationProvider.cs" />
     <Compile Include="MongoOrderRepository.cs" />
     <Compile Include="MongoProfileRepository.cs" />
     <Compile Include="MongoReviewRepository.cs" />

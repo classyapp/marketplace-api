@@ -28,6 +28,7 @@ namespace classy.Services
         public IReviewManager ReviewManager { get; set; }
         public ICollectionManager CollectionManager { get; set; }
         public IAnalyticsManager AnalyticsManager { get; set; }
+        public ILocalizationManager LocalizationManager { get; set; }
 
         [CustomAuthenticate]
         public object Post(CreateProfileProxy request)
@@ -969,6 +970,24 @@ namespace classy.Services
             {
                 return new HttpError(HttpStatusCode.NotFound, kex.Message);
             }
+        }
+
+        //
+        // GET: /resource/{Key}
+        // get resource by key
+        public object Get(GetResourceByKey request)
+        {
+            var resource = LocalizationManager.GetResourceByKey(request.Environment.AppId, request.Key);
+            return new HttpResult(resource, HttpStatusCode.OK);
+        }
+
+        //
+        // POST: /resource/{Key}
+        // set resource values
+        public object Post(SetResourceValues request)
+        {
+            var resource = LocalizationManager.SetResourceValues(request.Environment.AppId, request.Key, request.Values);
+            return new HttpResult(resource, HttpStatusCode.OK);
         }
     }
 }
