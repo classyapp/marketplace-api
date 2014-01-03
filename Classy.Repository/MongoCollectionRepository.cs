@@ -16,16 +16,11 @@ namespace Classy.Repository
     {
         #region // fields and ctors
 
-        static MongoClient Client = new MongoClient("mongodb://localhost");
-        static MongoServer Server;
-        static MongoDatabase Db;
-        static MongoCollection<Collection> CollectionsCollection;
+        private MongoCollection<Collection> CollectionsCollection;
 
-        static MongoCollectionRepository()
+        public MongoCollectionRepository(MongoDatabase db)
         {
-            Server = Client.GetServer();
-            Db = Server.GetDatabase("classifieds");
-            CollectionsCollection = Db.GetCollection<Collection>("collections");
+            CollectionsCollection = db.GetCollection<Collection>("collections");
         }
 
         #endregion 

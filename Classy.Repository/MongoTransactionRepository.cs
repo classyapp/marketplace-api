@@ -11,16 +11,11 @@ namespace Classy.Repository
 {
     public class MongoTransactionRepository : ITransactionRepository
     {
-        static MongoClient Client = new MongoClient("mongodb://localhost");
-        static MongoServer Server;
-        static MongoDatabase Db;
-        static MongoCollection<Transaction> TransactionsCollection;
+        private MongoCollection<Transaction> TransactionsCollection;
 
-        static MongoTransactionRepository()
+        public MongoTransactionRepository(MongoDatabase db)
         {
-            Server = Client.GetServer();
-            Db = Server.GetDatabase("classifieds");
-            TransactionsCollection = Db.GetCollection<Transaction>("transactions");
+            TransactionsCollection = db.GetCollection<Transaction>("transactions");
         }
     
         public string Save(Transaction transaction)

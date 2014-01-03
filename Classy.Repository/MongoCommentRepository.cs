@@ -12,16 +12,11 @@ namespace Classy.Repository
 {
     public class MongoCommentRepository : ICommentRepository
     {
-        static MongoClient Client = new MongoClient("mongodb://localhost");
-        static MongoServer Server;
-        static MongoDatabase Db;
-        static MongoCollection<Comment> CommentsCollection;
+        private MongoCollection<Comment> CommentsCollection;
 
-        static MongoCommentRepository()
+        public MongoCommentRepository(MongoDatabase db)
         {
-            Server = Client.GetServer();
-            Db = Server.GetDatabase("classifieds");
-            CommentsCollection = Db.GetCollection<Comment>("comments");
+            CommentsCollection = db.GetCollection<Comment>("comments");
         }
 
         public string Save(Comment comment)

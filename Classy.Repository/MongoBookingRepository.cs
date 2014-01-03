@@ -11,16 +11,11 @@ namespace Classy.Repository
 {
     public class MongoBookingRepository : IBookingRepository
     {
-        static MongoClient Client = new MongoClient("mongodb://localhost");
-        static MongoServer Server;
-        static MongoDatabase Db;
-        static MongoCollection<BookedTimeslot> BookingsCollection;
+        private MongoCollection<BookedTimeslot> BookingsCollection;
 
-        static MongoBookingRepository()
+        public MongoBookingRepository(MongoDatabase db)
         {
-            Server = Client.GetServer();
-            Db = Server.GetDatabase("classifieds");
-            BookingsCollection = Db.GetCollection<BookedTimeslot>("bookings");
+            BookingsCollection = db.GetCollection<BookedTimeslot>("bookings");
         }
     
         public string Save(BookedTimeslot timeslot, int maxDoubleBookings)

@@ -14,16 +14,11 @@ namespace Classy.Repository
 {
     public class MongoListingRepository : IListingRepository
     {
-        static MongoClient Client = new MongoClient("mongodb://localhost");
-        static MongoServer Server;
-        static MongoDatabase Db;
-        static MongoCollection<Listing> ListingsCollection;
+        private MongoCollection<Listing> ListingsCollection;
 
-        static MongoListingRepository()
+        public MongoListingRepository(MongoDatabase db)
         {
-            Server = Client.GetServer();
-            Db = Server.GetDatabase("classifieds");
-            ListingsCollection = Db.GetCollection<Listing>("classifieds");
+            ListingsCollection = db.GetCollection<Listing>("classifieds");
         }
 
         public Listing GetById(string listingId, string appId, bool includeDrafts)

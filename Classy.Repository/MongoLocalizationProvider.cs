@@ -11,16 +11,11 @@ namespace Classy.Repository
 {
     public class MongoLocalizationProvider : ILocalizationRepository
     {
-        static MongoClient Client = new MongoClient("mongodb://localhost");
-        static MongoServer Server;
-        static MongoDatabase Db;
-        static MongoCollection<LocalizationResource> ResourcesCollection;
+        private MongoCollection<LocalizationResource> ResourcesCollection;
 
-        static MongoLocalizationProvider()
+        public MongoLocalizationProvider(MongoDatabase db)
         {
-            Server = Client.GetServer();
-            Db = Server.GetDatabase("classifieds");
-            ResourcesCollection = Db.GetCollection<LocalizationResource>("resources");
+            ResourcesCollection = db.GetCollection<LocalizationResource>("resources");
         }
     
         public LocalizationResource GetResourceByKey(string appId, string key)
