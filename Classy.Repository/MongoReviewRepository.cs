@@ -12,16 +12,11 @@ namespace Classy.Repository
 {
     public class MongoReviewRepository : IReviewRepository
     {
-        static MongoClient Client = new MongoClient("mongodb://localhost");
-        static MongoServer Server;
-        static MongoDatabase Db;
-        static MongoCollection<Review> ReviewsCollection;
+        private MongoCollection<Review> ReviewsCollection;
 
-        static MongoReviewRepository()
+        public MongoReviewRepository(MongoDatabase db)
         {
-            Server = Client.GetServer();
-            Db = Server.GetDatabase("classifieds");
-            ReviewsCollection = Db.GetCollection<Review>("reviews");
+            ReviewsCollection = db.GetCollection<Review>("reviews");
         }
 
         public string Save(Review review)

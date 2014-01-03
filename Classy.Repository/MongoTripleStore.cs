@@ -10,16 +10,11 @@ namespace Classy.Repository
 {
     public class MongoTripleStore : ITripleStore
     {
-        static MongoClient Client = new MongoClient("mongodb://localhost");
-        static MongoServer Server;
-        static MongoDatabase Db;
-        static MongoCollection<Triple> TripleCollection;
+        private MongoCollection<Triple> TripleCollection;
 
-        static MongoTripleStore()
+        public MongoTripleStore(MongoDatabase db)
         {
-            Server = Client.GetServer();
-            Db = Server.GetDatabase("classifieds");
-            TripleCollection = Db.GetCollection<Triple>("triples");
+            TripleCollection = db.GetCollection<Triple>("triples");
         }
 
         public Triple LogActivity(string appId, string subjectObjectId, string predicate, string objectObjectId, ref bool tripleAlreadyExists)

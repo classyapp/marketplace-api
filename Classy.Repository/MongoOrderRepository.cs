@@ -10,16 +10,11 @@ namespace Classy.Repository
 {
     public class MongoOrderRepository : IOrderRepository
     {
-        static MongoClient Client = new MongoClient("mongodb://localhost");
-        static MongoServer Server;
-        static MongoDatabase Db;
-        static MongoCollection<Order> OrdersCollection;
+        private MongoCollection<Order> OrdersCollection;
 
-        static MongoOrderRepository()
+        public MongoOrderRepository(MongoDatabase db)
         {
-            Server = Client.GetServer();
-            Db = Server.GetDatabase("classifieds");
-            OrdersCollection = Db.GetCollection<Order>("orders");
+            OrdersCollection = db.GetCollection<Order>("orders");
         }
 
         public string Save(Order order)

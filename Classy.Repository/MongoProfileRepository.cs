@@ -12,18 +12,13 @@ namespace Classy.Repository
 {
     public class MongoProfileRepository : IProfileRepository
     {
-        static MongoClient Client = new MongoClient("mongodb://localhost");
-        static MongoServer Server;
-        static MongoDatabase Db;
-        static MongoCollection<Profile> ProfilesCollection;
-        static MongoCollection<ProxyClaim> ProxyClaimsCollection;
+        private MongoCollection<Profile> ProfilesCollection;
+        private MongoCollection<ProxyClaim> ProxyClaimsCollection;
 
-        static MongoProfileRepository()
+        public MongoProfileRepository(MongoDatabase db)
         {
-            Server = Client.GetServer();
-            Db = Server.GetDatabase("classifieds");
-            ProfilesCollection = Db.GetCollection<Profile>("profiles");
-            ProxyClaimsCollection = Db.GetCollection<ProxyClaim>("proxyclaims");   
+            ProfilesCollection = db.GetCollection<Profile>("profiles");
+            ProxyClaimsCollection = db.GetCollection<ProxyClaim>("proxyclaims");   
         }
 
         public string Save(Profile profile)

@@ -53,13 +53,8 @@ namespace Classy.Auth
             }
         }
 
-        public MongoDBAuthRepository(bool createMissingCollections)
+        public MongoDBAuthRepository(MongoDatabase db, bool createMissingCollections)
         {
-            var connectionString = ConfigurationManager.ConnectionStrings["MongoDB"].ConnectionString;
-            var client = new MongoClient(connectionString);
-            var databaseName = MongoUrl.Create(connectionString).DatabaseName;
-            var server = client.GetServer();
-            var db = server.GetDatabase(databaseName);
             this.mongoDatabase = db;
 
             if (createMissingCollections)
