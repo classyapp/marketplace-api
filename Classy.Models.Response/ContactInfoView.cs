@@ -15,7 +15,12 @@ namespace Classy.Models.Response
         public string TwitterUsername { get; set; }
         public string LinkedInProfileUrl { get; set; }
 
-        public string Name { get { return string.Concat(FirstName, " ", LastName); } }
+        public string Name { 
+            get {
+                if (string.IsNullOrEmpty(FirstName) && string.IsNullOrEmpty(LastName)) return null;
+                return string.Concat(FirstName, " ", LastName); 
+            } 
+        }
     }
 
     public class ExtendedContactInfoView : ContactInfoView
