@@ -158,7 +158,7 @@ namespace ServiceStack.ServiceInterface
             {
                 var json = req.Headers["X-Classy-Env"];
                 var env = json.FromJson<Classy.Models.Env>();
-                if (!VerifyApiKey(env.AppId))
+                if (!VerifyApiKey(env != null ? env.AppId : null))
                 {
                     throw HttpError.Unauthorized("Invalid API Key");
                 }

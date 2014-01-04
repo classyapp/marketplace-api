@@ -51,7 +51,7 @@ namespace classy.Manager
             bool includeFavoritedByProfiles)
         {
             // TODO: cache listings
-            var listing = GetVerifiedListing(appId, listingId, requestedByProfileId);
+            var listing = GetVerifiedListing(appId, listingId);
             var listingView = listing.ToListingView();
 
             if (includeComments)
@@ -416,8 +416,8 @@ namespace classy.Manager
             string appId,
             string collectionId,
             string profileId,
-            bool includeListings,
             bool includeDrafts,
+            bool includeListings,
             bool increaseViewCounter,
             bool increaseViewCounterOnListings)
         {
