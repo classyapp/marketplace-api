@@ -6,7 +6,6 @@ using MongoDB.Bson;
 using System.Text.RegularExpressions;
 using ServiceStack.FluentValidation;
 using MongoDB.Bson.Serialization.IdGenerators;
-using ServiceStack.ServiceInterface;
 using System.ComponentModel.DataAnnotations;
 
 namespace Classy.Models
