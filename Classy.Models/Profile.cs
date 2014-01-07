@@ -14,7 +14,7 @@ namespace Classy.Models
     /// </summary>   
     public class Profile : BaseObject
     {
-        public static string PROXY_METADATA_KEY = "ProxyProfile";
+        public const string PROXY_METADATA_KEY = "ProxyProfile";
 
         public Profile()
         {
