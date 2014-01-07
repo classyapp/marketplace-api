@@ -36,7 +36,7 @@ namespace classy.Services
             ProfileView profile = null;
 
             string[] content;
-            var f = File.OpenText(@"C:\Users\YUVAL\Downloads\metavchim.csv");
+            var f = File.OpenText(@"C:\Users\YUVAL\Downloads\cuisines.csv");
             while (!f.EndOfStream)
             {
                 var line = f.ReadLine();
@@ -45,7 +45,22 @@ namespace classy.Services
                 profile = ProfileManager.CreateProfileProxy(
                     request.Environment.AppId,
                     new ProfessionalInfo {
-                        CompanyName = content[0]
+                        CompanyName = content[4],
+                        CompanyContactInfo = new ContactInfo
+                        {
+                            WebsiteUrl = content[18],
+                            Location = new Location
+                            {
+                                Address = new PhysicalAddress
+                                {
+                                    Street1 = content[5],
+                                    City = content[7],
+                                    PostalCode = content[6]
+                                }
+                            },
+                            Phone = content[9],
+                            Email = content[17]
+                        }
                     },
                     new Dictionary<string, string>());
                 profile.Metadata.Add("LicenseNo", content[1]);

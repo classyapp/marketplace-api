@@ -130,7 +130,7 @@ namespace classy.Manager
             bool formatCommentsAsHtml)
         {
             // TODO: cache listings
-            tag = string.IsNullOrEmpty(tag) ? null : string.Concat("#", tag.TrimEnd(new char[] { '#' }));
+            tag = string.IsNullOrEmpty(tag) ? null : string.Concat("#", tag.TrimStart(new char[] { '#' }));
             var listings = ListingRepository.Search(tag, listingType, metadata, priceMin, priceMax, location, appId, false, true);
             var comments = includeComments ?
                 CommentRepository.GetByListingIds(listings.Select(x => x.Id).AsEnumerable(), formatCommentsAsHtml) : null;
