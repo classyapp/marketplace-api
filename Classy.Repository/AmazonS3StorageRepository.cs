@@ -5,24 +5,41 @@ using System.Configuration;
 using System.IO;
 using System.Linq;
 using System.Net;
+using System.Threading.Tasks;
 using System.Web;
 
 namespace Classy.Repository
 {
     public class AmazonS3StorageRepository : IStorageRepository
     {
+        private readonly Amazon.S3.IAmazonS3 s3Client;
+        private readonly string bucketName;
+
+        public AmazonS3StorageRepository(Amazon.S3.IAmazonS3 s3Client, string bucketName)
+        {
+            this.s3Client = s3Client;
+            this.bucketName = bucketName;
+        }
         public void SaveFile(string key, byte[] content, string contentType)
         {
-            var s3Client = Amazon.AWSClientFactory.CreateAmazonS3Client(
-                ConfigurationManager.AppSettings["S3AccessKey"], 
-                ConfigurationManager.AppSettings["S3SecretKey"]
-            );
             PutObjectRequest request = new PutObjectRequest();
-            request.BucketName = ConfigurationManager.AppSettings["S3BucketName"];
+            request.BucketName = bucketName;
             request.ContentType = contentType;
             request.Key = key;
             request.InputStream = new MemoryStream(content);
             s3Client.PutObject(request);
+        }
+
+        public Stream GetFile(string key)
+        {
+            var request = new GetObjectRequest()
+            {
+                Key = key,
+                BucketName = bucketName
+            };
+            var obj = s3Client.GetObject(request);
+            byte[] buffer = new byte[obj.ContentLength];
+            return obj.ResponseStream;
         }
 
         public void SaveFileFromUrl(string key, string url, string contentType)

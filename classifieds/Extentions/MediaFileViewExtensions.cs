@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Web;
 using ServiceStack.Common;
+using Classy.Repository;
 
 namespace classy
 {

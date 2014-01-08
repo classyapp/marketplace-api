@@ -167,10 +167,17 @@ namespace classy.Manager
                             var key = Guid.NewGuid().ToString();
                             var content = reader.ReadBytes((int)file.ContentLength);
                             StorageRepository.SaveFile(key, content, file.ContentType);
-                            mediaFiles.Add(new MediaFile
+                            var mediaFile = new MediaFile
                             {
+                                Type = MediaFileType.Image,
+                                ImageSize = ImageSize.Original,
                                 ContentType = file.ContentType,
                                 Url = StorageRepository.KeyToUrl(key)
+                            };
+                            mediaFiles.Add(mediaFile);
+                            System.Threading.Tasks.Task.Factory.StartNew(() =>
+                            {
+                                PostProcessingManager.GenerateThumbnail(listingId, appId, mediaFile, ImageSize.Thumbnail266x266, StorageRepository, ListingRepository);
                             });
                         }
                     }
