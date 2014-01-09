@@ -117,7 +117,8 @@ namespace Classy.Repository
             {
                 foreach (var m in metadata)
                 {
-                    queries.Add(Query.ElemMatch("Metadata", Query.And(Query.EQ("Key", m.Key), Query.EQ("Value", m.Value))));
+                    if (!string.IsNullOrEmpty(m.Value))
+                        queries.Add(Query.ElemMatch("Metadata", Query.And(Query.EQ("Key", m.Key), Query.EQ("Value", m.Value))));
                 }
             }
             if (location != null)
