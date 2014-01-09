@@ -106,6 +106,27 @@ namespace Classy.Repository
             }
         }
 
+        public void UpdateExternalMedia(string listingId, string appId, MediaFile media)
+        {
+            try
+            {
+                var query = Query.And(
+                   Query<Listing>.EQ(x => x.Id, listingId),
+                   Query<Listing>.EQ(x => x.AppId, appId),
+                   Query.EQ("ExternalMedia.Key", media.Key)
+                );
+
+                var result = ListingsCollection.Update(
+                    query,
+                    MongoDB.Driver.Builders.Update.Set("ExternalMedia.$", media.ToBson())
+                );
+            }
+            catch
+            {
+                throw;
+            }
+        }
+
         public void DeleteExternalMedia(string listingId, string appId, string url)
         {
             try

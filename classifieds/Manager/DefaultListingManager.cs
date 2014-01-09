@@ -170,14 +170,13 @@ namespace classy.Manager
                             var mediaFile = new MediaFile
                             {
                                 Type = MediaFileType.Image,
-                                ImageSize = ImageSize.Original,
                                 ContentType = file.ContentType,
                                 Url = StorageRepository.KeyToUrl(key)
                             };
                             mediaFiles.Add(mediaFile);
                             System.Threading.Tasks.Task.Factory.StartNew(() =>
                             {
-                                PostProcessingManager.GenerateThumbnail(listingId, appId, mediaFile, ImageSize.Thumbnail266x266, StorageRepository, ListingRepository);
+                                PostProcessingManager.GenerateThumbnails(mediaFile, listingId, appId, StorageRepository, ListingRepository);
                             });
                         }
                     }
