@@ -66,6 +66,7 @@
     <Compile Include="Collection.cs" />
     <Compile Include="ContactInfo.cs" />
     <Compile Include="Env.cs" />
+    <Compile Include="MediaThumbnail.cs" />
     <Compile Include="LocalizationResource.cs" />
     <Compile Include="Profile.cs" />
     <Compile Include="ProxyClaim.cs" />

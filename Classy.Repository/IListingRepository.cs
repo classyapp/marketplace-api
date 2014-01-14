@@ -28,6 +28,7 @@ namespace Classy.Repository
         IList<Listing> GetByProfileId(string appId, string profileId, bool includeDrafts);
         IList<Listing> Search(string tag, string listingType, IDictionary<string, string> metadata, double? priceMin, double? priceMax, Location location, string appId, bool includeDrafts, bool increaseViewCounter);
         void AddExternalMedia(string listingId, string appId, IList<MediaFile> media);
+        void UpdateExternalMedia(string listingId, string appId, MediaFile media);
         void DeleteExternalMedia(string listingId, string appId, string url);
         void IncreaseCounter(string listingId, string appId, ListingCounters counters, int value);
         void IncreaseCounter(string[] listingId, string appId, ListingCounters counters, int value);

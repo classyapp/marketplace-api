@@ -11,11 +11,15 @@ namespace Classy.Repository
 {
     public class FileSystemStorageRepository : IStorageRepository
     {
+        private string GetPathFromKey(string key)
+        {
+            return string.Concat(@"c:\img\", key, ".gif");
+        }
         public void SaveFile(string key, byte[] content, string contentType)
         {
             var ms = new MemoryStream(content);
             var img = System.Drawing.Image.FromStream(ms);
-            var filename = string.Concat(@"c:\img\", key, ".gif");
+            var filename = GetPathFromKey(key);
         }
 
         public void SaveFileFromUrl(string key, string url, string contentType)
@@ -25,12 +29,19 @@ namespace Classy.Repository
 
         public void DeleteFile(string key)
         {
-            File.Delete(string.Concat(@"c:\img\", key, ".gif"));
+            File.Delete(GetPathFromKey(key));
         }
 
         public string KeyToUrl(string key)
         {
-            return string.Concat(@"c:\img\", key, ".gif");
+            return GetPathFromKey(key);
+        }
+
+
+        public Stream GetFile(string key)
+        {
+            FileStream stream = new FileStream(GetPathFromKey(key), FileMode.Open);
+            return stream;
         }
     }
 }
