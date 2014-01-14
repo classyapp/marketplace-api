@@ -13,10 +13,15 @@ namespace Classy.Models
 
     public class MediaFile
     {
+        public MediaFile()
+        {
+            Thumbnails = new List<MediaThumbnail>();
+        }
+
+        public MediaFileType Type { get; set; }
         public string Key { get; set; }
         public string ContentType { get; set; }
         public string Url { get; set; }
-        public MediaFileType Type { get; set; }
-        public string Thumbnail_266x266_Key { get; set; }
+        public IList<MediaThumbnail> Thumbnails { get; set; }
     }
 }

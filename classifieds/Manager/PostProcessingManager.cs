@@ -41,19 +41,26 @@ namespace classy.Manager
                 }
             }
 
-            Tuple<int, int, Action<string>>[] imageThumbnails = new Tuple<int,int,Action<string>>[] { 
-                new Tuple<int, int, Action<string>>(266, 266, (key) => { image.Thumbnail_266x266_Key = key; })
-            };
-        
-            foreach(var thum in imageThumbnails) {
-                using (var thumbnail = squareImage.GetThumbnailImage(thum.Item1, thum.Item2, () => false, System.IntPtr.Zero)) 
+            Point[] sizes = new Point[] { new Point { X = 266, Y = 266 } };
+
+            foreach(var s in sizes) {
+                using (var thumbnail = squareImage.GetThumbnailImage(s.X, s.Y, () => false, System.IntPtr.Zero)) 
                 {
                     using (MemoryStream memoryStream = new MemoryStream(thumbnail.Size.Height * thumbnail.Size.Width))
                     {
-                        var thumbnailKey = string.Format("{0}_{1}x{2}", image.Key, thum.Item1, thum.Item2);
                         thumbnail.Save(memoryStream, System.Drawing.Imaging.ImageFormat.Png);
+
+                        var thumbnailKey = string.Format("{0}_{1}x{2}", image.Key, s.X, s.Y);
                         storageRepo.SaveFile(thumbnailKey, memoryStream.GetBuffer(), "image/png");
-                        thum.Item3(thumbnailKey);
+                        MediaThumbnail mediaThumbnail = new MediaThumbnail()
+                        {
+                            Width = s.X,
+                            Height = s.Y,
+                            Key = thumbnailKey,
+                            Url = storageRepo.KeyToUrl(thumbnailKey)
+                        };
+
+                        image.Thumbnails.Add(mediaThumbnail);
                     }
                 }
             }

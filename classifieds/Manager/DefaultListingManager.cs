@@ -171,7 +171,8 @@ namespace classy.Manager
                             {
                                 Type = MediaFileType.Image,
                                 ContentType = file.ContentType,
-                                Url = StorageRepository.KeyToUrl(key)
+                                Url = StorageRepository.KeyToUrl(key),
+                                Key = key
                             };
                             mediaFiles.Add(mediaFile);
                             System.Threading.Tasks.Task.Factory.StartNew(() =>

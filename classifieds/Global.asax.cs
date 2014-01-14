@@ -79,13 +79,15 @@ namespace classy
                 container.Register<ICommentRepository>(c => new MongoCommentRepository(c.Resolve<MongoDatabase>()));
                 container.Register<IReviewRepository>(c => new MongoReviewRepository(c.Resolve<MongoDatabase>()));
                 container.Register<Amazon.S3.IAmazonS3>(c => {
-                    var s3Client = Amazon.AWSClientFactory.CreateAmazonS3Client(
-                        ConfigurationManager.AppSettings["S3AccessKey"],
-                        ConfigurationManager.AppSettings["S3SecretKey"]
-                    );
+                    var config = new Amazon.S3.AmazonS3Config()
+                    {
+                        ServiceURL = "s3.amazonaws.com",
+                        RegionEndpoint = Amazon.RegionEndpoint.USEast1 // TODO: yuval, feel free to change this!
+                    };
+                    var s3Client = Amazon.AWSClientFactory.CreateAmazonS3Client(config);
                     return s3Client;
                 });
-                container.Register<IStorageRepository>(c => new AmazonS3StorageRepository(c.Resolve<Amazon.S3.AmazonS3Client>(),  ConfigurationManager.AppSettings["S3BucketName"]));
+                container.Register<IStorageRepository>(c => new AmazonS3StorageRepository(c.Resolve<Amazon.S3.IAmazonS3>(), ConfigurationManager.AppSettings["S3BucketName"]));
                 container.Register<IProfileRepository>(c => new MongoProfileRepository(c.Resolve<MongoDatabase>()));
                 container.Register<IBookingRepository>(c => new MongoBookingRepository(c.Resolve<MongoDatabase>()));
                 container.Register<ITransactionRepository>(c => new MongoTransactionRepository(c.Resolve<MongoDatabase>()));
