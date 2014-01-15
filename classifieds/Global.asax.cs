@@ -23,6 +23,8 @@ using System.Web.SessionState;
 using ServiceStack.Text;
 using MongoDB.Driver;
 using System.Configuration;
+using classy.Extentions;
+using classy.Operations;
 
 namespace classy
 {
@@ -49,6 +51,13 @@ namespace classy
 
             public override void Configure(Funq.Container container)
             {
+                //Enable Authentication and Registration
+                ConfigureAuth(container);
+
+                // Validation
+                Plugins.Add(new ValidationFeature());
+                container.RegisterValidators(typeof(PostListing).Assembly);
+
                 // CORS
                 //Plugins.Add(new CorsFeature(
                 //    allowedOrigins: "http://www.thisisclassy.com",
@@ -57,105 +66,26 @@ namespace classy
                 //    allowCredentials: true
                 //));
 
-                //Enable Authentication and Registration
-                ConfigureAuth(container);
-
-                // Validation
-                Plugins.Add(new ValidationFeature());
-                container.RegisterValidators(typeof(PostListing).Assembly);
-
-                // register mongodb repositories
-                container.Register<MongoDatabase>(c =>
-                {
-                    var connectionString = ConfigurationManager.ConnectionStrings["MongoDB"].ConnectionString;
-                    var client = new MongoClient(connectionString);
-                    var databaseName = MongoUrl.Create(connectionString).DatabaseName;
-                    var server = client.GetServer();
-                    var db = server.GetDatabase(databaseName);
-                    return db;
-                });
-                container.Register<ITripleStore>(c => new MongoTripleStore(c.Resolve<MongoDatabase>()));
-                container.Register<IListingRepository>(c => new MongoListingRepository(c.Resolve<MongoDatabase>()));
-                container.Register<ICommentRepository>(c => new MongoCommentRepository(c.Resolve<MongoDatabase>()));
-                container.Register<IReviewRepository>(c => new MongoReviewRepository(c.Resolve<MongoDatabase>()));
-                container.Register<Amazon.S3.IAmazonS3>(c => {
-                    var config = new Amazon.S3.AmazonS3Config()
-                    {
-                        ServiceURL = "s3.amazonaws.com",
-                        RegionEndpoint = Amazon.RegionEndpoint.USEast1 // TODO: yuval, feel free to change this!
-                    };
-                    var s3Client = Amazon.AWSClientFactory.CreateAmazonS3Client(config);
-                    return s3Client;
-                });
-                container.Register<IStorageRepository>(c => new AmazonS3StorageRepository(c.Resolve<Amazon.S3.IAmazonS3>(), ConfigurationManager.AppSettings["S3BucketName"]));
-                container.Register<IProfileRepository>(c => new MongoProfileRepository(c.Resolve<MongoDatabase>()));
-                container.Register<IBookingRepository>(c => new MongoBookingRepository(c.Resolve<MongoDatabase>()));
-                container.Register<ITransactionRepository>(c => new MongoTransactionRepository(c.Resolve<MongoDatabase>()));
-                container.Register<IOrderRepository>(c => new MongoOrderRepository(c.Resolve<MongoDatabase>()));
-                container.Register<ICollectionRepository>(c => new MongoCollectionRepository(c.Resolve<MongoDatabase>()));
-                container.Register<ILocalizationRepository>(c => new MongoLocalizationProvider(c.Resolve<MongoDatabase>()));
-                container.Register<IAppManager>(c =>
-                    new DefaultAppManager());
-                container.Register<IPaymentGateway>(c => 
-                    new TranzilaPaymentGateway(
-                        c.TryResolve<ITransactionRepository>()));
-                container.Register<IBookingManager>(c =>
-                    new DefaultBookingManager(
-                        c.TryResolve<IListingRepository>(),
-                        c.TryResolve<IBookingRepository>(),
-                        c.TryResolve<IPaymentGateway>(),
-                        c.TryResolve<ITripleStore>()));
-                container.Register<IOrderManager>(c =>
-                    new DefaultOrderManager(
-                        c.TryResolve<IListingRepository>(),
-                        c.TryResolve<IProfileRepository>(),
-                        c.TryResolve<IOrderRepository>(),
-                        c.TryResolve<ITransactionRepository>(),
-                        c.TryResolve<IPaymentGateway>(),
-                        c.TryResolve<ITripleStore>(),
-                        c.TryResolve<ITaxCalculator>(),
-                        c.TryResolve<IShippingCalculator>()));
-                container.Register<IListingManager>(c =>
-                    new DefaultListingManager(
-                        c.TryResolve<IListingRepository>(),
-                        c.TryResolve<ICommentRepository>(),
-                        c.TryResolve<IProfileRepository>(),
-                        c.TryResolve<ICollectionRepository>(),
-                        c.TryResolve<ITripleStore>(),
-                        c.TryResolve<IStorageRepository>()));
-                container.Register<IProfileManager>(c =>
-                    new DefaultProfileManager(
-                        c.TryResolve<IAppManager>(),
-                        c.TryResolve<IProfileRepository>(),
-                        c.TryResolve<IListingRepository>(),
-                        c.TryResolve<IReviewRepository>(),
-                        c.TryResolve<ICollectionRepository>(),
-                        c.TryResolve<ITripleStore>()));
-                container.Register<IReviewManager>(c =>
-                    new DefaultProfileManager(
-                        c.TryResolve<IAppManager>(),
-                        c.TryResolve<IProfileRepository>(),
-                        c.TryResolve<IListingRepository>(),
-                        c.TryResolve<IReviewRepository>(),
-                        c.TryResolve<ICollectionRepository>(),
-                        c.TryResolve<ITripleStore>()));
-                container.Register<ICollectionManager>(c =>
-                    new DefaultListingManager(
-                        c.TryResolve<IListingRepository>(),
-                        c.TryResolve<ICommentRepository>(),
-                        c.TryResolve<IProfileRepository>(),
-                        c.TryResolve<ICollectionRepository>(),
-                        c.TryResolve<ITripleStore>(),
-                        c.TryResolve<IStorageRepository>()));
-                container.Register<IAnalyticsManager>(c =>
-                    new DefaultAnalyticsManager(
-                        c.TryResolve<ITripleStore>()));
-                container.Register<ILocalizationManager>(c =>
-                    new DefaultLocalizationManager(
-                        c.TryResolve<ILocalizationRepository>()));
+                container.WireUp();
 
                 // configure service routes
                 ConfigureServiceRoutes();
+
+                ConfigureOperators(container);
+            }
+
+            private void ConfigureOperators(Funq.Container container)
+            {
+                container.Register<CreateThumbnailsOperator>(c => new CreateThumbnailsOperator(c.TryResolve<IStorageRepository>(), c.TryResolve<IListingRepository>()));
+                var mqServer = container.TryResolve<ServiceStack.Messaging.IMessageService>();
+                mqServer.RegisterHandler<CreateThumbnailsRequest>(m =>
+                {
+                    var operation = container.TryResolve<CreateThumbnailsOperator>();
+                    operation.PerformOperation(m.GetBody());
+                    return true;
+                });
+
+                mqServer.Start();
             }
 
             private void ConfigureAuth(Funq.Container container)

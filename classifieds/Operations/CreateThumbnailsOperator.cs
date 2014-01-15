@@ -2,21 +2,34 @@
 using Classy.Repository;
 using System;
 using System.Collections.Generic;
+using System.Drawing;
 using System.IO;
 using System.Linq;
 using System.Web;
-using System.Drawing;
 
-namespace classy.Manager
+namespace classy.Operations
 {
-    public class PostProcessingManager
+    public class CreateThumbnailsOperator : IOperator<CreateThumbnailsRequest>
     {
-        public static void GenerateThumbnails(MediaFile image, string listingId, string appId, IStorageRepository storageRepo, IListingRepository listingRepo)
+        private readonly IStorageRepository _storageRepository;
+        private readonly IListingRepository _listingRepository;
+
+        public CreateThumbnailsOperator(IStorageRepository storageRepo, IListingRepository listingRepo)
         {
+            _storageRepository = storageRepo;
+            _listingRepository = listingRepo;
+        }
+
+        public void PerformOperation(CreateThumbnailsRequest request)
+        {
+            // TODO: grab media file by key instead of off the listing?
+            var listing = _listingRepository.GetById(request.ListingId, request.AppId, true);
+            var listingMediaFile = listing.ExternalMedia.Single(x => x.Key == request.MediaKey);
+
             int height = 0, width = 0;
             Bitmap squareImage;
             // crop to square
-            using (Stream originalStream = storageRepo.GetFile(image.Key))
+            using (Stream originalStream = _storageRepository.GetFile(request.MediaKey))
             {
                 using (Image originalImg = Image.FromStream(originalStream))
                 {
@@ -43,28 +56,30 @@ namespace classy.Manager
 
             Point[] sizes = new Point[] { new Point { X = 266, Y = 266 } };
 
-            foreach(var s in sizes) {
-                using (var thumbnail = squareImage.GetThumbnailImage(s.X, s.Y, () => false, System.IntPtr.Zero)) 
+            foreach (var s in sizes)
+            {
+                using (var thumbnail = squareImage.GetThumbnailImage(s.X, s.Y, () => false, System.IntPtr.Zero))
                 {
                     using (MemoryStream memoryStream = new MemoryStream(thumbnail.Size.Height * thumbnail.Size.Width))
                     {
                         thumbnail.Save(memoryStream, System.Drawing.Imaging.ImageFormat.Png);
 
-                        var thumbnailKey = string.Format("{0}_{1}x{2}", image.Key, s.X, s.Y);
-                        storageRepo.SaveFile(thumbnailKey, memoryStream.GetBuffer(), "image/png");
+                        var thumbnailKey = string.Format("{0}_{1}x{2}", request.MediaKey, s.X, s.Y);
+                        _storageRepository.SaveFile(thumbnailKey, memoryStream.GetBuffer(), "image/png");
                         MediaThumbnail mediaThumbnail = new MediaThumbnail()
                         {
                             Width = s.X,
                             Height = s.Y,
                             Key = thumbnailKey,
-                            Url = storageRepo.KeyToUrl(thumbnailKey)
+                            Url = _storageRepository.KeyToUrl(thumbnailKey)
                         };
 
-                        image.Thumbnails.Add(mediaThumbnail);
+                        listingMediaFile.Thumbnails.Add(mediaThumbnail);
                     }
                 }
             }
-            listingRepo.UpdateExternalMedia(listingId, appId, image);
+            //TODO: any way to only update the thumbnails? i see a potential race condition here otherwise
+            _listingRepository.UpdateExternalMedia(request.ListingId, request.AppId, listingMediaFile);
         }
     }
 }
