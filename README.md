@@ -1,4 +1,7 @@
-# Getting the code
-Because of the relative path dependencies of the Visual Studio project files, you'll need to be careful about where you clone this repository. First you should have a directory that will hold all of the different *classy* related code. You'll want to clone this repo into a directory called `classy` like:
+Dependencies
+====
 
-> git clone git@github.com:juvaly/marketplace-api.git classy
+You'll need:
+
+* MongoDB - [instructions here](http://docs.mongodb.org/manual/tutorial/install-mongodb-on-windows/)
+* Redis - redis is not available for Windows but [there's a port that's good enough for development](https://github.com/MSOpenTech/redis) - you'll need to build the executables using the instructions in the readme there and then just run `redis-server.exe`

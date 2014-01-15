@@ -10,11 +10,14 @@ using Classy.Auth;
 using ServiceStack.Common;
 using ServiceStack.ServiceHost;
 using System.IO;
+using ServiceStack.Messaging;
+using classy.Operations;
 
 namespace classy.Manager
 {
     public class DefaultListingManager : IListingManager, ICollectionManager
     {
+        private IMessageQueueClient _messageQueueClient;
         private IListingRepository ListingRepository;
         private ICommentRepository CommentRepository;
         private IProfileRepository ProfileRepository;
@@ -23,6 +26,7 @@ namespace classy.Manager
         private IStorageRepository StorageRepository;
 
         public DefaultListingManager(
+            IMessageQueueClient messageQueueClient,
             IListingRepository listingRepository,
             ICommentRepository commentRepository,
             IProfileRepository profileRepository,
@@ -30,6 +34,7 @@ namespace classy.Manager
             ITripleStore tripleStore,
             IStorageRepository storageRepository)
         {
+            _messageQueueClient = messageQueueClient;
             ListingRepository = listingRepository;
             CommentRepository = commentRepository;
             ProfileRepository = profileRepository;
@@ -175,10 +180,7 @@ namespace classy.Manager
                                 Key = key
                             };
                             mediaFiles.Add(mediaFile);
-                            System.Threading.Tasks.Task.Factory.StartNew(() =>
-                            {
-                                PostProcessingManager.GenerateThumbnails(mediaFile, listingId, appId, StorageRepository, ListingRepository);
-                            });
+                            _messageQueueClient.Publish<CreateThumbnailsRequest>(new CreateThumbnailsRequest(listingId, appId, key));
                         }
                     }
                 }
