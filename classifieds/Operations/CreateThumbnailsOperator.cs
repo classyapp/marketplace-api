@@ -54,7 +54,7 @@ namespace classy.Operations
                 }
             }
 
-            Point[] sizes = new Point[] { new Point { X = 266, Y = 266 } };
+            Point[] sizes = new Point[] { new Point { X = 266, Y = 266 } , new Point { X = 301, Y = 301 } };
 
             foreach (var s in sizes)
             {
