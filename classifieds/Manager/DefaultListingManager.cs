@@ -563,7 +563,7 @@ namespace classy.Manager
 
         private Listing GetVerifiedListing(string appId, string listingId)
         {
-            return ListingRepository.GetById(listingId, appId, false);
+            return GetVerifiedListing(appId, listingId, false);
         }
     }
 }

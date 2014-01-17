@@ -118,7 +118,7 @@ namespace Classy.Repository
 
                 var result = ListingsCollection.Update(
                     query,
-                    MongoDB.Driver.Builders.Update.Set("ExternalMedia.$", media.ToBson())
+                    MongoDB.Driver.Builders.Update.Set("ExternalMedia.$", media.ToBsonDocument())
                 );
             }
             catch

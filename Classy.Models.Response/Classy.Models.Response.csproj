@@ -59,6 +59,7 @@
     <Compile Include="LocalizationResourceView.cs" />
     <Compile Include="LocationView.cs" />
     <Compile Include="MediaFileView.cs" />
+    <Compile Include="MediaThumbnailView.cs" />
     <Compile Include="PhysicalAddressView.cs" />
     <Compile Include="PostReviewResponse.cs" />
     <Compile Include="PricingInfoView.cs" />
