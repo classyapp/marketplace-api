@@ -307,7 +307,6 @@ namespace classy.Manager
             revieweeProfile.ReviewAverageScore =
                 ((revieweeProfile.ReviewAverageScore * revieweeProfile.ReviewCount) + score) / (++revieweeProfile.ReviewCount);
            
-            ProfileRepository.IncreaseCounter(appId, revieweeProfile.Id, ProfileCounters.Reviews, 1);
             ProfileRepository.Save(revieweeProfile);
 
             // return
@@ -367,9 +366,6 @@ namespace classy.Manager
                 else revieweeProfile.Metadata = metadata;
             }
 
-            // increase the review count for the merchant, and the average score
-            revieweeProfile.ReviewAverageScore =
-                ((revieweeProfile.ReviewAverageScore * revieweeProfile.ReviewCount) + score) / (++revieweeProfile.ReviewCount);
             // increase the review count for the merchant, and the average score + avg score for all sub criteria
             revieweeProfile.ReviewAverageScore =
                 ((revieweeProfile.ReviewAverageScore * revieweeProfile.ReviewCount) + score) / (++revieweeProfile.ReviewCount);
