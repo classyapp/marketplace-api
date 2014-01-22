@@ -31,6 +31,7 @@ namespace Classy.Models
         public string FacebookUserId { get; set; }
         public string FacebookUserName { get; set; }
         public string ImageUrl { get; set; }
+        public string ThumbnailUrl { get; set; }
         public int Rank { get; set; }
         public int FollowerCount { get; set; }
         public int FollowingCount { get; set; }

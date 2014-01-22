@@ -55,8 +55,11 @@ namespace Classy.Auth
                     profile.ContactInfo.Email = authToken.Email;
                     if (isNew)
                     {
+                        profile.UserName = authToken.UserName;
                         profile.ImageUrl = SaveFileFromUrl(storage, session.UserAuthId,  
                             string.Format("http://graph.facebook.com/{0}/picture?type=large", authToken.UserName));
+                        profile.ThumbnailUrl = SaveFileFromUrl(storage, session.UserAuthId,
+                            string.Format("http://graph.facebook.com/{0}/picture?type=square", authToken.UserName));
                     }
                 }
                 else if (authToken.Provider == TwitterAuthProvider.Name)
@@ -70,7 +73,8 @@ namespace Classy.Auth
             {
                 try
                 {
-                    profile.ImageUrl = SaveFileFromUrl(storage, session.UserAuthId, "http://www.gravatar.com/avatar/?f=y&d=mm");
+                    profile.ImageUrl = SaveFileFromUrl(storage, session.UserAuthId, "http://www.gravatar.com/avatar/?f=y&d=mm&s=261");
+                    profile.ThumbnailUrl = SaveFileFromUrl(storage, session.UserAuthId, "http://www.gravatar.com/avatar/?f=y&d=mm&s=50");
                 }
                 catch(WebException)
                 {
