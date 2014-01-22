@@ -56,9 +56,9 @@ namespace Classy.Auth
                     if (isNew)
                     {
                         profile.UserName = authToken.UserName;
-                        profile.ImageUrl = SaveFileFromUrl(storage, session.UserAuthId,  
+                        profile.ImageUrl = SaveFileFromUrl(storage, string.Concat("profile_img_", session.UserAuthId),  
                             string.Format("http://graph.facebook.com/{0}/picture?type=large", authToken.UserName));
-                        profile.ThumbnailUrl = SaveFileFromUrl(storage, session.UserAuthId,
+                        profile.ThumbnailUrl = SaveFileFromUrl(storage, string.Concat("profile_thumb_", session.UserAuthId),
                             string.Format("http://graph.facebook.com/{0}/picture?type=square", authToken.UserName));
                     }
                 }
@@ -73,8 +73,8 @@ namespace Classy.Auth
             {
                 try
                 {
-                    profile.ImageUrl = SaveFileFromUrl(storage, session.UserAuthId, "http://www.gravatar.com/avatar/?f=y&d=mm&s=261");
-                    profile.ThumbnailUrl = SaveFileFromUrl(storage, session.UserAuthId, "http://www.gravatar.com/avatar/?f=y&d=mm&s=50");
+                    profile.ImageUrl = SaveFileFromUrl(storage, string.Concat("profile_img_", session.UserAuthId), "http://www.gravatar.com/avatar/?f=y&d=mm&s=261");
+                    profile.ThumbnailUrl = SaveFileFromUrl(storage, string.Concat("profile_thumb_", session.UserAuthId), "http://www.gravatar.com/avatar/?f=y&d=mm&s=50");
                 }
                 catch(WebException)
                 {
@@ -86,9 +86,8 @@ namespace Classy.Auth
             repo.Save(profile);
         }
 
-        public string SaveFileFromUrl(IStorageRepository storage, string profileId, string url)
+        public string SaveFileFromUrl(IStorageRepository storage, string key, string url)
         {
-            string key = string.Concat("profile_img_", profileId);
             storage.SaveFileFromUrl(key, url, "image/jpeg");
             return storage.KeyToUrl(key);
         }

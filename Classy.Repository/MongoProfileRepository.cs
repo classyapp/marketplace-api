@@ -92,6 +92,10 @@ namespace Classy.Repository
             var queries = new List<IMongoQuery>() {
                 Query<Profile>.EQ(x => x.AppId, appId)
             };
+            if (professionalsOnly)
+            {
+                queries.Add(Query.NE("ProfessionalInfo", BsonNull.Value));
+            }
             if (!string.IsNullOrEmpty(displayName))
             {
                 // search for professional with matching company name, or contact name

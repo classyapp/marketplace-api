@@ -144,6 +144,10 @@ namespace classy.Manager
             {
                 var collections = CollectionRepository.GetByProfileId(appId, profileId);
                 profileView.Collections = collections.ToCollectionViewList();
+                foreach(var c in profileView.Collections)
+                {
+                    c.Listings = ListingRepository.GetById(c.IncludedListings.ToArray(), appId, false).ToListingViewList();
+                }
             }
 
             if (logImpression)
