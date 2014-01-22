@@ -383,7 +383,6 @@ namespace classy.Manager
                     revieweeProfile.ReviewAverageSubCriteria.Add(k, subScore);
                 }
             }
-            ProfileRepository.IncreaseCounter(appId, revieweeProfile.Id, ProfileCounters.Reviews, 1);
             ProfileRepository.Save(revieweeProfile);
 
             // return

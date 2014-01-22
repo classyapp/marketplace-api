@@ -15,8 +15,8 @@ namespace classy.Manager
                 AppId = appId,
                 EnableProxyProfiles = true,
                 ProxyClaimNeedsVerification = true,
-                AllowUnmoderatedComments = false,
-                AllowUnmoderatedReviews = false
+                AllowUnmoderatedComments = true,
+                AllowUnmoderatedReviews = true
             };
         }
     }
