@@ -12,10 +12,12 @@ namespace Classy.Repository
     public class MongoLocalizationProvider : ILocalizationRepository
     {
         private MongoCollection<LocalizationResource> ResourcesCollection;
+        private MongoCollection<LocalizationListResource> ListResourcesCollection;
 
         public MongoLocalizationProvider(MongoDatabase db)
         {
             ResourcesCollection = db.GetCollection<LocalizationResource>("resources");
+            ListResourcesCollection = db.GetCollection<LocalizationListResource>("listresources");
         }
     
         public LocalizationResource GetResourceByKey(string appId, string key)
@@ -29,6 +31,13 @@ namespace Classy.Repository
         {
             ResourcesCollection.Save(resource);
             return resource.Id;
+        }
+
+        public LocalizationListResource GetListResourceByKey(string appId, string key)
+        {
+            var query = Query<LocalizationListResource>.Where(x => x.AppId == appId && x.Key == key);
+            var resource = ListResourcesCollection.FindOne(query);
+            return resource;
         }
     }
 }

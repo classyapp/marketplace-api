@@ -997,6 +997,15 @@ namespace classy.Services
         }
 
         //
+        // GET: /resource/list/{Key}
+        // get resource by key
+        public object Get(GetListResourceByKey request)
+        {
+            var resource = LocalizationManager.GetListResourceByKey(request.Environment.AppId, request.Key);
+            return new HttpResult(resource, HttpStatusCode.OK);
+        }
+
+        //
         // POST: /resource/{Key}
         // set resource values
         public object Post(SetResourceValues request)

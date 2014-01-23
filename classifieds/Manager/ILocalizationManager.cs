@@ -12,5 +12,6 @@ namespace classy.Manager
     {
         LocalizationResourceView GetResourceByKey(string appId, string key);
         LocalizationResourceView SetResourceValues(string appId, string key, IDictionary<string, string> values);
+        LocalizationListResourceView GetListResourceByKey(string appId, string key);
     }
 }

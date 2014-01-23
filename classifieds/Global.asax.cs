@@ -193,6 +193,7 @@ namespace classy
                     .Add<LogActivity>("/stats/push", "POST")
 
                     // Localization
+                    .Add<GetListResourceByKey>("/resource/list/{Key}", "GET")
                     .Add<GetResourceByKey>("/resource/{Key}", "GET")
                     .Add<SetResourceValues>("/resource/{Key}", "POST")
                 ;

@@ -9,6 +9,5 @@ namespace Classy.Models.Request
     public class GetResourceByKey : BaseRequestDto
     {
         public string Key { get; set; }
-        public string Culture { get; set; }
     }
 }

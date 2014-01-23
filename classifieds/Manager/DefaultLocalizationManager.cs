@@ -51,5 +51,12 @@ namespace classy.Manager
             // return
             return resource.TranslateTo<LocalizationResourceView>();
         }
+
+
+        public LocalizationListResourceView GetListResourceByKey(string appId, string key)
+        {
+            var listResource = LocalizationRepository.GetListResourceByKey(appId, key);
+            return listResource.ToLocalizationListResourceView();
+        }
     }
 }
