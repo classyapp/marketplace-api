@@ -105,11 +105,11 @@ namespace classy.Manager
         /// </summary>
         /// <param name="appId"></param>
         /// <param name="profileId"></param>
-        /// <param name="followeeUsername"></param>
+        /// <param name="followeeProfileId"></param>
         void FollowProfile(
             string appId,
             string profileId,
-            string followeeUsername);
+            string followeeProfileId);
 
         /// <summary>
         /// 

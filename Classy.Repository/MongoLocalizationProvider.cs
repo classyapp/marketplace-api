@@ -39,5 +39,12 @@ namespace Classy.Repository
             var resource = ListResourcesCollection.FindOne(query);
             return resource;
         }
+
+        public IList<string> GetResourceKeysForApp(string appId)
+        {
+            var query = Query<LocalizationResource>.Where(x => x.AppId == appId);
+            var resourceKeys = ResourcesCollection.Find(query).Select(x => x.Key).ToList();
+            return resourceKeys;
+        }
     }
 }

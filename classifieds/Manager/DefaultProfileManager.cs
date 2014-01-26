@@ -77,10 +77,10 @@ namespace classy.Manager
         public void FollowProfile(
             string appId,
             string profileId,
-            string followeeUsername)
+            string followeeProfileId)
         {
             var follower = ProfileRepository.GetById(appId, profileId, false);
-            var followee = ProfileRepository.GetByUsername(appId, followeeUsername, false);
+            var followee = ProfileRepository.GetById(appId, followeeProfileId, false);
             if (followee == null) throw new KeyNotFoundException("invalid username");
 
             // save triple
@@ -92,7 +92,7 @@ namespace classy.Manager
                 ProfileRepository.IncreaseCounter(appId, followee.Id, ProfileCounters.Followers | ProfileCounters.Rank, 1);
 
                 // add followee and save follower profile
-                follower.FolloweeUsernames.Add(followee.UserName);
+                follower.FolloweeProfileIds.Add(followeeProfileId);
                 follower.FollowingCount++;
                 ProfileRepository.Save(follower);
             }
@@ -124,7 +124,7 @@ namespace classy.Manager
             if (includeFollowingProfiles)
             {
                 var profileIds = TripleStore.GetActivityObjectList(appId, ActivityPredicate.FOLLOW_PROFILE, profileId);
-                var following = ProfileRepository.GetByIds(appId, profileIds.ToArray());
+                var following = ProfileRepository.GetByIds(appId, profile.FolloweeProfileIds.ToArray());
                 profileView.Following = following.ToProfileViewList();
             }
 
@@ -132,6 +132,12 @@ namespace classy.Manager
             {
                 var reviews = ReviewRepository.GetByRevieweeProfileId(appId, profileId, false, false);
                 profileView.Reviews = reviews.ToReviewViewList();
+                var reviewers = ProfileRepository.GetByIds(appId, reviews.Select(x => x.ProfileId).ToArray());
+                foreach (var r in profileView.Reviews)
+                {
+                    r.ReviewerUsername = reviewers.Single(x => x.Id == r.ProfileId).UserName;
+                    r.ReviewerThumbnailUrl = reviewers.Single(x => x.Id == r.ProfileId).ThumbnailUrl;
+                }
             }
 
             if (includeListings)

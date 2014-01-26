@@ -10,6 +10,7 @@ namespace classy.Manager
 {
     public interface ILocalizationManager
     {
+        IList<string> GetResourceKeysForApp(string appId);
         LocalizationResourceView GetResourceByKey(string appId, string key);
         LocalizationResourceView SetResourceValues(string appId, string key, IDictionary<string, string> values);
         LocalizationListResourceView GetListResourceByKey(string appId, string key);

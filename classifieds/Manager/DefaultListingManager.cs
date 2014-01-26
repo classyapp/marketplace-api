@@ -97,14 +97,13 @@ namespace classy.Manager
             return listingView;
         }
 
-        public IList<ListingView> GetListingsByUsername(
+        public IList<ListingView> GetListingsByProfileId(
             string appId, 
-            string username, 
+            string profileId, 
             bool includeComments, 
             bool formatCommentsAsHtml)
         {
-            var profile = ProfileRepository.GetByUsername(appId, username, false);
-            if (profile == null) throw new KeyNotFoundException("invalid username");
+            var profile = GetVerifiedProfile(appId, profileId);
 
             // TODO: cache listings
             var listings = ListingRepository.GetByProfileId(profile.Id, appId, false);

@@ -102,6 +102,7 @@
     <Compile Include="DTO\Request\ClaimProxyProfile.cs" />
     <Compile Include="DTO\Request\AddListingToCollection.cs" />
     <Compile Include="DTO\Request\GetListResourceByKey.cs" />
+    <Compile Include="DTO\Request\GetResourceKeysForApp.cs" />
     <Compile Include="DTO\Request\SetResourceValues.cs" />
     <Compile Include="DTO\Request\GetResourceByKey.cs" />
     <Compile Include="DTO\Request\GetCollectionById.cs" />
@@ -118,7 +119,7 @@
     <Compile Include="DTO\Request\GetBookingsForProfile.cs" />
     <Compile Include="DTO\Request\GetBookingsForProfileListings.cs" />
     <Compile Include="DTO\Request\GetListingById.cs" />
-    <Compile Include="DTO\Request\GetListingsByUsername.cs" />
+    <Compile Include="DTO\Request\GetListingsByProfileId.cs" />
     <Compile Include="DTO\Request\GetOrdersForListing.cs" />
     <Compile Include="DTO\Request\GetOrdersForProfile.cs" />
     <Compile Include="DTO\Request\GetOrdersForProfileListings.cs" />

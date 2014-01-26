@@ -6,8 +6,7 @@ using System.Web;
 
 namespace Classy.Models.Request
 {
-    public class FollowProfile : BaseRequestDto
+    public class GetResourceKeysForApp : BaseRequestDto
     {
-        public string FolloweeProfileId { get; set; }
     }
 }

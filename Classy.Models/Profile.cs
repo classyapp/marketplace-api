@@ -19,7 +19,7 @@ namespace Classy.Models
         public Profile()
         {
             ContactInfo = new ContactInfo();
-            FolloweeUsernames = new List<string>();
+            FolloweeProfileIds = new List<string>();
             Metadata = new Dictionary<string, string>();
             Created = DateTime.UtcNow;
         }
@@ -41,7 +41,7 @@ namespace Classy.Models
         public int ReviewCount { get; set; }
         public decimal ReviewAverageScore { get; set; }
         public IDictionary<string, decimal> ReviewAverageSubCriteria { get; set; }
-        public IList<string> FolloweeUsernames { get; set; }
+        public IList<string> FolloweeProfileIds { get; set; }
         public IDictionary<string, string> Metadata { get; set; }
         public ProfessionalInfo ProfessionalInfo { get; set; }
 

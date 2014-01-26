@@ -100,13 +100,13 @@ namespace classy.Services
             }
         }
 
-        public object Get(GetListingsByUsername request)
+        public object Get(GetListingsByProfileId request)
         {
             try
             {
-                var listingViews = ListingManager.GetListingsByUsername(
+                var listingViews = ListingManager.GetListingsByProfileId(
                     request.Environment.AppId,
-                    request.Username,
+                    request.ProfileId,
                     request.IncludeComments,
                     request.FormatCommentsAsHtml);
 
@@ -337,7 +337,7 @@ namespace classy.Services
                 ProfileManager.FollowProfile(
                     request.Environment.AppId,
                     session.UserAuthId,
-                    request.FolloweeUsername);
+                    request.FolloweeProfileId);
 
                 return new HttpResult(HttpStatusCode.OK);
             }
@@ -994,6 +994,15 @@ namespace classy.Services
         {
             var resource = LocalizationManager.GetResourceByKey(request.Environment.AppId, request.Key);
             return new HttpResult(resource, HttpStatusCode.OK);
+        }
+
+        //
+        // GET: /resource/keys
+        // get all available resource keys for an app
+        public object Get(GetResourceKeysForApp request)
+        {
+            var resourceKeys = LocalizationManager.GetResourceKeysForApp(request.Environment.AppId);
+            return new HttpResult(resourceKeys, HttpStatusCode.OK);
         }
 
         //

@@ -8,20 +8,20 @@ using ServiceStack.Common.Web;
 
 namespace Classy.Models.Request
 {
-    public class GetListingsByUsername : BaseRequestDto
+    public class GetListingsByProfileId : BaseRequestDto
     {
-        public string Username { get; set; }
+        public string ProfileId { get; set; }
         public bool IncludeComments { get; set; }
         public bool FormatCommentsAsHtml { get; set; }
     }
 
-    public class GetListingsByUsernameValidator : AbstractValidator<GetListingsByUsername>
+    public class GetListingsByProfileIdValidator : AbstractValidator<GetListingsByProfileId>
     {
-        public GetListingsByUsernameValidator()
+        public GetListingsByProfileIdValidator()
         {
             RuleSet(HttpMethods.Get, () =>
             {
-                RuleFor(x => x.Username).NotEmpty();
+                RuleFor(x => x.ProfileId).NotEmpty();
             });
         }
     }

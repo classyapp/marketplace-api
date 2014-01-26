@@ -130,7 +130,7 @@ namespace classy
                     .Add<PostListing>("/listing/{ListingId}", "PUT") // update listing
                     .Add<SearchListings>("/listing/search", ApplyTo.Get | ApplyTo.Post) // search listings by tag and/or metadata
                     .Add<SearchListings>("/tags/{tag}", "GET") // search with a nicer url for tag
-                    .Add<GetListingsByUsername>("/profile/{Username}/listing/list", "GET") // get list of listing for profile
+                    .Add<GetListingsByProfileId>("/profile/{Username}/listing/list", "GET") // get list of listing for profile
 
                     // Collections
                     .Add<CreateCollection>("/collection/new", "POST") // create a new collection
@@ -152,7 +152,7 @@ namespace classy
                     // Social Actions
                     .Add<FavoriteListing>("/listing/{ListingId}/favorite", "POST") // favorite
                     //.Add<FavoriteListing>("/listing/{ListingId}/favorite", "DELETE") // un-favorite
-                    .Add<FollowProfile>("/profile/{FolloweeUsername}/follow", "POST") // follow
+                    .Add<FollowProfile>("/profile/{FolloweeProfileId}/follow", "POST") // follow
                     //.Add<FollowProfile>("/profile/{FolloweeUsername/follow", "DELETE") // un-follow
                     .Add<FlagListing>("/listing/{ListingId}/flag", "POST") // flag a listing
 
@@ -195,6 +195,7 @@ namespace classy
                     // Localization
                     .Add<GetListResourceByKey>("/resource/list/{Key}", "GET")
                     .Add<GetResourceByKey>("/resource/{Key}", "GET")
+                    .Add<GetResourceKeysForApp>("/resource/keys", "GET")
                     .Add<SetResourceValues>("/resource/{Key}", "POST")
                 ;
             }

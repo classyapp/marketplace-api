@@ -10,7 +10,7 @@ namespace Classy.Models.Response
         public ProfileView()
         {
             Metadata = new Dictionary<string, string>();
-            FolloweeUsernames = new List<string>();
+            FolloweeProfileIds = new List<string>();
         }
 
         public string Id { get; set; }
@@ -32,7 +32,7 @@ namespace Classy.Models.Response
         public bool IsProxy { get; set; }
         public ProfessionalInfoView ProfessionalInfo { get; set; }
         public int Rank { get; set; }
-        public IList<string> FolloweeUsernames { get; set; }
+        public IList<string> FolloweeProfileIds { get; set; }
         public IList<ProfileView> Following { get; set; }
         public IList<ProfileView> FollowedBy { get; set; }
         public IList<ReviewView> Reviews { get; set; }

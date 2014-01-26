@@ -41,13 +41,13 @@ namespace classy.Manager
         /// 
         /// </summary>
         /// <param name="appId"></param>
-        /// <param name="username"></param>
+        /// <param name="profileId"></param>
         /// <param name="includeComments"></param>
         /// <param name="formatCommentsAsHtml"></param>
         /// <returns></returns>
-        IList<ListingView> GetListingsByUsername(
+        IList<ListingView> GetListingsByProfileId(
             string appId,
-            string username,
+            string profileId,
             bool includeComments,
             bool formatCommentsAsHtml);
 
