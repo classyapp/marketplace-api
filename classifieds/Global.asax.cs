@@ -25,38 +25,51 @@ using MongoDB.Driver;
 using System.Configuration;
 using classy.Extentions;
 using classy.Operations;
+using Requests = classy.DTO.Request;
 
 namespace classy
 {
     public class Global : System.Web.HttpApplication
     {
-        public class ListingServiceHost : AppHostBase
+        protected void Application_Start(object sender, EventArgs e)
         {
-            public ListingServiceHost() : base("Listing Service Endpoint, Hello", typeof(Services.ListingService).Assembly) 
+            var host = new ApiServicesHost();
+            host.Init();
+        }
+
+        /// <summary>
+        /// Configures ServiceStack settings and routes as well as IoC container
+        /// </summary>
+        public class ApiServicesHost : AppHostBase
+        {
+            public ApiServicesHost()
+                : base("Listing Service Endpoint, Hello", typeof(Services.ListingService).Assembly)
             {
                 // request filter to verify api key
                 RequestFilters.Add(CustomAuthenticateAttribute.SetEnvironment);
-
+#if DEBUG
+                var debugMode = true;
+                var enableFeatures = Feature.All;
+#else
+                var debugMode = false;
+                var enableFeatures = Feature.All.Remove(Feature.Metadata).Remove(Feature.Html);
+#endif
                 SetConfig(new EndpointHostConfig()
                 {
                     DefaultContentType = ContentType.Json,
-                    DebugMode = false,
-                    EnableFeatures = Feature.All
-                        .Remove(Feature.Metadata)
-                        .Remove(Feature.Html)
+                    DebugMode = debugMode,
+                    EnableFeatures = enableFeatures
                 });
             }
 
-        
-
-            public override void Configure(Funq.Container container)
+            public override void Configure(Funq.Container ioc)
             {
                 //Enable Authentication and Registration
-                ConfigureAuth(container);
+                ConfigureAuth(ioc);
 
                 // Validation
                 Plugins.Add(new ValidationFeature());
-                container.RegisterValidators(typeof(PostListing).Assembly);
+                ioc.RegisterValidators(typeof(PostListing).Assembly);
 
                 // CORS
                 //Plugins.Add(new CorsFeature(
@@ -66,12 +79,13 @@ namespace classy
                 //    allowCredentials: true
                 //));
 
-                container.WireUp();
+                ioc.WireUp();
+
+                ConfigureOperators(ioc);
 
                 // configure service routes
-                ConfigureServiceRoutes();
-
-                ConfigureOperators(container);
+                AddListingRoutes();
+                AddProfileRoutes();
             }
 
             private void ConfigureOperators(Funq.Container container)
@@ -90,8 +104,8 @@ namespace classy
 
             private void ConfigureAuth(Funq.Container container)
             {
-                var appSettings = new AppSettings(); 
-                
+                var appSettings = new AppSettings();
+
                 //Register all Authentication methods you want to enable for this web app. 
                 Plugins.Add(new Classy.Auth.AuthFeature(
                     () => new CustomUserSession(), // Use your own typed Custom UserSession type
@@ -110,7 +124,7 @@ namespace classy
                 //container.RegisterAs<CustomRegistrationValidator, IValidator<Registration>>();
 
                 //Store User Data into the referenced MongoDB database
-                container.Register<Classy.Auth.IUserAuthRepository>(c => new Classy.Auth.MongoDBAuthRepository(c.Resolve<MongoDatabase>(), true)); 
+                container.Register<Classy.Auth.IUserAuthRepository>(c => new Classy.Auth.MongoDBAuthRepository(c.Resolve<MongoDatabase>(), true));
 
                 //logging feature
 #if DEBUG
@@ -118,7 +132,14 @@ namespace classy
 #endif
             }
 
-            private void ConfigureServiceRoutes()
+            private void AddProfileRoutes()
+            {
+                Routes
+                    .Add<Requests.Profile.RequestCustomerReview>("/profile/{ProfileId}/requestReview", ApplyTo.Post)
+                    ;
+            }
+
+            private void AddListingRoutes()
             {
                 Routes
                     // Listings
@@ -197,12 +218,6 @@ namespace classy
                     .Add<SetResourceValues>("/resource/{Key}", "POST")
                 ;
             }
-        }
-
-        protected void Application_Start(object sender, EventArgs e)
-        {
-            var host = new ListingServiceHost();
-            host.Init();
         }
     }
 }
