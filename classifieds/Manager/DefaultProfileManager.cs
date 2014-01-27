@@ -326,15 +326,14 @@ namespace classy.Manager
             string content,
             decimal score,
             IDictionary<string, decimal> subCriteria,
-            ContactInfo contactInfo,
-            IDictionary<string, string> metadata)
+            IDictionary<string, string> metadata,
+            ContactInfo newProfessionalContactInfo,
+            IDictionary<string, string> newProfessionalMetadata)
         {
             // get the merchant profile
             var revieweeProfile = GetVerifiedProfile(appId, revieweeProfileId);
             if (!revieweeProfile.IsProfessional && !revieweeProfile.IsProxy)
                 throw new ArgumentException("ProfileNotProfessionalOrProxy");
-            if (!revieweeProfile.IsProxy && (contactInfo != null || metadata != null))
-                throw new ArgumentException("ProfileNotProxy");
 
             // get app info
             var app = AppManager.GetAppById(appId);
@@ -354,23 +353,12 @@ namespace classy.Manager
                 Content = content,
                 Score = score,
                 SubCriteria = subCriteria,
+                Metadata = metadata,
                 IsPublished = app.AllowUnmoderatedReviews
             };
             ReviewRepository.Save(review);
 
-            // update contact info and metadata (if this is a proxy, otherwise exception was thrown above)
-            if (contactInfo != null) revieweeProfile.ContactInfo = contactInfo;
-            if (metadata != null)
-            {
-                if (revieweeProfile.Metadata != null)
-                {
-                    foreach (var attribute in metadata)
-                    {
-                        revieweeProfile.Metadata[attribute.Key] = attribute.Value;
-                    }
-                }
-                else revieweeProfile.Metadata = metadata;
-            }
+            // TODO: create a new proxy profile using the NewProfessionalMetadata and NewProfessionalContactInfo properties
 
             // increase the review count for the merchant, and the average score + avg score for all sub criteria
             revieweeProfile.ReviewAverageScore =

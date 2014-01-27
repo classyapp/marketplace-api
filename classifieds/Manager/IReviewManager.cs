@@ -38,8 +38,9 @@ namespace classy.Manager
         /// <param name="content"></param>
         /// <param name="score"></param>
         /// <param name="subCriteria"></param>
-        /// <param name="contactInfo"></param>
         /// <param name="metadata"></param>
+        /// <param name="newProfessionalContactInfo"></param>
+        /// <param name="newProfessionalMetadata"></param>
         /// <returns></returns>
         ReviewView PostReviewForProfile(
             string appId,
@@ -48,8 +49,9 @@ namespace classy.Manager
             string content,
             decimal score,
             IDictionary<string, decimal> subCriteria,
-            ContactInfo contactInfo,
-            IDictionary<string, string> metadata);
+            IDictionary<string, string> metadata,
+            ContactInfo newProfessionalContactInfo,
+            IDictionary<string, string> newProfessionalMetadata);
 
         /// <summary>
         /// 

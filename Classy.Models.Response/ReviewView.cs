@@ -15,6 +15,8 @@ namespace Classy.Models.Response
         public string ListingId { get; set; }
         public string Content { get; set; }
         public int Score { get; set; }
+        public IDictionary<string, decimal> SubCriteria { get; set; }
+        public IDictionary<string, string> Metadata { get; set; }
         public bool IsPublished { get; set; }
         public bool IsDeleted { get; set; }
     }

@@ -13,6 +13,7 @@ namespace Classy.Models
         public string Content { get; set; }
         public decimal Score { get; set; }
         public IDictionary<string, decimal> SubCriteria { get; set; }
+        public IDictionary<string, string> Metadata { get; set; }
         public bool IsPublished { get; set; }
         public bool IsDeleted { get; set; }
     }

@@ -13,8 +13,9 @@ namespace Classy.Models.Request
         public string Content { get; set; }
         public decimal Score { get; set; }
         public IDictionary<string, decimal> SubCriteria { get; set; }
-        public ContactInfo ContactInfo { get; set; }
         public IDictionary<string, string> Metadata { get; set; }
+        public ContactInfo NewProfessionalContactInfo { get; set; }
+        public IDictionary<string, string> NewProfessionalMetadata { get; set; }
         public bool ReturnReviewerProfile { get; set; }
         public bool ReturnRevieweeProfile { get; set; }
     }

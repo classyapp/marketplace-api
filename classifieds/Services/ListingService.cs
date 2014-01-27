@@ -791,8 +791,9 @@ namespace classy.Services
                     request.Content,
                     request.Score,
                     request.SubCriteria,
-                    request.ContactInfo,
-                    request.Metadata);
+                    request.Metadata,
+                    request.NewProfessionalContactInfo,
+                    request.NewProfessionalMetadata);
                 var response = new PostReviewResponse
                 {
                     Review = review.TranslateTo<ReviewView>()
