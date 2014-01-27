@@ -892,8 +892,6 @@ namespace classy.Services
         // log an activity 
         public object Post(LogActivity request)
         {
-            var session = SessionAs<CustomUserSession>();
-            if (!session.IsAuthenticated && request.SubjectId != "guest") throw new ApplicationException("when no user logged in, SubjectId must be 'guest'");
             var tripleView = AnalyticsManager.LogActivity(request.Environment.AppId, request.SubjectId, ActivityPredicate.CONTACT_PROFILE, request.ObjectId);
             return new HttpResult(tripleView, HttpStatusCode.OK);
         }
