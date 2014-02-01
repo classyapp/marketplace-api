@@ -59,6 +59,11 @@ namespace classy.Manager
             var listing = GetVerifiedListing(appId, listingId);
             var listingView = listing.ToListingView();
 
+            if (logImpression)
+            {
+                ListingRepository.IncreaseCounter(listingId, appId, ListingCounters.Views, 1);
+            }
+
             if (includeComments)
             {
                 var comments = CommentRepository.GetByListingId(listingId, formatCommentsAsHtml);
@@ -135,7 +140,7 @@ namespace classy.Manager
         {
             // TODO: cache listings
             tag = string.IsNullOrEmpty(tag) ? null : string.Concat("#", tag.TrimStart(new char[] { '#' }));
-            var listings = ListingRepository.Search(tag, listingType, metadata, priceMin, priceMax, location, appId, false, true);
+            var listings = ListingRepository.Search(tag, listingType, metadata, priceMin, priceMax, location, appId, false, false);
             var comments = includeComments ?
                 CommentRepository.GetByListingIds(listings.Select(x => x.Id).AsEnumerable(), formatCommentsAsHtml) : null;
             var listingViews = new List<ListingView>();
