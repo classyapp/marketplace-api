@@ -55,6 +55,7 @@ namespace classy.Manager
         /// <param name="appId"></param>
         /// <param name="collectionId"></param>
         /// <param name="profileId">the profile id of the authenticated user</param>
+        /// <param name="includeProfile"></param>
         /// <param name="includeListings"></param>
         /// <param name="includeDrafts"></param>
         /// <param name="increaseViewCounter"></param>
@@ -64,6 +65,7 @@ namespace classy.Manager
             string appId,
             string collectionId,
             string profileId,
+            bool includeProfile,
             bool includeListings,
             bool includeDrafts,
             bool increaseViewCounter,

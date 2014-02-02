@@ -958,6 +958,7 @@ namespace classy.Services
                     request.Environment.AppId,
                     request.CollectionId,
                     session.UserAuthId,
+                    request.IncludeProfile,
                     request.IncludeDrafts,
                     request.IncludeListings,
                     request.IncreaseViewCounter,

@@ -9,6 +9,7 @@ namespace Classy.Models.Response
     {
         public string Id { get; set; }
         public string ProfileId { get; set; }
+        public ProfileView Profile { get; set; }
         public string Title { get; set; }
         public string Content { get; set; }
         public bool IsPublic { get; set; }

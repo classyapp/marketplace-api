@@ -429,6 +429,7 @@ namespace classy.Manager
             string appId,
             string collectionId,
             string profileId,
+            bool includeProfile,
             bool includeDrafts,
             bool includeListings,
             bool increaseViewCounter,
@@ -438,6 +439,10 @@ namespace classy.Manager
             {
                 var collection = GetVerifiedCollection(appId, collectionId);
                 var collectionView = collection.ToCollectionView();
+                if (includeProfile)
+                {
+                    collectionView.Profile = ProfileRepository.GetById(appId, collection.ProfileId, false).ToProfileView();
+                }
                 if (includeListings)
                 {
                     collectionView.Listings = ListingRepository.GetById(collection.IncludedListings.ToArray(), appId, includeDrafts).ToListingViewList();
