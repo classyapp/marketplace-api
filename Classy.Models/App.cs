@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Web;
+using System.Drawing;
 
 namespace Classy.Models
 {
@@ -13,5 +14,6 @@ namespace Classy.Models
         public bool AllowUnmoderatedComments { get; set; }
         public bool EnableProxyProfiles { get; set; }
         public bool ProxyClaimNeedsVerification { get; set; }
+        public Point[] ExternalMediaThumbnailSizes { get; set; }
     }
 }

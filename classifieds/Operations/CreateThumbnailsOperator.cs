@@ -1,4 +1,5 @@
-﻿using Classy.Models;
+﻿using classy.Manager;
+using Classy.Models;
 using Classy.Repository;
 using System;
 using System.Collections.Generic;
@@ -13,16 +14,19 @@ namespace classy.Operations
     {
         private readonly IStorageRepository _storageRepository;
         private readonly IListingRepository _listingRepository;
+        private readonly IAppManager _appManager;
 
-        public CreateThumbnailsOperator(IStorageRepository storageRepo, IListingRepository listingRepo)
+        public CreateThumbnailsOperator(IStorageRepository storageRepo, IListingRepository listingRepo, IAppManager appManager)
         {
             _storageRepository = storageRepo;
             _listingRepository = listingRepo;
+            _appManager = appManager;
         }
 
         public void PerformOperation(CreateThumbnailsRequest request)
         {
             // TODO: grab media file by key instead of off the listing?
+            var app = _appManager.GetAppById(request.AppId);
             var listing = _listingRepository.GetById(request.ListingId, request.AppId, true);
             var listingMediaFile = listing.ExternalMedia.Single(x => x.Key == request.MediaKey);
 
@@ -54,7 +58,7 @@ namespace classy.Operations
                 }
             }
 
-            Point[] sizes = new Point[] { new Point { X = 266, Y = 266 } , new Point { X = 301, Y = 301 } };
+            var sizes = app.ExternalMediaThumbnailSizes;
 
             foreach (var s in sizes)
             {
