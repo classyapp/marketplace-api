@@ -12,8 +12,9 @@ namespace Classy.Repository
         IList<string> GetResourceKeysForApp(string appId);
 
         LocalizationResource GetResourceByKey(string appId, string key);
-        string SetResource(LocalizationResource resources);
+        string SetResource(LocalizationResource resource);
 
         LocalizationListResource GetListResourceByKey(string appId, string key);
+        string SetListResource(LocalizationListResource listResource);
     }
 }

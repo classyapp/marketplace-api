@@ -197,6 +197,7 @@ namespace classy
                     .Add<GetResourceByKey>("/resource/{Key}", "GET")
                     .Add<GetResourceKeysForApp>("/resource/keys", "GET")
                     .Add<SetResourceValues>("/resource/{Key}", "POST")
+                    .Add<SetResourceListValues>("/resource/list/{Key}", "POST")
                 ;
             }
         }

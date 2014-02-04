@@ -40,6 +40,12 @@ namespace Classy.Repository
             return resource;
         }
 
+        public string SetListResource(LocalizationListResource listResource)
+        {
+            ListResourcesCollection.Save(listResource);
+            return listResource.Id;
+        }
+
         public IList<string> GetResourceKeysForApp(string appId)
         {
             var query = Query<LocalizationResource>.Where(x => x.AppId == appId);

@@ -1024,5 +1024,14 @@ namespace classy.Services
             var resource = LocalizationManager.SetResourceValues(request.Environment.AppId, request.Key, request.Values);
             return new HttpResult(resource, HttpStatusCode.OK);
         }
+
+        //
+        // POST: /resource/list/{Key}
+        // set resource values
+        public object Post(SetResourceListValues request)
+        {
+            var listResource = LocalizationManager.SetListResourceValues(request.Environment.AppId, request.Key, request.ListItems);
+            return new HttpResult(listResource, HttpStatusCode.OK);
+        }
     }
 }

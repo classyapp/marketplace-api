@@ -103,6 +103,7 @@
     <Compile Include="DTO\Request\AddListingToCollection.cs" />
     <Compile Include="DTO\Request\GetListResourceByKey.cs" />
     <Compile Include="DTO\Request\GetResourceKeysForApp.cs" />
+    <Compile Include="DTO\Request\SetResourceListValues.cs" />
     <Compile Include="DTO\Request\SetResourceValues.cs" />
     <Compile Include="DTO\Request\GetResourceByKey.cs" />
     <Compile Include="DTO\Request\GetCollectionById.cs" />

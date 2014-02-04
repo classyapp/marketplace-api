@@ -59,6 +59,33 @@ namespace classy.Manager
             return listResource.ToLocalizationListResourceView();
         }
 
+        public LocalizationListResourceView SetListResourceValues(string appId, string key, IList<ListItem> listItems)
+        {
+            var listResource = LocalizationRepository.GetListResourceByKey(appId, key);
+            if (listResource == null)
+            {
+                listResource = new LocalizationListResource
+                {
+                    AppId = appId,
+                    Key = key,
+                    ListItems = listItems
+                };
+            }
+            else
+            {
+                if (listResource.ListItems == null) listResource.ListItems = new List<ListItem>();
+                foreach (var item in listItems)
+                {
+                    if (listResource.ListItems.Any(x => x.Value == item.Value)) listResource.ListItems.Single(x => x.Value == item.Value).Text = item.Text ;
+                    else listResource.ListItems.Add(item);
+                }
+            }
+            // save 
+            LocalizationRepository.SetListResource(listResource);
+            // return
+            return listResource.ToLocalizationListResourceView();
+        }
+
         public IList<string> GetResourceKeysForApp(string appId)
         {
             return LocalizationRepository.GetResourceKeysForApp(appId);
