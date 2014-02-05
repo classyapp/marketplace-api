@@ -14,7 +14,7 @@ namespace Classy.Models.Request
         public string Title { get; set; }
         public string Content { get; set; }
         public bool IsPublic { get; set; }
-        public IList<string> IncludedListings { get; set; }
+        public IList<IncludedListing> IncludedListings { get; set; }
         public IList<string> Collaborators { get; set; }
         public IList<string> PermittedViewers { get; set; }
 

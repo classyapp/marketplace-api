@@ -388,7 +388,7 @@ namespace classy.Manager
             string title,
             string content,
             bool isPublic,
-            IList<string> includedListings,
+            IList<Classy.Models.IncludedListing> includedListings,
             IList<string> collaborators,
             IList<string> permittedViewers)
         {
@@ -410,10 +410,10 @@ namespace classy.Manager
 
                 // log an activity, and increase the counter for the listings that were included
                 var exists = false;
-                foreach (var listingId in includedListings)
+                foreach (var listing in includedListings)
                 {
-                    TripleStore.LogActivity(appId, profileId, ActivityPredicate.ADD_LISTING_TO_COLLECTION, listingId, ref exists);
-                    if (!exists) ListingRepository.IncreaseCounter(listingId, appId, ListingCounters.AddToCollection, 1);
+                    TripleStore.LogActivity(appId, profileId, ActivityPredicate.ADD_LISTING_TO_COLLECTION, listing.ListingId, ref exists);
+                    if (!exists) ListingRepository.IncreaseCounter(listing.ListingId, appId, ListingCounters.AddToCollection, 1);
                 }
 
                 // return
@@ -445,7 +445,7 @@ namespace classy.Manager
                 }
                 if (includeListings)
                 {
-                    collectionView.Listings = ListingRepository.GetById(collection.IncludedListings.ToArray(), appId, includeDrafts).ToListingViewList();
+                    collectionView.Listings = ListingRepository.GetById(collection.IncludedListings.Select(l => l.ListingId).ToArray(), appId, includeDrafts).ToListingViewList();
                 }
                 if (increaseViewCounter)
                 {
@@ -454,7 +454,7 @@ namespace classy.Manager
                     //CollectionRepository.IncreaseCounter(appId, collectionId);
                     if (increaseViewCounterOnListings)
                     {
-                        ListingRepository.IncreaseCounter(collection.IncludedListings.ToArray(), appId, ListingCounters.Views, 1);
+                        ListingRepository.IncreaseCounter(collection.IncludedListings.Select(l => l.ListingId).ToArray(), appId, ListingCounters.Views, 1);
                     }
                 //    var update = Update<Listing>.Inc(x => x.ViewCount, 1);
                 //    ListingsCollection.Update(query, update, new MongoUpdateOptions { Flags = UpdateFlags.Multi });
@@ -494,7 +494,7 @@ namespace classy.Manager
                 var collection = GetVerifiedCollection(appId, collectionId);
                 if (collection.ProfileId != profileId) throw new UnauthorizedAccessException();
                 // TODO: verify all listings exist
-                if (collection.IncludedListings == null) collection.IncludedListings = new List<string>();
+                if (collection.IncludedListings == null) collection.IncludedListings = new List<Classy.Models.IncludedListing>();
                 // log an activity, and increase the counter for the listings that were included
                 var exists = false;
                 foreach (var listingId in listingIds)
@@ -502,7 +502,7 @@ namespace classy.Manager
                     TripleStore.LogActivity(appId, profileId, ActivityPredicate.ADD_LISTING_TO_COLLECTION, listingId, ref exists);
                     if (!exists)
                     {
-                        collection.IncludedListings.Add(listingId);
+                        collection.IncludedListings.Add(new Classy.Models.IncludedListing { ListingId = listingId, Comments = string.Empty });
                         ListingRepository.IncreaseCounter(listingId, appId, ListingCounters.AddToCollection, 1);
                     }
                 }
@@ -510,6 +510,36 @@ namespace classy.Manager
                 return collection.ToCollectionView();
             }
             catch(Exception)
+            {
+                throw;
+            }
+        }
+
+        public CollectionView UpdateCollection(
+            string appId,
+            string profileId,
+            string collectionId,
+            string title,
+            string content,
+            IList<Classy.Models.IncludedListing> listings)
+        {
+            try
+            {
+                var collection = GetVerifiedCollection(appId, collectionId);
+                if (collection.ProfileId != profileId) throw new UnauthorizedAccessException();
+                // TODO: verify all listings exist
+                if (collection.IncludedListings == null) collection.IncludedListings = new List<Classy.Models.IncludedListing>();
+                // log an activity, and increase the counter for the listings that were included
+                collection.Title = title;
+                collection.Content = content;
+                collection.IncludedListings = listings;
+
+                CollectionRepository.Update(collection);
+                var collectionView = collection.ToCollectionView();
+                collectionView.Listings = ListingRepository.GetById(collection.IncludedListings.Select(l => l.ListingId).ToArray(), appId, false).ToListingViewList();
+                return collectionView;
+            }
+            catch (Exception)
             {
                 throw;
             }
