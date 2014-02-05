@@ -10,6 +10,7 @@ namespace Classy.Models.Response
         public string Category { get; set; }
         public string TaxId { get; set; }
         public string CompanyName { get; set; }
+        public bool IsProxy { get; set; }
         public ExtendedContactInfoView CompanyContactInfo { get; set; }
         public int SettlementPeriodInDays { get; set; }
         public int RollingReservePercent { get; set; }

@@ -14,8 +14,6 @@ namespace Classy.Models
     /// </summary>   
     public class Profile : BaseObject
     {
-        public const string PROXY_METADATA_KEY = "ProxyProfile";
-
         public Profile()
         {
             ContactInfo = new ContactInfo();
@@ -78,8 +76,7 @@ namespace Classy.Models
         {
             get
             {
-                return
-                    this.Metadata != null && this.Metadata.ContainsKey(PROXY_METADATA_KEY);
+                return this.IsProfessional && this.ProfessionalInfo.IsProxy;
             }
         }
     }

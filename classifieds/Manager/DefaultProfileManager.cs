@@ -37,18 +37,18 @@ namespace classy.Manager
 
         public ProfileView CreateProfileProxy(
             string appId,
-            ProfessionalInfo ProfessionalInfo,
+            ProfessionalInfo professionalInfo,
             IDictionary<string, string> metadata)
         {
             if (metadata == null)
             {
                 metadata = new Dictionary<string, string>();
             }
-            metadata.Add(Profile.PROXY_METADATA_KEY, "1");
+            professionalInfo.IsProxy = true;
             var profile = new Profile
             {
                 AppId = appId,
-                ProfessionalInfo = ProfessionalInfo,
+                ProfessionalInfo = professionalInfo,
                 Metadata = metadata
             };
 

@@ -19,6 +19,9 @@ namespace Classy.Models
         public string TaxId { get; set; }
         public string CompanyName { get; set; }
         public ContactInfo CompanyContactInfo { get; set; }
+        public bool IsProxy { get; set; }
+
+        // following fields are for vendors
         public BankAccount PaymentDetails { get; set; }
         public int SettlementPeriodInDays { get; set; }
         public int RollingReservePercent { get; set; }

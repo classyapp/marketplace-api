@@ -33,43 +33,10 @@ namespace classy.Services
         [CustomAuthenticate]
         public object Post(CreateProfileProxy request)
         {
-            ProfileView profile = null;
-
-            string[] content;
-            var f = File.OpenText(@"C:\Users\YUVAL\Downloads\cuisines.csv");
-            while (!f.EndOfStream)
-            {
-                var line = f.ReadLine();
-                content = line.Split(',');
-
-                profile = ProfileManager.CreateProfileProxy(
-                    request.Environment.AppId,
-                    new ProfessionalInfo {
-                        CompanyName = content[4],
-                        CompanyContactInfo = new ContactInfo
-                        {
-                            WebsiteUrl = content[18],
-                            Location = new Location
-                            {
-                                Address = new PhysicalAddress
-                                {
-                                    Street1 = content[5],
-                                    City = content[7],
-                                    PostalCode = content[6]
-                                }
-                            },
-                            Phone = content[9],
-                            Email = content[17]
-                        }
-                    },
-                    new Dictionary<string, string>());
-                profile.Metadata.Add("LicenseNo", content[1]);
-            }
-
-            //var profile = ProfileManager.CreateProfileProxy(
-            //    request.Environment.AppId,
-            //    request.ProfessionalInfo,
-            //    request.Metadata);
+            var profile = ProfileManager.CreateProfileProxy(
+                request.Environment.AppId,
+                request.ProfessionalInfo,
+                request.Metadata);
                 
             return new HttpResult(profile, HttpStatusCode.OK);
         }
