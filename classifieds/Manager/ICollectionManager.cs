@@ -31,7 +31,7 @@ namespace classy.Manager
             string title,
             string content,
             bool isPublic,
-            IList<string> includedListings,
+            IList<Classy.Models.IncludedListing> includedListings,
             IList<string> collaborators,
             IList<string> permittedViewers);
 
@@ -48,6 +48,24 @@ namespace classy.Manager
             string profileId,
             string collectionId,
             string[] listingIds);
+
+        /// <summary>
+        /// updates existing collection
+        /// </summary>
+        /// <param name="appId"></param>
+        /// <param name="profileId"></param>
+        /// <param name="collectionId"></param>
+        /// <param name="title"></param>
+        /// <param name="content"></param>
+        /// <param name="listings"></param>
+        /// <returns>the collection with the updated listings</returns>
+        CollectionView UpdateCollection(
+            string appId,
+            string profileId,
+            string collectionId,
+            string title,
+            string content,
+            IList<Classy.Models.IncludedListing> listings);
 
         /// <summary>
         /// get a specific <see cref="CollectionView"/> by id

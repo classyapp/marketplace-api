@@ -135,6 +135,7 @@ namespace classy
                     // Collections
                     .Add<CreateCollection>("/collection/new", "POST") // create a new collection
                     .Add<AddListingsToCollection>("/collection/{CollectionId}/listing/new", "POST") // add listings to collection
+                    .Add<UpdateCollection>("/collection/{CollectionId}/edit") //update listings comments, and collection title and content
                     //.Add<RemoveListingsFromCollection>("/collection/{CollectionId}/listing", "DELETE") // remove listings to collection
                     //.Add<AddCollaboratorsToCollection>("/collection/{CollectionId}/collaborator", "POST") // add collaborators to collection
                     //.Add<RemoveCollaboratorsFromCollection>("/collection/{CollectionId}/collaborator", "DELETE") // remove collaborators to collection

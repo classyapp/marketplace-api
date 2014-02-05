@@ -10,6 +10,7 @@ namespace Classy.Models
         public const string VIEW_LISTING = "view-listing";
         public const string VIEW_PROFILE = "view-profile";
         public const string VIEW_COLLECTION = "view-collection";
+        public const string EDIT_COLLECTION = "edit-collection";
         public const string FAVORITE_LISTING = "fav-listing";
         public const string FAVORITE_COMMENT = "fav-comment";
         public const string FOLLOW_PROFILE = "follow-profile";

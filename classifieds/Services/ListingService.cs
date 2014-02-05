@@ -947,6 +947,30 @@ namespace classy.Services
         }
 
         //
+        // POST: /collection/{CollectionId}/edit
+        // add listings to a collection
+        [CustomAuthenticate]
+        public object Post(UpdateCollection request)
+        {
+            try
+            {
+                var session = SessionAs<CustomUserSession>();
+                var collection = CollectionManager.UpdateCollection(
+                    request.Environment.AppId,
+                    session.UserAuthId,
+                    request.CollectionId,
+                    request.Title,
+                    request.Content,
+                    request.IncludedListings);
+                return new HttpResult(collection, HttpStatusCode.OK);
+            }
+            catch (KeyNotFoundException kex)
+            {
+                return new HttpError(HttpStatusCode.NotFound, kex.Message);
+            }
+        }
+
+        //
         // GET: /collection/{CollectionId}
         // get collection by id
         public object Get(GetCollectionById request)

@@ -30,7 +30,7 @@ namespace Classy.Models
         /// <summary>
         /// the ids of the listings included in this collection
         /// </summary>
-        public IList<string> IncludedListings { get; set; }
+        public IList<IncludedListing> IncludedListings { get; set; }
         /// <summary>
         /// a list of profile ids of collaborators - these profiles will be able to edit this collection
         /// </summary>

@@ -152,7 +152,14 @@ namespace classy.Manager
                 profileView.Collections = collections.ToCollectionViewList();
                 foreach(var c in profileView.Collections)
                 {
-                    c.Listings = ListingRepository.GetById(c.IncludedListings.ToArray(), appId, false).ToListingViewList();
+                    if (c.IncludedListings != null)
+                    {
+                        c.Listings = ListingRepository.GetById(c.IncludedListings.Select(l => l.ListingId).ToArray(), appId, false).ToListingViewList();
+                    }
+                    else
+                    {
+                        c.Listings = new List<ListingView>();
+                    }
                 }
             }
 
