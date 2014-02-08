@@ -15,5 +15,7 @@ namespace Classy.Models
         public bool EnableProxyProfiles { get; set; }
         public bool ProxyClaimNeedsVerification { get; set; }
         public Point[] ExternalMediaThumbnailSizes { get; set; }
+        public string DefaultProfileImage { get; set; }
+        public string DefaultProfileThumbnail { get; set; }
     }
 }

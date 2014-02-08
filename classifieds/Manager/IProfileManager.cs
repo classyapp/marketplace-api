@@ -15,11 +15,15 @@ namespace classy.Manager
         /// 
         /// </summary>
         /// <param name="appId"></param>
+        /// <param name="requestedByProfileId"></param>
+        /// <param name="batchId"></param>
         /// <param name="ProfessionalInfo"></param>
         /// <param name="metadata"></param>
         /// <returns></returns>
         ProfileView CreateProfileProxy(
             string appId,
+            string requestedByProfileId,
+            string batchId,
             ProfessionalInfo ProfessionalInfo,
             IDictionary<string, string> metadata);
 

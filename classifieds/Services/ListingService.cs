@@ -33,8 +33,11 @@ namespace classy.Services
         [CustomAuthenticate]
         public object Post(CreateProfileProxy request)
         {
+            var session = SessionAs<CustomUserSession>();
             var profile = ProfileManager.CreateProfileProxy(
                 request.Environment.AppId,
+                session.UserAuthId,
+                request.BatchId,
                 request.ProfessionalInfo,
                 request.Metadata);
                 

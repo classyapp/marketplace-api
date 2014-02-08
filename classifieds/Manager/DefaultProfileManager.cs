@@ -37,6 +37,8 @@ namespace classy.Manager
 
         public ProfileView CreateProfileProxy(
             string appId,
+            string requestedByProfileId,
+            string batchId,
             ProfessionalInfo professionalInfo,
             IDictionary<string, string> metadata)
         {
@@ -44,14 +46,22 @@ namespace classy.Manager
             {
                 metadata = new Dictionary<string, string>();
             }
+            // log the user that created this, and the batch id (so we can find all related records)
+            metadata.Add("CreatedBy", requestedByProfileId);
+            metadata.Add("BatchId", batchId);
+            // mark as a proxy
             professionalInfo.IsProxy = true;
+            // create the profile
+            var app = AppManager.GetAppById(appId);
             var profile = new Profile
             {
                 AppId = appId,
                 ProfessionalInfo = professionalInfo,
-                Metadata = metadata
+                Metadata = metadata,
+                ImageUrl = app.DefaultProfileImage,
+                ThumbnailUrl = app.DefaultProfileThumbnail
             };
-
+            // save in repo
             ProfileRepository.Save(profile);
 
             return profile.ToProfileView();
