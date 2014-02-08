@@ -109,7 +109,8 @@ namespace classy.Services
                     request.Environment.AppId,
                     request.ProfileId,
                     request.IncludeComments,
-                    request.FormatCommentsAsHtml);
+                    request.FormatCommentsAsHtml,
+                    request.IncludeDrafts);
 
                 return new HttpResult(listingViews, HttpStatusCode.OK);
             }

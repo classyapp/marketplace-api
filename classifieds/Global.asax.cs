@@ -131,7 +131,7 @@ namespace classy
                     .Add<PostListing>("/listing/{ListingId}", "PUT") // update listing
                     .Add<SearchListings>("/listing/search", ApplyTo.Get | ApplyTo.Post) // search listings by tag and/or metadata
                     .Add<SearchListings>("/tags/{tag}", "GET") // search with a nicer url for tag
-                    .Add<GetListingsByProfileId>("/profile/{Username}/listing/list", "GET") // get list of listing for profile
+                    .Add<GetListingsByProfileId>("/profile/{ProfileId}/listing/list", "GET") // get list of listing for profile
 
                     // Collections
                     .Add<CreateCollection>("/collection/new", "POST") // create a new collection
