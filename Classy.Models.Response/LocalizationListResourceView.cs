@@ -9,6 +9,7 @@ namespace Classy.Models
     public class ListItemView
     {
         public string Value { get; set; }
+        public string ParentValue { get; set; }
         public IDictionary<string, string> Text { get; set; }
     }
 
