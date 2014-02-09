@@ -12,4 +12,11 @@ namespace Classy.Models.Request
         public IDictionary<string, string> Metadata { get; set; }
         public ProfessionalInfo ProfessionalInfo { get; set; }
     }
+
+    public class CreateProfileProxyValidator : AbstractValidator<CreateProfileProxy>
+    {
+        public CreateProfileProxyValidator() {
+            RuleFor(x => x.ProfessionalInfo).NotNull();
+        }
+    }
 }

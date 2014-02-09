@@ -42,6 +42,8 @@ namespace classy.Manager
             ProfessionalInfo professionalInfo,
             IDictionary<string, string> metadata)
         {
+            if (professionalInfo == null) throw new ArgumentNullException("professionalInfo cannot be null");
+
             if (metadata == null)
             {
                 metadata = new Dictionary<string, string>();
