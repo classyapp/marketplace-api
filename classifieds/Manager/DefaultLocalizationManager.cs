@@ -76,7 +76,16 @@ namespace classy.Manager
                 if (listResource.ListItems == null) listResource.ListItems = new List<ListItem>();
                 foreach (var item in listItems)
                 {
-                    if (listResource.ListItems.Any(x => x.Value == item.Value)) listResource.ListItems.Single(x => x.Value == item.Value).Text = item.Text ;
+                    if (listResource.ListItems.Any(x => x.Value == item.Value))
+                    {
+                        var existingItem = listResource.ListItems.Single(x => x.Value == item.Value);
+                        existingItem.ParentValue = item.ParentValue;
+                        foreach(var e in item.Text)
+                        {
+                            if (existingItem.Text.ContainsKey(e.Key)) existingItem.Text[e.Key] = e.Value;
+                            else existingItem.Text.Add(e);
+                        }
+                    }
                     else listResource.ListItems.Add(item);
                 }
             }
