@@ -124,13 +124,14 @@ namespace classy
                     // Listings
                     .Add<GetListingById>("/listing/{ListingId}", "GET") // get listing by id, update listing
                     .Add<PostListing>("/listing/new", "POST") // post new listing
+                    .Add<EditListing>("/listing/{ListingId}/edit", "POST") // post new listing
                     .Add<AddExternalMedia>("/listing/{ListingId}/media", "POST") // add media files and associate with listing
                     .Add<DeleteExternalMedia>("/listing/{ListingId}/media", "DELETE")
                     .Add<PublishListing>("/listing/{ListingId}/publish", "POST") // publish a post to the public
                     .Add<PostListing>("/listing/{ListingId}", "PUT") // update listing
                     .Add<SearchListings>("/listing/search", ApplyTo.Get | ApplyTo.Post) // search listings by tag and/or metadata
                     .Add<SearchListings>("/tags/{tag}", "GET") // search with a nicer url for tag
-                    .Add<GetListingsByProfileId>("/profile/{Username}/listing/list", "GET") // get list of listing for profile
+                    .Add<GetListingsByProfileId>("/profile/{ProfileId}/listing/list", "GET") // get list of listing for profile
 
                     // Collections
                     .Add<CreateCollection>("/collection/new", "POST") // create a new collection

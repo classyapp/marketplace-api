@@ -49,7 +49,8 @@ namespace classy.Manager
             string appId,
             string profileId,
             bool includeComments,
-            bool formatCommentsAsHtml);
+            bool formatCommentsAsHtml,
+            bool includeDrafts);
 
         /// <summary>
         /// 

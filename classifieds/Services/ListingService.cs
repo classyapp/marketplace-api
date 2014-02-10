@@ -40,7 +40,7 @@ namespace classy.Services
                 request.BatchId,
                 request.ProfessionalInfo,
                 request.Metadata);
-                
+
             return new HttpResult(profile, HttpStatusCode.OK);
         }
 
@@ -64,7 +64,7 @@ namespace classy.Services
 
                 return new HttpResult(listingView, HttpStatusCode.OK);
             }
-            catch(KeyNotFoundException kex)
+            catch (KeyNotFoundException kex)
             {
                 return new HttpError(HttpStatusCode.NotFound, kex.Message);
             }
@@ -78,7 +78,8 @@ namespace classy.Services
                     request.Environment.AppId,
                     request.ProfileId,
                     request.IncludeComments,
-                    request.FormatCommentsAsHtml);
+                    request.FormatCommentsAsHtml,
+                    request.IncludeDrafts);
 
                 return new HttpResult(listingViews, HttpStatusCode.OK);
             }
@@ -382,7 +383,7 @@ namespace classy.Services
         {
             var session = SessionAs<CustomUserSession>();
             if (!session.IsAuthenticated) return new HttpError(HttpStatusCode.Unauthorized, "No Session");
-            else 
+            else
             {
                 var profile = ProfileManager.GetProfileById(
                     request.Environment.AppId,
@@ -837,7 +838,7 @@ namespace classy.Services
                 return new HttpError(HttpStatusCode.NotFound, kex.Message);
             }
         }
-    
+
         // delete a review
         public object Delete(PublishOrDeleteReview request)
         {
@@ -888,7 +889,7 @@ namespace classy.Services
                     request.PermittedViewers);
                 return new HttpResult(collection, HttpStatusCode.OK);
             }
-            catch(KeyNotFoundException kex)
+            catch (KeyNotFoundException kex)
             {
                 return new HttpError(HttpStatusCode.NotFound, kex.Message);
             }
@@ -910,7 +911,7 @@ namespace classy.Services
                     request.IncludedListings);
                 return new HttpResult(collection, HttpStatusCode.OK);
             }
-            catch(KeyNotFoundException kex)
+            catch (KeyNotFoundException kex)
             {
                 return new HttpError(HttpStatusCode.NotFound, kex.Message);
             }
@@ -933,6 +934,35 @@ namespace classy.Services
                     request.Content,
                     request.IncludedListings);
                 return new HttpResult(collection, HttpStatusCode.OK);
+            }
+            catch (KeyNotFoundException kex)
+            {
+                return new HttpError(HttpStatusCode.NotFound, kex.Message);
+            }
+        }
+
+        //
+        // POST: /listing/{ListingId}/edit
+        // edit listings 
+        [CustomAuthenticate]
+        public object Post(EditListing request)
+        {
+            try
+            {
+                var session = SessionAs<CustomUserSession>();
+                var listing = ListingManager.SaveListing(
+                            request.Environment.AppId,
+                            request.ListingId,
+                            session.UserAuthId,
+                            request.Title,
+                            request.Content,
+                            request.ListingType,
+                            request.Pricing,
+                            request.ContactInfo,
+                            request.SchedulingTemplate,
+                            request.Metadata);
+
+                return new HttpResult(listing, HttpStatusCode.OK);
             }
             catch (KeyNotFoundException kex)
             {
