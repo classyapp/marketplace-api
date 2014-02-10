@@ -79,7 +79,6 @@ namespace classy.Manager
                     if (listResource.ListItems.Any(x => x.Value == item.Value))
                     {
                         var existingItem = listResource.ListItems.Single(x => x.Value == item.Value);
-                        existingItem.ParentValue = item.ParentValue;
                         foreach(var e in item.Text)
                         {
                             if (existingItem.Text.ContainsKey(e.Key)) existingItem.Text[e.Key] = e.Value;
