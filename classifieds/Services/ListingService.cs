@@ -942,35 +942,6 @@ namespace classy.Services
         }
 
         //
-        // POST: /listing/{ListingId}/edit
-        // edit listings 
-        [CustomAuthenticate]
-        public object Post(EditListing request)
-        {
-            try
-            {
-                var session = SessionAs<CustomUserSession>();
-                var listing = ListingManager.SaveListing(
-                            request.Environment.AppId,
-                            request.ListingId,
-                            session.UserAuthId,
-                            request.Title,
-                            request.Content,
-                            request.ListingType,
-                            request.Pricing,
-                            request.ContactInfo,
-                            request.SchedulingTemplate,
-                            request.Metadata);
-
-                return new HttpResult(listing, HttpStatusCode.OK);
-            }
-            catch (KeyNotFoundException kex)
-            {
-                return new HttpError(HttpStatusCode.NotFound, kex.Message);
-            }
-        }
-
-        //
         // GET: /collection/{CollectionId}
         // get collection by id
         public object Get(GetCollectionById request)
