@@ -124,7 +124,6 @@ namespace classy
                     // Listings
                     .Add<GetListingById>("/listing/{ListingId}", "GET") // get listing by id, update listing
                     .Add<PostListing>("/listing/new", "POST") // post new listing
-                    .Add<EditListing>("/listing/{ListingId}/edit", "POST") // post new listing
                     .Add<AddExternalMedia>("/listing/{ListingId}/media", "POST") // add media files and associate with listing
                     .Add<DeleteExternalMedia>("/listing/{ListingId}/media", "DELETE")
                     .Add<PublishListing>("/listing/{ListingId}/publish", "POST") // publish a post to the public
