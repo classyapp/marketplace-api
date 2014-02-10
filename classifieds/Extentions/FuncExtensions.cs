@@ -49,7 +49,8 @@ namespace classy.Extentions
                 var config = new Amazon.S3.AmazonS3Config()
                 {
                     ServiceURL = "s3.amazonaws.com",
-                    RegionEndpoint = Amazon.RegionEndpoint.USEast1
+                    RegionEndpoint = Amazon.RegionEndpoint.USEast1,
+                    Timeout = new TimeSpan(0, 5, 0)
                 };
                 var s3Client = Amazon.AWSClientFactory.CreateAmazonS3Client(config);
                 return s3Client;
