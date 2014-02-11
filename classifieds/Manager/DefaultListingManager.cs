@@ -44,11 +44,11 @@ namespace classy.Manager
         }
 
         public ListingView GetListingById(
-            string appId, 
-            string listingId, 
+            string appId,
+            string listingId,
             string requestedByProfileId,
-            bool logImpression, 
-            bool includeDrafts, 
+            bool logImpression,
+            bool includeDrafts,
             bool includeComments,
             bool formatCommentsAsHtml,
             bool includeCommenterProfiles,
@@ -103,9 +103,9 @@ namespace classy.Manager
         }
 
         public IList<ListingView> GetListingsByProfileId(
-            string appId, 
-            string profileId, 
-            bool includeComments, 
+            string appId,
+            string profileId,
+            bool includeComments,
             bool formatCommentsAsHtml,
             bool includeDrafts)
         {
@@ -130,13 +130,13 @@ namespace classy.Manager
 
         public IList<ListingView> SearchListings(
             string appId,
-            string tag, 
+            string tag,
             string listingType,
-            IDictionary<string, string> metadata, 
-            double? priceMin, 
-            double? priceMax, 
-            Location location, 
-            bool includeComments, 
+            IDictionary<string, string> metadata,
+            double? priceMin,
+            double? priceMax,
+            Location location,
+            bool includeComments,
             bool formatCommentsAsHtml)
         {
             // TODO: cache listings
@@ -158,9 +158,9 @@ namespace classy.Manager
         }
 
         public ListingView AddExternalMediaToListing(
-            string appId, 
-            string listingId, 
-            string profileId, 
+            string appId,
+            string listingId,
+            string profileId,
             IFile[] files)
         {
             var listing = GetVerifiedListing(appId, listingId, profileId, true);
@@ -197,18 +197,25 @@ namespace classy.Manager
         }
 
         public ListingView DeleteExternalMediaFromListing(
-            string appId, 
-            string listingId, 
-            string profileId, 
+            string appId,
+            string listingId,
+            string profileId,
             string url)
         {
             var listing = GetVerifiedListing(appId, listingId, profileId, true);
 
-            ListingRepository.DeleteExternalMedia(listingId, appId, url);
-            StorageRepository.DeleteFile(url);
+            MediaFile file = listing.ExternalMedia.SingleOrDefault(e => e.Url == url);
+            if (file != null)
+            {
+                foreach (var thumb in file.Thumbnails)
+                {
+                    StorageRepository.DeleteFile(thumb.Key);
+                }
+                ListingRepository.DeleteExternalMedia(listingId, appId, url);
+                StorageRepository.DeleteFile(url);
 
-            listing.ExternalMedia.Remove(listing.ExternalMedia.SingleOrDefault(x => x.Url == url));
-
+                listing.ExternalMedia.Remove(file);
+            }
             return listing.ToListingView();
         }
 
@@ -223,7 +230,7 @@ namespace classy.Manager
             // can't publish a purchasable listing if 
             if ((listing.PricingInfo != null || listing.SchedulingTemplate != null) && !profile.IsVendor)
                 throw new ApplicationException("a listing with pricing or scheduling information can only be published by a merchant profile");
-            
+
             // publish
             ListingRepository.Publish(listingId, appId);
             listing.IsPublished = true;
@@ -244,21 +251,23 @@ namespace classy.Manager
         {
             Listing listing;
             bool isNewListing = listingId.IsNullOrEmpty();
-            if (!isNewListing) {
+            if (!isNewListing)
+            {
                 listing = GetVerifiedListing(appId, listingId, true);
             }
-            else {
+            else
+            {
                 listing = new Listing
                 {
                     ProfileId = profileId,
                     AppId = appId
                 };
             }
-            
+
             // include basic listing info
             if (!title.IsNullOrEmpty()) listing.Title = title;
             if (!listingType.IsNullOrEmpty()) listing.ListingType = listingType;
-            if (!content.IsNullOrEmpty()) 
+            if (!content.IsNullOrEmpty())
             {
                 listing.Content = content;
                 listing.Hashtags = content.ExtractHashtags();
@@ -285,18 +294,23 @@ namespace classy.Manager
             {
                 ListingRepository.Update(listing);
             }
-            
+
             // return
             return listing.ToListingView();
         }
 
         public string DeleteListing(string appId, string listingId, string profileId)
         {
-            IList<Collection> collections = CollectionRepository.GetByListingId(appId, profileId, listingId);
-            foreach (var collection in collections)
+            CollectionRepository.RemoveListingById(appId, profileId, listingId);
+
+            Listing listing = GetVerifiedListing(appId, listingId);
+            foreach (var file in listing.ExternalMedia)
             {
-                collection.IncludedListings.First(l => l.ListingId == listingId);
-                CollectionRepository.Update(collection);
+                foreach (var thumb in file.Thumbnails)
+                {
+                    StorageRepository.DeleteFile(thumb.Key);
+                }
+                StorageRepository.DeleteFile(file.Key);
             }
             ListingRepository.Delete(listingId, appId);
 
@@ -320,7 +334,7 @@ namespace classy.Manager
                 ListingId = listingId,
                 Content = content
             };
-            
+
             comment.Id = CommentRepository.Save(comment);
 
             // increase comment count for listing
@@ -359,8 +373,8 @@ namespace classy.Manager
         }
 
         public void FavoriteListing(
-            string appId, 
-            string listingId, 
+            string appId,
+            string listingId,
             string profileId)
         {
             var listing = GetVerifiedListing(appId, listingId);
@@ -470,8 +484,8 @@ namespace classy.Manager
                     {
                         ListingRepository.IncreaseCounter(collection.IncludedListings.Select(l => l.ListingId).ToArray(), appId, ListingCounters.Views, 1);
                     }
-                //    var update = Update<Listing>.Inc(x => x.ViewCount, 1);
-                //    ListingsCollection.Update(query, update, new MongoUpdateOptions { Flags = UpdateFlags.Multi });
+                    //    var update = Update<Listing>.Inc(x => x.ViewCount, 1);
+                    //    ListingsCollection.Update(query, update, new MongoUpdateOptions { Flags = UpdateFlags.Multi });
                 }
                 return collectionView;
             }
@@ -523,7 +537,7 @@ namespace classy.Manager
                 CollectionRepository.Update(collection);
                 return collection.ToCollectionView();
             }
-            catch(Exception)
+            catch (Exception)
             {
                 throw;
             }
