@@ -123,6 +123,7 @@ namespace classy
                 Routes
                     // Listings
                     .Add<GetListingById>("/listing/{ListingId}", "GET") // get listing by id, update listing
+                    .Add<DeleteListing>("/listing/{ListingId}", "DELETE") // delete listing by id, update listing
                     .Add<PostListing>("/listing/new", "POST") // post new listing
                     .Add<AddExternalMedia>("/listing/{ListingId}/media", "POST") // add media files and associate with listing
                     .Add<DeleteExternalMedia>("/listing/{ListingId}/media", "DELETE")

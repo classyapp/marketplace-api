@@ -103,6 +103,15 @@ namespace classy.Manager
             IDictionary<string, string> customAttributes);
 
         /// <summary>
+        /// delete listing and update relevant collections
+        /// </summary>
+        /// <param name="appId"></param>
+        /// <param name="listingId"></param>
+        /// <param name="userId"></param>
+        /// <returns></returns>
+        string DeleteListing(string appId, string listingId, string userId);
+
+        /// <summary>
         /// 
         /// </summary>
         /// <param name="appId"></param>

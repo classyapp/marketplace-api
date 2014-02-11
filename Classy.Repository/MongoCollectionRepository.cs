@@ -77,5 +77,19 @@ namespace Classy.Repository
                 throw;
             }
         }
+
+        public IList<Collection> GetByListingId(string appId, string profileId, string listingId)
+        {
+            try
+            {
+                var getByProfileId = Query<Collection>.Where(x => x.AppId == appId && x.ProfileId == profileId && x.IncludedListings.Any(y => y.ListingId == listingId));
+                var collections = CollectionsCollection.Find(getByProfileId);
+                return collections.ToList();
+            }
+            catch (MongoException)
+            {
+                throw;
+            }
+        }
     }
 }

@@ -33,6 +33,7 @@ namespace Classy.Repository
         void IncreaseCounter(string listingId, string appId, ListingCounters counters, int value);
         void IncreaseCounter(string[] listingId, string appId, ListingCounters counters, int value);
         void Publish(string listingId, string appId);
+        void Delete(string listingId, string appId);
         void AddHashtags(string listingId, string appId, string[] hashtags);
         void RemoveHashtags(string listingId, string appId, string[] hashtags);
         string Insert(Listing listing);

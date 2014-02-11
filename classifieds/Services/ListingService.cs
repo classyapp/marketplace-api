@@ -231,6 +231,27 @@ namespace classy.Services
             }
         }
 
+        // delete listing
+        [CustomAuthenticate]
+        public object Delete(DeleteListing request)
+        {
+            try
+            {
+                var session = SessionAs<CustomUserSession>();
+
+                var listing = ListingManager.DeleteListing(
+                    request.Environment.AppId,
+                    request.ListingId,
+                    session.UserAuthId);
+
+                return new HttpResult(listing, HttpStatusCode.OK);
+            }
+            catch (KeyNotFoundException kex)
+            {
+                return new HttpError(HttpStatusCode.NotFound, kex.Message);
+            }
+        }
+
         // add comment to post
         [CustomAuthenticate]
         public object Post(PostComment request)
