@@ -91,6 +91,8 @@ namespace classy.Manager
         /// <param name="includeFollowingProfiles"></param>
         /// <param name="includeReviews"></param>
         /// <param name="includeListings"></param>
+        /// <param name="includeCollections"></param>
+        /// <param name="includeFavorites"></param>
         /// <param name="logImpression"></param>
         /// <returns></returns>
         ProfileView GetProfileById(
@@ -102,6 +104,7 @@ namespace classy.Manager
             bool includeReviews,
             bool includeListings,
             bool includeCollections,
+            bool includeFavorites,
             bool logImpression);
         
         /// <summary>

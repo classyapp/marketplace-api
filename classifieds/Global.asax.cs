@@ -150,11 +150,9 @@ namespace classy
                     //.Add<PublishComment>("/listing/{ListingId}}/comment/{CommentId}/publish", "POST")
                     //.Add<DeleteComment>("/listing/{ListingId}/comment/{CommentId}", "DELETE")
 
-                    // Social Actions
-                    .Add<FavoriteListing>("/listing/{ListingId}/favorite", "POST") // favorite
-                    //.Add<FavoriteListing>("/listing/{ListingId}/favorite", "DELETE") // un-favorite
-                    .Add<FollowProfile>("/profile/{FolloweeProfileId}/follow", "POST") // follow
-                    //.Add<FollowProfile>("/profile/{FolloweeUsername/follow", "DELETE") // un-follow
+                    // Social Action
+                    .Add<FavoriteListing>("/listing/{ListingId}/favorite", ApplyTo.Post | ApplyTo.Delete) // favorite / unfavorite
+                    .Add<FollowProfile>("/profile/{FolloweeProfileId}/follow", ApplyTo.Post | ApplyTo.Delete) // follow / unfollow
                     .Add<FlagListing>("/listing/{ListingId}/flag", "POST") // flag a listing
 
                     // Scheduling and Booking

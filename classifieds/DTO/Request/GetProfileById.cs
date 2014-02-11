@@ -16,6 +16,7 @@ namespace Classy.Models.Request
         public bool IncludeReviews { get; set; }
         public bool IncludeListings { get; set; }
         public bool IncludeCollections { get; set; }
+        public bool IncludeFavorites { get; set; }
         public bool LogImpression { get; set; }
     }
 

@@ -275,6 +275,27 @@ namespace classy.Services
             }
         }
 
+        // un-favorite a listing
+        [CustomAuthenticate]
+        public object Delete(FavoriteListing request)
+        {
+            try
+            {
+                var session = SessionAs<CustomUserSession>();
+
+                ListingManager.UnfavoriteListing(
+                    request.Environment.AppId,
+                    request.ListingId,
+                    session.UserAuthId);
+
+                return new HttpResult(HttpStatusCode.OK);
+            }
+            catch (KeyNotFoundException kex)
+            {
+                return new HttpError(HttpStatusCode.NotFound, kex.Message);
+            }
+        }
+
         // favorite a listing
         [CustomAuthenticate]
         public object Post(FlagListing request)
@@ -394,6 +415,7 @@ namespace classy.Services
                     false,
                     false,
                     false,
+                    true, 
                     false);
                 return new HttpResult(profile);
             }
@@ -415,6 +437,7 @@ namespace classy.Services
                     request.IncludeReviews,
                     request.IncludeListings,
                     request.IncludeCollections,
+                    request.IncludeFavorites,
                     request.LogImpression);
 
                 return new HttpResult(profile, HttpStatusCode.OK);
@@ -779,7 +802,8 @@ namespace classy.Services
                         false,
                         false,
                         false,
-                        false);
+                        false,
+                    false);
                 if (request.ReturnReviewerProfile)
                     response.ReviewerProfile = ProfileManager.GetProfileById(
                         request.Environment.AppId,
@@ -790,7 +814,8 @@ namespace classy.Services
                         false,
                         false,
                         false,
-                        false);
+                        false,
+                    false);
                 return new HttpResult(response, HttpStatusCode.OK);
             }
             catch (KeyNotFoundException kex)

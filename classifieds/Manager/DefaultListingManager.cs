@@ -361,6 +361,22 @@ namespace classy.Manager
             }
         }
 
+        public void UnfavoriteListing(
+            string appId,
+            string listingId,
+            string profileId)
+        {
+            var listing = GetVerifiedListing(appId, listingId);
+
+            bool tripleExists = false;
+            TripleStore.DeleteActivity(appId, profileId, ActivityPredicate.FAVORITE_LISTING, listingId);
+            if (!tripleExists)
+            {
+                ListingRepository.IncreaseCounter(listingId, appId, ListingCounters.Favorites, -1);
+                ProfileRepository.IncreaseCounter(appId, listing.ProfileId, ProfileCounters.Rank, -1);
+            }
+        }
+
         public void FlagListing(
             string appId,
             string listingId,

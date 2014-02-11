@@ -175,6 +175,17 @@ namespace classy.Manager
         /// <param name="appId"></param>
         /// <param name="listingId"></param>
         /// <param name="profileId"></param>
+        void UnfavoriteListing(
+            string appId,
+            string listingId,
+            string profileId);
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="appId"></param>
+        /// <param name="listingId"></param>
+        /// <param name="profileId"></param>
         /// <param name="FlagReason"></param>
         void FlagListing(
             string appId,

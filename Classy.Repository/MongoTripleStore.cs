@@ -44,6 +44,17 @@ namespace Classy.Repository
             return triple;
         }
 
+        public void DeleteActivity(string appId, string subjectObjectId, string predicate, string objectObjectId)
+        {
+            var query = Query.And(new IMongoQuery[] {
+                Query<Triple>.EQ(x => x.AppId, appId),
+                Query<Triple>.EQ(x => x.SubjectId, subjectObjectId),
+                Query<Triple>.EQ(x => x.Predicate, predicate.ToString()),
+                Query<Triple>.EQ(x => x.ObjectId, objectObjectId)
+            });
+            TripleCollection.Remove(query);
+        }
+
         public IList<string> GetActivitySubjectList(string appId, string predicate, string objectObjectId)
         {
             var query = Query.And(

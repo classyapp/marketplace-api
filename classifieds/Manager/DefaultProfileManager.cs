@@ -119,6 +119,7 @@ namespace classy.Manager
             bool includeReviews,
             bool includeListings,
             bool includeCollections,
+            bool includeFavorites,
             bool logImpression)
         {
             var profile = ProfileRepository.GetById(appId, profileId, logImpression);
@@ -173,6 +174,12 @@ namespace classy.Manager
                         c.Listings = new List<ListingView>();
                     }
                 }
+            }
+
+            if (includeFavorites)
+            {
+                var listingIds = TripleStore.GetActivityObjectList(appId, ActivityPredicate.FAVORITE_LISTING, profileId);
+                profileView.FavoriteListingIds = listingIds;
             }
 
             if (logImpression)

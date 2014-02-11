@@ -38,6 +38,7 @@ namespace Classy.Models.Response
         public IList<ReviewView> Reviews { get; set; }
         public IList<ListingView> Listings { get; set; }
         public IList<CollectionView> Collections { get; set; }
+        public IList<string> FavoriteListingIds { get; set; }
         public IDictionary<string, string> Metadata { get; set; }
     }
 }
