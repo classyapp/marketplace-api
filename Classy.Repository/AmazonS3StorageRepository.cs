@@ -27,7 +27,7 @@ namespace Classy.Repository
             request.ContentType = contentType;
             request.Key = key;
             request.InputStream = new MemoryStream(content);
-            s3Client.PutObject(request);
+            s3Client.PutObjectAsync(request);
         }
 
         public Stream GetFile(string key)
