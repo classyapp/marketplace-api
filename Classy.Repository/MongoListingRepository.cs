@@ -156,6 +156,18 @@ namespace Classy.Repository
             }
         }
 
+        public void Delete(string listingId, string appId)
+        {
+            try
+            {
+                ListingsCollection.Remove(Query<Listing>.Where(x => x.Id == listingId && x.AppId == appId));
+            }
+            catch (MongoException mex)
+            {
+                throw;
+            }        
+        }
+
         public void IncreaseCounter(string listingId, string appId, ListingCounters counters, int value)
         {
             IncreaseCounter(new string[] { listingId }, appId, counters, value);

@@ -290,6 +290,19 @@ namespace classy.Manager
             return listing.ToListingView();
         }
 
+        public string DeleteListing(string appId, string listingId, string profileId)
+        {
+            IList<Collection> collections = CollectionRepository.GetByListingId(appId, profileId, listingId);
+            foreach (var collection in collections)
+            {
+                collection.IncludedListings.First(l => l.ListingId == listingId);
+                CollectionRepository.Update(collection);
+            }
+            ListingRepository.Delete(listingId, appId);
+
+            return listingId;
+        }
+
         public CommentView AddCommentToListing(
             string appId,
             string listingId,
