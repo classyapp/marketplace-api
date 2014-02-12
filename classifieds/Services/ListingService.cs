@@ -79,7 +79,8 @@ namespace classy.Services
                     request.ProfileId,
                     request.IncludeComments,
                     request.FormatCommentsAsHtml,
-                    request.IncludeDrafts);
+                    request.IncludeDrafts,
+                    request.Page);
 
                 return new HttpResult(listingViews, HttpStatusCode.OK);
             }

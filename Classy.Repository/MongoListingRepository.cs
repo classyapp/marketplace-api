@@ -14,6 +14,9 @@ namespace Classy.Repository
 {
     public class MongoListingRepository : IListingRepository
     {
+
+        private static readonly int PAGESIZE = 9;
+
         private MongoCollection<Listing> ListingsCollection;
 
         public MongoListingRepository(MongoDatabase db)
@@ -41,7 +44,7 @@ namespace Classy.Repository
             return listings.ToList(); 
         }
 
-        public IList<Listing> GetByProfileId(string appId, string profileId, bool includeDrafts)
+        public IList<Listing> GetByProfileId(string appId, string profileId, bool includeDrafts, int page)
         {
             var query = Query.And(
                     Query<Listing>.EQ(x => x.ProfileId, profileId),
@@ -52,7 +55,15 @@ namespace Classy.Repository
             }
 
             // now get the listings
-            var listings = ListingsCollection.Find(query);
+            MongoCursor<Listing> listings = null;
+            if (page <= 0)
+            {
+                listings = ListingsCollection.Find(query);
+            }
+            else
+            {
+                listings = ListingsCollection.Find(query).SetSkip(PAGESIZE * (page - 1)).SetLimit(PAGESIZE);
+            }
             return listings.ToList();
         }
 

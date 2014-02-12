@@ -50,7 +50,8 @@ namespace classy.Manager
             string profileId,
             bool includeComments,
             bool formatCommentsAsHtml,
-            bool includeDrafts);
+            bool includeDrafts,
+            int page);
 
         /// <summary>
         /// 

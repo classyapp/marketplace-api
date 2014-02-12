@@ -85,7 +85,7 @@ namespace classy.Manager
             DateRange dateRange,
             bool includeCancelled)
         {
-            var listings = ListingRepository.GetByProfileId(profileId, appId, false);
+            var listings = ListingRepository.GetByProfileId(profileId, appId, false, -1);
             var listingIds = listings.Select(x => x.Id).ToArray();
             return BookingRepository.GetByListingId(listingIds, appId, dateRange, includeCancelled);
         }
