@@ -112,6 +112,8 @@
     <Compile Include="DTO\Request\CreateCollection.cs" />
     <Compile Include="DTO\Request\GetSessionProfile.cs" />
     <Compile Include="DTO\Request\LogActivity.cs" />
+    <Compile Include="DTO\Request\SubmitCollectionForEditorialApproval - Copy.cs" />
+    <Compile Include="DTO\Request\GetApprovedCollections.cs" />
     <Compile Include="DTO\Request\UpdateCollection.cs" />
     <Compile Include="DTO\Request\UpdateProfile.cs" />
     <Compile Include="DTO\Request\CreateProfileProxy.cs" />

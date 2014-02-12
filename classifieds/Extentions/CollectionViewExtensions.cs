@@ -13,7 +13,8 @@ namespace classy
         public static CollectionView ToCollectionView(this Collection from)
         {
             var to = from.TranslateTo<CollectionView>();
-            to.IncludedListings = from.IncludedListings.Select(l => new Classy.Models.Response.IncludedListing { ListingId = l.ListingId, Comments = l.Comments }).ToList();
+            to.IncludedListings = from.IncludedListings.Select(l => new Classy.Models.Response.IncludedListingView { ListingId = l.ListingId, Comments = l.Comments }).ToList();
+            to.Thumbnails = (from.Thumbnails ?? new List<MediaThumbnail>()).Select(t => new MediaThumbnailView { Height = t.Height, Key = t.Key, Width = t.Width, Url = t.Url }).ToList();
             return to;
         }
 
@@ -22,11 +23,7 @@ namespace classy
             var to = new List<CollectionView>();
             foreach (var c in from)
             {
-                CollectionView v = c.TranslateTo<CollectionView>();
-                if (c.IncludedListings == null)
-                    v.IncludedListings = new Classy.Models.Response.IncludedListing[0];
-                else
-                    v.IncludedListings = c.IncludedListings.Select(l => new Classy.Models.Response.IncludedListing { ListingId = l.ListingId, Comments = l.Comments }).ToArray();
+                CollectionView v = c.ToCollectionView();
                 to.Add(v);
             }
             return to;

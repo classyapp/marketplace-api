@@ -11,6 +11,7 @@ namespace Classy.Models.Request
         public string CollectionId { get; set; }
         public string Title { get; set; }
         public string Content { get; set; }
+        public string EditorialEditorialApprovalBy { get; set; }
         public IList<IncludedListing> IncludedListings { get; set; }
     }
 }

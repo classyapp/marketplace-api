@@ -90,5 +90,54 @@ namespace Classy.Repository
                 throw;
             }
         }
+
+        public void SubmitForEditorialApproval(string appId, string collectionId)
+        {
+            try
+            {
+                CollectionsCollection.Update(Query<Collection>.Where(x => x.AppId == appId && x.Id == collectionId), Update<Collection>.Set(x => x.SumittedForEditorialApproval, true));
+            }
+            catch (MongoException)
+            {
+                throw;
+            }
+        }
+
+
+        public void EditorialApproveCollection(string appId, string collectionId, string editorProfileId, string category)
+        {
+            try
+            {
+                CollectionsCollection.Update(
+                    Query<Collection>.Where(x => x.AppId == appId && x.Id == collectionId), 
+                    Update<Collection>
+                        .Set(x => x.EditorialApprovalBy, editorProfileId)
+                        .Set(x => x.EditorialApprovalDate, DateTime.UtcNow)
+                        .Set(x => x.Category, category)
+                );
+            }
+            catch (MongoException)
+            {
+                throw;
+            }
+        }
+
+        public IList<Collection> GetApprovedCollections(string appId, string[] categories, int maxCollections)
+        {
+            try
+            {
+                var query = Query<Collection>.Where(x => x.AppId == appId && x.EditorialApprovalDate != null);
+                if (categories != null) query = Query.And(query, Query<Collection>.In(x => x.Category, categories));
+
+                var collections = CollectionsCollection.Find(query)
+                    .SetSortOrder(SortBy<Collection>.Descending(x => x.EditorialApprovalDate))
+                    .SetLimit(maxCollections);
+                return collections.ToList();
+            }
+            catch (MongoException)
+            {
+                throw;
+            }
+        }
     }
 }

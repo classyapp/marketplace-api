@@ -451,6 +451,11 @@ namespace classy.Manager
                     Collaborators = collaborators,
                     PermittedViewers = permittedViewers
                 };
+
+                // TODO: thumbnails should be created async and show a grid of recent items in the collection
+                var last = GetVerifiedListing(appId, includedListings.Last().ListingId);
+                collection.Thumbnails = last.ExternalMedia[0].Thumbnails;
+
                 CollectionRepository.Insert(collection);
 
                 // log an activity, and increase the counter for the listings that were included
@@ -532,7 +537,7 @@ namespace classy.Manager
             string appId,
             string profileId,
             string collectionId,
-            string[] listingIds)
+            IList<IncludedListing> includedListings)
         {
             try
             {
@@ -542,15 +547,19 @@ namespace classy.Manager
                 if (collection.IncludedListings == null) collection.IncludedListings = new List<Classy.Models.IncludedListing>();
                 // log an activity, and increase the counter for the listings that were included
                 var exists = false;
-                foreach (var listingId in listingIds)
+                foreach (var listing in includedListings)
                 {
-                    TripleStore.LogActivity(appId, profileId, ActivityPredicate.ADD_LISTING_TO_COLLECTION, listingId, ref exists);
+                    TripleStore.LogActivity(appId, profileId, ActivityPredicate.ADD_LISTING_TO_COLLECTION, listing.ListingId, ref exists);
                     if (!exists)
                     {
-                        collection.IncludedListings.Add(new Classy.Models.IncludedListing { ListingId = listingId, Comments = string.Empty });
-                        ListingRepository.IncreaseCounter(listingId, appId, ListingCounters.AddToCollection, 1);
+                        collection.IncludedListings.Add(new Classy.Models.IncludedListing { ListingId = listing.ListingId, Comments = listing.Comments });
+                        ListingRepository.IncreaseCounter(listing.ListingId, appId, ListingCounters.AddToCollection, 1);
                     }
                 }
+                // TODO: thumbnails should be created async and show a grid of recent items in the collection
+                var last = GetVerifiedListing(appId, includedListings.Last().ListingId);
+                collection.Thumbnails = last.ExternalMedia[0].Thumbnails;
+                // save
                 CollectionRepository.Update(collection);
                 return collection.ToCollectionView();
             }
@@ -566,7 +575,7 @@ namespace classy.Manager
             string collectionId,
             string title,
             string content,
-            IList<Classy.Models.IncludedListing> listings)
+            IList<IncludedListing> listings)
         {
             try
             {
@@ -589,6 +598,30 @@ namespace classy.Manager
                 throw;
             }
         }
+
+        public CollectionView SubmitCollectionForEditorialApproval(string appId, string collectionId)
+        {
+            var collection = GetVerifiedCollection(appId, collectionId);
+            collection.SumittedForEditorialApproval = true;
+            CollectionRepository.SubmitForEditorialApproval(appId, collectionId);
+            return collection.ToCollectionView();
+        }
+
+        public IList<CollectionView> GetApprovedCollections(
+            string appId,
+            string[] categories,
+            int maxCollections)
+        {
+            var collections = CollectionRepository.GetApprovedCollections(appId, categories, maxCollections);
+            var profiles = ProfileRepository.GetByIds(appId, collections.Select(x => x.ProfileId).ToArray());
+            var view = collections.ToCollectionViewList();
+            foreach(var c in view)
+            {
+                c.Profile = profiles.SingleOrDefault(p => p.Id == c.ProfileId).ToProfileView();
+            }
+            return view;
+        }
+
 
         private Collection GetVerifiedCollection(string appId, string collectionId)
         {
