@@ -38,6 +38,6 @@ namespace Classy.Repository
         /// <param name="collection"></param>
         void Update(Collection collection);
 
-        IList<Collection> GetByListingId(string appId, string profileId, string listingId);
+        void RemoveListingById(string appId, string profileId, string listingId);
     }
 }

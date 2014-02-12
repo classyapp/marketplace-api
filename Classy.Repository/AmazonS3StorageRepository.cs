@@ -51,7 +51,10 @@ namespace Classy.Repository
 
         public void DeleteFile(string key)
         {
-            throw new NotImplementedException();
+            DeleteObjectRequest request = new DeleteObjectRequest();
+            request.BucketName = bucketName;
+            request.Key = key;
+            s3Client.DeleteObject(request);
         }
 
         public string KeyToUrl(string key)
