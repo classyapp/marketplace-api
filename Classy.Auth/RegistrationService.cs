@@ -78,13 +78,14 @@ namespace Classy.Auth
                 RuleFor(x => x.Email).NotEmpty().EmailAddress().When(x => x.UserName.IsNullOrEmpty());
                 RuleFor(x => x.UserName)
                     .Must(x => UserAuthRepo.GetUserAuthByUserName(x, x) == null)
-                    .WithErrorCode("AlreadyExists")
-                    .WithMessage("UserName already exists")
+                    .WithErrorCode("Register_UsernameAlreadyExists")
                     .When(x => !x.UserName.IsNullOrEmpty());
+                RuleFor(x => x.UserName)
+                    .Matches(@"^(?=[A-Za-z0-9])(?!.*[._]{2})[A-Za-z0-9._s]{3,15}$")
+                    .WithErrorCode("Register_InvalidUsername");
                 RuleFor(x => x.Email)
                     .Must(x => x.IsNullOrEmpty() || UserAuthRepo.GetUserAuthByUserName(x, x) == null)
-                    .WithErrorCode("AlreadyExists")
-                    .WithMessage("Email already exists")
+                    .WithErrorCode("Register_EmailAlreadyExists")
                     .When(x => !x.Email.IsNullOrEmpty());
             });
             RuleSet(ApplyTo.Put, () =>
