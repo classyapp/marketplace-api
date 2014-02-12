@@ -47,7 +47,7 @@ namespace classy.Manager
             string appId,
             string profileId,
             string collectionId,
-            string[] listingIds);
+            IList<IncludedListing> listingIds);
 
         /// <summary>
         /// updates existing collection
@@ -98,5 +98,27 @@ namespace classy.Manager
         IList<CollectionView> GetCollectionsByProfileId(
             string appId,
             string profileId);
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="appId"></param>
+        /// <param name="collectionId"></param>
+        /// <returns></returns>
+        CollectionView SubmitCollectionForEditorialApproval(
+            string appId,
+            string collectionId);
+
+        /// <summary>
+        /// get a list of the most recently editorial approved collections
+        /// </summary>
+        /// <param name="appId"></param>
+        /// <param name="categories"></param>
+        /// <param name="maxCollections"></param>
+        /// <returns></returns>
+        IList<CollectionView> GetApprovedCollections(
+            string appId,
+            string[] categories,
+            int maxCollections);
     }
 }

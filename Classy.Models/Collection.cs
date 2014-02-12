@@ -24,9 +24,25 @@ namespace Classy.Models
         /// </summary>
         public string Content { get; set; }
         /// <summary>
+        /// the category for the collection
+        /// </summary>
+        public string Category { get; set; }
+        /// <summary>
         /// when set to true, the collection will be publicly visible
         /// </summary>
         public bool IsPublic { get; set; }
+        /// <summary>
+        /// a flag indicating if the collection was submitted for editorial approval by the creator
+        /// </summary>
+        public bool SumittedForEditorialApproval { get; set; }
+        /// <summary>
+        /// ProfileId of the editor that approved this collection (if any)
+        /// </summary>
+        public string EditorialApprovalBy { get; set; }
+        /// <summary>
+        /// timestamp of when editorial approval occured
+        /// </summary>
+        public DateTime? EditorialApprovalDate { get; set; }
         /// <summary>
         /// the ids of the listings included in this collection
         /// </summary>
@@ -52,5 +68,9 @@ namespace Classy.Models
         /// the number of times people favorited this collection
         /// </summary>
         public int FavoriteCount { get; set; }
+        /// <summary>
+        /// a set of thumbnails that give a peek into the listings the collection holds
+        /// </summary>
+        public IList<MediaThumbnail> Thumbnails { get; set; }
     }
 }

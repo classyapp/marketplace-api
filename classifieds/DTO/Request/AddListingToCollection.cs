@@ -9,7 +9,7 @@ namespace Classy.Models.Request
     public class AddListingsToCollection : BaseRequestDto
     {
         public string CollectionId { get; set; }
-        public string[] IncludedListings { get; set; }
+        public IList<IncludedListing> IncludedListings { get; set; }
     }
 
     public class AddListingsToCollectionValidator : AbstractValidator<AddListingsToCollection>

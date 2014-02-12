@@ -964,10 +964,10 @@ namespace classy.Services
         }
 
         //
-        // POST: /collection/{CollectionId}/edit
-        // add listings to a collection
+        // PUT: /collection/{CollectionId}
+        // update collection
         [CustomAuthenticate]
-        public object Post(UpdateCollection request)
+        public object Put(UpdateCollection request)
         {
             try
             {
@@ -985,6 +985,37 @@ namespace classy.Services
             {
                 return new HttpError(HttpStatusCode.NotFound, kex.Message);
             }
+        }
+
+        //
+        // POST: /collection/{CollectionId}/submit
+        // add listings to a collection
+        [CustomAuthenticate]
+        public object Post(SubmitCollectionForEditorialApproval request)
+        {
+            try
+            {
+                var collection = CollectionManager.SubmitCollectionForEditorialApproval(
+                    request.Environment.AppId,
+                    request.CollectionId);
+                return new HttpResult(collection, HttpStatusCode.OK);
+            }
+            catch (KeyNotFoundException kex)
+            {
+                return new HttpError(HttpStatusCode.NotFound, kex.Message);
+            }
+        }
+
+        //
+        // GET: /collection/list/approved
+        // get a list of approved collections
+        public object Get(GetApprovedCollections request)
+        {
+            var collections = CollectionManager.GetApprovedCollections(
+                request.Environment.AppId,
+                request.Categories,
+                request.MaxCollections);
+            return new HttpResult(collections , HttpStatusCode.OK);
         }
 
         //
