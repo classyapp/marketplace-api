@@ -107,12 +107,13 @@ namespace classy.Manager
             string profileId,
             bool includeComments,
             bool formatCommentsAsHtml,
-            bool includeDrafts)
+            bool includeDrafts,
+            int page)
         {
             var profile = GetVerifiedProfile(appId, profileId);
 
             // TODO: cache listings
-            var listings = ListingRepository.GetByProfileId(appId, profile.Id, includeDrafts);
+            var listings = ListingRepository.GetByProfileId(appId, profile.Id, includeDrafts, page);
             var comments = includeComments ?
                 CommentRepository.GetByListingIds(listings.Select(x => x.Id).AsEnumerable(), formatCommentsAsHtml) : null;
             var listingViews = new List<ListingView>();

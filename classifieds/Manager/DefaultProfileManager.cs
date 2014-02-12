@@ -155,7 +155,7 @@ namespace classy.Manager
 
             if (includeListings)
             {
-                var listings = ListingRepository.GetByProfileId(appId, profileId, false);
+                var listings = ListingRepository.GetByProfileId(appId, profileId, false, 1);
                 profileView.Listings = listings.ToListingViewList();
             }
 
