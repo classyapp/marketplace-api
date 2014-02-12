@@ -33,28 +33,25 @@ namespace classy.Operations
             int height = 0, width = 0;
             Bitmap squareImage;
             // crop to square
-            using (Stream originalStream = _storageRepository.GetFile(request.MediaKey))
+            using (Image originalImg = Image.FromStream(new MemoryStream(request.Content)))
             {
-                using (Image originalImg = Image.FromStream(originalStream))
+                int minDimension;
+                int startX = 0;
+                int startY = 0;
+                if (originalImg.Height < originalImg.Width)
                 {
-                    int minDimension;
-                    int startX = 0;
-                    int startY = 0;
-                    if (originalImg.Height < originalImg.Width)
-                    {
-                        minDimension = originalImg.Height;
-                        startX = (originalImg.Width - originalImg.Height) / 2;
-                    }
-                    else
-                    {
-                        minDimension = originalImg.Width;
-                        startY = (originalImg.Height - originalImg.Width) / 2;
-                    }
+                    minDimension = originalImg.Height;
+                    startX = (originalImg.Width - originalImg.Height) / 2;
+                }
+                else
+                {
+                    minDimension = originalImg.Width;
+                    startY = (originalImg.Height - originalImg.Width) / 2;
+                }
 
-                    using (Bitmap bmp = new Bitmap(originalImg))
-                    {
-                        squareImage = bmp.Clone(new Rectangle(startX, startY, minDimension, minDimension), System.Drawing.Imaging.PixelFormat.DontCare);
-                    }
+                using (Bitmap bmp = new Bitmap(originalImg))
+                {
+                    squareImage = bmp.Clone(new Rectangle(startX, startY, minDimension, minDimension), System.Drawing.Imaging.PixelFormat.DontCare);
                 }
             }
 
@@ -66,10 +63,10 @@ namespace classy.Operations
                 {
                     using (MemoryStream memoryStream = new MemoryStream(thumbnail.Size.Height * thumbnail.Size.Width))
                     {
-                        thumbnail.Save(memoryStream, System.Drawing.Imaging.ImageFormat.Png);
+                        thumbnail.Save(memoryStream, System.Drawing.Imaging.ImageFormat.Jpeg);
 
                         var thumbnailKey = string.Format("{0}_{1}x{2}", request.MediaKey, s.X, s.Y);
-                        _storageRepository.SaveFile(thumbnailKey, memoryStream.GetBuffer(), "image/png");
+                        _storageRepository.SaveFile(thumbnailKey, memoryStream.GetBuffer(), "image/jpeg");
                         MediaThumbnail mediaThumbnail = new MediaThumbnail()
                         {
                             Width = s.X,
@@ -82,6 +79,7 @@ namespace classy.Operations
                     }
                 }
             }
+
             //TODO: any way to only update the thumbnails? i see a potential race condition here otherwise
             _listingRepository.UpdateExternalMedia(request.ListingId, request.AppId, listingMediaFile);
         }

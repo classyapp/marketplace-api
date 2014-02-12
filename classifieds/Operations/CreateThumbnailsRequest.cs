@@ -7,15 +7,19 @@ namespace classy.Operations
 {
     public class CreateThumbnailsRequest
     {
-        public string ListingId { get; private set; }
         public string AppId { get; private set; }
+        public string ListingId { get; private set; }
         public string MediaKey { get; private set; }
+        public string ContentType { get; private set; }
+        public byte[] Content { get; private set; }
 
-        public CreateThumbnailsRequest(string listingId, string appId, string mediaKey)
+        public CreateThumbnailsRequest(string appId, string listingId, string mediaKey, string contentType, byte[] content)
         {
-            ListingId = listingId;
             AppId = appId;
+            ListingId = listingId;
             MediaKey = mediaKey;
+            ContentType = contentType;
+            Content = content;
         }
     }
 }

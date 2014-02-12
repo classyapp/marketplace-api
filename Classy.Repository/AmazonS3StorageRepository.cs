@@ -54,7 +54,7 @@ namespace Classy.Repository
             DeleteObjectRequest request = new DeleteObjectRequest();
             request.BucketName = bucketName;
             request.Key = key;
-            s3Client.DeleteObject(request);
+            s3Client.DeleteObjectAsync(request);
         }
 
         public string KeyToUrl(string key)

@@ -76,8 +76,10 @@ namespace classy
 
             private void ConfigureOperators(Funq.Container container)
             {
-                container.Register<CreateThumbnailsOperator>(c => new CreateThumbnailsOperator(c.TryResolve<IStorageRepository>(), c.TryResolve<IListingRepository>(), c.TryResolve<IAppManager>()));
                 var mqServer = container.TryResolve<ServiceStack.Messaging.IMessageService>();
+
+                // create thumbnails
+                container.Register<CreateThumbnailsOperator>(c => new CreateThumbnailsOperator(c.TryResolve<IStorageRepository>(), c.TryResolve<IListingRepository>(), c.TryResolve<IAppManager>()));
                 mqServer.RegisterHandler<CreateThumbnailsRequest>(m =>
                 {
                     var operation = container.TryResolve<CreateThumbnailsOperator>();

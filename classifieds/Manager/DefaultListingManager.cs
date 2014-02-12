@@ -185,7 +185,8 @@ namespace classy.Manager
                                 Key = key
                             };
                             mediaFiles.Add(mediaFile);
-                            _messageQueueClient.Publish<CreateThumbnailsRequest>(new CreateThumbnailsRequest(listingId, appId, key));
+
+                            _messageQueueClient.Publish<CreateThumbnailsRequest>(new CreateThumbnailsRequest(appId, listingId, key, file.ContentType, content));
                         }
                     }
                 }
