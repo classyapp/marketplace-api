@@ -106,7 +106,8 @@ namespace classy.Services
                 request.PriceMax,
                 request.Location,
                 request.IncludeComments,
-                request.FormatCommentsAsHtml);
+                request.FormatCommentsAsHtml,
+                request.Page);
 
             return new HttpResult(listingViews, HttpStatusCode.OK);
         }

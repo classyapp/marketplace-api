@@ -138,11 +138,12 @@ namespace classy.Manager
             double? priceMax,
             Location location,
             bool includeComments,
-            bool formatCommentsAsHtml)
+            bool formatCommentsAsHtml,
+            int page)
         {
             // TODO: cache listings
             tag = string.IsNullOrEmpty(tag) ? null : string.Concat("#", tag.TrimStart(new char[] { '#' }));
-            var listings = ListingRepository.Search(tag, listingType, metadata, priceMin, priceMax, location, appId, false, false);
+            var listings = ListingRepository.Search(tag, listingType, metadata, priceMin, priceMax, location, appId, false, false, page);
             var comments = includeComments ?
                 CommentRepository.GetByListingIds(listings.Select(x => x.Id).AsEnumerable(), formatCommentsAsHtml) : null;
             var listingViews = new List<ListingView>();

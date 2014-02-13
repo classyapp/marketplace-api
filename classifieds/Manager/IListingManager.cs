@@ -75,7 +75,8 @@ namespace classy.Manager
             double? priceMax,
             Location location,
             bool includeComments,
-            bool formatCommentsAsHtml);
+            bool formatCommentsAsHtml,
+            int page);
 
         /// <summary>
         /// 

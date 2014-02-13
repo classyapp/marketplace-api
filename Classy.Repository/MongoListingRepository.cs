@@ -242,7 +242,9 @@ namespace Classy.Repository
             throw new NotImplementedException();
         }
 
-        public IList<Listing> Search(string tag, string listingType, IDictionary<string, string> metadata, double? priceMin, double? priceMax, Location location, string appId, bool includeDrafts, bool increaseViewCounter)
+        public IList<Listing> Search(string tag, string listingType, IDictionary<string, string> metadata, 
+            double? priceMin, double? priceMax, Location location, string appId, 
+            bool includeDrafts, bool increaseViewCounter, int page)
         {
             var queries = new List<IMongoQuery>() {
                 Query<Listing>.EQ(x => x.AppId, appId)
@@ -281,10 +283,20 @@ namespace Classy.Repository
             }
 
             var query = Query.And(queries);
-            // increase the view count of all deals
-            if (increaseViewCounter) ListingsCollection.Update(query, Update<Listing>.Inc(x => x.ViewCount, 1), UpdateFlags.Multi);
             // now get the listings
-            var listings = ListingsCollection.Find(query);
+            MongoCursor<Listing> listings = null;
+            if (page <= 0)
+            {
+                // increase the view count of all deals
+                if (increaseViewCounter) ListingsCollection.Update(query, Update<Listing>.Inc(x => x.ViewCount, 1), UpdateFlags.Multi);
+                listings = ListingsCollection.Find(query);
+            }
+            else
+            {
+                listings = ListingsCollection.Find(query).SetSkip((page - 1) * PAGESIZE).SetLimit(PAGESIZE);
+                var ids = listings.Select(l => l.Id).ToArray();
+                if (increaseViewCounter) ListingsCollection.Update(Query<Listing>.Where(l => ids.Contains(l.Id)), Update<Listing>.Inc(x => x.ViewCount, 1), UpdateFlags.Multi);
+            }
             return listings.ToList();
         }
     }
