@@ -129,7 +129,7 @@ namespace classy.Manager
             return listingViews;
         }
 
-        public IList<ListingView> SearchListings(
+        public SearchResultsView SearchListings(
             string appId,
             string tag,
             string listingType,
@@ -141,9 +141,11 @@ namespace classy.Manager
             bool formatCommentsAsHtml,
             int page)
         {
+            long count = 0;
+
             // TODO: cache listings
             tag = string.IsNullOrEmpty(tag) ? null : string.Concat("#", tag.TrimStart(new char[] { '#' }));
-            var listings = ListingRepository.Search(tag, listingType, metadata, priceMin, priceMax, location, appId, false, false, page);
+            var listings = ListingRepository.Search(tag, listingType, metadata, priceMin, priceMax, location, appId, false, false, page, ref count);
             var comments = includeComments ?
                 CommentRepository.GetByListingIds(listings.Select(x => x.Id).AsEnumerable(), formatCommentsAsHtml) : null;
             var listingViews = new List<ListingView>();
@@ -156,7 +158,7 @@ namespace classy.Manager
                 }
                 listingViews.Add(view);
             }
-            return listingViews;
+            return new SearchResultsView { Results = listingViews, Count = count };
         }
 
         public ListingView AddExternalMediaToListing(

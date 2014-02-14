@@ -66,7 +66,7 @@ namespace classy.Manager
         /// <param name="includeComments"></param>
         /// <param name="formatCommentsAsHtml"></param>
         /// <returns></returns>
-        IList<ListingView> SearchListings(
+        SearchResultsView SearchListings(
             string appId,
             string tag,
             string listingType,
