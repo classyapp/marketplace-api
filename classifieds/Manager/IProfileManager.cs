@@ -73,13 +73,15 @@ namespace classy.Manager
         /// <param name="metadata"></param>
         /// <param name="professionalsOnly"></param>
         /// <returns></returns>
-        IList<ProfileView> SearchProfiles(
+        SearchResultsView<ProfileView> SearchProfiles(
             string appId,
             string partialUserName,
             string category,
             Location location,
             IDictionary<string, string> metadata,
-            bool professionalsOnly);
+            bool professionalsOnly,
+            int page,
+            int pageSize);
 
         /// <summary>
         /// 

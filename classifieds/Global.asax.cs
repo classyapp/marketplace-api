@@ -123,6 +123,8 @@ namespace classy
             private void ConfigureServiceRoutes()
             {
                 Routes
+                    // App settings
+                    .Add<GetAppSettings>("/app/settings", "GET")
                     // Listings
                     .Add<GetListingById>("/listing/{ListingId}", "GET") // get listing by id, update listing
                     .Add<DeleteListing>("/listing/{ListingId}", "DELETE") // delete listing by id, update listing

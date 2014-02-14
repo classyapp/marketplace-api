@@ -17,5 +17,6 @@ namespace Classy.Models.Request
         public Location Location { get; set; }
         public bool IncludeComments { get; set; }
         public bool FormatCommentsAsHtml { get; set; }
+        public int Page { get; set; }
     }
 }

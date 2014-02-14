@@ -177,7 +177,7 @@ namespace classy.Manager
             string profileId,
             bool includeCancelled)
         {
-            var listings = ListingRepository.GetByProfileId(profileId, appId, false, -1);
+            var listings = ListingRepository.GetByProfileId(profileId, appId, false);
             var listingIds = listings.Select(x => x.Id).ToArray();
             return OrderRepository.GetByListingId(appId, listingIds, includeCancelled);
         }
