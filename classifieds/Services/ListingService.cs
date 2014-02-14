@@ -48,7 +48,7 @@ namespace classy.Services
         public object Get(GetAppSettings request)
         {
             App app = AppManager.GetAppById(request.Environment.AppId);
-            return new { PageSize = app.PagingPageSize, PagesCount = app.PagingPages };
+            return new HttpResult(new AppView { PageSize = app.PagingPageSize, PagesCount = app.PagingPages }, HttpStatusCode.OK);
         }
 
         public object Get(GetListingById request)

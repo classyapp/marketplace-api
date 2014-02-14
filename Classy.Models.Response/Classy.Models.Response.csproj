@@ -49,6 +49,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="AppView.cs" />
     <Compile Include="BaseDeleteResponse.cs" />
     <Compile Include="CancelBookingResponse.cs" />
     <Compile Include="CancelOrderResponse.cs" />
