@@ -18,7 +18,7 @@ namespace Classy.Repository
         public MongoProfileRepository(MongoDatabase db)
         {
             ProfilesCollection = db.GetCollection<Profile>("profiles");
-            ProxyClaimsCollection = db.GetCollection<ProxyClaim>("proxyclaims");   
+            ProxyClaimsCollection = db.GetCollection<ProxyClaim>("proxyclaims");
         }
 
         public string Save(Profile profile)
@@ -28,7 +28,7 @@ namespace Classy.Repository
                 ProfilesCollection.Save(profile);
                 return profile.Id;
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 throw;
             }
@@ -62,7 +62,7 @@ namespace Classy.Repository
             {
                 var profile = ProfilesCollection.FindOne(query);
                 return profile;
-            }   
+            }
         }
 
         public IList<Profile> GetByIds(string appId, string[] profileIds)
@@ -87,7 +87,8 @@ namespace Classy.Repository
             ProfilesCollection.Update(query, update);
         }
 
-        public IList<Profile> Search(string appId, string displayName, string category, Location location, IDictionary<string, string> metadata, bool professionalsOnly)
+        public IList<Profile> Search(string appId, string displayName, string category, Location location, IDictionary<string, string> metadata, 
+            bool professionalsOnly, int page, int pageSize, ref long count)
         {
             var queries = new List<IMongoQuery>() {
                 Query<Profile>.EQ(x => x.AppId, appId)
@@ -131,7 +132,18 @@ namespace Classy.Repository
             }
 
             var query = Query.And(queries);
-           var profiles = ProfilesCollection.Find(query);
+            MongoCursor<Profile> profiles = null;
+            if (page <= 0)
+            {
+                profiles = ProfilesCollection.Find(query);
+                count = profiles.Count();
+            }
+            else
+            {
+                profiles =  ProfilesCollection.Find(query).SetSkip((page - 1) * pageSize).SetLimit(pageSize);
+                count =  ProfilesCollection.Count(query);
+            }
+
             return profiles.ToList();
         }
 
@@ -142,8 +154,8 @@ namespace Classy.Repository
                 ProfilesCollection.Remove(Query<Profile>.EQ(x => x.Id, profileId));
             }
             catch (MongoException mex)
-            { 
-                throw mex; 
+            {
+                throw mex;
             }
         }
 

@@ -14,5 +14,6 @@ namespace Classy.Models.Request
         public Location Location { get; set; }
         public string Category { get; set; }
         public bool ProfessionalsOnly { get; set; }
+        public int Page { get; set; }
     }
 }

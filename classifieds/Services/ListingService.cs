@@ -29,6 +29,7 @@ namespace classy.Services
         public ICollectionManager CollectionManager { get; set; }
         public IAnalyticsManager AnalyticsManager { get; set; }
         public ILocalizationManager LocalizationManager { get; set; }
+        public IAppManager AppManager { get; set; }
 
         [CustomAuthenticate]
         public object Post(CreateProfileProxy request)
@@ -42,6 +43,12 @@ namespace classy.Services
                 request.Metadata);
 
             return new HttpResult(profile, HttpStatusCode.OK);
+        }
+
+        public object Get(GetAppSettings request)
+        {
+            App app = AppManager.GetAppById(request.Environment.AppId);
+            return new { PageSize = app.PagingPageSize, PagesCount = app.PagingPages };
         }
 
         public object Get(GetListingById request)
@@ -79,8 +86,7 @@ namespace classy.Services
                     request.ProfileId,
                     request.IncludeComments,
                     request.FormatCommentsAsHtml,
-                    request.IncludeDrafts,
-                    request.Page);
+                    request.IncludeDrafts);
 
                 return new HttpResult(listingViews, HttpStatusCode.OK);
             }
@@ -107,7 +113,8 @@ namespace classy.Services
                 request.Location,
                 request.IncludeComments,
                 request.FormatCommentsAsHtml,
-                request.Page);
+                request.Page,
+                AppManager.GetAppById(request.Environment.AppId).PagingPageSize);
 
             return new HttpResult(listingViews, HttpStatusCode.OK);
         }
@@ -508,9 +515,11 @@ namespace classy.Services
                 request.Category,
                 request.Location,
                 request.Metadata,
-                request.ProfessionalsOnly);
+                request.ProfessionalsOnly,
+                request.Page,
+                AppManager.GetAppById(request.Environment.AppId).PagingPageSize);
 
-            return new HttpResult(profiles.Take(150), HttpStatusCode.OK);
+            return new HttpResult(profiles, HttpStatusCode.OK);
         }
 
         // book timelost within listing

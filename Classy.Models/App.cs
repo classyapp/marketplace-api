@@ -17,5 +17,7 @@ namespace Classy.Models
         public Point[] ExternalMediaThumbnailSizes { get; set; }
         public string DefaultProfileImage { get; set; }
         public string DefaultProfileThumbnail { get; set; }
+        public int PagingPages { get; set; }
+        public int PagingPageSize { get; set; }
     }
 }

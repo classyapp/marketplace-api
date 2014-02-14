@@ -14,9 +14,6 @@ namespace Classy.Repository
 {
     public class MongoListingRepository : IListingRepository
     {
-
-        private static readonly int PAGESIZE = 9;
-
         private MongoCollection<Listing> ListingsCollection;
 
         public MongoListingRepository(MongoDatabase db)
@@ -44,7 +41,7 @@ namespace Classy.Repository
             return listings.ToList(); 
         }
 
-        public IList<Listing> GetByProfileId(string appId, string profileId, bool includeDrafts, int page)
+        public IList<Listing> GetByProfileId(string appId, string profileId, bool includeDrafts)
         {
             var query = Query.And(
                     Query<Listing>.EQ(x => x.ProfileId, profileId),
@@ -55,15 +52,8 @@ namespace Classy.Repository
             }
 
             // now get the listings
-            MongoCursor<Listing> listings = null;
-            if (page <= 0)
-            {
-                listings = ListingsCollection.Find(query);
-            }
-            else
-            {
-                listings = ListingsCollection.Find(query).SetSkip(PAGESIZE * (page - 1)).SetLimit(PAGESIZE);
-            }
+            MongoCursor<Listing> listings = listings = ListingsCollection.Find(query);
+            
             return listings.ToList();
         }
 
@@ -243,8 +233,8 @@ namespace Classy.Repository
         }
 
         public IList<Listing> Search(string tag, string listingType, IDictionary<string, string> metadata, 
-            double? priceMin, double? priceMax, Location location, string appId, 
-            bool includeDrafts, bool increaseViewCounter, int page, ref long count)
+            double? priceMin, double? priceMax, Location location, string appId,
+            bool includeDrafts, bool increaseViewCounter, int page, int pageSize, ref long count)
         {
             var queries = new List<IMongoQuery>() {
                 Query<Listing>.EQ(x => x.AppId, appId)
@@ -294,7 +284,7 @@ namespace Classy.Repository
             }
             else
             {
-                listings = ListingsCollection.Find(query).SetSkip((page - 1) * PAGESIZE).SetLimit(PAGESIZE);
+                listings = ListingsCollection.Find(query).SetSkip((page - 1) * pageSize).SetLimit(pageSize);
                 count = ListingsCollection.Count(query);
                 var ids = listings.Select(l => l.Id).ToArray();
                 if (increaseViewCounter) ListingsCollection.Update(Query<Listing>.Where(l => ids.Contains(l.Id)), Update<Listing>.Inc(x => x.ViewCount, 1), UpdateFlags.Multi);

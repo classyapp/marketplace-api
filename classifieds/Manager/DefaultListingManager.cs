@@ -107,13 +107,12 @@ namespace classy.Manager
             string profileId,
             bool includeComments,
             bool formatCommentsAsHtml,
-            bool includeDrafts,
-            int page)
+            bool includeDrafts)
         {
             var profile = GetVerifiedProfile(appId, profileId);
 
             // TODO: cache listings
-            var listings = ListingRepository.GetByProfileId(appId, profile.Id, includeDrafts, page);
+            var listings = ListingRepository.GetByProfileId(appId, profile.Id, includeDrafts);
             var comments = includeComments ?
                 CommentRepository.GetByListingIds(listings.Select(x => x.Id).AsEnumerable(), formatCommentsAsHtml) : null;
             var listingViews = new List<ListingView>();
@@ -129,7 +128,7 @@ namespace classy.Manager
             return listingViews;
         }
 
-        public SearchResultsView SearchListings(
+        public SearchResultsView<ListingView> SearchListings(
             string appId,
             string tag,
             string listingType,
@@ -139,13 +138,14 @@ namespace classy.Manager
             Location location,
             bool includeComments,
             bool formatCommentsAsHtml,
-            int page)
+            int page,
+            int pageSize)
         {
             long count = 0;
 
             // TODO: cache listings
             tag = string.IsNullOrEmpty(tag) ? null : string.Concat("#", tag.TrimStart(new char[] { '#' }));
-            var listings = ListingRepository.Search(tag, listingType, metadata, priceMin, priceMax, location, appId, false, false, page, ref count);
+            var listings = ListingRepository.Search(tag, listingType, metadata, priceMin, priceMax, location, appId, false, false, page, pageSize, ref count);
             var comments = includeComments ?
                 CommentRepository.GetByListingIds(listings.Select(x => x.Id).AsEnumerable(), formatCommentsAsHtml) : null;
             var listingViews = new List<ListingView>();
@@ -158,7 +158,7 @@ namespace classy.Manager
                 }
                 listingViews.Add(view);
             }
-            return new SearchResultsView { Results = listingViews, Count = count };
+            return new SearchResultsView<ListingView> { Results = listingViews, Count = count };
         }
 
         public ListingView AddExternalMediaToListing(

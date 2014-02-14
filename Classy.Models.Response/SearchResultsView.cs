@@ -6,9 +6,9 @@ using System.Threading.Tasks;
 
 namespace Classy.Models.Response
 {
-    public class SearchResultsView
+    public class SearchResultsView<T>
     {
-        public IList<ListingView> Results { get; set; }
+        public IList<T> Results { get; set; }
         public long Count { get; set; }
     }
 }

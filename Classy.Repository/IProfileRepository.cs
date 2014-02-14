@@ -26,7 +26,7 @@ namespace Classy.Repository
         Profile GetById(string appId, string profileId, bool increaseViewCounter);
         IList<Profile> GetByIds(string appId, string[] profileIds);
         Profile GetByUsername(string appId, string username, bool increaseViewCounter);
-        IList<Profile> Search(string appId, string displayName, string category, Location location, IDictionary<string, string> metadata, bool professionalsOnly);
+        IList<Profile> Search(string appId, string displayName, string category, Location location, IDictionary<string, string> metadata, bool professionalsOnly, int page, int pageSize, ref long count);
         void Delete(string profileId);
         void IncreaseCounter(string appId, string profileId, ProfileCounters counters, int value); // returns the profile id or null
         // proxies

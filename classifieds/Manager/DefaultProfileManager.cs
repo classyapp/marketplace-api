@@ -69,21 +69,24 @@ namespace classy.Manager
             return profile.ToProfileView();
         }
 
-        public IList<ProfileView> SearchProfiles(
+        public SearchResultsView<ProfileView> SearchProfiles(
             string appId,
             string partialUserName,
             string category,
             Location location,
             IDictionary<string, string> metadata,
-            bool professionalsOnly)
+            bool professionalsOnly,
+            int page,
+            int pageSize)
         {
-            var profileList = ProfileRepository.Search(appId, partialUserName, category, location, metadata, professionalsOnly);
+            long count = 0;
+            var profileList = ProfileRepository.Search(appId, partialUserName, category, location, metadata, professionalsOnly, page, pageSize, ref count);
             IList<ProfileView> results = new List<ProfileView>();
             foreach(var profile in profileList)
             {
                 results.Add(profile.ToProfileView());
             }
-            return results;
+            return new SearchResultsView<ProfileView> { Results = results, Count = count };
         }
 
         public void FollowProfile(
@@ -155,7 +158,7 @@ namespace classy.Manager
 
             if (includeListings)
             {
-                var listings = ListingRepository.GetByProfileId(appId, profileId, false, 1);
+                var listings = ListingRepository.GetByProfileId(appId, profileId, false);
                 profileView.Listings = listings.ToListingViewList();
             }
 

@@ -50,8 +50,7 @@ namespace classy.Manager
             string profileId,
             bool includeComments,
             bool formatCommentsAsHtml,
-            bool includeDrafts,
-            int page);
+            bool includeDrafts);
 
         /// <summary>
         /// 
@@ -66,7 +65,7 @@ namespace classy.Manager
         /// <param name="includeComments"></param>
         /// <param name="formatCommentsAsHtml"></param>
         /// <returns></returns>
-        SearchResultsView SearchListings(
+        SearchResultsView<ListingView> SearchListings(
             string appId,
             string tag,
             string listingType,
@@ -76,7 +75,8 @@ namespace classy.Manager
             Location location,
             bool includeComments,
             bool formatCommentsAsHtml,
-            int page);
+            int page,
+            int pageSize);
 
         /// <summary>
         /// 
