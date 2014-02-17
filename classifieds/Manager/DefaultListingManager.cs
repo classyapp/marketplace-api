@@ -577,20 +577,23 @@ namespace classy.Manager
             string appId,
             string profileId,
             string collectionId,
-            string listingId)
+            string[] listingIds)
         {
             try
             {
                 var collection = GetVerifiedCollection(appId, collectionId);
                 if (collection.ProfileId != profileId) throw new UnauthorizedAccessException();
 
-                IncludedListing listing = collection.IncludedListings.FirstOrDefault(l => l.ListingId == listingId);
-                collection.IncludedListings.Remove(listing);
+                foreach (string listingId in listingIds)
+                {
+                    IncludedListing listing = collection.IncludedListings.FirstOrDefault(l => l.ListingId == listingId);
+                    collection.IncludedListings.Remove(listing);
 
-                TripleStore.DeleteActivity(appId, profileId, ActivityPredicate.ADD_LISTING_TO_COLLECTION, listing.ListingId);
+                    TripleStore.DeleteActivity(appId, profileId, ActivityPredicate.ADD_LISTING_TO_COLLECTION, listing.ListingId);
 
-                // save
-                CollectionRepository.Update(collection);
+                    // save
+                    CollectionRepository.Update(collection);   
+                }
             }
             catch (Exception)
             {

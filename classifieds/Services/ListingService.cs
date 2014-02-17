@@ -987,7 +987,7 @@ namespace classy.Services
                     request.Environment.AppId,
                     session.UserAuthId,
                     request.CollectionId,
-                    request.ListingId);
+                    request.ListingIds);
                 return new HttpResult(request, HttpStatusCode.OK);
             }
             catch (KeyNotFoundException kex)

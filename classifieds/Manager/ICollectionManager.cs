@@ -60,7 +60,7 @@ namespace classy.Manager
             string appId, 
             string profileId, 
             string collectionId, 
-            string listingId);
+            string[] listingIds);
 
         /// <summary>
         /// updates existing collection

@@ -9,7 +9,7 @@ namespace Classy.Models.Request
     public class RemoveListingFromCollection : BaseRequestDto
     {
         public string CollectionId { get; set; }
-        public string ListingId { get; set; }
+        public string[] ListingIds { get; set; }
     }
 
     public class RemoveListingFromCollectionValidator : AbstractValidator<RemoveListingFromCollection>
@@ -17,7 +17,7 @@ namespace Classy.Models.Request
         public RemoveListingFromCollectionValidator()
         {
             RuleFor(x => x.CollectionId).NotNull();
-            RuleFor(x => x.ListingId).NotNull();
+            RuleFor(x => x.ListingIds).NotNull();
         }
     }
 }
