@@ -140,6 +140,7 @@ namespace classy
                     // Collections
                     .Add<CreateCollection>("/collection/new", "POST") // create a new collection
                     .Add<AddListingsToCollection>("/collection/{CollectionId}/listing/new", "POST") // add listings to collection
+                    .Add<RemoveListingFromCollection>("/collection/{CollectionId}/remove", "POST")
                     .Add<UpdateCollection>("/collection/{CollectionId}", "PUT") //update listings comments, and collection title and content
                     .Add<SubmitCollectionForEditorialApproval>("/collection/{CollectionId}/submit", "POST")
                     .Add<GetApprovedCollections>("/collection/list/approved", "GET")

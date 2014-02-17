@@ -573,6 +573,34 @@ namespace classy.Manager
             }
         }
 
+        public void RemoveListingsFromCollection(
+            string appId,
+            string profileId,
+            string collectionId,
+            string[] listingIds)
+        {
+            try
+            {
+                var collection = GetVerifiedCollection(appId, collectionId);
+                if (collection.ProfileId != profileId) throw new UnauthorizedAccessException();
+
+                foreach (string listingId in listingIds)
+                {
+                    IncludedListing listing = collection.IncludedListings.FirstOrDefault(l => l.ListingId == listingId);
+                    collection.IncludedListings.Remove(listing);
+
+                    TripleStore.DeleteActivity(appId, profileId, ActivityPredicate.ADD_LISTING_TO_COLLECTION, listing.ListingId);
+
+                    // save
+                    CollectionRepository.Update(collection);   
+                }
+            }
+            catch (Exception)
+            {
+                throw;
+            }
+        }
+
         public CollectionView UpdateCollection(
             string appId,
             string profileId,

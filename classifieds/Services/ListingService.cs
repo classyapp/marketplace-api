@@ -975,6 +975,28 @@ namespace classy.Services
         }
 
         //
+        // POST: /collection/{CollectionId}/listings
+        // add listings to a collection
+        [CustomAuthenticate]
+        public object Post(RemoveListingFromCollection request)
+        {
+            try
+            {
+                var session = SessionAs<CustomUserSession>();
+                CollectionManager.RemoveListingsFromCollection(
+                    request.Environment.AppId,
+                    session.UserAuthId,
+                    request.CollectionId,
+                    request.ListingIds);
+                return new HttpResult(request, HttpStatusCode.OK);
+            }
+            catch (KeyNotFoundException kex)
+            {
+                return new HttpError(HttpStatusCode.NotFound, kex.Message);
+            }
+        }
+
+        //
         // PUT: /collection/{CollectionId}
         // update collection
         [CustomAuthenticate]

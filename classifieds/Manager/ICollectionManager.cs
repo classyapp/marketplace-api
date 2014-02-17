@@ -50,6 +50,19 @@ namespace classy.Manager
             IList<IncludedListing> listingIds);
 
         /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="appId"></param>
+        /// <param name="profileId"></param>
+        /// <param name="collectionId"></param>
+        /// <param name="listingId"></param>
+        void RemoveListingsFromCollection(
+            string appId, 
+            string profileId, 
+            string collectionId, 
+            string[] listingIds);
+
+        /// <summary>
         /// updates existing collection
         /// </summary>
         /// <param name="appId"></param>
