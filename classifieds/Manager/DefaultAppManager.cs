@@ -22,7 +22,7 @@ namespace classy.Manager
                 DefaultProfileImage = "http://d107oye3n9eb07.cloudfront.net/profile_img_69064",
                 DefaultProfileThumbnail = "http://d107oye3n9eb07.cloudfront.net/profile_thumb_69064",
                 PagingPages = 5,
-                PagingPageSize = 9
+                PagingPageSize = 12
             };
         }
     }
