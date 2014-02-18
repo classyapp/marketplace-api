@@ -14,11 +14,5 @@ namespace Classy.Models
         public string Id { get; set; }
         public string Comments { get; set; }
         public string ListingType { get; set; }
-
-        public IncludedListing()
-        {
-            // backward compatibility
-            ListingType = "photo";
-        }
     }
 }
