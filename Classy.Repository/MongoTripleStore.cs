@@ -17,14 +17,16 @@ namespace Classy.Repository
             TripleCollection = db.GetCollection<Triple>("triples");
         }
 
-        public Triple LogActivity(string appId, string subjectObjectId, string predicate, string objectObjectId, ref bool tripleAlreadyExists)
+        public Triple LogActivity(string appId, string subjectObjectId, string predicate, string objectObjectId, ref int count)
         {
+            count = 1;
             var triple = new Triple
             {
                 AppId = appId,
                 SubjectId = subjectObjectId,
                 Predicate = predicate.ToString(),
-                ObjectId = objectObjectId
+                ObjectId = objectObjectId,
+                Count = count
             };
 
             var query = Query.And(new IMongoQuery[] {
@@ -36,7 +38,8 @@ namespace Classy.Repository
             var existingTriple = TripleCollection.FindOne(query);
             if (existingTriple != null)
             {
-                tripleAlreadyExists = true;
+                existingTriple.Count++;
+                count = existingTriple.Count;
                 return null;
             }
 
@@ -44,7 +47,7 @@ namespace Classy.Repository
             return triple;
         }
 
-        public void DeleteActivity(string appId, string subjectObjectId, string predicate, string objectObjectId)
+        public void DeleteActivity(string appId, string subjectObjectId, string predicate, string objectObjectId, ref int count)
         {
             var query = Query.And(new IMongoQuery[] {
                 Query<Triple>.EQ(x => x.AppId, appId),
@@ -52,7 +55,28 @@ namespace Classy.Repository
                 Query<Triple>.EQ(x => x.Predicate, predicate.ToString()),
                 Query<Triple>.EQ(x => x.ObjectId, objectObjectId)
             });
-            TripleCollection.Remove(query);
+            var existingTriple = TripleCollection.FindOne(query);
+            if (existingTriple != null)
+            {
+                existingTriple.Count--;
+                TripleCollection.Save(existingTriple);
+            }
+        }
+
+        public void ResetActivity(string appId, string subjectObjectId, string predicate, string objectObjectId)
+        {
+            var query = Query.And(new IMongoQuery[] {
+                Query<Triple>.EQ(x => x.AppId, appId),
+                Query<Triple>.EQ(x => x.SubjectId, subjectObjectId),
+                Query<Triple>.EQ(x => x.Predicate, predicate.ToString()),
+                Query<Triple>.EQ(x => x.ObjectId, objectObjectId)
+            });
+            var existingTriple = TripleCollection.FindOne(query);
+            if (existingTriple != null)
+            {
+                existingTriple.Count = 0;
+                TripleCollection.Save(existingTriple);
+            }
         }
 
         public IList<string> GetActivitySubjectList(string appId, string predicate, string objectObjectId)

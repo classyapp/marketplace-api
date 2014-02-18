@@ -67,8 +67,8 @@ namespace classy.Manager
                 ListingRepository.IncreaseCounter(listingId, appId, ListingCounters.Bookings, 1);
 
                 // log the booking activity
-                var tripleExists = false;
-                TripleStore.LogActivity(appId, profileId, ActivityPredicate.BOOK_LISTING, listingId, ref tripleExists);
+                int count = 1;
+                TripleStore.LogActivity(appId, profileId, ActivityPredicate.BOOK_LISTING, listingId, ref count);
 
                 // return the transaction
                 return bookedTimeslot;

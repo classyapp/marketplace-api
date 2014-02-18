@@ -23,8 +23,8 @@ namespace classy.Manager
             string predicate, 
             string objectId)
         {
-            var exists = false;
-            var triple = TripleStore.LogActivity(appId, subjectId, predicate, objectId, ref exists);
+            int count = 0;
+            var triple = TripleStore.LogActivity(appId, subjectId, predicate, objectId, ref count);
             return triple.TranslateTo<TripleView>();
         }
     }
