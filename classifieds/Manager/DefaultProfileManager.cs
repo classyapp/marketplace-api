@@ -99,9 +99,9 @@ namespace classy.Manager
             if (followee == null) throw new KeyNotFoundException("invalid username");
 
             // save triple
-            bool tripleExists = false;
-            TripleStore.LogActivity(appId, follower.Id, ActivityPredicate.FOLLOW_PROFILE, followee.Id, ref tripleExists);
-            if (!tripleExists)
+            int count = 0; 
+            TripleStore.LogActivity(appId, follower.Id, ActivityPredicate.FOLLOW_PROFILE, followee.Id, ref count);
+            if (count == 1)
             {
                 // increase follower count
                 ProfileRepository.IncreaseCounter(appId, followee.Id, ProfileCounters.Followers | ProfileCounters.Rank, 1);
@@ -170,7 +170,7 @@ namespace classy.Manager
                 {
                     if (c.IncludedListings != null)
                     {
-                        c.Listings = ListingRepository.GetById(c.IncludedListings.Select(l => l.ListingId).ToArray(), appId, false).ToListingViewList();
+                        c.Listings = ListingRepository.GetById(c.IncludedListings.Select(l => l.Id).ToArray(), appId, false).ToListingViewList();
                     }
                     else
                     {
@@ -187,8 +187,8 @@ namespace classy.Manager
 
             if (logImpression)
             {
-                var exists = false;
-                TripleStore.LogActivity(appId, requestedByProfileId.IsNullOrEmpty() ? "guest" : requestedByProfileId, ActivityPredicate.VIEW_PROFILE, profileId, ref exists);
+                int count = 1;
+                TripleStore.LogActivity(appId, requestedByProfileId.IsNullOrEmpty() ? "guest" : requestedByProfileId, ActivityPredicate.VIEW_PROFILE, profileId, ref count);
             }
 
             // TODO: if requested by someone other than the profile owner, remove all non-public data!!
@@ -333,9 +333,9 @@ namespace classy.Manager
             ReviewRepository.Save(review);
 
             // log activity
-            var exists = false;
-            TripleStore.LogActivity(appId, reviewerProfileId, ActivityPredicate.REVIEW_PROFILE, listing.Id, ref exists);
-            if (exists) throw new ApplicationException("this user already submitted a review for this listing");
+            int count = 1;
+            TripleStore.LogActivity(appId, reviewerProfileId, ActivityPredicate.REVIEW_PROFILE, listing.Id, ref count);
+            if (count > 1) throw new ApplicationException("this user already submitted a review for this listing");
 
             // increase the review count for the merchant, and the average score + avg score for all sub criteria
             // TODO : does this eve belog here? what about sub criteria for listings? for each listing type? aaaarghhh!!!
@@ -368,9 +368,9 @@ namespace classy.Manager
             var app = AppManager.GetAppById(appId);
 
             // log activity
-            var exists = false;
-            TripleStore.LogActivity(appId, reviewerProfileId, ActivityPredicate.REVIEW_PROFILE, revieweeProfileId, ref exists);
-            if (exists) throw new ArgumentException("AlreadyReviewed");
+            int count = 1;
+            TripleStore.LogActivity(appId, reviewerProfileId, ActivityPredicate.REVIEW_PROFILE, revieweeProfileId, ref count);
+            if (count > 1) throw new ArgumentException("AlreadyReviewed");
 
             // save the review
             var review = new Review

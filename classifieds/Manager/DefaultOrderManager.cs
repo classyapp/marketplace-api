@@ -90,8 +90,8 @@ namespace classy.Manager
                 OrderRepository.Save(order);
 
                 // log the purchase activity
-                var tripleExists = false;
-                TripleStore.LogActivity(appId, profileId, ActivityPredicate.PURCHASE_LISTING, listingId, ref tripleExists);
+                int count = 0;
+                TripleStore.LogActivity(appId, profileId, ActivityPredicate.PURCHASE_LISTING, listingId, ref count);
 
                 // increase purchase counter
                 ListingRepository.IncreaseCounter(listingId, appId, ListingCounters.Purchases, quantity);

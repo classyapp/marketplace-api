@@ -11,7 +11,8 @@ namespace Classy.Models
     /// </summary>
     public class IncludedListing
     {
-        public string ListingId { get; set; }
+        public string Id { get; set; }
         public string Comments { get; set; }
+        public string ListingType { get; set; }
     }
 }

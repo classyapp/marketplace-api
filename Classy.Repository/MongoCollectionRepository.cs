@@ -82,7 +82,7 @@ namespace Classy.Repository
         {
             try
             {
-                var getByProfileId = Query<Collection>.Where(x => x.AppId == appId && x.ProfileId == profileId && x.IncludedListings.Any(y => y.ListingId == listingId));
+                var getByProfileId = Query<Collection>.Where(x => x.AppId == appId && x.ProfileId == profileId && x.IncludedListings.Any(y => y.Id == listingId));
                 CollectionsCollection.Update(getByProfileId, MongoDB.Driver.Builders.Update.Pull("IncludedListings", Query.EQ("ListingId", listingId)));
             }
             catch (MongoException)
