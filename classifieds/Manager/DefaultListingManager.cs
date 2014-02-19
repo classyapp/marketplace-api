@@ -528,12 +528,13 @@ namespace classy.Manager
 
         public IList<CollectionView> GetCollectionsByProfileId(
             string appId,
-            string profileId)
+            string profileId,
+            string collectionType)
         {
             try
             {
                 var profile = GetVerifiedProfile(appId, profileId);
-                var collections = CollectionRepository.GetByProfileId(appId, profileId);
+                var collections = CollectionRepository.GetByProfileId(appId, profileId, collectionType);
                 return collections.ToCollectionViewList();
             }
             catch (Exception)
@@ -604,8 +605,15 @@ namespace classy.Manager
                         int count = 0;
                         TripleStore.DeleteActivity(appId, profileId, ActivityPredicate.ADD_LISTING_TO_COLLECTION, listing.Id, ref count);
 
-                        var last = GetVerifiedListing(appId, collection.IncludedListings.Last().Id);
-                        collection.Thumbnails = last.ExternalMedia[0].Thumbnails;
+                        if (collection.IncludedListings.Count > 0)
+                        {
+                            var last = GetVerifiedListing(appId, collection.IncludedListings.Last().Id);
+                            collection.Thumbnails = last.ExternalMedia[0].Thumbnails;
+                        }
+                        else
+                        {
+                            collection.Thumbnails = new MediaThumbnail[0];
+                        }
 
                         // save
                         CollectionRepository.Update(collection);

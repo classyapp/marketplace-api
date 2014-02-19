@@ -164,7 +164,7 @@ namespace classy.Manager
 
             if (includeCollections)
             {
-                var collections = CollectionRepository.GetByProfileId(appId, profileId);
+                var collections = CollectionRepository.GetByProfileId(appId, profileId, "generic");
                 profileView.Collections = collections.ToCollectionViewList();
                 foreach(var c in profileView.Collections)
                 {

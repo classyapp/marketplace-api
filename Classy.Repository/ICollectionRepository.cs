@@ -24,8 +24,9 @@ namespace Classy.Repository
         /// </summary>
         /// <param name="appId"></param>
         /// <param name="profileId"></param>
+        /// <param name="collectionType"></param>
         /// <returns></returns>
-        IList<Collection> GetByProfileId(string appId, string profileId);
+        IList<Collection> GetByProfileId(string appId, string profileId, string collectionType);
         /// <summary>
         /// insert a new <see cref="Collection"/>
         /// </summary>

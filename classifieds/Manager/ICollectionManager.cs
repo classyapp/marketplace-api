@@ -111,7 +111,8 @@ namespace classy.Manager
         /// <returns>a list of <see cref="CollectionView"/> objects</returns>
         IList<CollectionView> GetCollectionsByProfileId(
             string appId,
-            string profileId);
+            string profileId,
+            string collectionType);
 
         /// <summary>
         /// 

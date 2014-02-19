@@ -64,11 +64,11 @@ namespace Classy.Repository
             }
         }
 
-        public IList<Collection> GetByProfileId(string appId, string profileId)
+        public IList<Collection> GetByProfileId(string appId, string profileId, string collectionType)
         {
             try
             {
-                var getByProfileId = Query<Collection>.Where(x => x.AppId == appId && x.ProfileId == profileId);
+                var getByProfileId = Query<Collection>.Where(x => x.AppId == appId && x.ProfileId == profileId && x.Type == collectionType);
                 var collections = CollectionsCollection.Find(getByProfileId);
                 return collections.ToList();
             }
