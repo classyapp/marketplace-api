@@ -1,5 +1,6 @@
 ﻿using Classy.Auth;
 using Classy.Models;
+using Classy.Models.Request;
 using Classy.Models.Response;
 using System;
 using System.Collections.Generic;
@@ -125,13 +126,17 @@ namespace classy.Manager
         /// </summary>
         /// <param name="appId"></param>
         /// <param name="profileId"></param>
-        /// <param name="ProfessionalInfo"></param>
+        /// <param name="contactInfo"></param>
+        /// <param name="professionalInfo"></param>
         /// <param name="metadata"></param>
+        /// <param name="fields"></param>
         /// <returns></returns>
         ProfileView UpdateProfile(
             string appId,
             string profileId,
-            ProfessionalInfo ProfessionalInfo,
-            IDictionary<string, string> metadata);
+            ContactInfo contactInfo,
+            ProfessionalInfo professionalInfo,
+            IDictionary<string, string> metadata,
+            ProfileUpdateFields fields);
     }
 }
