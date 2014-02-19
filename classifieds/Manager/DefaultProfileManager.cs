@@ -165,7 +165,7 @@ namespace classy.Manager
 
             if (includeCollections)
             {
-                var collections = CollectionRepository.GetByProfileId(appId, profileId, CollectionType.PhotoBook);
+                var collections = CollectionRepository.GetByProfileId(appId, profileId);
                 profileView.Collections = collections.ToCollectionViewList();
                 foreach(var c in profileView.Collections)
                 {
