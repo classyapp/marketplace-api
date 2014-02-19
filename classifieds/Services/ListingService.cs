@@ -1088,7 +1088,8 @@ namespace classy.Services
             {
                 var collection = CollectionManager.GetCollectionsByProfileId(
                     request.Environment.AppId,
-                    request.ProfileId);
+                    request.ProfileId,
+                    request.CollectionType);
                 return new HttpResult(collection, HttpStatusCode.OK);
             }
             catch (KeyNotFoundException kex)

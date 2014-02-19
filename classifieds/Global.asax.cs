@@ -151,7 +151,7 @@ namespace classy
                     //.Add<RemovePermittedViewersFromCollection>("/collection/{CollectionId}/viewer", "DELETE") // remove view permissions
                     //.Add<UpdateCollection>("/collection/{CollectionId}", "PUT") // update collection details
                     .Add<GetCollectionById>("/collection/{CollectionId}", "GET") // get a collection by id
-                    .Add<GetCollectionByProfileId>("/profile/{ProfileId}/collection/list", "GET") // get a collection by id
+                    .Add<GetCollectionByProfileId>("/profile/{ProfileId}/collection/list/{CollectionType}", "GET") // get a collection by id
 
                     // Comments
                     .Add<PostComment>("/listing/{ListingId}/comment/new", "POST") // post new comment

@@ -27,7 +27,6 @@ namespace Classy.Models.Request
             When(x => string.IsNullOrEmpty(x.ListingId), () =>
             {
                 RuleFor(x => x.Title).NotEmpty();
-                RuleFor(x => x.Content).NotEmpty();
                 RuleFor(x => x.ListingType).NotEmpty();
                 When(x => x.ContactInfo != null, () =>
                 {

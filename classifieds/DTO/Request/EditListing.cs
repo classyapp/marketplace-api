@@ -9,15 +9,6 @@ namespace Classy.Models.Request
 {
     public class EditListing : PostListing
     {
-        public string ListingId { get; set; }
-        public string Title { get; set; }
-        public string Content { get; set; }
-        public string ListingType { get; set; }
-        public Location Location { get; set; }
-        public PricingInfo Pricing { get; set; }
-        public ContactInfo ContactInfo { get; set; }
-        public TimeslotSchedule SchedulingTemplate { get; set; }
-        public IDictionary<string, string> Metadata { get; set; }
     }
 
     public class EditListingValidator : PostListingValidator
@@ -27,7 +18,6 @@ namespace Classy.Models.Request
             When(x => string.IsNullOrEmpty(x.ListingId), () =>
             {
                 RuleFor(x => x.Title).NotEmpty();
-                RuleFor(x => x.Content).NotEmpty();
                 RuleFor(x => x.ListingType).NotEmpty();
                 When(x => x.ContactInfo != null, () =>
                 {
