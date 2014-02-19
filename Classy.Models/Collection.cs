@@ -6,6 +6,12 @@ using System.Threading.Tasks;
 
 namespace Classy.Models
 {
+    public static class CollectionType
+    {
+        public static readonly string PhotoBook = "PhotoBook";
+        public static readonly string Project = "Project";
+    }
+
     /// <summary>
     /// represents a collection of listings curated by a user, with the ability to collaborate with other users
     /// </summary>
@@ -78,3 +84,4 @@ namespace Classy.Models
         public IList<MediaThumbnail> Thumbnails { get; set; }
     }
 }
+

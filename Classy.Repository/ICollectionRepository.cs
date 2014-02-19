@@ -28,6 +28,13 @@ namespace Classy.Repository
         /// <returns></returns>
         IList<Collection> GetByProfileId(string appId, string profileId, string collectionType);
         /// <summary>
+        /// get a a list of the user's <see cref="Collection"/>s
+        /// </summary>
+        /// <param name="appId"></param>
+        /// <param name="profileId"></param>
+        /// <returns></returns>
+        IList<Collection> GetByProfileId(string appId, string profileId);
+        /// <summary>
         /// insert a new <see cref="Collection"/>
         /// </summary>
         /// <param name="collection"></param>
