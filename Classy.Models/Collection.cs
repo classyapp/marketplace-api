@@ -16,6 +16,10 @@ namespace Classy.Models
         /// </summary>
         public string ProfileId { get; set; }
         /// <summary>
+        /// Collection types: ideabook, project
+        /// </summary>
+        public string Type { get; set; }
+        /// <summary>
         /// the title of the collection
         /// </summary>
         public string Title { get; set; }

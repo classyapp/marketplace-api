@@ -938,6 +938,7 @@ namespace classy.Services
                 var collection = CollectionManager.CreateCollection(
                     request.Environment.AppId,
                     session.UserAuthId,
+                    request.Type,
                     request.Title,
                     request.Content,
                     request.IsPublic,

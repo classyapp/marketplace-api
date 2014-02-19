@@ -11,6 +11,7 @@ namespace Classy.Models.Request
     /// </summary>
     public class CreateCollection : BaseRequestDto
     {
+        public string Type { get; set; }
         public string Title { get; set; }
         public string Content { get; set; }
         public bool IsPublic { get; set; }
@@ -28,6 +29,7 @@ namespace Classy.Models.Request
     {
         public CreateCollectionValidator()
         {
+            RuleFor(x => x.Type).NotEmpty();
             RuleFor(x => x.Title).NotEmpty();
         }
     }
