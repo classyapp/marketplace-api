@@ -28,6 +28,7 @@ namespace classy.Manager
         CollectionView CreateCollection(
             string appId,
             string profileId,
+            string type,
             string title,
             string content,
             bool isPublic,

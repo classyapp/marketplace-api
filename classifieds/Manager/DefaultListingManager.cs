@@ -435,6 +435,7 @@ namespace classy.Manager
         public CollectionView CreateCollection(
             string appId,
             string profileId,
+            string type,
             string title,
             string content,
             bool isPublic,
@@ -449,6 +450,7 @@ namespace classy.Manager
                 {
                     AppId = appId,
                     ProfileId = profileId,
+                    Type = type,
                     Title = title,
                     Content = content,
                     IsPublic = isPublic,
@@ -458,9 +460,11 @@ namespace classy.Manager
                 };
 
                 // TODO: thumbnails should be created async and show a grid of recent items in the collection
-                var last = GetVerifiedListing(appId, includedListings.Last().Id);
-                collection.Thumbnails = last.ExternalMedia[0].Thumbnails;
-
+                if (includedListings.Count > 0)
+                {
+                    var last = GetVerifiedListing(appId, includedListings.Last().Id);
+                    collection.Thumbnails = last.ExternalMedia[0].Thumbnails;
+                }
                 CollectionRepository.Insert(collection);
 
                 // log an activity, and increase the counter for the listings that were included
