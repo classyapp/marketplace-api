@@ -7,6 +7,7 @@ using System.Linq;
 using System.Web;
 using ServiceStack.Common;
 using Classy.Auth;
+using Classy.Models.Request;
 
 namespace classy.Manager
 {
@@ -199,25 +200,29 @@ namespace classy.Manager
         public ProfileView UpdateProfile(
             string appId,
             string profileId,
-            ProfessionalInfo ProfessionalInfo,
-            IDictionary<string, string> metadata)
+            ContactInfo contactInfo,
+            ProfessionalInfo professionalInfo,
+            IDictionary<string, string> metadata,
+            ProfileUpdateFields fields)
         {
             var profile = GetVerifiedProfile(appId, profileId);
 
             // copy seller info
-            profile.ProfessionalInfo = ProfessionalInfo;
+            if (fields.HasFlag(ProfileUpdateFields.ProfessionalInfo)) profile.ProfessionalInfo = professionalInfo;
             // copy metadata 
-            if (profile.Metadata != null)
+            if (fields.HasFlag(ProfileUpdateFields.Metadata))
             {
-                if (metadata != null)
+                if (profile.Metadata != null)
                 {
                     foreach (var attribute in metadata)
                     {
                         profile.Metadata[attribute.Key] = attribute.Value;
                     }
                 }
+                else profile.Metadata = metadata;
             }
-            else profile.Metadata = metadata;
+            // copy contact info
+            if (fields.HasFlag(ProfileUpdateFields.ContactInfo)) profile.ContactInfo = contactInfo;
 
             ProfileRepository.Save(profile);
             return profile.ToProfileView();

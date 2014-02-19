@@ -440,8 +440,8 @@ namespace classy.Services
                     request.Environment.AppId,
                     session.UserAuthId,
                     session.UserAuthId,
-                    false,
-                    false,
+                    true,
+                    true,
                     false,
                     false,
                     false,
@@ -490,8 +490,10 @@ namespace classy.Services
                 var profile = ProfileManager.UpdateProfile(
                     request.Environment.AppId,
                     request.ProfileId,
+                    request.ContactInfo,
                     request.ProfessionalInfo,
-                    request.Metadata);
+                    request.Metadata,
+                    request.Fields);
 
                 return new HttpResult(profile, HttpStatusCode.OK);
             }
