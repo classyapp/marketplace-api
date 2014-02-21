@@ -38,53 +38,53 @@ namespace Classy.Auth
         {
             var tokens = this.Init(authService, ref session, request);
 
-            var authServer = new AuthorizationServerDescription { AuthorizationEndpoint = new Uri(this.AuthorizeUrl), TokenEndpoint = new Uri(this.AccessTokenUrl) };
-            var authClient = new WebServerClient(authServer, this.ConsumerKey)
-            {
-                ClientCredentialApplicator = ClientCredentialApplicator.PostParameter(this.ConsumerSecret),
-            };
+            //var authServer = new AuthorizationServerDescription { AuthorizationEndpoint = new Uri(this.AuthorizeUrl), TokenEndpoint = new Uri(this.AccessTokenUrl) };
+            //var authClient = new WebServerClient(authServer, this.ConsumerKey)
+            //{
+            //    ClientCredentialApplicator = ClientCredentialApplicator.PostParameter(this.ConsumerSecret),
+            //};
 
-            var authState = authClient.ProcessUserAuthorization();
-            if (authState == null)
-            {
-                try
-                {
-                    var authReq = authClient.PrepareRequestUserAuthorization(this.Scopes, new Uri(this.CallbackUrl));
-                    var authContentType = authReq.Headers[HttpHeaders.ContentType];
-                    var httpResult = new HttpResult(authReq.ResponseStream, authContentType) { StatusCode = authReq.Status, StatusDescription = "Moved Temporarily" };
-                    foreach (string header in authReq.Headers)
-                    {
-                        httpResult.Headers[header] = authReq.Headers[header];
-                    }
+            //var authState = authClient.ProcessUserAuthorization();
+            //if (authState == null)
+            //{
+            //    try
+            //    {
+            //        var authReq = authClient.PrepareRequestUserAuthorization(this.Scopes, new Uri(this.CallbackUrl));
+            //        var authContentType = authReq.Headers[HttpHeaders.ContentType];
+            //        var httpResult = new HttpResult(authReq.ResponseStream, authContentType) { StatusCode = authReq.Status, StatusDescription = "Moved Temporarily" };
+            //        foreach (string header in authReq.Headers)
+            //        {
+            //            httpResult.Headers[header] = authReq.Headers[header];
+            //        }
 
-                    foreach (string name in authReq.Cookies)
-                    {
-                        var cookie = authReq.Cookies[name];
+            //        foreach (string name in authReq.Cookies)
+            //        {
+            //            var cookie = authReq.Cookies[name];
 
-                        if (cookie != null)
-                        {
-                            httpResult.SetSessionCookie(name, cookie.Value, cookie.Path);
-                        }
-                    }
+            //            if (cookie != null)
+            //            {
+            //                httpResult.SetSessionCookie(name, cookie.Value, cookie.Path);
+            //            }
+            //        }
 
-                    authService.SaveSession(session, this.SessionExpiry);
-                    return httpResult;
-                }
-                catch (ProtocolException ex)
-                {
-                    Log.Error(string.Format("Failed to login to {0}", this.Provider), ex);
-                    return authService.Redirect(session.ReferrerUrl.AddHashParam("f", "Unknown"));
-                }
-            }
+            //        authService.SaveSession(session, this.SessionExpiry);
+            //        return httpResult;
+            //    }
+            //    catch (ProtocolException ex)
+            //    {
+            //        Log.Error(string.Format("Failed to login to {0}", this.Provider), ex);
+            //        return authService.Redirect(session.ReferrerUrl.AddHashParam("f", "Unknown"));
+            //    }
+            //}
 
-            var accessToken = authState.AccessToken;
+            var accessToken = request.oauth_token;
             if (accessToken != null)
             {
                 try
                 {
                     tokens.AccessToken = accessToken;
-                    tokens.RefreshToken = authState.RefreshToken;
-                    tokens.RefreshTokenExpiry = authState.AccessTokenExpirationUtc;
+                    //tokens.RefreshToken = authState.RefreshToken;
+                    //tokens.RefreshTokenExpiry = authState.AccessTokenExpirationUtc;
                     session.IsAuthenticated = true;
                     session.SetEnvironment(request.Environment);
                     var authInfo = this.CreateAuthInfo(accessToken);
