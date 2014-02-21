@@ -402,7 +402,7 @@ namespace classy.Manager
             var listing = GetVerifiedListing(appId, listingId);
 
             int count = 0;
-            TripleStore.DeleteActivity(appId, profileId, ActivityPredicate.FAVORITE_LISTING, listingId, ref count);
+            TripleStore.ResetActivity(appId, profileId, ActivityPredicate.FAVORITE_LISTING, listingId);
             if (count == 0)
             {
                 ListingRepository.IncreaseCounter(listingId, appId, ListingCounters.Favorites, -1);
