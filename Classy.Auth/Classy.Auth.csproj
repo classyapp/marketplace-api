@@ -151,7 +151,6 @@
     <Compile Include="AuthProvider.cs" />
     <Compile Include="AuthService.cs" />
     <Compile Include="BasicAuthProvider.cs" />
-    <Compile Include="ExtensionMethods.cs" />
     <Compile Include="GoogleOAuth2Provider.cs" />
     <Compile Include="OAuth2Provider.cs" />
     <Compile Include="SecureAppRequestBase.cs" />

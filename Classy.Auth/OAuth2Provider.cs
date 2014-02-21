@@ -10,7 +10,6 @@ using ServiceStack.Common.Web;
 using ServiceStack.Configuration;
 using ServiceStack.ServiceInterface;
 using ServiceStack.ServiceInterface.Auth;
-using Classy.Auth.Helpers;
 using ServiceStack.WebHost.Endpoints;
 
 namespace Classy.Auth

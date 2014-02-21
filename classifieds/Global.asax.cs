@@ -100,6 +100,7 @@ namespace classy
                         new Classy.Auth.IAuthProvider[] {
                         new Classy.Auth.CredentialsAuthProvider(),              //HTML Form post of UserName/Password credentials
                         new CustomFacebookAuthProvider(appSettings),    //Sign-in with Facebook
+                        new GoogleOAuth2Provider(appSettings),
                         //new DigestAuthProvider(appSettings),        //Sign-in with Digest Auth
                         new Classy.Auth.BasicAuthProvider()
                 }));
