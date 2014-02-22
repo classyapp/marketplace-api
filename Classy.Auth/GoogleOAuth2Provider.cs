@@ -89,15 +89,21 @@ namespace Classy.Auth
                     session.SetEnvironment(request.Environment);
                     var authInfo = this.CreateAuthInfo(accessToken);
                     this.OnAuthenticated(authService, session, tokens, authInfo);
-                    return authService.Redirect(session.ReferrerUrl.AddHashParam("s", "1"));
-                }
-                catch (WebException we)
-                {
-                    var statusCode = ((HttpWebResponse)we.Response).StatusCode;
-                    if (statusCode == HttpStatusCode.BadRequest)
+
+                    return new AuthResponse
                     {
-                        return authService.Redirect(session.ReferrerUrl.AddHashParam("f", "AccessTokenFailed"));
-                    }
+                        UserName = session.UserName,
+                        SessionId = session.Id,
+                        ReferrerUrl = session.ReferrerUrl
+                    };
+                }
+                catch (WebException ex)
+                {
+                    throw;
+                }
+                catch (Exception ex)
+                {
+                    throw;
                 }
             }
 
