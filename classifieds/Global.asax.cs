@@ -188,6 +188,7 @@ namespace classy
                     .Add<RejectProxyClaim>("/profile/{ClaimId}/reject", "POST")
                     .Add<CreateProfileProxy>("/profile/new", "POST")
                     .Add<SearchProfiles>("/profile/search", ApplyTo.Get | ApplyTo.Post)
+                    .Add<GetFacebookAlbums>("/profile/social/facebook/albums", ApplyTo.Get)
 
                     // Reviews
                     .Add<PostReviewForListing>("/listing/{ListingId}/reviews/new", "POST")

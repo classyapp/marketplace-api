@@ -30,6 +30,7 @@ namespace Classy.Models.Response
         public bool IsProfessional { get; set; }
         public bool IsVendor { get; set; }
         public bool IsProxy { get; set; }
+        public bool IsFacebookConnected { get; set; }
         public ProfessionalInfoView ProfessionalInfo { get; set; }
         public int Rank { get; set; }
         public IList<string> FolloweeProfileIds { get; set; }

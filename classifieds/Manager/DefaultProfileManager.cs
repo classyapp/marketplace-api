@@ -8,6 +8,8 @@ using System.Web;
 using ServiceStack.Common;
 using Classy.Auth;
 using Classy.Models.Request;
+using ServiceStack.Text;
+using ServiceStack.ServiceClient.Web;
 
 namespace classy.Manager
 {
@@ -448,6 +450,43 @@ namespace classy.Manager
             var revieweeProfile = GetVerifiedProfile(appId, revieweeProfileId);
             var reviews = ReviewRepository.GetByRevieweeProfileId(appId, revieweeProfileId, includeDrafts, includeOnlyDrafts);
             return reviews.TranslateTo<List<ReviewView>>();
+        }
+
+        public IList<SocialPhotoAlbumView> GetFacebookAlbums(
+            string appId, 
+            string profileId,
+            string token)
+        {
+            var profile = GetVerifiedProfile(appId, profileId);
+            profile.FacebookUserId.ThrowIfNullOrEmpty("this profile is not connected to facebook");
+
+            var url = "https://graph.facebook.com/me/albums?access_token={0}&fields=id,name,count,photos".Fmt(token);
+            var albums = url.GetStringFromUrl();
+            var albumsObj = Newtonsoft.Json.JsonConvert.DeserializeObject<dynamic>(albums);
+            var albumList = new List<SocialPhotoAlbumView>();
+            foreach(dynamic a in albumsObj["data"])
+            {
+                var album = new SocialPhotoAlbumView
+                {
+                    Id = a["id"],
+                    Name = a["name"],
+                    PhotoCount = a["count"]
+                };
+                if (a["photos"] != null)
+                {
+                    album.Photos = new List<SocialPhotoView>();
+                    foreach (var p in a["photos"]["data"])
+                    {
+                        album.Photos.Add(new SocialPhotoView
+                        {
+                            Id = p["id"],
+                            Url = p["source"]
+                        });
+                    }
+                }
+                albumList.Add(album);
+            }
+            return albumList;
         }
 
         /// <summary>

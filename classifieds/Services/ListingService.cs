@@ -1128,6 +1128,8 @@ namespace classy.Services
         //
         // POST: /resource/{Key}
         // set resource values
+        [CustomAuthenticate]
+        [RequiredPermission("cms")]
         public object Post(SetResourceValues request)
         {
             var resource = LocalizationManager.SetResourceValues(request.Environment.AppId, request.Key, request.Values);
@@ -1137,10 +1139,24 @@ namespace classy.Services
         //
         // POST: /resource/list/{Key}
         // set resource values
+        [CustomAuthenticate]
+        [RequiredPermission("cms")]
         public object Post(SetResourceListValues request)
         {
             var listResource = LocalizationManager.SetListResourceValues(request.Environment.AppId, request.Key, request.ListItems);
             return new HttpResult(listResource, HttpStatusCode.OK);
+        }
+
+        //
+        //GET: /profile/facebook/friends
+        // get a list of the user's facebook friends
+        [CustomAuthenticate]
+        public object Get(GetFacebookAlbums request)
+        {
+            var session = SessionAs<CustomUserSession>();
+            var token = session.ProviderOAuthAccess.SingleOrDefault(x => x.Provider == "facebook").AccessToken;
+            var albums = ProfileManager.GetFacebookAlbums(request.Environment.AppId, session.UserAuthId, token);            
+            return new HttpResult(albums, HttpStatusCode.OK);
         }
     }
 }

@@ -22,6 +22,7 @@ namespace classy
                 to.IsVendor = from.IsVendor;
                 to.IsProfessional = from.IsProfessional;
                 to.ProfessionalInfo = from.ProfessionalInfo.ToSellerView();
+                to.IsFacebookConnected = !from.FacebookUserId.IsNullOrEmpty();
             }
             //proxy
             to.IsProxy = from.IsProxy;
