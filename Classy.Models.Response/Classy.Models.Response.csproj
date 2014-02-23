@@ -56,6 +56,7 @@
     <Compile Include="CollectionView.cs" />
     <Compile Include="CommentView.cs" />
     <Compile Include="ContactInfoView.cs" />
+    <Compile Include="SocialPhotoAlbumView.cs" />
     <Compile Include="IncludedListingView.cs" />
     <Compile Include="Listing.cs" />
     <Compile Include="ListingView.cs" />
@@ -74,6 +75,7 @@
     <Compile Include="ReviewView.cs" />
     <Compile Include="ProfessionalInfoView.cs" />
     <Compile Include="SearchResultsView.cs" />
+    <Compile Include="SocialPhotoView.cs" />
     <Compile Include="SubTransactionView.cs" />
     <Compile Include="TimeslotScheduleView.cs" />
     <Compile Include="TripleView.cs" />

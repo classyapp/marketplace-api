@@ -55,6 +55,9 @@ namespace Classy.Auth
                     profile.ContactInfo.Email = authToken.Email;
                     if (isNew)
                     {
+
+                        profile.FacebookUserId = authToken.UserId;
+                        profile.FacebookUserName = authToken.UserName;
                         profile.UserName = authToken.UserName;
                         profile.ImageUrl = SaveFileFromUrl(storage, string.Concat("profile_img_", session.UserAuthId),  
                             string.Format("http://graph.facebook.com/{0}/picture?type=large", authToken.UserName));

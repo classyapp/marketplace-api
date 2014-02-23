@@ -138,5 +138,17 @@ namespace classy.Manager
             ProfessionalInfo professionalInfo,
             IDictionary<string, string> metadata,
             ProfileUpdateFields fields);
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="appId"></param>
+        /// <param name="profileId"></param>
+        /// <param name="token"></param>
+        /// <returns></returns>
+        IList<SocialPhotoAlbumView> GetFacebookAlbums(
+            string appId,
+            string profileId,
+            string token);
     }
 }
