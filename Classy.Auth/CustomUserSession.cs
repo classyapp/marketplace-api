@@ -86,6 +86,7 @@ namespace Classy.Auth
             }
 
             //
+            profile.Permissions = session.Permissions;
             repo.Save(profile);
         }
 

@@ -42,6 +42,7 @@ namespace Classy.Models
         public IList<string> FolloweeProfileIds { get; set; }
         public IDictionary<string, string> Metadata { get; set; }
         public ProfessionalInfo ProfessionalInfo { get; set; }
+        public IList<string> Permissions { get; set; }
 
         //
         public bool IsProfessional {

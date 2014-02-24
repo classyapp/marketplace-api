@@ -41,5 +41,6 @@ namespace Classy.Models.Response
         public IList<CollectionView> Collections { get; set; }
         public IList<string> FavoriteListingIds { get; set; }
         public IDictionary<string, string> Metadata { get; set; }
+        public IList<string> Permissions { get; set; }
     }
 }
