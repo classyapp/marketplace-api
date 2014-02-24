@@ -189,6 +189,7 @@ namespace classy
                     .Add<RejectProxyClaim>("/profile/{ClaimId}/reject", "POST")
                     .Add<CreateProfileProxy>("/profile/new", "POST")
                     .Add<SearchProfiles>("/profile/search", ApplyTo.Get | ApplyTo.Post)
+                    .Add<GetGoogleContacts>("/profile/social/google/contacts", ApplyTo.Get)
 
                     // Reviews
                     .Add<PostReviewForListing>("/listing/{ListingId}/reviews/new", "POST")

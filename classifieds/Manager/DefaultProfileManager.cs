@@ -8,6 +8,11 @@ using System.Web;
 using ServiceStack.Common;
 using Classy.Auth;
 using Classy.Models.Request;
+using ServiceStack.Text;
+using ServiceStack.ServiceClient.Web;
+using System.IO;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 
 namespace classy.Manager
 {
@@ -448,6 +453,47 @@ namespace classy.Manager
             var revieweeProfile = GetVerifiedProfile(appId, revieweeProfileId);
             var reviews = ReviewRepository.GetByRevieweeProfileId(appId, revieweeProfileId, includeDrafts, includeOnlyDrafts);
             return reviews.TranslateTo<List<ReviewView>>();
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="appId"></param>
+        /// <param name="profileId"></param>
+        /// <param name="token"></param>
+        /// <returns></returns>
+        public IOrderedEnumerable<GoogleContact> GetGoogleContacts(string appId, string profileId, string token)
+        {
+            try
+            {
+                IList<GoogleContact> contacts = new List<GoogleContact>();
+
+                var profile = GetVerifiedProfile(appId, profileId);
+                var url = string.Format("https://www.google.com/m8/feeds/contacts/default/full?access_token={0}&max-results=1000&alt=json", token);
+
+                var contactsJson = url.GetStringFromUrl();
+                JObject data = (JObject)JsonConvert.DeserializeObject(contactsJson);
+                foreach (var entry in data["feed"]["entry"])
+                {
+                    var photoLink = entry["link"].FirstOrDefault(l => l.Value<string>("rel") == "http://schemas.google.com/contacts/2008/rel#photo");
+                    if (entry["gd$email"] != null)
+                    {
+                        contacts.Add(new GoogleContact
+                        {
+                            Email = entry["gd$email"][0].Value<string>("address"),
+                            Name = entry["title"].Value<string>("$t"),
+                            ImageUrl = photoLink == null ? null : string.Format("{0}?access_token={1}", photoLink.Value<string>("href"), token)
+                        });
+                    }
+                }
+
+
+                return contacts.OrderBy(c => c.Name);
+            }
+            catch (Exception ex)
+            {
+                return null;
+            }
         }
 
         /// <summary>

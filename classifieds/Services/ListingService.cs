@@ -1142,5 +1142,23 @@ namespace classy.Services
             var listResource = LocalizationManager.SetListResourceValues(request.Environment.AppId, request.Key, request.ListItems);
             return new HttpResult(listResource, HttpStatusCode.OK);
         }
+
+        //
+        //GET: /profile/google/contacts
+        // get a list of the user's facebook friends
+        [CustomAuthenticate]
+        public object Get(GetGoogleContacts request)
+        {
+            var session = SessionAs<CustomUserSession>();
+            var token = session.ProviderOAuthAccess.SingleOrDefault(x => x.Provider == "GoogleOAuth");
+            if (token != null)
+            {
+                var contacts = ProfileManager.GetGoogleContacts(request.Environment.AppId, session.UserAuthId, token.AccessToken);
+                return new HttpResult(contacts, HttpStatusCode.OK);
+            }
+            return new HttpResult(null, HttpStatusCode.OK);
+            
+        }
+
     }
 }
