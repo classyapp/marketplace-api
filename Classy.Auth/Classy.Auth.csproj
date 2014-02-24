@@ -76,6 +76,7 @@
     <Compile Include="AuthProvider.cs" />
     <Compile Include="AuthService.cs" />
     <Compile Include="BasicAuthProvider.cs" />
+    <Compile Include="CustomRequiredPermissionAttribute.cs" />
     <Compile Include="SecureAppRequestBase.cs" />
     <Compile Include="CredentialsAuthProvider.cs" />
     <Compile Include="CustomAuthenticateAttribute.cs" />

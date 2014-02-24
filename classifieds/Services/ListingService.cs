@@ -1129,7 +1129,7 @@ namespace classy.Services
         // POST: /resource/{Key}
         // set resource values
         [CustomAuthenticate]
-        [RequiredPermission("cms")]
+        [CustomRequiredPermission("cms")]
         public object Post(SetResourceValues request)
         {
             var resource = LocalizationManager.SetResourceValues(request.Environment.AppId, request.Key, request.Values);
