@@ -464,12 +464,12 @@ namespace classy.Manager
         /// <param name="profileId"></param>
         /// <param name="token"></param>
         /// <returns></returns>
-        public IEnumerable<GoogleContact> GetGoogleContacts(string appId, string profileId, string token)
+        public IEnumerable<EmailContact> GetGoogleContacts(string appId, string profileId, string token)
         {
             try
             {
-                IList<GoogleContact> contacts = new List<GoogleContact>();
-                IList<GoogleContact> noNameContacts = new List<GoogleContact>();
+                IList<EmailContact> contacts = new List<EmailContact>();
+                IList<EmailContact> noNameContacts = new List<EmailContact>();
 
                 var profile = GetVerifiedProfile(appId, profileId);
                 var url = string.Format("https://www.google.com/m8/feeds/contacts/default/full?access_token={0}&max-results=1000&alt=json", token);
@@ -483,27 +483,27 @@ namespace classy.Manager
                     {
                         if (!string.IsNullOrEmpty(entry["title"].Value<string>("$t")))
                         {
-                            contacts.Add(new GoogleContact
+                            contacts.Add(new EmailContact
                             {
                                 Email = entry["gd$email"][0].Value<string>("address"),
-                                Name = entry["title"].Value<string>("$t"),
-                                ImageUrl = photoLink == null ? null : string.Format("{0}?access_token={1}", photoLink.Value<string>("href"), token)
+                                Name = entry["title"].Value<string>("$t")
+                                //ImageUrl = photoLink == null ? null : string.Format("{0}?access_token={1}", photoLink.Value<string>("href"), token)
                             });
                         }
                         else
                         {
-                            noNameContacts.Add(new GoogleContact
+                            noNameContacts.Add(new EmailContact
                             {
                                 Email = entry["gd$email"][0].Value<string>("address"),
-                                Name = string.Empty,
-                                ImageUrl = photoLink == null ? null : string.Format("{0}?access_token={1}", photoLink.Value<string>("href"), token)
+                                Name = string.Empty
+                                //ImageUrl = photoLink == null ? null : string.Format("{0}?access_token={1}", photoLink.Value<string>("href"), token)
                             });
                         }
                     }
                 }
 
 
-                List<GoogleContact> result = new List<GoogleContact>(contacts.OrderBy(c => c.Name));
+                List<EmailContact> result = new List<EmailContact>(contacts.OrderBy(c => c.Name));
                 result.AddRange(noNameContacts);
                 return result;
             }

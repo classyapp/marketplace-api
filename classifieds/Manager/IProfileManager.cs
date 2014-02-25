@@ -146,6 +146,6 @@ namespace classy.Manager
         /// <param name="profileId"></param>
         /// <param name="token"></param>
         /// <returns></returns>
-        IEnumerable<GoogleContact> GetGoogleContacts(string appId, string profileId, string token);
+        IEnumerable<EmailContact> GetGoogleContacts(string appId, string profileId, string token);
     }
 }

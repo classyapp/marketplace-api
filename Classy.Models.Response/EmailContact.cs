@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Classy.Models.Response
 {
-    public class GoogleContact
+    public class EmailContact
     {
         public string Name { get; set; }
         public string Email { get; set; }
