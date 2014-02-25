@@ -88,7 +88,7 @@ namespace classy.Manager
             long count = 0;
             var profileList = ProfileRepository.Search(appId, partialUserName, category, location, metadata, professionalsOnly, page, pageSize, ref count);
             IList<ProfileView> results = new List<ProfileView>();
-            foreach(var profile in profileList)
+            foreach (var profile in profileList)
             {
                 results.Add(profile.ToProfileView());
             }
@@ -105,7 +105,7 @@ namespace classy.Manager
             if (followee == null) throw new KeyNotFoundException("invalid username");
 
             // save triple
-            int count = 0; 
+            int count = 0;
             TripleStore.LogActivity(appId, follower.Id, ActivityPredicate.FOLLOW_PROFILE, followee.Id, ref count);
             if (count == 1)
             {
@@ -136,7 +136,7 @@ namespace classy.Manager
 
             var profileView = profile.ToProfileView();
 
-            if (includeFollowedByProfiles) 
+            if (includeFollowedByProfiles)
             {
                 var profileIds = TripleStore.GetActivitySubjectList(appId, ActivityPredicate.FOLLOW_PROFILE, profileId);
                 var followedby = ProfileRepository.GetByIds(appId, profileIds.ToArray());
@@ -172,7 +172,7 @@ namespace classy.Manager
             {
                 var collections = CollectionRepository.GetByProfileId(appId, profileId);
                 profileView.Collections = collections.ToCollectionViewList();
-                foreach(var c in profileView.Collections)
+                foreach (var c in profileView.Collections)
                 {
                     if (c.IncludedListings != null)
                     {
@@ -243,7 +243,8 @@ namespace classy.Manager
             var proxyProfile = GetVerifiedProfile(appId, proxyProfileId);
             if (!proxyProfile.IsProxy) throw new ApplicationException("can't claim. not a proxy.");
 
-            var claim = new ProxyClaim {
+            var claim = new ProxyClaim
+            {
                 AppId = appId,
                 ProfileId = profileId,
                 ProxyProfileId = proxyProfileId,
@@ -263,7 +264,7 @@ namespace classy.Manager
 
         // TODO: make sure only admins can do this
         public ProxyClaimView ApproveProxyClaim(
-            string appId, 
+            string appId,
             string claimId)
         {
             var claim = ProfileRepository.GetProxyClaimById(appId, claimId);
@@ -274,7 +275,8 @@ namespace classy.Manager
             // copy seller info from proxy to profile
             profile.ProfessionalInfo = claim.ProfessionalInfo;
             // copy metadata from proxy to profile
-            if (profile.Metadata != null) {
+            if (profile.Metadata != null)
+            {
                 if (claim.Metadata != null)
                 {
                     foreach (var attribute in claim.Metadata)
@@ -301,7 +303,7 @@ namespace classy.Manager
 
         // TODO: make sure only admins can do this
         public ProxyClaimView RejectProxyClaim(
-            string appId, 
+            string appId,
             string claimId)
         {
             var claim = ProfileRepository.GetProxyClaimById(appId, claimId);
@@ -351,7 +353,7 @@ namespace classy.Manager
             // TODO : does this eve belog here? what about sub criteria for listings? for each listing type? aaaarghhh!!!
             revieweeProfile.ReviewAverageScore =
                 ((revieweeProfile.ReviewAverageScore * revieweeProfile.ReviewCount) + score) / (++revieweeProfile.ReviewCount);
-           
+
             ProfileRepository.Save(revieweeProfile);
 
             // return
@@ -462,11 +464,12 @@ namespace classy.Manager
         /// <param name="profileId"></param>
         /// <param name="token"></param>
         /// <returns></returns>
-        public IOrderedEnumerable<GoogleContact> GetGoogleContacts(string appId, string profileId, string token)
+        public IEnumerable<GoogleContact> GetGoogleContacts(string appId, string profileId, string token)
         {
             try
             {
                 IList<GoogleContact> contacts = new List<GoogleContact>();
+                IList<GoogleContact> noNameContacts = new List<GoogleContact>();
 
                 var profile = GetVerifiedProfile(appId, profileId);
                 var url = string.Format("https://www.google.com/m8/feeds/contacts/default/full?access_token={0}&max-results=1000&alt=json", token);
@@ -478,17 +481,31 @@ namespace classy.Manager
                     var photoLink = entry["link"].FirstOrDefault(l => l.Value<string>("rel") == "http://schemas.google.com/contacts/2008/rel#photo");
                     if (entry["gd$email"] != null)
                     {
-                        contacts.Add(new GoogleContact
+                        if (!string.IsNullOrEmpty(entry["title"].Value<string>("$t")))
                         {
-                            Email = entry["gd$email"][0].Value<string>("address"),
-                            Name = entry["title"].Value<string>("$t"),
-                            ImageUrl = photoLink == null ? null : string.Format("{0}?access_token={1}", photoLink.Value<string>("href"), token)
-                        });
+                            contacts.Add(new GoogleContact
+                            {
+                                Email = entry["gd$email"][0].Value<string>("address"),
+                                Name = entry["title"].Value<string>("$t"),
+                                ImageUrl = photoLink == null ? null : string.Format("{0}?access_token={1}", photoLink.Value<string>("href"), token)
+                            });
+                        }
+                        else
+                        {
+                            noNameContacts.Add(new GoogleContact
+                            {
+                                Email = entry["gd$email"][0].Value<string>("address"),
+                                Name = string.Empty,
+                                ImageUrl = photoLink == null ? null : string.Format("{0}?access_token={1}", photoLink.Value<string>("href"), token)
+                            });
+                        }
                     }
                 }
 
 
-                return contacts.OrderBy(c => c.Name);
+                List<GoogleContact> result = new List<GoogleContact>(contacts.OrderBy(c => c.Name));
+                result.AddRange(noNameContacts);
+                return result;
             }
             catch (Exception ex)
             {
