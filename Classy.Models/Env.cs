@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 
 namespace Classy.Models
 {
@@ -35,5 +37,21 @@ namespace Classy.Models
         /// The 2-char ISO country code. Defaults to "US".
         /// </summary>
         public string CountryCode { get; set; }
+        /// <summary>
+        /// string containging json object for latitude and longitude
+        /// </summary>
+        public string GPSCoordinates { get; set; }
+
+        private Location location;
+
+        public Location GetDefaultLocation()
+        {
+            if (location == null)
+            {
+                JToken token = (JToken)JsonConvert.DeserializeObject(GPSCoordinates);
+                location = new Location { Longitude = token.Value<double>("longitude"), Latitude = token.Value<double>("latitude"), Address = new PhysicalAddress() { Country = CountryCode } };
+            }
+            return location;
+        }
     }
 }

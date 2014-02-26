@@ -127,8 +127,8 @@ namespace Classy.Repository
             }
             if (location != null)
             {
-                //ProfilesCollection.EnsureIndex(IndexKeys.GeoSpatial("merchant location"));
-                //queries.Add(Query<Profile>.Near(x => x.ContactInfo.Location, location.Longitude, location.Latitude, 1 / 111.12, true));
+                ProfilesCollection.EnsureIndex(IndexKeys.GeoSpatial("merchant location"));
+                queries.Add(Query<Profile>.Near(x => x.ContactInfo.Location, location.Longitude.Value, location.Latitude.Value, 1 / 111.12, true));
             }
 
             var query = Query.And(queries);

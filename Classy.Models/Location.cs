@@ -9,8 +9,8 @@ namespace Classy.Models
 {
     public class Location
     {
-        public double Longitude { get; set; }
-        public double Latitude { get; set; }
+        public double? Longitude { get; set; }
+        public double? Latitude { get; set; }
         public PhysicalAddress Address { get; set; }
     }
 
@@ -18,12 +18,8 @@ namespace Classy.Models
     {
         public LocationValidator()
         {
-            RuleFor(x => x.Longitude)
-                .GreaterThan(0)
-                .WithErrorCode("Missing Lognitude");
-            RuleFor(x => x.Latitude)
-                .GreaterThan(0)
-                .WithErrorCode("Missing Latitude");
+            RuleFor(x => x.Longitude).NotNull();
+            RuleFor(x => x.Latitude).NotNull();
         }
     }
 }
