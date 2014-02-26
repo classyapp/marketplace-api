@@ -1158,5 +1158,21 @@ namespace classy.Services
             var albums = ProfileManager.GetFacebookAlbums(request.Environment.AppId, session.UserAuthId, token);            
             return new HttpResult(albums, HttpStatusCode.OK);
         }
+        //GET: /profile/google/contacts
+        // get a list of the user's facebook friends
+        [CustomAuthenticate]
+        public object Get(GetGoogleContacts request)
+        {
+            var session = SessionAs<CustomUserSession>();
+            var token = session.ProviderOAuthAccess.SingleOrDefault(x => x.Provider == "GoogleOAuth");
+            if (token != null)
+            {
+                var contacts = ProfileManager.GetGoogleContacts(request.Environment.AppId, session.UserAuthId, token.AccessToken);
+                return new HttpResult(contacts, HttpStatusCode.OK);
+            }
+            return new HttpResult(null, HttpStatusCode.OK);
+            
+        }
+
     }
 }

@@ -43,6 +43,9 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\packages\AWSSDK.2.0.4.1\lib\net45\AWSSDK.dll</HintPath>
     </Reference>
+    <Reference Include="DotNetOpenAuth">
+      <HintPath>..\packages\DotNetOpenAuth.Ultimate.4.3.4.13329\lib\net45-full\DotNetOpenAuth.dll</HintPath>
+    </Reference>
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="MongoDB.Bson">
       <HintPath>..\lib\MongoDB.Bson.dll</HintPath>
@@ -53,6 +56,9 @@
     <Reference Include="Newtonsoft.Json, Version=4.5.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\lib\Newtonsoft.Json.dll</HintPath>
+    <Reference Include="Newtonsoft.Json, Version=6.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\packages\Newtonsoft.Json.6.0.1\lib\net45\Newtonsoft.Json.dll</HintPath>
     </Reference>
     <Reference Include="ServiceStack">
       <HintPath>..\lib\ServiceStack.dll</HintPath>
@@ -109,6 +115,7 @@
     <Compile Include="DTO\Request\EditListing.cs" />
     <Compile Include="DTO\Request\GetAppSettings.cs" />
     <Compile Include="DTO\Request\GetFacebookAlbums.cs" />
+    <Compile Include="DTO\Request\GetGoogleContacts.cs" />
     <Compile Include="DTO\Request\GetListResourceByKey.cs" />
     <Compile Include="DTO\Request\GetResourceKeysForApp.cs" />
     <Compile Include="DTO\Request\RemoveListingFromCollection.cs" />

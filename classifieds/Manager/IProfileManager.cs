@@ -150,5 +150,14 @@ namespace classy.Manager
             string appId,
             string profileId,
             string token);
+
+		/// <summary>
+        /// 
+        /// </summary>
+        /// <param name="appId"></param>
+        /// <param name="profileId"></param>
+        /// <param name="token"></param>
+        /// <returns></returns>
+        IEnumerable<EmailContact> GetGoogleContacts(string appId, string profileId, string token);
     }
 }
