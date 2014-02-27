@@ -128,6 +128,7 @@ namespace Classy.Repository
             if (location != null)
             {
                 ProfilesCollection.EnsureIndex(IndexKeys.GeoSpatial("merchant location"));
+                //ProfilesCollection.EnsureIndex(IndexKeys.GeoSpatialSpherical("merchant location sphere"));
                 queries.Add(Query<Profile>.Near(x => x.ContactInfo.Location, location.Longitude.Value, location.Latitude.Value, 1 / 111.12, true));
             }
 

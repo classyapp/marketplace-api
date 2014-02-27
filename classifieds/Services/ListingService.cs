@@ -133,7 +133,7 @@ namespace classy.Services
                 request.Content,
                 request.ListingType,
                 request.Pricing,
-                request.ContactInfo,
+                request.ContactInfo ?? session.GetDefaultContactInfo(),
                 request.SchedulingTemplate,
                 request.Metadata);
 
@@ -228,7 +228,7 @@ namespace classy.Services
                     request.Content,
                     null,
                     request.Pricing,
-                    request.ContactInfo,
+                    request.ContactInfo ?? session.GetDefaultContactInfo(),
                     request.SchedulingTemplate,
                     request.Metadata);
 
@@ -490,7 +490,7 @@ namespace classy.Services
                 var profile = ProfileManager.UpdateProfile(
                     request.Environment.AppId,
                     request.ProfileId,
-                    request.ContactInfo,
+                    request.ContactInfo ?? session.GetDefaultContactInfo(),
                     request.ProfessionalInfo,
                     request.Metadata,
                     request.Fields);
