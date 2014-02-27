@@ -22,6 +22,7 @@ namespace Classy.Models.Request
         public ProfessionalInfo ProfessionalInfo { get; set; }
         public ContactInfo ContactInfo { get; set; }
         public ProfileUpdateFields Fields { get; set; }
+        public string Password { get; set; }
     }
 
     public class UpdateProfileValidator : AbstractValidator<UpdateProfile>
@@ -50,6 +51,11 @@ namespace Classy.Models.Request
             When(x => x.Fields.HasFlag(ProfileUpdateFields.ContactInfo), () =>
             {
                 RuleFor(x => x.ContactInfo).NotNull();
+            });
+
+            When(x => x.Fields.HasFlag(ProfileUpdateFields.SetPassword), () =>
+            {
+                RuleFor(x => x.Password).NotNull();
             });
         }
     }
