@@ -487,6 +487,13 @@ namespace classy.Services
 
                 if (session.UserAuthId != request.ProfileId) throw new UnauthorizedAccessException("not yours to update");
 
+                if (request.Fields.HasFlag(ProfileUpdateFields.SetPassword))
+                {
+                    IUserAuthRepository authRepository = GetAppHost().TryResolve<IUserAuthRepository>();
+                    UserAuth userAuth = authRepository.GetUserAuth(request.Environment.AppId, session.UserAuthId);
+                    authRepository.UpdateUserAuth(userAuth, userAuth, request.Password);
+                }
+
                 var profile = ProfileManager.UpdateProfile(
                     request.Environment.AppId,
                     request.ProfileId,
