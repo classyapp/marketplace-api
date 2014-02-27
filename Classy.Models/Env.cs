@@ -38,9 +38,9 @@ namespace Classy.Models
         /// </summary>
         public string CountryCode { get; set; }
         /// <summary>
-        /// string containging json object for latitude and longitude
+        /// latitude and longitude
         /// </summary>
-        public string GPSCoordinates { get; set; }
+        public GPSLocation GPSCoordinates { get; set; }
 
         private Location location;
 
@@ -48,8 +48,7 @@ namespace Classy.Models
         {
             if (location == null)
             {
-                JToken token = (JToken)JsonConvert.DeserializeObject(GPSCoordinates);
-                location = new Location { Longitude = token.Value<double>("longitude"), Latitude = token.Value<double>("latitude"), Address = new PhysicalAddress() { Country = CountryCode } };
+                location = new Location { Longitude = GPSCoordinates.Longitude, Latitude = GPSCoordinates.Latitude, Address = new PhysicalAddress() { Country = CountryCode } };
             }
             return location;
         }
