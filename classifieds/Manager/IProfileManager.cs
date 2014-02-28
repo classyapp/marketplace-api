@@ -137,7 +137,8 @@ namespace classy.Manager
             ContactInfo contactInfo,
             ProfessionalInfo professionalInfo,
             IDictionary<string, string> metadata,
-            ProfileUpdateFields fields);
+            ProfileUpdateFields fields,
+            string imageUrl);
 
         /// <summary>
         /// 

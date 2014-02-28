@@ -208,7 +208,8 @@ namespace classy.Manager
             ContactInfo contactInfo,
             ProfessionalInfo professionalInfo,
             IDictionary<string, string> metadata,
-            ProfileUpdateFields fields)
+            ProfileUpdateFields fields,
+            string imageUrl)
         {
             var profile = GetVerifiedProfile(appId, profileId);
 
@@ -228,6 +229,13 @@ namespace classy.Manager
             }
             // copy contact info
             if (fields.HasFlag(ProfileUpdateFields.ContactInfo)) profile.ContactInfo = contactInfo;
+
+            // image 
+            if (fields.HasFlag(ProfileUpdateFields.ProfileImage))
+            {
+                profile.ImageUrl = imageUrl;
+                profile.ThumbnailUrl = imageUrl;
+            }
 
             ProfileRepository.Save(profile);
             return profile.ToProfileView();

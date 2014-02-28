@@ -485,6 +485,8 @@ namespace classy.Services
             {
                 var session = SessionAs<CustomUserSession>();
 
+                string imageUrl = null;
+
                 if (session.UserAuthId != request.ProfileId) throw new UnauthorizedAccessException("not yours to update");
 
                 if (request.Fields.HasFlag(ProfileUpdateFields.SetPassword))
@@ -494,13 +496,32 @@ namespace classy.Services
                     authRepository.UpdateUserAuth(userAuth, userAuth, request.Password);
                 }
 
+                if (request.Fields.HasFlag(ProfileUpdateFields.ProfileImage) && Request.Files.Length == 1)
+                {
+                    var currProfile = ProfileManager.GetProfileById(request.Environment.AppId, request.ProfileId, session.UserAuthId, false, false, false, false, false, false, false);
+                    var storage = GetAppHost().TryResolve<IStorageRepository>();
+                    // delete exisintg images
+                    Uri uri = new Uri(currProfile.ImageUrl);
+                    storage.DeleteFile(uri.AbsolutePath.Trim('/'));
+                    uri = new Uri(currProfile.ThumbnailUrl);
+                    storage.DeleteFile(uri.AbsolutePath.Trim('/'));
+
+                    // upload the new one
+                    byte[] image = new byte[Request.Files[0].InputStream.Length];
+                    Request.Files[0].InputStream.Read(image, 0, image.Length);
+                    string key = string.Concat("profile_img_", Guid.NewGuid().ToString());
+                    storage.SaveFile(key, image, Request.Files[0].ContentType);
+                    imageUrl = storage.KeyToUrl(key);
+                }
+
                 var profile = ProfileManager.UpdateProfile(
                     request.Environment.AppId,
                     request.ProfileId,
                     request.ContactInfo,
                     request.ProfessionalInfo,
                     request.Metadata,
-                    request.Fields);
+                    request.Fields,
+                    imageUrl);
 
                 return new HttpResult(profile, HttpStatusCode.OK);
             }
