@@ -213,7 +213,12 @@ namespace classy.Manager
             var profile = GetVerifiedProfile(appId, profileId);
 
             // copy seller info
-            if (fields.HasFlag(ProfileUpdateFields.ProfessionalInfo)) profile.ProfessionalInfo = professionalInfo;
+            if (fields.HasFlag(ProfileUpdateFields.ProfessionalInfo))
+            {
+                profile.ProfessionalInfo = professionalInfo;
+                TryGeocoding(profile.ProfessionalInfo);
+            }
+
             // copy metadata 
             if (fields.HasFlag(ProfileUpdateFields.Metadata))
             {
@@ -552,6 +557,19 @@ namespace classy.Manager
             if (review == null) throw new KeyNotFoundException("invalid review");
             if (review.RevieweeProfileId != profileId) throw new UnauthorizedAccessException("unauthorized");
             return review;
+        }
+
+        private void TryGeocoding(ProfessionalInfo professionalInfo)
+        {
+            if (professionalInfo.CompanyContactInfo != null &&
+                professionalInfo.CompanyContactInfo.Location != null &&
+                //!professionalInfo.CompanyContactInfo.Location.Longitude.HasValue && // Comes with 0, 0
+                professionalInfo.CompanyContactInfo.Location.Address != null)
+            {
+                // Do geocoding!!!
+                professionalInfo.CompanyContactInfo.Location.Longitude = 0;
+                professionalInfo.CompanyContactInfo.Location.Latitude = 0;
+            }
         }
     }
 }
