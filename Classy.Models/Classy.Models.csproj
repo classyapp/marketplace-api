@@ -46,6 +46,9 @@
     <Reference Include="MongoDB.Driver">
       <HintPath>..\lib\MongoDB.Driver.dll</HintPath>
     </Reference>
+    <Reference Include="Newtonsoft.Json">
+      <HintPath>..\packages\Newtonsoft.Json.6.0.1\lib\net45\Newtonsoft.Json.dll</HintPath>
+    </Reference>
     <Reference Include="ServiceStack.Common">
       <HintPath>..\lib\ServiceStack.Common.dll</HintPath>
     </Reference>
@@ -67,6 +70,7 @@
     <Compile Include="Collection.cs" />
     <Compile Include="ContactInfo.cs" />
     <Compile Include="Env.cs" />
+    <Compile Include="GPSLocation.cs" />
     <Compile Include="IncludedListing.cs" />
     <Compile Include="LocalizationListResource.cs" />
     <Compile Include="MediaThumbnail.cs" />

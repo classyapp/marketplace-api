@@ -125,23 +125,54 @@ namespace Classy.Repository
                     queries.Add(Query.EQ(string.Concat("Metadata", m.Key), m.Value));
                 }
             }
+            IMongoQuery locationQueryByGPS = null;
+            IMongoQuery locationByCountry = null;
             if (location != null)
             {
-                //ProfilesCollection.EnsureIndex(IndexKeys.GeoSpatial("merchant location"));
-                //queries.Add(Query<Profile>.Near(x => x.ContactInfo.Location, location.Longitude, location.Latitude, 1 / 111.12, true));
+                if (professionalsOnly)
+                {
+                    ProfilesCollection.EnsureIndex(IndexKeys.GeoSpatial("ProfessionalInfo.CompanyContactInfo.Location"));
+                    locationQueryByGPS = Query<Profile>.Near(x => x.ProfessionalInfo.CompanyContactInfo.Location, location.Longitude.Value, location.Latitude.Value, 1 / 111.12, true);
+                    locationByCountry = Query<Profile>.EQ(x => x.ProfessionalInfo.CompanyContactInfo.Location.Address.Country, location.Address.Country);
+                }
+                else
+                {
+                    ProfilesCollection.EnsureIndex(IndexKeys.GeoSpatial("ContactInfo.Location"));
+                    locationQueryByGPS = Query<Profile>.Near(x => x.ContactInfo.Location, location.Longitude.Value, location.Latitude.Value, 1 / 111.12, true);
+                    locationByCountry = Query<Profile>.EQ(x => x.ContactInfo.Location.Address.Country, location.Address.Country);
+                }
             }
+            queries.Add(locationQueryByGPS);
 
             var query = Query.And(queries);
             MongoCursor<Profile> profiles = null;
             if (page <= 0)
             {
-                profiles = ProfilesCollection.Find(query);
                 count = profiles.Count();
+                if (count == 0)
+                {
+                    // try by country
+                    queries.Remove(locationQueryByGPS);
+                    queries.Add(locationByCountry);
+                    query = Query.And(queries);
+                    count = profiles.Count();
+                }
+                profiles = ProfilesCollection.Find(query);
             }
             else
             {
                 profiles =  ProfilesCollection.Find(query).SetSkip((page - 1) * pageSize).SetLimit(pageSize);
                 count =  ProfilesCollection.Count(query);
+                if (count == 0 && page == 1)
+                {
+                    // search by country 
+                    // ?? NOT sure it's the right option...
+                    queries.Remove(locationQueryByGPS);
+                    queries.Add(locationByCountry);
+                    query = Query.And(queries);
+                    profiles = ProfilesCollection.Find(query).SetSkip((page - 1) * pageSize).SetLimit(pageSize);
+                    count = profiles.Count();
+                }
             }
 
             return profiles.ToList();
