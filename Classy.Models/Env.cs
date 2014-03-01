@@ -48,7 +48,7 @@ namespace Classy.Models
         {
             if (location == null)
             {
-                location = new Location { Longitude = GPSCoordinates.Longitude, Latitude = GPSCoordinates.Latitude, Address = new PhysicalAddress() { Country = CountryCode } };
+                location = new Location { Coords = new Coords { Longitude = GPSCoordinates.Longitude, Latitude = GPSCoordinates.Latitude }, Address = new PhysicalAddress() { Country = CountryCode } };
             }
             return location;
         }

@@ -14,6 +14,7 @@ namespace classy
         {
             var to = from.TranslateTo<LocationView>();
             if (from.Address != null) to.Address = from.Address.TranslateTo<PhysicalAddressView>();
+            if (from.Coords != null) to.Coords = from.Coords.TranslateTo<CoordsView>();
             return to;
         }
     }

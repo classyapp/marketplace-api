@@ -131,14 +131,14 @@ namespace Classy.Repository
             {
                 if (professionalsOnly)
                 {
-                    ProfilesCollection.EnsureIndex(IndexKeys.GeoSpatial("ProfessionalInfo.CompanyContactInfo.Location"));
-                    locationQueryByGPS = Query<Profile>.Near(x => x.ProfessionalInfo.CompanyContactInfo.Location, location.Longitude.Value, location.Latitude.Value, 1 / 111.12, true);
+                    ProfilesCollection.EnsureIndex(IndexKeys.GeoSpatial("ProfessionalInfo.CompanyContactInfo.Location.Coords"));
+                    locationQueryByGPS = Query<Profile>.Near(x => x.ProfessionalInfo.CompanyContactInfo.Location.Coords, location.Coords.Longitude.Value, location.Coords.Latitude.Value, 1 / 111.12, true);
                     locationByCountry = Query<Profile>.EQ(x => x.ProfessionalInfo.CompanyContactInfo.Location.Address.Country, location.Address.Country);
                 }
                 else
                 {
-                    ProfilesCollection.EnsureIndex(IndexKeys.GeoSpatial("ContactInfo.Location"));
-                    locationQueryByGPS = Query<Profile>.Near(x => x.ContactInfo.Location, location.Longitude.Value, location.Latitude.Value, 1 / 111.12, true);
+                    ProfilesCollection.EnsureIndex(IndexKeys.GeoSpatial("ContactInfo.Location.Coords"));
+                    locationQueryByGPS = Query<Profile>.Near(x => x.ContactInfo.Location.Coords, location.Coords.Longitude.Value, location.Coords.Latitude.Value, 1 / 111.12, true);
                     locationByCountry = Query<Profile>.EQ(x => x.ContactInfo.Location.Address.Country, location.Address.Country);
                 }
             }
@@ -163,7 +163,7 @@ namespace Classy.Repository
             {
                 profiles =  ProfilesCollection.Find(query).SetSkip((page - 1) * pageSize).SetLimit(pageSize);
                 count =  ProfilesCollection.Count(query);
-                if (count == 0 && page == 1)
+                if (count == 0)
                 {
                     // search by country 
                     // ?? NOT sure it's the right option...

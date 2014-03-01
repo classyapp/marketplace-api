@@ -621,8 +621,8 @@ namespace classy.Manager
                 professionalInfo.CompanyContactInfo.Location.Address != null)
             {
                 // Do geocoding!!!
-                professionalInfo.CompanyContactInfo.Location.Longitude = 0;
-                professionalInfo.CompanyContactInfo.Location.Latitude = 0;
+                professionalInfo.CompanyContactInfo.Location.Coords.Longitude = 0;
+                professionalInfo.CompanyContactInfo.Location.Coords.Latitude = 0;
             }
         }
     }

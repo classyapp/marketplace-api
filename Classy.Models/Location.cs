@@ -7,10 +7,15 @@ using System.Text;
 
 namespace Classy.Models
 {
-    public class Location
+    public class Coords 
     {
         public double? Longitude { get; set; }
         public double? Latitude { get; set; }
+    }
+
+    public class Location
+    {
+        public Coords Coords { get; set; }
         public PhysicalAddress Address { get; set; }
     }
 
@@ -18,8 +23,9 @@ namespace Classy.Models
     {
         public LocationValidator()
         {
-            RuleFor(x => x.Longitude).NotNull();
-            RuleFor(x => x.Latitude).NotNull();
+            RuleFor(x => x.Coords).Cascade(CascadeMode.StopOnFirstFailure).NotNull();
+            RuleFor(x => x.Coords.Longitude).NotNull();
+            RuleFor(x => x.Coords.Latitude).NotNull();
         }
     }
 }
