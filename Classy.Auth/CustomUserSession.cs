@@ -59,10 +59,7 @@ namespace Classy.Auth
                         profile.FacebookUserId = authToken.UserId;
                         profile.FacebookUserName = authToken.UserName;
                         profile.UserName = authToken.UserName;
-                        profile.ImageUrl = SaveFileFromUrl(storage, string.Concat("profile_img_", session.UserAuthId),  
-                            string.Format("http://graph.facebook.com/{0}/picture?type=large", authToken.UserName));
-                        profile.ThumbnailUrl = SaveFileFromUrl(storage, string.Concat("profile_thumb_", session.UserAuthId),
-                            string.Format("http://graph.facebook.com/{0}/picture?type=square", authToken.UserName));
+                        profile.Avatar = CreateAvatar(storage, string.Format("http://graph.facebook.com/{0}/picture?type=large", authToken.UserName), session.UserAuthId);
                     }
                 }
                 else if (authToken.Provider == TwitterAuthProvider.Name)
@@ -72,12 +69,11 @@ namespace Classy.Auth
             }
 
             // still no profile pic?
-            if (isNew && string.IsNullOrEmpty(profile.ImageUrl))
+            if (profile.Avatar == null)
             {
                 try
                 {
-                    profile.ImageUrl = SaveFileFromUrl(storage, string.Concat("profile_img_", session.UserAuthId), "http://www.gravatar.com/avatar/?f=y&d=mm&s=261");
-                    profile.ThumbnailUrl = SaveFileFromUrl(storage, string.Concat("profile_thumb_", session.UserAuthId), "http://www.gravatar.com/avatar/?f=y&d=mm&s=50");
+                    profile.Avatar = CreateAvatar(storage, "http://www.gravatar.com/avatar/?f=y&d=mm&s=261", session.UserAuthId); 
                 }
                 catch(WebException)
                 {
@@ -94,6 +90,33 @@ namespace Classy.Auth
         {
             storage.SaveFileFromUrl(key, url, "image/jpeg");
             return storage.KeyToUrl(key);
+        }
+
+        private MediaFile CreateAvatar(IStorageRepository storage, string url, string userAuthId)
+        {
+            var avatarKey = string.Concat("profile_img_", userAuthId);
+            var avatarUrl = SaveFileFromUrl(storage, avatarKey, url);
+
+            var avatarThumbKey = string.Concat("profile_thumb_", userAuthId);
+            var avatarThumbUrl =  SaveFileFromUrl(storage, avatarThumbKey, url);
+
+            var avatar = new MediaFile
+            {
+                Type = MediaFileType.Image,
+                ContentType = "image/jpeg",
+                Url = avatarUrl,
+                Key = avatarKey,
+                Thumbnails = new List<MediaThumbnail>() { 
+                    new MediaThumbnail 
+                    {
+                        Width = 50,
+                        Height = 50,
+                        Key = avatarThumbKey,
+                        Url = avatarThumbUrl
+                    } 
+                }
+            };
+            return avatar;
         }
     }
 

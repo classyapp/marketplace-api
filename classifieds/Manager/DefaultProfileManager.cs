@@ -24,6 +24,7 @@ namespace classy.Manager
         private IReviewRepository ReviewRepository;
         private ICollectionRepository CollectionRepository;
         private ITripleStore TripleStore;
+        private IStorageRepository StorageRepository;
 
         public DefaultProfileManager(
             IAppManager appManager,
@@ -31,7 +32,8 @@ namespace classy.Manager
             IListingRepository listingRepository,
             IReviewRepository reviewRepository,
             ICollectionRepository collectionRepository,
-            ITripleStore tripleStore)
+            ITripleStore tripleStore,
+            IStorageRepository storageRepository)
         {
             AppManager = appManager;
             ProfileRepository = profileRepository;
@@ -39,6 +41,7 @@ namespace classy.Manager
             ReviewRepository = reviewRepository;
             CollectionRepository = collectionRepository;
             TripleStore = tripleStore;
+            StorageRepository = storageRepository;
         }
 
         public ProfileView CreateProfileProxy(
@@ -65,9 +68,7 @@ namespace classy.Manager
             {
                 AppId = appId,
                 ProfessionalInfo = professionalInfo,
-                Metadata = metadata,
-                ImageUrl = app.DefaultProfileImage,
-                ThumbnailUrl = app.DefaultProfileThumbnail
+                Metadata = metadata
             };
             // save in repo
             ProfileRepository.Save(profile);
@@ -158,7 +159,7 @@ namespace classy.Manager
                 foreach (var r in profileView.Reviews)
                 {
                     r.ReviewerUsername = reviewers.Single(x => x.Id == r.ProfileId).UserName;
-                    r.ReviewerThumbnailUrl = reviewers.Single(x => x.Id == r.ProfileId).ThumbnailUrl;
+                    r.ReviewerThumbnailUrl = reviewers.Single(x => x.Id == r.ProfileId).Avatar.Url;
                 }
             }
 
@@ -209,12 +210,14 @@ namespace classy.Manager
             ProfessionalInfo professionalInfo,
             IDictionary<string, string> metadata,
             ProfileUpdateFields fields,
-            string imageUrl)
+            byte[] profileImage,
+            string profileImageContentType)
         {
             var profile = GetVerifiedProfile(appId, profileId);
 
             // copy seller info
             if (fields.HasFlag(ProfileUpdateFields.ProfessionalInfo)) profile.ProfessionalInfo = professionalInfo;
+
             // copy metadata 
             if (fields.HasFlag(ProfileUpdateFields.Metadata))
             {
@@ -232,9 +235,9 @@ namespace classy.Manager
 
             // image 
             if (fields.HasFlag(ProfileUpdateFields.ProfileImage))
-            {
-                profile.ImageUrl = imageUrl;
-                profile.ThumbnailUrl = imageUrl;
+            {   
+                StorageRepository.SaveFile(profile.Avatar.Key, profileImage, profileImageContentType);
+                StorageRepository.SaveFile(profile.Avatar.Thumbnails[0].Key, profileImage, profileImageContentType);
             }
 
             ProfileRepository.Save(profile);

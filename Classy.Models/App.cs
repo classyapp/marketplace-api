@@ -10,14 +10,13 @@ namespace Classy.Models
 {
     public class App : BaseObject
     {
+        public int PageSize { get; set; }
+        public int PagesCount { get; set; }
         public bool AllowUnmoderatedReviews { get; set; }
         public bool AllowUnmoderatedComments { get; set; }
         public bool EnableProxyProfiles { get; set; }
         public bool ProxyClaimNeedsVerification { get; set; }
         public Point[] ExternalMediaThumbnailSizes { get; set; }
         public string DefaultProfileImage { get; set; }
-        public string DefaultProfileThumbnail { get; set; }
-        public int PagingPages { get; set; }
-        public int PagingPageSize { get; set; }
     }
 }

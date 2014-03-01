@@ -138,7 +138,8 @@ namespace classy.Manager
             ProfessionalInfo professionalInfo,
             IDictionary<string, string> metadata,
             ProfileUpdateFields fields,
-            string imageUrl);
+            byte[] profileImage,
+            string profileImagContentType);
 
         /// <summary>
         /// 
