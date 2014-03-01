@@ -9,6 +9,7 @@ using System.Linq;
 using Classy.Repository;
 using Classy.Models;
 using System.Net;
+using System;
 
 namespace Classy.Auth
 {
@@ -94,27 +95,15 @@ namespace Classy.Auth
 
         private MediaFile CreateAvatar(IStorageRepository storage, string url, string userAuthId)
         {
-            var avatarKey = string.Concat("profile_img_", userAuthId);
+            var avatarKey = string.Concat("profile_img_", userAuthId, "_", Guid.NewGuid().ToString());
             var avatarUrl = SaveFileFromUrl(storage, avatarKey, url);
-
-            var avatarThumbKey = string.Concat("profile_thumb_", userAuthId);
-            var avatarThumbUrl =  SaveFileFromUrl(storage, avatarThumbKey, url);
 
             var avatar = new MediaFile
             {
                 Type = MediaFileType.Image,
                 ContentType = "image/jpeg",
                 Url = avatarUrl,
-                Key = avatarKey,
-                Thumbnails = new List<MediaThumbnail>() { 
-                    new MediaThumbnail 
-                    {
-                        Width = 50,
-                        Height = 50,
-                        Key = avatarThumbKey,
-                        Url = avatarThumbUrl
-                    } 
-                }
+                Key = avatarKey
             };
             return avatar;
         }

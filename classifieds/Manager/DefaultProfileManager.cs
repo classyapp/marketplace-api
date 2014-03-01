@@ -235,9 +235,16 @@ namespace classy.Manager
 
             // image 
             if (fields.HasFlag(ProfileUpdateFields.ProfileImage))
-            {   
-                StorageRepository.SaveFile(profile.Avatar.Key, profileImage, profileImageContentType);
-                StorageRepository.SaveFile(profile.Avatar.Thumbnails[0].Key, profileImage, profileImageContentType);
+            {
+                var avatarKey = string.Concat("profile_img_", profile.Id, "_", Guid.NewGuid().ToString());
+                StorageRepository.SaveFile(avatarKey, profileImage, profileImageContentType);
+                profile.Avatar = new MediaFile
+                {
+                    Key = avatarKey,
+                    Url = StorageRepository.KeyToUrl(avatarKey),
+                    ContentType = profileImageContentType,
+                    Type = MediaFileType.Image
+                };
             }
 
             ProfileRepository.Save(profile);
