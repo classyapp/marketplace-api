@@ -12,7 +12,8 @@ namespace Classy.Models.Request
         SetPassword = 1,
         ContactInfo = 2,
         ProfessionalInfo = 4,
-        Metadata = 8
+        Metadata = 8,
+        ProfileImage = 16
     }
 
     public class UpdateProfile : BaseRequestDto
