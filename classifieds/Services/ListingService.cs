@@ -110,7 +110,7 @@ namespace classy.Services
                 request.Metadata,
                 request.PriceMin,
                 request.PriceMax,
-                request.Location,
+                request.Location ?? request.Environment.GetDefaultLocation(),
                 request.IncludeComments,
                 request.FormatCommentsAsHtml,
                 request.Page,
@@ -133,7 +133,7 @@ namespace classy.Services
                 request.Content,
                 request.ListingType,
                 request.Pricing,
-                request.ContactInfo,
+                request.ContactInfo ?? session.GetDefaultContactInfo(),
                 request.SchedulingTemplate,
                 request.Metadata);
 
@@ -228,7 +228,7 @@ namespace classy.Services
                     request.Content,
                     null,
                     request.Pricing,
-                    request.ContactInfo,
+                    request.ContactInfo ?? session.GetDefaultContactInfo(),
                     request.SchedulingTemplate,
                     request.Metadata);
 
@@ -507,7 +507,7 @@ namespace classy.Services
                 var profile = ProfileManager.UpdateProfile(
                     request.Environment.AppId,
                     request.ProfileId,
-                    request.ContactInfo,
+                    request.ContactInfo ?? session.GetDefaultContactInfo(),
                     request.ProfessionalInfo,
                     request.Metadata,
                     request.Fields,
@@ -534,7 +534,7 @@ namespace classy.Services
                 request.Environment.AppId,
                 request.DisplayName,
                 request.Category,
-                request.Location,
+                request.Location ?? request.Environment.GetDefaultLocation(),
                 request.Metadata,
                 request.ProfessionalsOnly,
                 request.Page,

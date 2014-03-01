@@ -45,6 +45,7 @@ namespace Classy.Auth
                 profile.ContactInfo.FirstName = session.FirstName;
                 profile.ContactInfo.LastName = session.LastName;
                 profile.ContactInfo.Email = session.Email;
+                profile.ContactInfo.Location = Environment.GetDefaultLocation();
             }
 
             foreach (var authToken in session.ProviderOAuthAccess)
@@ -63,9 +64,23 @@ namespace Classy.Auth
                         profile.Avatar = CreateAvatar(storage, string.Format("http://graph.facebook.com/{0}/picture?type=large", authToken.UserName), session.UserAuthId);
                     }
                 }
+                else if (authToken.Provider == GoogleOAuth2Provider.Name)
+                {
+                    profile.ContactInfo.FirstName = authToken.FirstName;
+                    profile.ContactInfo.LastName = authToken.LastName;
+                    profile.ContactInfo.Email = authToken.Email;
+                    if (isNew)
+                    {
+                        profile.UserName = authToken.UserName;
+                        profile.ImageUrl = SaveFileFromUrl(storage, string.Concat("profile_img_", session.UserAuthId),
+                            string.Format("https://plus.google.com/s2/photos/profile/{0}?sz=220", authToken.UserId));
+                        profile.ThumbnailUrl = SaveFileFromUrl(storage, string.Concat("profile_thumb_", session.UserAuthId),
+                            string.Format("https://plus.google.com/s2/photos/profile/{0}?sz=100", authToken.UserId));
+                    }
+                }
                 else if (authToken.Provider == TwitterAuthProvider.Name)
                 {
-                    
+
                 }
             }
 
