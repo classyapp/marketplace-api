@@ -19,7 +19,7 @@ namespace Classy.Repository
 
         public Triple LogActivity(string appId, string subjectObjectId, string predicate, string objectObjectId, ref int count)
         {
-            count = 0;
+            count = 1;
             var triple = new Triple
             {
                 AppId = appId,
