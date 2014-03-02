@@ -264,8 +264,8 @@ namespace Classy.Repository
             }
             if (location != null)
             {
-                ListingsCollection.EnsureIndex(IndexKeys.GeoSpatial("Location"));
-                queries.Add(Query<Listing>.Near(x => x.ContactInfo.Location, location.Longitude, location.Latitude, 1/111.12, true));
+                //ListingsCollection.EnsureIndex(IndexKeys.GeoSpatial("Location"));
+                //queries.Add(Query<Listing>.Near(x => x.ContactInfo.Location, location.Longitude.Value, location.Latitude.Value, 1/111.12, true));
             }
             if (!includeDrafts)
             {

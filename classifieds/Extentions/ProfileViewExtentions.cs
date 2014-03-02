@@ -24,6 +24,8 @@ namespace classy
                 to.ProfessionalInfo = from.ProfessionalInfo.ToSellerView();
                 to.IsFacebookConnected = !from.FacebookUserId.IsNullOrEmpty();
             }
+            // avatar
+            if (from.Avatar != null) to.Avatar = from.Avatar.ToMediaFileView();
             //proxy
             to.IsProxy = from.IsProxy;
             return to;

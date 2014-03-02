@@ -47,8 +47,8 @@ namespace classy.Services
 
         public object Get(GetAppSettings request)
         {
-            App app = AppManager.GetAppById(request.Environment.AppId);
-            return new HttpResult(new AppView { PageSize = app.PagingPageSize, PagesCount = app.PagingPages }, HttpStatusCode.OK);
+            var app = AppManager.GetAppById(request.Environment.AppId);
+            return new HttpResult(app, HttpStatusCode.OK);
         }
 
         public object Get(GetListingById request)
@@ -110,11 +110,11 @@ namespace classy.Services
                 request.Metadata,
                 request.PriceMin,
                 request.PriceMax,
-                request.Location,
+                request.Location ?? request.Environment.GetDefaultLocation(),
                 request.IncludeComments,
                 request.FormatCommentsAsHtml,
                 request.Page,
-                AppManager.GetAppById(request.Environment.AppId).PagingPageSize);
+                AppManager.GetAppById(request.Environment.AppId).PageSize);
 
             return new HttpResult(listingViews, HttpStatusCode.OK);
         }
@@ -133,7 +133,7 @@ namespace classy.Services
                 request.Content,
                 request.ListingType,
                 request.Pricing,
-                request.ContactInfo,
+                request.ContactInfo ?? session.GetDefaultContactInfo(),
                 request.SchedulingTemplate,
                 request.Metadata);
 
@@ -228,7 +228,7 @@ namespace classy.Services
                     request.Content,
                     null,
                     request.Pricing,
-                    request.ContactInfo,
+                    request.ContactInfo ?? session.GetDefaultContactInfo(),
                     request.SchedulingTemplate,
                     request.Metadata);
 
@@ -483,17 +483,36 @@ namespace classy.Services
         {
             try
             {
-                var session = SessionAs<CustomUserSession>();
+                var session = SessionAs<CustomUserSession>();   
 
                 if (session.UserAuthId != request.ProfileId) throw new UnauthorizedAccessException("not yours to update");
+
+                if (request.Fields.HasFlag(ProfileUpdateFields.SetPassword))
+                {
+                    IUserAuthRepository authRepository = GetAppHost().TryResolve<IUserAuthRepository>();
+                    UserAuth userAuth = authRepository.GetUserAuth(request.Environment.AppId, session.UserAuthId);
+                    authRepository.UpdateUserAuth(userAuth, userAuth, request.Password);
+                }
+
+                byte[] imageData = null;
+                string imageContentType = null;
+                if (request.Fields.HasFlag(ProfileUpdateFields.ProfileImage) && Request.Files.Length == 1)
+                {
+                    var reader = new BinaryReader(Request.Files[0].InputStream);
+                    imageData = new byte[Request.Files[0].InputStream.Length];
+                    reader.Read(imageData, 0, imageData.Length);
+                    imageContentType = Request.Files[0].ContentType;
+                }
 
                 var profile = ProfileManager.UpdateProfile(
                     request.Environment.AppId,
                     request.ProfileId,
-                    request.ContactInfo,
+                    request.ContactInfo ?? session.GetDefaultContactInfo(),
                     request.ProfessionalInfo,
                     request.Metadata,
-                    request.Fields);
+                    request.Fields,
+                    imageData,
+                    imageContentType);
 
                 return new HttpResult(profile, HttpStatusCode.OK);
             }
@@ -515,11 +534,11 @@ namespace classy.Services
                 request.Environment.AppId,
                 request.DisplayName,
                 request.Category,
-                request.Location,
+                request.Location ?? request.Environment.GetDefaultLocation(),
                 request.Metadata,
                 request.ProfessionalsOnly,
                 request.Page,
-                AppManager.GetAppById(request.Environment.AppId).PagingPageSize);
+                AppManager.GetAppById(request.Environment.AppId).PageSize);
 
             return new HttpResult(profiles, HttpStatusCode.OK);
         }
@@ -1158,5 +1177,21 @@ namespace classy.Services
             var albums = ProfileManager.GetFacebookAlbums(request.Environment.AppId, session.UserAuthId, token);            
             return new HttpResult(albums, HttpStatusCode.OK);
         }
+        //GET: /profile/google/contacts
+        // get a list of the user's facebook friends
+        [CustomAuthenticate]
+        public object Get(GetGoogleContacts request)
+        {
+            var session = SessionAs<CustomUserSession>();
+            var token = session.ProviderOAuthAccess.SingleOrDefault(x => x.Provider == "GoogleOAuth");
+            if (token != null)
+            {
+                var contacts = ProfileManager.GetGoogleContacts(request.Environment.AppId, session.UserAuthId, token.AccessToken);
+                return new HttpResult(contacts, HttpStatusCode.OK);
+            }
+            return new HttpResult(null, HttpStatusCode.OK);
+            
+        }
+
     }
 }

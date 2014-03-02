@@ -9,6 +9,7 @@ using System.Linq;
 using Classy.Repository;
 using Classy.Models;
 using System.Net;
+using System;
 
 namespace Classy.Auth
 {
@@ -44,6 +45,7 @@ namespace Classy.Auth
                 profile.ContactInfo.FirstName = session.FirstName;
                 profile.ContactInfo.LastName = session.LastName;
                 profile.ContactInfo.Email = session.Email;
+                profile.ContactInfo.Location = Environment.GetDefaultLocation();
             }
 
             foreach (var authToken in session.ProviderOAuthAccess)
@@ -59,25 +61,32 @@ namespace Classy.Auth
                         profile.FacebookUserId = authToken.UserId;
                         profile.FacebookUserName = authToken.UserName;
                         profile.UserName = authToken.UserName;
-                        profile.ImageUrl = SaveFileFromUrl(storage, string.Concat("profile_img_", session.UserAuthId),  
-                            string.Format("http://graph.facebook.com/{0}/picture?type=large", authToken.UserName));
-                        profile.ThumbnailUrl = SaveFileFromUrl(storage, string.Concat("profile_thumb_", session.UserAuthId),
-                            string.Format("http://graph.facebook.com/{0}/picture?type=square", authToken.UserName));
+                        profile.Avatar = CreateAvatar(storage, string.Format("http://graph.facebook.com/{0}/picture?type=large", authToken.UserName), session.UserAuthId);
+                    }
+                }
+                else if (authToken.Provider == GoogleOAuth2Provider.Name)
+                {
+                    profile.ContactInfo.FirstName = authToken.FirstName;
+                    profile.ContactInfo.LastName = authToken.LastName;
+                    profile.ContactInfo.Email = authToken.Email;
+                    if (isNew)
+                    {
+                        profile.UserName = authToken.UserName;
+                        profile.Avatar = CreateAvatar(storage, string.Format("https://plus.google.com/s2/photos/profile/{0}?sz=220", authToken.UserId), session.UserAuthId);
                     }
                 }
                 else if (authToken.Provider == TwitterAuthProvider.Name)
                 {
-                    
+
                 }
             }
 
             // still no profile pic?
-            if (isNew && string.IsNullOrEmpty(profile.ImageUrl))
+            if (profile.Avatar == null)
             {
                 try
                 {
-                    profile.ImageUrl = SaveFileFromUrl(storage, string.Concat("profile_img_", session.UserAuthId), "http://www.gravatar.com/avatar/?f=y&d=mm&s=261");
-                    profile.ThumbnailUrl = SaveFileFromUrl(storage, string.Concat("profile_thumb_", session.UserAuthId), "http://www.gravatar.com/avatar/?f=y&d=mm&s=50");
+                    profile.Avatar = CreateAvatar(storage, "http://www.gravatar.com/avatar/?f=y&d=mm&s=261", session.UserAuthId); 
                 }
                 catch(WebException)
                 {
@@ -94,6 +103,21 @@ namespace Classy.Auth
         {
             storage.SaveFileFromUrl(key, url, "image/jpeg");
             return storage.KeyToUrl(key);
+        }
+
+        private MediaFile CreateAvatar(IStorageRepository storage, string url, string userAuthId)
+        {
+            var avatarKey = string.Concat("profile_img_", userAuthId, "_", Guid.NewGuid().ToString());
+            var avatarUrl = SaveFileFromUrl(storage, avatarKey, url);
+
+            var avatar = new MediaFile
+            {
+                Type = MediaFileType.Image,
+                ContentType = "image/jpeg",
+                Url = avatarUrl,
+                Key = avatarKey
+            };
+            return avatar;
         }
     }
 

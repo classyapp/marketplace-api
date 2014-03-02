@@ -5,9 +5,9 @@ using System.Text;
 
 namespace Classy.Models.Response
 {
-    public class LocationView
+    public class CoordsView
     {
-        public CoordsView Coords { get; set; }
-        public PhysicalAddressView Address { get; set; }
+        public double? Longitude { get; set; }
+        public double? Latitude { get; set; }
     }
 }

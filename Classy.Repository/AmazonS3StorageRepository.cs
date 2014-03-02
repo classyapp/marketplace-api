@@ -27,6 +27,7 @@ namespace Classy.Repository
             request.ContentType = contentType;
             request.Key = key;
             request.InputStream = new MemoryStream(content);
+            request.CannedACL = Amazon.S3.S3CannedACL.PublicReadWrite;
             s3Client.PutObjectAsync(request);
         }
 

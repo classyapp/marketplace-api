@@ -99,7 +99,8 @@ namespace classy.Extentions
                     c.TryResolve<IListingRepository>(),
                     c.TryResolve<IReviewRepository>(),
                     c.TryResolve<ICollectionRepository>(),
-                    c.TryResolve<ITripleStore>()));
+                    c.TryResolve<ITripleStore>(),
+                    c.TryResolve<IStorageRepository>()));
             container.Register<IReviewManager>(c =>
                 new DefaultProfileManager(
                     c.TryResolve<IAppManager>(),
@@ -107,7 +108,8 @@ namespace classy.Extentions
                     c.TryResolve<IListingRepository>(),
                     c.TryResolve<IReviewRepository>(),
                     c.TryResolve<ICollectionRepository>(),
-                    c.TryResolve<ITripleStore>()));
+                    c.TryResolve<ITripleStore>(),
+                    c.TryResolve<IStorageRepository>()));
             container.Register<ICollectionManager>(c =>
                 new DefaultListingManager(
                     c.TryResolve<IMessageQueueClient>(),
