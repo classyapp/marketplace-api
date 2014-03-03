@@ -236,6 +236,7 @@ namespace Classy.Repository
             double? priceMin, double? priceMax, Location location, string appId,
             bool includeDrafts, bool increaseViewCounter, int page, int pageSize, ref long count)
         {
+            var sortOrder = SortBy<Listing>.Descending(x => x.DisplayOrder);
             var queries = new List<IMongoQuery>() {
                 Query<Listing>.EQ(x => x.AppId, appId)
             };
@@ -279,12 +280,12 @@ namespace Classy.Repository
             {
                 // increase the view count of all deals
                 if (increaseViewCounter) ListingsCollection.Update(query, Update<Listing>.Inc(x => x.ViewCount, 1), UpdateFlags.Multi);
-                listings = ListingsCollection.Find(query);
+                listings = ListingsCollection.Find(query).SetSortOrder(sortOrder);
                 count = listings.Count();
             }
             else
             {
-                listings = ListingsCollection.Find(query).SetSkip((page - 1) * pageSize).SetLimit(pageSize);
+                listings = ListingsCollection.Find(query).SetSortOrder(sortOrder).SetSkip((page - 1) * pageSize).SetLimit(pageSize);
                 count = ListingsCollection.Count(query);
                 var ids = listings.Select(l => l.Id).ToArray();
                 if (increaseViewCounter) ListingsCollection.Update(Query<Listing>.Where(l => ids.Contains(l.Id)), Update<Listing>.Inc(x => x.ViewCount, 1), UpdateFlags.Multi);

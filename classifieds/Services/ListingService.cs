@@ -485,7 +485,8 @@ namespace classy.Services
             {
                 var session = SessionAs<CustomUserSession>();   
 
-                if (session.UserAuthId != request.ProfileId) throw new UnauthorizedAccessException("not yours to update");
+                if (session.UserAuthId != request.ProfileId &&
+                    !session.Permissions.Contains("admin")) throw new UnauthorizedAccessException("not yours to update");
 
                 if (request.Fields.HasFlag(ProfileUpdateFields.SetPassword))
                 {
