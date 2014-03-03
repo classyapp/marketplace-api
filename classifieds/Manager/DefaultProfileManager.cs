@@ -617,8 +617,7 @@ namespace classy.Manager
         {
             if (professionalInfo.CompanyContactInfo != null &&
                 professionalInfo.CompanyContactInfo.Location != null &&
-                //!professionalInfo.CompanyContactInfo.Location.Longitude.HasValue && // Comes with 0, 0
-                professionalInfo.CompanyContactInfo.Location.Address != null)
+                professionalInfo.CompanyContactInfo.Location.Coords != null)
             {
                 // Do geocoding!!!
                 professionalInfo.CompanyContactInfo.Location.Coords.Longitude = 0;
