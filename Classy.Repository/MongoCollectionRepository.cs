@@ -92,11 +92,11 @@ namespace Classy.Repository
             }
         }
 
-        public void RemoveListingById(string appId, string profileId, string listingId)
+        public void RemoveListingById(string appId, string listingId)
         {
             try
             {
-                var getByProfileId = Query<Collection>.Where(x => x.AppId == appId && x.ProfileId == profileId && x.IncludedListings.Any(y => y.Id == listingId));
+                var getByProfileId = Query<Collection>.Where(x => x.AppId == appId && x.IncludedListings.Any(y => y.Id == listingId));
                 CollectionsCollection.Update(getByProfileId, MongoDB.Driver.Builders.Update.Pull("IncludedListings", Query.EQ("ListingId", listingId)));
             }
             catch (MongoException)

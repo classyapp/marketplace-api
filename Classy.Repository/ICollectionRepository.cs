@@ -49,9 +49,8 @@ namespace Classy.Repository
         /// remove a listing from the collection
         /// </summary>
         /// <param name="appId"></param>
-        /// <param name="profileId"></param>
         /// <param name="listingId"></param>
-        void RemoveListingById(string appId, string profileId, string listingId);
+        void RemoveListingById(string appId, string listingId);
         /// <summary>
         /// submit the collection for editorial approval
         /// </summary>

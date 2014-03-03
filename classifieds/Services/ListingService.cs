@@ -56,11 +56,11 @@ namespace classy.Services
             try
             {
                 var session = SessionAs<CustomUserSession>();
+                ListingManager.SecurityContext = session.ToSecurityContext();
 
                 var listingView = ListingManager.GetListingById(
                     request.Environment.AppId,
                     request.ListingId,
-                    session.UserAuthId,
                     request.LogImpression,
                     false,
                     request.IncludeComments,
@@ -124,11 +124,11 @@ namespace classy.Services
         public object Post(PostListing request)
         {
             var session = SessionAs<CustomUserSession>();
+            ListingManager.SecurityContext = session.ToSecurityContext();
 
             var listing = ListingManager.SaveListing(
                 request.Environment.AppId,
                 null,
-                session.UserAuthId,
                 request.Title,
                 request.Content,
                 request.ListingType,
@@ -154,11 +154,11 @@ namespace classy.Services
             try
             {
                 var session = SessionAs<CustomUserSession>();
+                ListingManager.SecurityContext = session.ToSecurityContext();
 
                 var listing = ListingManager.AddExternalMediaToListing(
                     request.Environment.AppId,
                     request.ListingId,
-                    session.UserAuthId,
                     Request.Files);
 
                 return new HttpResult(listing, HttpStatusCode.OK);
@@ -176,11 +176,11 @@ namespace classy.Services
             try
             {
                 var session = SessionAs<CustomUserSession>();
+                ListingManager.SecurityContext = session.ToSecurityContext();
 
                 var listing = ListingManager.DeleteExternalMediaFromListing(
                     request.Environment.AppId,
                     request.ListingId,
-                    session.UserAuthId,
                     request.Url);
 
                 return new HttpResult(listing, HttpStatusCode.OK);
@@ -219,11 +219,11 @@ namespace classy.Services
             try
             {
                 var session = SessionAs<CustomUserSession>();
+                ListingManager.SecurityContext = session.ToSecurityContext();
 
                 var listing = ListingManager.SaveListing(
                     request.Environment.AppId,
                     request.ListingId,
-                    session.UserAuthId,
                     request.Title,
                     request.Content,
                     null,
@@ -247,11 +247,11 @@ namespace classy.Services
             try
             {
                 var session = SessionAs<CustomUserSession>();
+                ListingManager.SecurityContext = session.ToSecurityContext();
 
                 var listing = ListingManager.DeleteListing(
                     request.Environment.AppId,
-                    request.ListingId,
-                    session.UserAuthId);
+                    request.ListingId);
 
                 return new HttpResult(listing, HttpStatusCode.OK);
             }

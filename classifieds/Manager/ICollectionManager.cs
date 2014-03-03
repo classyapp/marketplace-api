@@ -11,7 +11,7 @@ namespace classy.Manager
     /// <summary>
     /// manage all <see cref="Collection"/> related operations 
     /// </summary>
-    public interface ICollectionManager
+    public interface ICollectionManager : IManager
     {
         /// <summary>
         /// creates a new <see cref="Collection"/>

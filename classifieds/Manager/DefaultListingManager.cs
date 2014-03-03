@@ -12,6 +12,7 @@ using ServiceStack.ServiceHost;
 using System.IO;
 using ServiceStack.Messaging;
 using classy.Operations;
+using ServiceStack.CacheAccess;
 
 namespace classy.Manager
 {
@@ -43,10 +44,11 @@ namespace classy.Manager
             StorageRepository = storageRepository;
         }
 
+        public ManagerSecurityContext SecurityContext { get; set; }
+
         public ListingView GetListingById(
             string appId,
             string listingId,
-            string requestedByProfileId,
             bool logImpression,
             bool includeDrafts,
             bool includeComments,
@@ -97,7 +99,7 @@ namespace classy.Manager
             if (logImpression)
             {
                 int count = 1;
-                TripleStore.LogActivity(appId, requestedByProfileId.IsNullOrEmpty() ? "guest" : requestedByProfileId, ActivityPredicate.VIEW_LISTING, listing.Id, ref count);
+                TripleStore.LogActivity(appId, SecurityContext.IsAuthenticated ? SecurityContext.AuthenticatedProfileId : "guest", ActivityPredicate.VIEW_LISTING, listing.Id, ref count);
             }
             return listingView;
         }
@@ -164,10 +166,9 @@ namespace classy.Manager
         public ListingView AddExternalMediaToListing(
             string appId,
             string listingId,
-            string profileId,
             IFile[] files)
         {
-            var listing = GetVerifiedListing(appId, listingId, profileId, true);
+            var listing = GetVerifiedListing(appId, listingId, true, true);
             var mediaFiles = new List<MediaFile>();
 
             if (files != null && files.Count() > 0)
@@ -204,10 +205,9 @@ namespace classy.Manager
         public ListingView DeleteExternalMediaFromListing(
             string appId,
             string listingId,
-            string profileId,
             string url)
         {
-            var listing = GetVerifiedListing(appId, listingId, profileId, true);
+            var listing = GetVerifiedListing(appId, listingId, true, false);
 
             MediaFile file = listing.ExternalMedia.SingleOrDefault(e => e.Url == url);
             if (file != null)
@@ -229,7 +229,7 @@ namespace classy.Manager
             string listingId,
             string profileId)
         {
-            var listing = GetVerifiedListing(appId, listingId, profileId, true);
+            var listing = GetVerifiedListing(appId, listingId, true, true);
             var profile = ProfileRepository.GetById(appId, listing.ProfileId, false);
 
             // can't publish a purchasable listing if 
@@ -245,7 +245,6 @@ namespace classy.Manager
         public ListingView SaveListing(
             string appId,
             string listingId,
-            string profileId,
             string title,
             string content,
             string listingType,
@@ -258,13 +257,13 @@ namespace classy.Manager
             bool isNewListing = listingId.IsNullOrEmpty();
             if (!isNewListing)
             {
-                listing = GetVerifiedListing(appId, listingId, true);
+                listing = GetVerifiedListing(appId, listingId, true, true);
             }
             else
             {
                 listing = new Listing
                 {
-                    ProfileId = profileId,
+                    ProfileId = SecurityContext.AuthenticatedProfileId,
                     AppId = appId
                 };
             }
@@ -304,12 +303,14 @@ namespace classy.Manager
             return listing.ToListingView();
         }
 
-        public string DeleteListing(string appId, string listingId, string profileId)
+        public string DeleteListing(string appId, string listingId)
         {
-            CollectionRepository.RemoveListingById(appId, profileId, listingId);
-            TripleStore.ResetActivity(appId, profileId, ActivityPredicate.ADD_LISTING_TO_COLLECTION, listingId);
+            var listing = GetVerifiedListing(appId, listingId, true, true);
 
-            Listing listing = GetVerifiedListing(appId, listingId);
+            CollectionRepository.RemoveListingById(appId, listingId);
+            // TODO: reverse all add-to-collection activities for this listing
+
+
             foreach (var file in listing.ExternalMedia)
             {
                 foreach (var thumb in file.Thumbnails)
@@ -706,11 +707,11 @@ namespace classy.Manager
         /// <param name="profileId"></param>
         /// <param name="logImpression"></param>
         /// <returns></returns>
-        private Listing GetVerifiedListing(string appId, string listingId, string profileId, bool includeDrafts)
+        private Listing GetVerifiedListing(string appId, string listingId, bool includeDrafts, bool verifyOwnership)
         {
             Listing listing;
             listing = GetVerifiedListing(appId, listingId, includeDrafts);
-            if (listing.ProfileId != profileId) throw new UnauthorizedAccessException("not authorized");
+            if (SecurityContext.IsAuthenticated && listing.ProfileId != SecurityContext.AuthenticatedProfileId && !SecurityContext.IsAdmin) throw new UnauthorizedAccessException("not authorized");
             return listing;
         }
 
@@ -721,22 +722,9 @@ namespace classy.Manager
         /// <param name="listingId"></param>
         /// <param name="profileId"></param>
         /// <returns></returns>
-        private Listing GetVerifiedListing(string appId, string listingId, string profileId)
-        {
-            return GetVerifiedListing(appId, listingId, profileId, false);
-        }
-
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="appId"></param>
-        /// <param name="listingId"></param>
-        /// <returns></returns>
         private Listing GetVerifiedListing(string appId, string listingId, bool includeDrafts)
         {
-            var listing = ListingRepository.GetById(listingId, appId, includeDrafts);
-            if (listing == null) throw new KeyNotFoundException("invalid listing id");
-            return listing;
+            return ListingRepository.GetById(listingId, appId, includeDrafts);
         }
 
         private Listing GetVerifiedListing(string appId, string listingId)

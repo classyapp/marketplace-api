@@ -9,14 +9,13 @@ using System.Threading.Tasks;
 
 namespace classy.Manager
 {
-    public interface IListingManager
+    public interface IListingManager : IManager
     {
         /// <summary>
         /// 
         /// </summary>
         /// <param name="appId"></param>
         /// <param name="listingId"></param>
-        /// <param name="requestedByProfileId"></param>
         /// <param name="logImpression"></param>
         /// <param name="includeDrafts"></param>
         /// <param name="includeComments"></param>
@@ -28,7 +27,6 @@ namespace classy.Manager
         ListingView GetListingById(
             string appId, 
             string listingId, 
-            string requestedByProfileId, 
             bool logImpression, 
             bool includeDrafts, 
             bool includeComments, 
@@ -83,7 +81,6 @@ namespace classy.Manager
         /// </summary>
         /// <param name="appId"></param>
         /// <param name="listingId"></param>
-        /// <param name="profileId"></param>
         /// <param name="title"></param>
         /// <param name="content"></param>
         /// <param name="listingType"></param>
@@ -95,7 +92,6 @@ namespace classy.Manager
         ListingView SaveListing(
             string appId,
             string listingId,
-            string profileId,
             string title,
             string content,
             string listingType,
@@ -109,37 +105,31 @@ namespace classy.Manager
         /// </summary>
         /// <param name="appId"></param>
         /// <param name="listingId"></param>
-        /// <param name="userId"></param>
         /// <returns></returns>
-        string DeleteListing(string appId, string listingId, string userId);
+        string DeleteListing(string appId, string listingId);
 
         /// <summary>
         /// 
         /// </summary>
         /// <param name="appId"></param>
         /// <param name="listingId"></param>
-        /// <param name="profileId"></param>
         /// <param name="mediaFiles"></param>
         /// <returns></returns>
         ListingView AddExternalMediaToListing(
             string appId,
             string listingId,
-            string profileId,
-            IFile[] files
-            );
+            IFile[] files);
 
         /// <summary>
         /// 
         /// </summary>
         /// <param name="appId"></param>
         /// <param name="listingId"></param>
-        /// <param name="profileId"></param>
         /// <param name="url"></param>
         /// <returns></returns>
         ListingView DeleteExternalMediaFromListing(
             string appId,
             string listingId,
-            string profileId,
             string url);
 
         /// <summary>

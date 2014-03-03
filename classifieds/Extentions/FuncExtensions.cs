@@ -1,6 +1,7 @@
 ﻿using classy.Manager;
 using Classy.Repository;
 using MongoDB.Driver;
+using ServiceStack.CacheAccess;
 using ServiceStack.Messaging;
 using ServiceStack.Redis;
 using ServiceStack.Redis.Messaging;
