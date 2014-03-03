@@ -35,13 +35,6 @@ namespace Classy.Models.Request
             {
                 RuleFor(x => x.ProfessionalInfo).Cascade(CascadeMode.StopOnFirstFailure).NotNull();
                 RuleFor(x => x.ProfessionalInfo.CompanyName).NotEmpty();
-                RuleFor(x => x.ProfessionalInfo.CompanyContactInfo.FirstName).NotEmpty();
-                RuleFor(x => x.ProfessionalInfo.CompanyContactInfo.LastName).NotEmpty();
-                RuleFor(x => x.ProfessionalInfo.CompanyContactInfo.Phone).NotEmpty();
-                RuleFor(x => x.ProfessionalInfo.Category).NotEmpty().NotEqual("0");
-                RuleFor(x => x.ProfessionalInfo.CompanyContactInfo.Location.Address.Street1).NotEmpty();
-                RuleFor(x => x.ProfessionalInfo.CompanyContactInfo.Location.Address.City).NotEmpty();
-                RuleFor(x => x.ProfessionalInfo.CompanyContactInfo.Location.Address.PostalCode).NotEmpty();
             });
 
             When(x => x.Fields.HasFlag(ProfileUpdateFields.Metadata), () =>
