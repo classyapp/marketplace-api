@@ -472,7 +472,11 @@ namespace classy.Manager
                 foreach (var listing in includedListings)
                 {
                     TripleStore.LogActivity(appId, profileId, ActivityPredicate.ADD_LISTING_TO_COLLECTION, listing.Id, ref count);
-                    if (count == 1) ListingRepository.IncreaseCounter(listing.Id, appId, ListingCounters.AddToCollection, 1);
+                    if (count == 1)
+                    {
+                        ListingRepository.IncreaseCounter(listing.Id, appId, ListingCounters.AddToCollection, 1);
+                        ProfileRepository.IncreaseCounter(appId, profileId, ProfileCounters.Rank, 1);
+                    }
                 }
 
                 // return
