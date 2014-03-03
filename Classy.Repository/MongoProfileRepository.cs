@@ -90,6 +90,10 @@ namespace Classy.Repository
         public IList<Profile> Search(string appId, string displayName, string category, Location location, IDictionary<string, string> metadata, 
             bool professionalsOnly, int page, int pageSize, ref long count)
         {
+            // sort order
+            var sortOrder = SortBy<Profile>.Descending(x => x.Rank, x => x.UserName);
+
+            // query building
             var queries = new List<IMongoQuery>() {
                 Query<Profile>.EQ(x => x.AppId, appId)
             };
@@ -144,36 +148,24 @@ namespace Classy.Repository
             }
             queries.Add(locationQueryByGPS);
 
+            // try query, and redo for entire country if nothing found nearby
             var query = Query.And(queries);
             MongoCursor<Profile> profiles = null;
-            if (page <= 0)
+            if (ProfilesCollection.Count(query) == 0)
             {
-                count = profiles.Count();
-                if (count == 0)
-                {
-                    // try by country
-                    queries.Remove(locationQueryByGPS);
-                    queries.Add(locationByCountry);
-                    query = Query.And(queries);
-                    count = profiles.Count();
-                }
-                profiles = ProfilesCollection.Find(query);
+                queries.Remove(locationQueryByGPS);
+                queries.Add(locationByCountry);
+                query = Query.And(queries);
+            }
+            if (page <= 0)
+            {   
+                profiles = ProfilesCollection.Find(query).SetSortOrder(sortOrder);
             }
             else
             {
-                profiles =  ProfilesCollection.Find(query).SetSkip((page - 1) * pageSize).SetLimit(pageSize);
-                count =  ProfilesCollection.Count(query);
-                if (count == 0)
-                {
-                    // search by country 
-                    // ?? NOT sure it's the right option...
-                    queries.Remove(locationQueryByGPS);
-                    queries.Add(locationByCountry);
-                    query = Query.And(queries);
-                    profiles = ProfilesCollection.Find(query).SetSkip((page - 1) * pageSize).SetLimit(pageSize);
-                    count = profiles.Count();
-                }
+                profiles =  ProfilesCollection.Find(query).SetSortOrder(sortOrder).SetSkip((page - 1) * pageSize).SetLimit(pageSize);
             }
+            count = ProfilesCollection.Count(query);
 
             return profiles.ToList();
         }
