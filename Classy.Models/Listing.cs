@@ -82,6 +82,10 @@ namespace Classy.Models
         /// the number of times the listing has been added to a collection
         /// </summary>
         public int AddToCollectionCount { get; set; }
+        /// <summary>
+        /// 
+        /// </summary>
+        public int DisplayOrder { get; set; }
 
         /// <summary>
         /// contact info for the listing. use to override contact info of the listing owner <see cref="Profile"/>
