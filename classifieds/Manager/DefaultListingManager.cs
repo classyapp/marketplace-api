@@ -327,7 +327,6 @@ namespace classy.Manager
         public CommentView AddCommentToListing(
             string appId,
             string listingId,
-            string profileId,
             string content,
             bool formatAsHHtml)
         {
@@ -337,7 +336,7 @@ namespace classy.Manager
             var comment = new Comment
             {
                 AppId = appId,
-                ProfileId = profileId,
+                ProfileId = SecurityContext.AuthenticatedProfileId,
                 ListingId = listingId,
                 Content = content
             };
@@ -348,26 +347,26 @@ namespace classy.Manager
             ListingRepository.IncreaseCounter(listingId, appId, ListingCounters.Comments, 1);
 
             // increase comment count for profile of commenter
-            ProfileRepository.IncreaseCounter(appId, profileId, ProfileCounters.Comments, 1);
+            ProfileRepository.IncreaseCounter(appId, SecurityContext.AuthenticatedProfileId, ProfileCounters.Comments, 1);
 
             // increase rank of listing owner
             ProfileRepository.IncreaseCounter(appId, listing.ProfileId, ProfileCounters.Rank, 1);
 
             // add hashtags to listing if the comment is by the listing owner
-            if (profileId == listing.ProfileId)
+            if (SecurityContext.AuthenticatedProfileId == listing.ProfileId)
             {
                 ListingRepository.AddHashtags(listingId, appId, content.ExtractHashtags());
             }
 
             // log a comment activity
             int count = 0;
-            TripleStore.LogActivity(appId, profileId, ActivityPredicate.COMMENT_ON_LISTING, listingId, ref count);
+            TripleStore.LogActivity(appId, SecurityContext.AuthenticatedProfileId, ActivityPredicate.COMMENT_ON_LISTING, listingId, ref count);
 
             // save mentions
             foreach (var mentionedUsername in comment.Content.ExtractUsernames())
             {
                 var mentionedProfile = ProfileRepository.GetByUsername(appId, mentionedUsername.TrimStart('@'), false);
-                TripleStore.LogActivity(appId, profileId, ActivityPredicate.MENTION_PROFILE, mentionedProfile.Id, ref count);
+                TripleStore.LogActivity(appId, SecurityContext.AuthenticatedProfileId, ActivityPredicate.MENTION_PROFILE, mentionedProfile.Id, ref count);
 
                 // increase rank of mentioned profile
                 ProfileRepository.IncreaseCounter(appId, mentionedProfile.Id, ProfileCounters.Rank, 1);
@@ -381,13 +380,12 @@ namespace classy.Manager
 
         public void FavoriteListing(
             string appId,
-            string listingId,
-            string profileId)
+            string listingId)
         {
             var listing = GetVerifiedListing(appId, listingId);
 
             int count = 0;
-            TripleStore.LogActivity(appId, profileId, ActivityPredicate.FAVORITE_LISTING, listingId, ref count);
+            TripleStore.LogActivity(appId, SecurityContext.AuthenticatedProfileId, ActivityPredicate.FAVORITE_LISTING, listingId, ref count);
             if (count == 1)
             {
                 ListingRepository.IncreaseCounter(listingId, appId, ListingCounters.Favorites, 1);
@@ -397,13 +395,12 @@ namespace classy.Manager
 
         public void UnfavoriteListing(
             string appId,
-            string listingId,
-            string profileId)
+            string listingId)
         {
             var listing = GetVerifiedListing(appId, listingId);
 
             int count = 0;
-            TripleStore.ResetActivity(appId, profileId, ActivityPredicate.FAVORITE_LISTING, listingId);
+            TripleStore.ResetActivity(appId, SecurityContext.AuthenticatedProfileId, ActivityPredicate.FAVORITE_LISTING, listingId);
             if (count == 0)
             {
                 ListingRepository.IncreaseCounter(listingId, appId, ListingCounters.Favorites, -1);

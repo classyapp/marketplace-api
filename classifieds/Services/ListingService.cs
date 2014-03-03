@@ -268,11 +268,11 @@ namespace classy.Services
             try
             {
                 var session = SessionAs<CustomUserSession>();
+                ListingManager.SecurityContext = session.ToSecurityContext();
 
                 var comment = ListingManager.AddCommentToListing(
                     request.Environment.AppId,
                     request.ListingId,
-                    session.UserAuthId,
                     request.Content,
                     request.FormatAsHtml);
 
@@ -291,11 +291,11 @@ namespace classy.Services
             try
             {
                 var session = SessionAs<CustomUserSession>();
+                ListingManager.SecurityContext = session.ToSecurityContext();
 
                 ListingManager.FavoriteListing(
                     request.Environment.AppId,
-                    request.ListingId,
-                    session.UserAuthId);
+                    request.ListingId);
 
                 return new HttpResult(HttpStatusCode.OK);
             }
@@ -312,11 +312,11 @@ namespace classy.Services
             try
             {
                 var session = SessionAs<CustomUserSession>();
+                ListingManager.SecurityContext = session.ToSecurityContext();
 
                 ListingManager.UnfavoriteListing(
                     request.Environment.AppId,
-                    request.ListingId,
-                    session.UserAuthId);
+                    request.ListingId);
 
                 return new HttpResult(HttpStatusCode.OK);
             }

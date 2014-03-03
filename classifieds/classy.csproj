@@ -177,7 +177,7 @@
     <Compile Include="Manager\IAnalyticsManager.cs" />
     <Compile Include="Manager\ICollectionManager.cs" />
     <Compile Include="Manager\ILocalizationManager.cs" />
-    <Compile Include="Manager\ManagerBase.cs" />
+    <Compile Include="Manager\IManager.cs" />
     <Compile Include="Manager\IReviewManager.cs" />
     <Compile Include="Manager\DefaultAppManager.cs" />
     <Compile Include="Manager\DefaultBookingManager.cs" />

@@ -155,7 +155,6 @@ namespace classy.Manager
         CommentView AddCommentToListing(
             string appId,
             string listingId,
-            string profileId,
             string content,
             bool formatAsHtml);
 
@@ -164,22 +163,18 @@ namespace classy.Manager
         /// </summary>
         /// <param name="appId"></param>
         /// <param name="listingId"></param>
-        /// <param name="profileId"></param>
         void FavoriteListing(
             string appId,
-            string listingId,
-            string profileId);
+            string listingId);
 
         /// <summary>
         /// 
         /// </summary>
         /// <param name="appId"></param>
         /// <param name="listingId"></param>
-        /// <param name="profileId"></param>
         void UnfavoriteListing(
             string appId,
-            string listingId,
-            string profileId);
+            string listingId);
 
         /// <summary>
         /// 
