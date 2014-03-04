@@ -186,7 +186,6 @@ namespace classy.Manager
         void FlagListing(
             string appId,
             string listingId,
-            string profileId,
             FlagReason FlagReason);
     }
 }

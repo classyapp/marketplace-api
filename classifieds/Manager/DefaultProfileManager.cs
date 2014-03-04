@@ -44,6 +44,8 @@ namespace classy.Manager
             StorageRepository = storageRepository;
         }
 
+        public ManagerSecurityContext SecurityContext { get; set; }
+
         public ProfileView CreateProfileProxy(
             string appId,
             string requestedByProfileId,

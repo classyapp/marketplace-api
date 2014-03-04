@@ -333,11 +333,11 @@ namespace classy.Services
             try
             {
                 var session = SessionAs<CustomUserSession>();
+                ListingManager.SecurityContext = session.ToSecurityContext();
 
                 ListingManager.FlagListing(
                     request.Environment.AppId,
                     request.ListingId,
-                    session.UserAuthId,
                     request.FlagReason);
 
                 return new HttpResult(HttpStatusCode.OK);
@@ -491,7 +491,7 @@ namespace classy.Services
                 if (request.Fields.HasFlag(ProfileUpdateFields.SetPassword))
                 {
                     IUserAuthRepository authRepository = GetAppHost().TryResolve<IUserAuthRepository>();
-                    UserAuth userAuth = authRepository.GetUserAuth(request.Environment.AppId, session.UserAuthId);
+                    UserAuth userAuth = authRepository.GetUserAuth(request.Environment.AppId, request.ProfileId);
                     authRepository.UpdateUserAuth(userAuth, userAuth, request.Password);
                 }
 

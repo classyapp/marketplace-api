@@ -388,7 +388,9 @@ namespace classy.Manager
             TripleStore.LogActivity(appId, SecurityContext.AuthenticatedProfileId, ActivityPredicate.FAVORITE_LISTING, listingId, ref count);
             if (count == 1)
             {
-                ListingRepository.IncreaseCounter(listingId, appId, ListingCounters.Favorites, 1);
+                var listingCounters = ListingCounters.Favorites;
+                if (SecurityContext.IsAdmin) listingCounters |= ListingCounters.DisplayOrder;
+                ListingRepository.IncreaseCounter(listingId, appId, listingCounters, 1);
                 ProfileRepository.IncreaseCounter(appId, listing.ProfileId, ProfileCounters.Rank, 1);
             }
         }
@@ -411,7 +413,6 @@ namespace classy.Manager
         public void FlagListing(
             string appId,
             string listingId,
-            string profileId,
             FlagReason FlagReason)
         {
             var listing = GetVerifiedListing(appId, listingId);
@@ -420,12 +421,12 @@ namespace classy.Manager
             {
                 case FlagReason.Inapropriate:
                     ListingRepository.IncreaseCounter(listingId, appId, ListingCounters.Flags, 1);
-                    ProfileRepository.IncreaseCounter(appId, profileId, ProfileCounters.Rank, -3);
+                    ProfileRepository.IncreaseCounter(appId, SecurityContext.AuthenticatedProfileId, ProfileCounters.Rank, -3);
                     break;
                 case FlagReason.Dislike:
                 default:
                     int count = 0;
-                    TripleStore.LogActivity(appId, profileId, ActivityPredicate.FLAG_LISTING, listingId, ref count);
+                    TripleStore.LogActivity(appId, SecurityContext.AuthenticatedProfileId, ActivityPredicate.FLAG_LISTING, listingId, ref count);
                     break;
             }
         }

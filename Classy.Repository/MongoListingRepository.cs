@@ -191,6 +191,7 @@ namespace Classy.Repository
                 if (counters.HasFlag(ListingCounters.Bookings)) update.Inc(x => x.BookingCount, value);
                 if (counters.HasFlag(ListingCounters.Purchases)) update.Inc(x => x.PurchaseCount, value);
                 if (counters.HasFlag(ListingCounters.AddToCollection)) update.Inc(x => x.AddToCollectionCount, value);
+                if (counters.HasFlag(ListingCounters.DisplayOrder)) update.Inc(x => x.DisplayOrder, value);
                 ListingsCollection.Update(query, update, new MongoUpdateOptions { Flags = UpdateFlags.Multi });
             }
             catch (MongoException mex)

@@ -10,7 +10,7 @@ using System.Threading.Tasks;
 
 namespace classy.Manager
 {
-    public interface IProfileManager
+    public interface IProfileManager : IManager
     {
         /// <summary>
         /// 
