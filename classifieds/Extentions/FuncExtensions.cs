@@ -15,11 +15,21 @@ namespace classy.Extentions
 {
     public static class FunqExtensions
     {
+        private static string GetConnectionString(string key) {
+            // try app settings
+            string connectionString = ConfigurationManager.AppSettings.Get(key + "_URI");
+            if (string.IsNullOrEmpty(connectionString))
+            {
+                // fall back on connection strings
+                connectionString = ConfigurationManager.ConnectionStrings[key].ConnectionString;
+            }
+            return connectionString;
+        }
         public static void WireUp(this Funq.Container container)
         {
             container.Register<IRedisClientsManager>(c =>
             {
-                var connectionString = ConfigurationManager.ConnectionStrings["RedisPubSub"].ConnectionString;
+                var connectionString = GetConnectionString("REDIS");
                 return new PooledRedisClientManager(new string[] { connectionString });
             });
             container.Register<IMessageService>(c => 
@@ -34,7 +44,7 @@ namespace classy.Extentions
             // register mongodb repositories
             container.Register<MongoDatabase>(c =>
             {
-                var connectionString = ConfigurationManager.ConnectionStrings["MongoDB"].ConnectionString;
+                var connectionString = GetConnectionString("MONGO");
                 var client = new MongoClient(connectionString);
                 var databaseName = MongoUrl.Create(connectionString).DatabaseName;
                 var server = client.GetServer();
