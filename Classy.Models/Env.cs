@@ -13,6 +13,21 @@ namespace Classy.Models
     /// </summary>
     public class Env
     {
+        private static Dictionary<string, Coords> DefaultCoordinates;
+
+        static Env()
+        {
+            DefaultCoordinates = new Dictionary<string, Coords>();
+            DefaultCoordinates.Add("US", new Coords { Longitude = -77.0364, Latitude = 38.8951 });
+            DefaultCoordinates.Add("UK", new Coords { Longitude = -0.1277, Latitude = 51.5073 });
+            DefaultCoordinates.Add("FR", new Coords { Longitude = 2.3522, Latitude = 48.8566 });
+            DefaultCoordinates.Add("IT", new Coords { Longitude = 12.4608, Latitude = 41.9015 });
+            DefaultCoordinates.Add("ES", new Coords { Longitude = -3.7038, Latitude = 40.4168 });
+            DefaultCoordinates.Add("IL", new Coords { Longitude = 35.2137, Latitude = 31.7683 });
+            DefaultCoordinates.Add("BE", new Coords { Longitude = 4.3517, Latitude = 50.853 });
+            DefaultCoordinates.Add("NL", new Coords { Longitude = 4.8952, Latitude = 52.3702 });
+        }
+
         public Env()
         {
             // set defaults
@@ -50,17 +65,23 @@ namespace Classy.Models
             {
                 location = new Location();
                 if (GPSCoordinates != null)
-                { 
+                {
                     location.Coords = new Coords { Longitude = GPSCoordinates.Longitude, Latitude = GPSCoordinates.Latitude };
                 }
                 if (!string.IsNullOrEmpty(CountryCode))
                 {
                     location.Address = new PhysicalAddress() { Country = CountryCode };
+                    if (location.Coords == null)
+                    {
+                        Coords coords = DefaultCoordinates[defaultCountry];
+                        location.Coords = new Coords { Longitude = coords.Longitude, Latitude = coords.Latitude };
+                    }
                 }
                 // check got at least one thing
                 if (GPSCoordinates == null && string.IsNullOrEmpty(CountryCode))
                 {
-
+                    Coords coords = DefaultCoordinates[defaultCountry];
+                    location.Coords = new Coords { Longitude = coords.Longitude, Latitude = coords.Latitude };
                     location.Address = new PhysicalAddress() { Country = defaultCountry };
                 }
             }
