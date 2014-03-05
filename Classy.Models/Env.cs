@@ -44,11 +44,25 @@ namespace Classy.Models
 
         private Location location;
 
-        public Location GetDefaultLocation()
+        public Location GetDefaultLocation(string defaultCountry)
         {
             if (location == null)
             {
-                location = new Location { Coords = new Coords { Longitude = GPSCoordinates.Longitude, Latitude = GPSCoordinates.Latitude }, Address = new PhysicalAddress() { Country = CountryCode } };
+                location = new Location();
+                if (GPSCoordinates != null)
+                { 
+                    location.Coords = new Coords { Longitude = GPSCoordinates.Longitude, Latitude = GPSCoordinates.Latitude };
+                }
+                if (!string.IsNullOrEmpty(CountryCode))
+                {
+                    location.Address = new PhysicalAddress() { Country = CountryCode };
+                }
+                // check got at least one thing
+                if (GPSCoordinates == null && string.IsNullOrEmpty(CountryCode))
+                {
+
+                    location.Address = new PhysicalAddress() { Country = defaultCountry };
+                }
             }
             return location;
         }

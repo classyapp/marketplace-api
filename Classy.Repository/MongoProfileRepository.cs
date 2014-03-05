@@ -135,27 +135,49 @@ namespace Classy.Repository
             {
                 if (professionalsOnly)
                 {
-                    ProfilesCollection.EnsureIndex(IndexKeys.GeoSpatial("ProfessionalInfo.CompanyContactInfo.Location.Coords"));
-                    locationQueryByGPS = Query<Profile>.Near(x => x.ProfessionalInfo.CompanyContactInfo.Location.Coords, location.Coords.Longitude.Value, location.Coords.Latitude.Value, 1 / 111.12, true);
-                    locationByCountry = Query<Profile>.EQ(x => x.ProfessionalInfo.CompanyContactInfo.Location.Address.Country, location.Address.Country);
+                    if (location.Coords != null)
+                    {
+                        ProfilesCollection.EnsureIndex(IndexKeys.GeoSpatial("ProfessionalInfo.CompanyContactInfo.Location.Coords"));
+                        locationQueryByGPS = Query<Profile>.Near(x => x.ProfessionalInfo.CompanyContactInfo.Location.Coords, location.Coords.Longitude.Value, location.Coords.Latitude.Value, 1 / 111.12, true);
+                    }
+                    if (location.Address != null && !string.IsNullOrEmpty(location.Address.Country))
+                    {
+                        locationByCountry = Query<Profile>.EQ(x => x.ProfessionalInfo.CompanyContactInfo.Location.Address.Country, location.Address.Country);
+                    }
                 }
                 else
                 {
-                    ProfilesCollection.EnsureIndex(IndexKeys.GeoSpatial("ContactInfo.Location.Coords"));
-                    locationQueryByGPS = Query<Profile>.Near(x => x.ContactInfo.Location.Coords, location.Coords.Longitude.Value, location.Coords.Latitude.Value, 1 / 111.12, true);
-                    locationByCountry = Query<Profile>.EQ(x => x.ContactInfo.Location.Address.Country, location.Address.Country);
+                    if (location.Coords != null)
+                    {
+                        ProfilesCollection.EnsureIndex(IndexKeys.GeoSpatial("ContactInfo.Location.Coords"));
+                        locationQueryByGPS = Query<Profile>.Near(x => x.ContactInfo.Location.Coords, location.Coords.Longitude.Value, location.Coords.Latitude.Value, 1 / 111.12, true);
+                    }
+                    if (location.Address != null && !string.IsNullOrEmpty(location.Address.Country))
+                    {
+                        locationByCountry = Query<Profile>.EQ(x => x.ContactInfo.Location.Address.Country, location.Address.Country);
+                    }
                 }
             }
-            queries.Add(locationQueryByGPS);
+            if (locationQueryByGPS != null)
+            {
+                queries.Add(locationQueryByGPS);
+            }
+            else if (locationByCountry != null)
+            {
+                queries.Add(locationByCountry);
+            }
 
             // try query, and redo for entire country if nothing found nearby
             var query = Query.And(queries);
             MongoCursor<Profile> profiles = null;
             if (ProfilesCollection.Count(query) == 0)
             {
-                queries.Remove(locationQueryByGPS);
-                queries.Add(locationByCountry);
-                query = Query.And(queries);
+                if (locationQueryByGPS != null && locationByCountry != null)
+                {
+                    queries.Remove(locationQueryByGPS);
+                    queries.Add(locationByCountry);
+                    query = Query.And(queries);
+                }
             }
             if (page <= 0)
             {   
