@@ -10,9 +10,9 @@ namespace classy
 {
     public static class UserSessionExtensions
     {
-        public static ContactInfo GetDefaultContactInfo(this CustomUserSession session)
+        public static ContactInfo GetDefaultContactInfo(this CustomUserSession session, string defaultCountry)
         {
-            return new ContactInfo { FirstName = session.FirstName, LastName = session.LastName, Email = session.Email, Location = session.Environment.GetDefaultLocation() };
+            return new ContactInfo { FirstName = session.FirstName, LastName = session.LastName, Email = session.Email, Location = session.Environment.GetDefaultLocation(defaultCountry) };
         }
 
         public static ManagerSecurityContext ToSecurityContext(this CustomUserSession session)

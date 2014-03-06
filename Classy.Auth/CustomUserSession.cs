@@ -45,7 +45,6 @@ namespace Classy.Auth
                 profile.ContactInfo.FirstName = session.FirstName;
                 profile.ContactInfo.LastName = session.LastName;
                 profile.ContactInfo.Email = session.Email;
-                profile.ContactInfo.Location = Environment.GetDefaultLocation();
             }
 
             foreach (var authToken in session.ProviderOAuthAccess)

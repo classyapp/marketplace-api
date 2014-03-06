@@ -110,7 +110,7 @@ namespace classy.Services
                 request.Metadata,
                 request.PriceMin,
                 request.PriceMax,
-                request.Location ?? request.Environment.GetDefaultLocation(),
+                request.Location ?? request.Environment.GetDefaultLocation(AppManager.GetAppById(request.Environment.AppId).DefaultCountry),
                 request.IncludeComments,
                 request.FormatCommentsAsHtml,
                 request.Page,
@@ -133,7 +133,7 @@ namespace classy.Services
                 request.Content,
                 request.ListingType,
                 request.Pricing,
-                request.ContactInfo ?? session.GetDefaultContactInfo(),
+                request.ContactInfo ?? session.GetDefaultContactInfo(AppManager.GetAppById(request.Environment.AppId).DefaultCountry),
                 request.SchedulingTemplate,
                 request.Metadata);
 
@@ -228,7 +228,7 @@ namespace classy.Services
                     request.Content,
                     null,
                     request.Pricing,
-                    request.ContactInfo ?? session.GetDefaultContactInfo(),
+                    request.ContactInfo ?? session.GetDefaultContactInfo(AppManager.GetAppById(request.Environment.AppId).DefaultCountry),
                     request.SchedulingTemplate,
                     request.Metadata);
 
@@ -508,7 +508,7 @@ namespace classy.Services
                 var profile = ProfileManager.UpdateProfile(
                     request.Environment.AppId,
                     request.ProfileId,
-                    request.ContactInfo ?? session.GetDefaultContactInfo(),
+                    request.ContactInfo ?? session.GetDefaultContactInfo(AppManager.GetAppById(request.Environment.AppId).DefaultCountry),
                     request.ProfessionalInfo,
                     request.Metadata,
                     request.Fields,
@@ -535,7 +535,7 @@ namespace classy.Services
                 request.Environment.AppId,
                 request.DisplayName,
                 request.Category,
-                request.Location ?? request.Environment.GetDefaultLocation(),
+                request.Location ?? request.Environment.GetDefaultLocation(AppManager.GetAppById(request.Environment.AppId).DefaultCountry),
                 request.Metadata,
                 request.ProfessionalsOnly,
                 request.Page,

@@ -21,7 +21,11 @@ namespace classy.Manager
                 ExternalMediaThumbnailSizes = new Point[] { new Point { X = 266, Y = 266 } , new Point { X = 301, Y = 301 }, new Point { X = 400, Y = 400 } },
                 DefaultProfileImage = "http://d107oye3n9eb07.cloudfront.net/profile_img_69064",
                 PagesCount = 5,
-                PageSize = 12
+                PageSize = 12,
+                DefaultCountry = "FR",
+                GPSLocationCookieName = "classy.env.gps_location",
+                CountryCookieName = "classy.env.country",
+                CultureCookieName = "classy.env.culture"
             };
         }
     }
