@@ -115,6 +115,7 @@
     <Compile Include="DTO\Request\GetGoogleContacts.cs" />
     <Compile Include="DTO\Request\GetListResourceByKey.cs" />
     <Compile Include="DTO\Request\GetResourceKeysForApp.cs" />
+    <Compile Include="DTO\Request\GetThumbnail.cs" />
     <Compile Include="DTO\Request\RemoveListingFromCollection.cs" />
     <Compile Include="DTO\Request\SetResourceListValues.cs" />
     <Compile Include="DTO\Request\SetResourceValues.cs" />
@@ -174,6 +175,7 @@
     </Compile>
     <Compile Include="Manager\DefaultAnalyticsManager.cs" />
     <Compile Include="Manager\DefaultLocalizationManager.cs" />
+    <Compile Include="Manager\DefaultThumbnailManager.cs" />
     <Compile Include="Manager\IAnalyticsManager.cs" />
     <Compile Include="Manager\ICollectionManager.cs" />
     <Compile Include="Manager\ILocalizationManager.cs" />
@@ -189,6 +191,7 @@
     <Compile Include="Manager\IListingManager.cs" />
     <Compile Include="Manager\IOrderManager.cs" />
     <Compile Include="Manager\IProfileManager.cs" />
+    <Compile Include="Manager\IThumbnailManager.cs" />
     <Compile Include="Operations\CreateThumbnailsOperator.cs" />
     <Compile Include="Operations\CreateThumbnailsRequest.cs" />
     <Compile Include="Operations\IOperator.cs" />
