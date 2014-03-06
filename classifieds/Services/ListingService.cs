@@ -29,6 +29,7 @@ namespace classy.Services
         public ICollectionManager CollectionManager { get; set; }
         public IAnalyticsManager AnalyticsManager { get; set; }
         public ILocalizationManager LocalizationManager { get; set; }
+        public IThumbnailManager ThumbnailManager { get; set; }
         public IAppManager AppManager { get; set; }
 
         [CustomAuthenticate]
@@ -1192,6 +1193,12 @@ namespace classy.Services
             }
             return new HttpResult(null, HttpStatusCode.OK);
             
+        }
+
+        [AddHeader(ContentType = "image/jpeg")]
+        public object Get(GetThumbnail request)
+        {
+            return new HttpResult(ThumbnailManager.CreateThumbnail(request.ImageKey, request.Width, request.Height), "image/jpeg");
         }
 
     }

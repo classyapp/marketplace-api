@@ -126,6 +126,10 @@ namespace classy
                 Routes
                     // App settings
                     .Add<GetAppSettings>("/app/settings", "GET")
+
+                    // Thumbnails
+                    .Add<GetThumbnail>("/thumbnail/{ImageKey}", "GET")
+
                     // Listings
                     .Add<GetListingById>("/listing/{ListingId}", "GET") // get listing by id, update listing
                     .Add<DeleteListing>("/listing/{ListingId}", "DELETE") // delete listing by id, update listing
