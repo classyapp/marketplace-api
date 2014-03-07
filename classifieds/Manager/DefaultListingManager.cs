@@ -181,7 +181,7 @@ namespace classy.Manager
                         {
                             var key = Guid.NewGuid().ToString();
                             var content = reader.ReadBytes((int)file.ContentLength);
-                            StorageRepository.SaveFile(key, content, file.ContentType);
+                            StorageRepository.SaveFile(key, content, file.ContentType, true);
                             var mediaFile = new MediaFile
                             {
                                 Type = MediaFileType.Image,
@@ -191,7 +191,7 @@ namespace classy.Manager
                             };
                             mediaFiles.Add(mediaFile);
 
-                            _messageQueueClient.Publish<CreateThumbnailsRequest>(new CreateThumbnailsRequest(appId, listingId, key, file.ContentType, content));
+                            //_messageQueueClient.Publish<CreateThumbnailsRequest>(new CreateThumbnailsRequest(appId, listingId, key, file.ContentType, content));
                         }
                     }
                 }

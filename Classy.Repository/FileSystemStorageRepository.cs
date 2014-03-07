@@ -17,6 +17,10 @@ namespace Classy.Repository
         }
         public void SaveFile(string key, byte[] content, string contentType)
         {
+            SaveFile(key, content, contentType, false);
+        }
+        public void SaveFile(string key, byte[] content, string contentType, bool cacheStream)
+        {
             var ms = new MemoryStream(content);
             var img = System.Drawing.Image.FromStream(ms);
             var filename = GetPathFromKey(key);

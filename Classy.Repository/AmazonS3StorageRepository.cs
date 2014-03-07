@@ -14,13 +14,27 @@ namespace Classy.Repository
     {
         private readonly Amazon.S3.IAmazonS3 s3Client;
         private readonly string bucketName;
+        private static Dictionary<string, Stream> memoryCache;
+        private static Dictionary<int, string> keys;
+
+        static AmazonS3StorageRepository()
+        {
+            memoryCache = new Dictionary<string, Stream>();
+            keys = new Dictionary<int, string>();
+        }
 
         public AmazonS3StorageRepository(Amazon.S3.IAmazonS3 s3Client, string bucketName)
         {
             this.s3Client = s3Client;
             this.bucketName = bucketName;
         }
+
         public void SaveFile(string key, byte[] content, string contentType)
+        {
+            SaveFile(key, content, contentType, false);
+        }
+
+        public void SaveFile(string key, byte[] content, string contentType, bool cacheStream)
         {
             PutObjectRequest request = new PutObjectRequest();
             request.BucketName = bucketName;
@@ -28,11 +42,31 @@ namespace Classy.Repository
             request.Key = key;
             request.InputStream = new MemoryStream(content);
             request.CannedACL = Amazon.S3.S3CannedACL.PublicReadWrite;
-            s3Client.PutObjectAsync(request);
+            if (cacheStream)
+            {
+                memoryCache.Add(key, new MemoryStream(content));
+                Task<PutObjectResponse> response = s3Client.PutObjectAsync(request);
+                keys.Add(response.Id, key);
+                response.ContinueWith(t => {
+                        if (t.IsCompleted)
+                        {
+                            memoryCache.Remove(keys[t.Id]);
+                        }
+                    });
+            }
+            else
+            {
+                s3Client.PutObjectAsync(request);
+            }
         }
 
         public Stream GetFile(string key)
         {
+            if (memoryCache.ContainsKey(key))
+            {
+                return memoryCache[key];
+            }
+
             var request = new GetObjectRequest()
             {
                 Key = key,
@@ -61,6 +95,19 @@ namespace Classy.Repository
         public string KeyToUrl(string key)
         {
             return string.Concat("http://", ConfigurationManager.AppSettings["CloudFrontDistributionUrl"].TrimEnd('/'), '/', key);
+        }
+
+        private void CacheStream(string originKey, Stream stream)
+        {
+            if (stream == null)
+                throw new ArgumentNullException("stream");
+
+            if (memoryCache.ContainsKey(originKey))
+            {
+                memoryCache[originKey].Dispose();
+                memoryCache.Remove(originKey);
+            }
+            memoryCache.Add(originKey, stream);
         }
     }
 }
