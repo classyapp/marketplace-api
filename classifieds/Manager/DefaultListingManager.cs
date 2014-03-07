@@ -521,6 +521,7 @@ namespace classy.Manager
                     //    var update = Update<Listing>.Inc(x => x.ViewCount, 1);
                     //    ListingsCollection.Update(query, update, new MongoUpdateOptions { Flags = UpdateFlags.Multi });
                 }
+
                 return collectionView;
             }
             catch (Exception)
@@ -538,6 +539,15 @@ namespace classy.Manager
             {
                 var profile = GetVerifiedProfile(appId, profileId);
                 var collections = CollectionRepository.GetByProfileId(appId, profileId, collectionType);
+
+                foreach (var collection in collections)
+                {
+                    if (collection.CoverPhotos == null || collection.CoverPhotos.Count == 0)
+                    {
+                        collection.CoverPhotos = ListingRepository.GetById(collection.IncludedListings.Select(l => l.Id).Skip(Math.Max(0, collection.IncludedListings.Count - 4)).ToArray(), appId, false).Select(l => l.ExternalMedia[0].Key).ToArray();
+                    }
+                }
+
                 return collections.ToCollectionViewList();
             }
             catch (Exception)
@@ -686,6 +696,10 @@ namespace classy.Manager
         private Collection GetVerifiedCollection(string appId, string collectionId)
         {
             var collection = CollectionRepository.GetById(appId, collectionId);
+            if (collection.CoverPhotos == null || collection.CoverPhotos.Count == 0)
+            {
+                collection.CoverPhotos = ListingRepository.GetById(collection.IncludedListings.Select(l => l.Id).Skip(Math.Max(0, collection.IncludedListings.Count - 4)).ToArray(), appId, false).Select(l => l.ExternalMedia[0].Key).ToArray();
+            }
             if (collection == null) throw new KeyNotFoundException("invalid collection");
             return collection;
         }
