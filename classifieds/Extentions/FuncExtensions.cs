@@ -136,6 +136,9 @@ namespace classy.Extentions
             container.Register<ILocalizationManager>(c =>
                 new DefaultLocalizationManager(
                     c.TryResolve<ILocalizationRepository>()));
+            container.Register<IThumbnailManager>(c =>
+                new DefaultThumbnailManager(
+                    c.TryResolve<IStorageRepository>()));
         }
     }
 }
