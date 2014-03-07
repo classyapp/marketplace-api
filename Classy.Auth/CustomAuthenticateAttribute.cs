@@ -156,13 +156,16 @@ namespace ServiceStack.ServiceInterface
         {
             if (req.HttpMethod != HttpMethods.Options)
             {
-                var json = req.Headers["X-Classy-Env"];
-                var env = json.FromJson<Classy.Models.Env>();
-                if (!VerifyApiKey(env != null ? env.AppId : null))
+                if (!req.AbsoluteUri.ToLower().StartsWith("/thumbnail"))
                 {
-                    throw HttpError.Unauthorized("Invalid API Key");
+                    var json = req.Headers["X-Classy-Env"];
+                    var env = json.FromJson<Classy.Models.Env>();
+                    if (!VerifyApiKey(env != null ? env.AppId : null))
+                    {
+                        throw HttpError.Unauthorized("Invalid API Key");
+                    }
+                    if (dto != null && dto is Classy.Models.BaseRequestDto) (dto as Classy.Models.BaseRequestDto).Environment = env;
                 }
-                if (dto != null && dto is Classy.Models.BaseRequestDto) (dto as Classy.Models.BaseRequestDto).Environment = env;
             }
         }
 
