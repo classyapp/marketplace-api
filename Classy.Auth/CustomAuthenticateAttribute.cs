@@ -156,7 +156,7 @@ namespace ServiceStack.ServiceInterface
         {
             if (req.HttpMethod != HttpMethods.Options)
             {
-                if (!req.AbsoluteUri.ToLower().StartsWith("/thumbnail"))
+                if (!(new Uri(req.AbsoluteUri).AbsolutePath.ToLower().StartsWith("/thumbnail")))
                 {
                     var json = req.Headers["X-Classy-Env"];
                     var env = json.FromJson<Classy.Models.Env>();
