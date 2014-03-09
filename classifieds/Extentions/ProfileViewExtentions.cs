@@ -23,6 +23,7 @@ namespace classy
                 to.IsProfessional = from.IsProfessional;
                 to.ProfessionalInfo = from.ProfessionalInfo.ToSellerView();
                 to.IsFacebookConnected = !from.FacebookUserId.IsNullOrEmpty();
+                to.IsGoogleConnected = !from.GoogleUserName.IsNullOrEmpty();
             }
             // avatar
             if (from.Avatar != null) to.Avatar = from.Avatar.ToMediaFileView();

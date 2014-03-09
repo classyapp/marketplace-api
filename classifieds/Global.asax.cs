@@ -78,14 +78,15 @@ namespace classy
             {
                 var mqServer = container.TryResolve<ServiceStack.Messaging.IMessageService>();
 
-                // create thumbnails
-                container.Register<CreateThumbnailsOperator>(c => new CreateThumbnailsOperator(c.TryResolve<IStorageRepository>(), c.TryResolve<IListingRepository>(), c.TryResolve<IAppManager>()));
-                mqServer.RegisterHandler<CreateThumbnailsRequest>(m =>
-                {
-                    var operation = container.TryResolve<CreateThumbnailsOperator>();
-                    operation.PerformOperation(m.GetBody());
-                    return true;
-                });
+                //// example operator registration
+                //// -----------------------------
+                //container.Register<CreateThumbnailsOperator>(c => new CreateThumbnailsOperator(c.TryResolve<IStorageRepository>(), c.TryResolve<IListingRepository>(), c.TryResolve<IAppManager>()));
+                //mqServer.RegisterHandler<CreateThumbnailsRequest>(m =>
+                //{
+                //    var operation = container.TryResolve<CreateThumbnailsOperator>();
+                //    operation.PerformOperation(m.GetBody());
+                //    return true;
+                //});
 
                 mqServer.Start();
             }
@@ -98,7 +99,7 @@ namespace classy
                 Plugins.Add(new Classy.Auth.AuthFeature(
                     () => new CustomUserSession(), // Use your own typed Custom UserSession type
                         new Classy.Auth.IAuthProvider[] {
-                        new Classy.Auth.CredentialsAuthProvider(),              //HTML Form post of UserName/Password credentials
+                        new Classy.Auth.CredentialsAuthProvider(),      //HTML Form post of UserName/Password credentials
                         new CustomFacebookAuthProvider(appSettings),    //Sign-in with Facebook
                         new GoogleOAuth2Provider(appSettings),
                         //new DigestAuthProvider(appSettings),        //Sign-in with Digest Auth
@@ -108,9 +109,6 @@ namespace classy
 
                 //Provide service for new users to register so they can login with supplied credentials.
                 Plugins.Add(new Classy.Auth.RegistrationFeature());
-
-                //override the default registration validation with your own custom implementation
-                //container.RegisterAs<CustomRegistrationValidator, IValidator<Registration>>();
 
                 //Store User Data into the referenced MongoDB database
                 container.Register<Classy.Auth.IUserAuthRepository>(c => new Classy.Auth.MongoDBAuthRepository(c.Resolve<MongoDatabase>(), true)); 

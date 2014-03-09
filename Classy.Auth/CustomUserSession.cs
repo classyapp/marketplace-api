@@ -54,11 +54,10 @@ namespace Classy.Auth
                     profile.ContactInfo.FirstName = authToken.FirstName;
                     profile.ContactInfo.LastName = authToken.LastName;
                     profile.ContactInfo.Email = authToken.Email;
+                    profile.FacebookUserId = authToken.UserId;
+                    profile.FacebookUserName = authToken.UserName;
                     if (isNew)
                     {
-
-                        profile.FacebookUserId = authToken.UserId;
-                        profile.FacebookUserName = authToken.UserName;
                         profile.UserName = authToken.UserName;
                         profile.Avatar = CreateAvatar(storage, string.Format("http://graph.facebook.com/{0}/picture?type=large", authToken.UserName), session.UserAuthId);
                     }
@@ -68,6 +67,7 @@ namespace Classy.Auth
                     profile.ContactInfo.FirstName = authToken.FirstName;
                     profile.ContactInfo.LastName = authToken.LastName;
                     profile.ContactInfo.Email = authToken.Email;
+                    profile.GoogleUserName = authToken.UserName;
                     if (isNew)
                     {
                         profile.UserName = authToken.UserName;
