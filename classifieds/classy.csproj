@@ -192,8 +192,6 @@
     <Compile Include="Manager\IOrderManager.cs" />
     <Compile Include="Manager\IProfileManager.cs" />
     <Compile Include="Manager\IThumbnailManager.cs" />
-    <Compile Include="Operations\CreateThumbnailsOperator.cs" />
-    <Compile Include="Operations\CreateThumbnailsRequest.cs" />
     <Compile Include="Operations\IOperator.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Services\ListingService.cs" />

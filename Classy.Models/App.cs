@@ -16,9 +16,9 @@ namespace Classy.Models
         public bool AllowUnmoderatedComments { get; set; }
         public bool EnableProxyProfiles { get; set; }
         public bool ProxyClaimNeedsVerification { get; set; }
-        public Point[] ExternalMediaThumbnailSizes { get; set; }
         public string DefaultProfileImage { get; set; }
         public string DefaultCountry { get; set; }
+        public string DefaultCulture { get; set; }
         public string GPSLocationCookieName { get; set; }
         public string CountryCookieName { get; set; }
         public string CultureCookieName { get; set; }

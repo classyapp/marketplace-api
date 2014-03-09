@@ -49,7 +49,7 @@ namespace classy.Services
         public object Get(GetAppSettings request)
         {
             var app = AppManager.GetAppById(request.Environment.AppId);
-            return new HttpResult(app, HttpStatusCode.OK);
+            return new HttpResult(app.TranslateTo<AppView>(), HttpStatusCode.OK);
         }
 
         public object Get(GetListingById request)

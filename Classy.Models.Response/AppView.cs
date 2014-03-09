@@ -15,5 +15,7 @@ namespace Classy.Models.Response
         public bool EnableProxyProfiles { get; set; }
         public bool ProxyClaimNeedsVerification { get; set; }
         public string DefaultProfileImage { get; set; }
+        public string DefaultCountry { get; set; }
+        public string DefaultCulture { get; set; }
     }
 }
