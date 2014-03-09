@@ -28,6 +28,7 @@ namespace Classy.Models
         public string TwitterScreenName { get; set; }
         public string FacebookUserId { get; set; }
         public string FacebookUserName { get; set; }
+        public string GoogleUserName { get; set; }
         public MediaFile Avatar { get; set; }
         public int Rank { get; set; }
         public int FollowerCount { get; set; }
