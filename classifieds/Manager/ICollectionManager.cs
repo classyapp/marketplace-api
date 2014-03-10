@@ -82,6 +82,17 @@ namespace classy.Manager
             IList<Classy.Models.IncludedListing> listings);
 
         /// <summary>
+        /// deletes existing collection
+        /// </summary>
+        /// <param name="appId"></param>
+        /// <param name="profileId"></param>
+        /// <param name="collectionId"></param>
+        void DeleteCollection(
+            string appId, 
+            string profileId, 
+            string collectionId);
+
+        /// <summary>
         /// get a specific <see cref="CollectionView"/> by id
         /// </summary>
         /// <param name="appId"></param>
