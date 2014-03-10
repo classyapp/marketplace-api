@@ -736,7 +736,10 @@ namespace classy.Manager
         /// <returns></returns>
         private Listing GetVerifiedListing(string appId, string listingId, bool includeDrafts)
         {
-            return ListingRepository.GetById(listingId, appId, includeDrafts);
+            Listing listing;
+            listing = ListingRepository.GetById(listingId, appId, includeDrafts);
+            if (listing == null) throw new KeyNotFoundException("invalid listing");
+            return listing;
         }
 
         private Listing GetVerifiedListing(string appId, string listingId)
