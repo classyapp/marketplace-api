@@ -46,6 +46,11 @@ namespace Classy.Repository
         /// <param name="collection"></param>
         void Update(Collection collection);
         /// <summary>
+        /// deletes an existing collection
+        /// </summary>
+        /// <param name="collection"></param>
+        void Delete(string appId, string collectionId);
+        /// <summary>
         /// remove a listing from the collection
         /// </summary>
         /// <param name="appId"></param>
