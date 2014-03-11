@@ -1053,9 +1053,9 @@ namespace classy.Services
             try
             {
                 var session = SessionAs<CustomUserSession>();
+                CollectionManager.SecurityContext = session.ToSecurityContext();
                 CollectionManager.DeleteCollection(
                     request.Environment.AppId,
-                    session.UserAuthId,
                     request.CollectionId);
                 return new HttpResult(true, HttpStatusCode.OK);
             }

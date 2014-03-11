@@ -89,7 +89,6 @@ namespace classy.Manager
         /// <param name="collectionId"></param>
         void DeleteCollection(
             string appId, 
-            string profileId, 
             string collectionId);
 
         /// <summary>

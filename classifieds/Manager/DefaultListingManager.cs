@@ -671,13 +671,12 @@ namespace classy.Manager
 
         public void DeleteCollection(
             string appId,
-            string profileId,
             string collectionId)
         {
             try
             {
                 var collection = GetVerifiedCollection(appId, collectionId);
-                if (collection.ProfileId != profileId) throw new UnauthorizedAccessException();
+                if (collection.ProfileId != SecurityContext.AuthenticatedProfileId && !SecurityContext.IsAdmin) throw new UnauthorizedAccessException();
                 
                 CollectionRepository.Delete(appId, collectionId);
             }
