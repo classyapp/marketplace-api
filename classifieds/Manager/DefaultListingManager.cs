@@ -669,6 +669,23 @@ namespace classy.Manager
             }
         }
 
+        public void DeleteCollection(
+            string appId,
+            string collectionId)
+        {
+            try
+            {
+                var collection = GetVerifiedCollection(appId, collectionId);
+                if (collection.ProfileId != SecurityContext.AuthenticatedProfileId && !SecurityContext.IsAdmin) throw new UnauthorizedAccessException();
+                
+                CollectionRepository.Delete(appId, collectionId);
+            }
+            catch (Exception)
+            {
+                throw;
+            }
+        }
+
         public CollectionView SubmitCollectionForEditorialApproval(string appId, string collectionId)
         {
             var collection = GetVerifiedCollection(appId, collectionId);

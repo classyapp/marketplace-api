@@ -103,6 +103,8 @@ namespace Classy.Repository
             }
             if (!string.IsNullOrEmpty(displayName))
             {
+                // escape 
+                displayName = displayName.Replace("?", "\\?");
                 // search for professional with matching company name, or contact name
                 var nameQuery = Query.Or(
                     Query<Profile>.Matches(x => x.ProfessionalInfo.CompanyContactInfo.FirstName, BsonRegularExpression.Create(new Regex(displayName, RegexOptions.IgnoreCase))),

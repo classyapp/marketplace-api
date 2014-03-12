@@ -64,6 +64,19 @@ namespace Classy.Repository
             }
         }
 
+        public void Delete(string appId, string collectionId)
+        {
+            try
+            {
+                var query = Query<Collection>.Where(x => x.AppId == appId && x.Id == collectionId);
+                CollectionsCollection.Remove(query);
+            }
+            catch (MongoException)
+            {
+                throw;
+            }
+        }
+
         public IList<Collection> GetByProfileId(string appId, string profileId, string collectionType)
         {
             try

@@ -1045,6 +1045,27 @@ namespace classy.Services
         }
 
         //
+        // DELETE: /collection/{CollectionId}
+        // delete collection
+        [CustomAuthenticate]
+        public object Delete(DeleteCollection request)
+        {
+            try
+            {
+                var session = SessionAs<CustomUserSession>();
+                CollectionManager.SecurityContext = session.ToSecurityContext();
+                CollectionManager.DeleteCollection(
+                    request.Environment.AppId,
+                    request.CollectionId);
+                return new HttpResult(true, HttpStatusCode.OK);
+            }
+            catch (KeyNotFoundException kex)
+            {
+                return new HttpError(HttpStatusCode.NotFound, kex.Message);
+            }
+        }
+
+        //
         // POST: /collection/{CollectionId}/submit
         // add listings to a collection
         [CustomAuthenticate]
