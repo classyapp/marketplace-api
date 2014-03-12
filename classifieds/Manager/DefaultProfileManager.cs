@@ -257,6 +257,12 @@ namespace classy.Manager
                 };
             }
 
+            // cover photos
+            if (fields.HasFlag(ProfileUpdateFields.CoverPhotos))
+            {
+                profile.ProfessionalInfo.CoverPhotos = professionalInfo.CoverPhotos;
+            }
+
             ProfileRepository.Save(profile);
             return profile.ToProfileView();
         }
