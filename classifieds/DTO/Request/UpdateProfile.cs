@@ -13,7 +13,8 @@ namespace Classy.Models.Request
         ContactInfo = 2,
         ProfessionalInfo = 4,
         Metadata = 8,
-        ProfileImage = 16
+        ProfileImage = 16,
+        CoverPhotos = 32
     }
 
     public class UpdateProfile : BaseRequestDto
@@ -50,6 +51,13 @@ namespace Classy.Models.Request
             When(x => x.Fields.HasFlag(ProfileUpdateFields.SetPassword), () =>
             {
                 RuleFor(x => x.Password).NotNull();
+            });
+
+            When(x => x.Fields.HasFlag(ProfileUpdateFields.CoverPhotos), () =>
+            {
+                RuleFor(x => x.ProfessionalInfo).Cascade(CascadeMode.StopOnFirstFailure).NotNull();
+                RuleFor(x => x.ProfessionalInfo.CoverPhotos).NotEmpty();
+                RuleFor(x => x.ProfessionalInfo.CoverPhotos.Count).LessThanOrEqualTo(4).GreaterThanOrEqualTo(1);
             });
         }
     }
