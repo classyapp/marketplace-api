@@ -57,6 +57,7 @@ namespace Classy.Models.Request
             {
                 RuleFor(x => x.ProfessionalInfo).Cascade(CascadeMode.StopOnFirstFailure).NotNull();
                 RuleFor(x => x.ProfessionalInfo.CoverPhotos).NotEmpty();
+                RuleFor(x => x.ProfessionalInfo.CoverPhotos.Count).LessThanOrEqualTo(4).GreaterThanOrEqualTo(1);
             });
         }
     }
