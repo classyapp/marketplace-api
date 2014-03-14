@@ -166,5 +166,37 @@ namespace Classy.Repository
                 throw;
             }
         }
+
+        public void IncreaseCounter(string collectionId, string appId, CollectionCounters counters, int value)
+        {
+            try
+            {
+                var query = Query.And(
+                    Query<Collection>.EQ(x => x.Id, collectionId),
+                    Query<Collection>.EQ(x => x.AppId, appId)
+                    );
+                var update = new UpdateBuilder<Collection>();
+                if (counters.HasFlag(CollectionCounters.Comments)) update.Inc(x => x.CommentCount, value);
+                CollectionsCollection.Update(query, update, new MongoUpdateOptions { Flags = UpdateFlags.Multi });
+            }
+            catch (MongoException mex)
+            {
+                throw;
+            }
+        }
+
+        public void AddHashtags(string collectionId, string appId, string[] hashtags)
+        {
+            try
+            {
+                CollectionsCollection.Update(Query.And(
+                    Query<Collection>.EQ(x => x.Id, collectionId),
+                    Query<Collection>.EQ(x => x.AppId, appId)), Update<Collection>.AddToSetEach<string>(x => x.Hashtags, hashtags));
+            }
+            catch (MongoException mex)
+            {
+                throw;
+            }
+        }
     }
 }

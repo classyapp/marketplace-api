@@ -148,6 +148,7 @@ namespace classy
                     .Add<DeleteCollection>("/collection/{CollectionId}", "DELETE") //delete collection
                     .Add<SubmitCollectionForEditorialApproval>("/collection/{CollectionId}/submit", "POST")
                     .Add<GetApprovedCollections>("/collection/list/approved", "GET")
+                    .Add<SetCollectionCoverPhotos>("/collection/{CollectionId}/cover", "POST") //set collection cover photos
                     //.Add<RemoveListingsFromCollection>("/collection/{CollectionId}/listing", "DELETE") // remove listings to collection
                     //.Add<AddCollaboratorsToCollection>("/collection/{CollectionId}/collaborator", "POST") // add collaborators to collection
                     //.Add<RemoveCollaboratorsFromCollection>("/collection/{CollectionId}/collaborator", "DELETE") // remove collaborators to collection
@@ -158,7 +159,8 @@ namespace classy
                     .Add<GetCollectionByProfileId>("/profile/{ProfileId}/collection/list/{CollectionType}", "GET") // get a collection by id
 
                     // Comments
-                    .Add<PostComment>("/listing/{ListingId}/comment/new", "POST") // post new comment
+                    .Add<PostComment>("/listing/{ObjectId}/comment/new", "POST") // post new comment
+                    .Add<PostComment>("/collection/{ObjectId}/comment/new", "POST") // post new comment
                     //.Add<PublishComment>("/listing/{ListingId}}/comment/{CommentId}/publish", "POST")
                     //.Add<DeleteComment>("/listing/{ListingId}/comment/{CommentId}", "DELETE")
 

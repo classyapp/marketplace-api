@@ -67,5 +67,10 @@ namespace Classy.Repository
             // return
             return comments;
         }
+
+        public IList<Comment> GetByCollectionId(string collectionId, bool formatCommentsAsHtml)
+        {
+            return GetByListingId(collectionId, formatCommentsAsHtml);
+        }
     }
 }

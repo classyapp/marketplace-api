@@ -269,13 +269,26 @@ namespace classy.Services
             try
             {
                 var session = SessionAs<CustomUserSession>();
-                ListingManager.SecurityContext = session.ToSecurityContext();
+                CommentView comment = null;
 
-                var comment = ListingManager.AddCommentToListing(
-                    request.Environment.AppId,
-                    request.ListingId,
-                    request.Content,
-                    request.FormatAsHtml);
+                if (request.Type == ObjectType.Listing)
+                {
+                    ListingManager.SecurityContext = session.ToSecurityContext();
+                    comment = ListingManager.AddCommentToListing(
+                        request.Environment.AppId,
+                        request.ObjectId,
+                        request.Content,
+                        request.FormatAsHtml);
+                }
+                else if (request.Type == ObjectType.Collection)
+                {
+                    CollectionManager.SecurityContext = session.ToSecurityContext();
+                    comment = CollectionManager.AddCommentToCollection(
+                        request.Environment.AppId,
+                        request.ObjectId,
+                        request.Content,
+                        request.FormatAsHtml);
+                }
 
                 return new HttpResult(comment, HttpStatusCode.OK);
             }
@@ -1066,6 +1079,28 @@ namespace classy.Services
         }
 
         //
+        // POST: /collection/{CollectionId}/cover
+        // set collection cover photos
+        public object Post(SetCollectionCoverPhotos request)
+        {
+            try
+            {
+                var session = SessionAs<CustomUserSession>();
+                CollectionManager.SecurityContext = session.ToSecurityContext();
+
+                var collection = CollectionManager.UpdateCollectionCover(
+                    request.Environment.AppId,
+                    request.CollectionId,
+                    request.Keys);
+                return new HttpResult(collection, HttpStatusCode.OK);
+            }
+            catch (KeyNotFoundException kex)
+            {
+                return new HttpError(HttpStatusCode.NotFound, kex.Message);
+            }
+        }
+
+        //
         // POST: /collection/{CollectionId}/submit
         // add listings to a collection
         [CustomAuthenticate]
@@ -1104,15 +1139,19 @@ namespace classy.Services
             try
             {
                 var session = SessionAs<CustomUserSession>();
+                CollectionManager.SecurityContext = session.ToSecurityContext();
+
                 var collection = CollectionManager.GetCollectionById(
                     request.Environment.AppId,
                     request.CollectionId,
-                    session.UserAuthId,
                     request.IncludeProfile,
-                    request.IncludeDrafts,
                     request.IncludeListings,
+                    request.IncludeDrafts,
                     request.IncreaseViewCounter,
-                    request.IncreaseViewCounterOnListings);
+                    request.IncreaseViewCounterOnListings,
+                    request.IncludeComments,
+                    request.FormatCommentsAsHtml,
+                    request.IncludeCommenterProfiles);
                 return new HttpResult(collection, HttpStatusCode.OK);
             }
             catch (KeyNotFoundException kex)

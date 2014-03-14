@@ -118,6 +118,7 @@
     <Compile Include="DTO\Request\GetResourceKeysForApp.cs" />
     <Compile Include="DTO\Request\GetThumbnail.cs" />
     <Compile Include="DTO\Request\RemoveListingFromCollection.cs" />
+    <Compile Include="DTO\Request\SetCollectionCoverPhotos.cs" />
     <Compile Include="DTO\Request\SetResourceListValues.cs" />
     <Compile Include="DTO\Request\SetResourceValues.cs" />
     <Compile Include="DTO\Request\GetResourceByKey.cs" />
