@@ -177,7 +177,7 @@ namespace Classy.Repository
                     );
                 var update = new UpdateBuilder<Collection>();
                 if (counters.HasFlag(CollectionCounters.Comments)) update.Inc(x => x.CommentCount, value);
-                CollectionsCollection.Update(query, update, new MongoUpdateOptions { Flags = UpdateFlags.Multi });
+                CollectionsCollection.Update(query, update);
             }
             catch (MongoException mex)
             {
