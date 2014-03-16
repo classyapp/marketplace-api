@@ -80,16 +80,17 @@ namespace classy.Manager
 
         public SearchResultsView<ProfileView> SearchProfiles(
             string appId,
-            string partialUserName,
+            string searchQuery,
             string category,
             Location location,
             IDictionary<string, string> metadata,
             bool professionalsOnly,
+            bool ignoreLocation,
             int page,
             int pageSize)
         {
             long count = 0;
-            var profileList = ProfileRepository.Search(appId, partialUserName, category, location, metadata, professionalsOnly, page, pageSize, ref count);
+            var profileList = ProfileRepository.Search(appId, searchQuery, category, location, metadata, professionalsOnly, ignoreLocation, page, pageSize, ref count);
             IList<ProfileView> results = new List<ProfileView>();
             foreach (var profile in profileList)
             {
