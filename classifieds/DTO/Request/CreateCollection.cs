@@ -11,6 +11,7 @@ namespace Classy.Models.Request
     /// </summary>
     public class CreateCollection : BaseRequestDto
     {
+        public string ProfileId { get; set; }
         public string Type { get; set; }
         public string Title { get; set; }
         public string Content { get; set; }

@@ -539,6 +539,7 @@ namespace classy.Services
                 request.Location ?? request.Environment.GetDefaultLocation(AppManager.GetAppById(request.Environment.AppId).DefaultCountry),
                 request.Metadata,
                 request.ProfessionalsOnly,
+                request.IgnoreLocation
                 request.Page,
                 AppManager.GetAppById(request.Environment.AppId).PageSize);
 

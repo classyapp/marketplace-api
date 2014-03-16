@@ -76,11 +76,12 @@ namespace classy.Manager
         /// <returns></returns>
         SearchResultsView<ProfileView> SearchProfiles(
             string appId,
-            string partialUserName,
+            string searchQuery,
             string category,
             Location location,
             IDictionary<string, string> metadata,
             bool professionalsOnly,
+            bool ignoreLocation,
             int page,
             int pageSize);
 
