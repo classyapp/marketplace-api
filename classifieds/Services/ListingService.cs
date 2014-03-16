@@ -539,7 +539,7 @@ namespace classy.Services
                 request.Location ?? request.Environment.GetDefaultLocation(AppManager.GetAppById(request.Environment.AppId).DefaultCountry),
                 request.Metadata,
                 request.ProfessionalsOnly,
-                request.IgnoreLocation
+                request.IgnoreLocation,
                 request.Page,
                 AppManager.GetAppById(request.Environment.AppId).PageSize);
 
@@ -959,9 +959,11 @@ namespace classy.Services
             try
             {
                 var session = SessionAs<CustomUserSession>();
+                ListingManager.SecurityContext = session.ToSecurityContext();
+
                 var collection = CollectionManager.CreateCollection(
                     request.Environment.AppId,
-                    session.UserAuthId,
+                    request.ProfileId,
                     request.Type,
                     request.Title,
                     request.Content,
@@ -986,9 +988,10 @@ namespace classy.Services
             try
             {
                 var session = SessionAs<CustomUserSession>();
+                CollectionManager.SecurityContext = session.ToSecurityContext();
+
                 var collection = CollectionManager.AddListingsToCollection(
                     request.Environment.AppId,
-                    session.UserAuthId,
                     request.CollectionId,
                     request.IncludedListings);
                 return new HttpResult(collection, HttpStatusCode.OK);

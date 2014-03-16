@@ -10,6 +10,7 @@ namespace Classy.Models
     {
         public static readonly string PhotoBook = "PhotoBook";
         public static readonly string Project = "Project";
+        public static readonly string WebPhotos = "WebPhotos";
     }
 
     /// <summary>
@@ -22,7 +23,7 @@ namespace Classy.Models
         /// </summary>
         public string ProfileId { get; set; }
         /// <summary>
-        /// Collection types: ideabook, project
+        /// Collection types: photobook, project, webphotos
         /// </summary>
         public string Type { get; set; }
         /// <summary>

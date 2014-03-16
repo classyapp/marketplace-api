@@ -40,13 +40,11 @@ namespace classy.Manager
         /// adds listings to an existing collection
         /// </summary>
         /// <param name="appId"></param>
-        /// <param name="profileId"></param>
         /// <param name="collectionId"></param>
         /// <param name="listingIds"></param>
         /// <returns>the collection with the new listings added to the IncludedListings param</returns>
         CollectionView AddListingsToCollection(
             string appId,
-            string profileId,
             string collectionId,
             IList<IncludedListing> listingIds);
 

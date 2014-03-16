@@ -448,7 +448,7 @@ namespace classy.Manager
                 var collection = new Collection
                 {
                     AppId = appId,
-                    ProfileId = profileId,
+                    ProfileId = string.IsNullOrEmpty(profileId) ? SecurityContext.AuthenticatedProfileId : profileId,
                     Type = type,
                     Title = title,
                     Content = content,
@@ -558,14 +558,13 @@ namespace classy.Manager
 
         public CollectionView AddListingsToCollection(
             string appId,
-            string profileId,
             string collectionId,
             IList<IncludedListing> includedListings)
         {
             try
             {
                 var collection = GetVerifiedCollection(appId, collectionId);
-                if (collection.ProfileId != profileId) throw new UnauthorizedAccessException();
+                if (collection.ProfileId != SecurityContext.AuthenticatedProfileId && collection.Type != CollectionType.WebPhotos) throw new UnauthorizedAccessException();
                 // TODO: verify all listings exist
                 if (collection.IncludedListings == null) collection.IncludedListings = new List<Classy.Models.IncludedListing>();
                 // log an activity, and increase the counter for the listings that were included
@@ -576,7 +575,7 @@ namespace classy.Manager
                     if (!collection.IncludedListings.Any(i => i.Id == listing.Id))
                     {
                         changed = true;
-                        TripleStore.LogActivity(appId, profileId, ActivityPredicate.ADD_LISTING_TO_COLLECTION, listing.Id, ref count);
+                        TripleStore.LogActivity(appId, SecurityContext.AuthenticatedProfileId, ActivityPredicate.ADD_LISTING_TO_COLLECTION, listing.Id, ref count);
                         collection.IncludedListings.Add(new Classy.Models.IncludedListing { Id = listing.Id, Comments = listing.Comments, ListingType = listing.ListingType });
                         ListingRepository.IncreaseCounter(listing.Id, appId, ListingCounters.AddToCollection, 1);
                     }
