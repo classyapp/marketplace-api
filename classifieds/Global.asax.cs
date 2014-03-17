@@ -159,8 +159,8 @@ namespace classy
                     .Add<GetCollectionByProfileId>("/profile/{ProfileId}/collection/list/{CollectionType}", "GET") // get a collection by id
 
                     // Comments
-                    .Add<PostListingComment>("/listing/{ListingId}/comment/new", "POST") // post new comment
-                    .Add<PostCollectionComment>("/collection/{CollectionId}/comment/new", "POST") // post new comment
+                    .Add<PostCommentForListing>("/listing/{ListingId}/comment/new", "POST") // post new comment
+                    .Add<PostCommentForCollection>("/collection/{CollectionId}/comment/new", "POST") // post new comment
                     //.Add<PublishComment>("/listing/{ListingId}}/comment/{CommentId}/publish", "POST")
                     //.Add<DeleteComment>("/listing/{ListingId}/comment/{CommentId}", "DELETE")
 

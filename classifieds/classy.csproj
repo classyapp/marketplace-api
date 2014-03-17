@@ -109,7 +109,7 @@
     <Compile Include="DTO\Request\ClaimProxyProfile.cs" />
     <Compile Include="DTO\Request\AddListingToCollection.cs" />
     <Compile Include="DTO\Request\PostComment.cs" />
-    <Compile Include="DTO\Request\PostCollectionComment.cs" />
+    <Compile Include="DTO\Request\PostCommentForCollection.cs" />
     <Compile Include="DTO\Request\DeleteCollection.cs" />
     <Compile Include="DTO\Request\DeleteListing.cs" />
     <Compile Include="DTO\Request\EditListing.cs" />
@@ -147,7 +147,7 @@
     <Compile Include="DTO\Request\GetOrdersForProfileListings.cs" />
     <Compile Include="DTO\Request\GetProfileById.cs" />
     <Compile Include="DTO\Request\GetReviewsByProfileId.cs" />
-    <Compile Include="DTO\Request\PostListingComment.cs" />
+    <Compile Include="DTO\Request\PostCommentForListing.cs" />
     <Compile Include="DTO\Request\PostListing.cs" />
     <Compile Include="DTO\Request\PostReviewForListing.cs" />
     <Compile Include="DTO\Request\PostReviewForProfile.cs" />

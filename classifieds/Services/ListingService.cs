@@ -264,7 +264,7 @@ namespace classy.Services
 
         // add comment to post
         [CustomAuthenticate]
-        public object Post(PostListingComment request)
+        public object Post(PostCommentForListing request)
         {
             try
             {
@@ -288,7 +288,7 @@ namespace classy.Services
 
         // add comment to post
         [CustomAuthenticate]
-        public object Post(PostCollectionComment request)
+        public object Post(PostCommentForCollection request)
         {
             try
             {
