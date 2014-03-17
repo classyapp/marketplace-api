@@ -264,31 +264,43 @@ namespace classy.Services
 
         // add comment to post
         [CustomAuthenticate]
-        public object Post(PostComment request)
+        public object Post(PostListingComment request)
         {
             try
             {
                 var session = SessionAs<CustomUserSession>();
                 CommentView comment = null;
 
-                if (request.Type == ObjectType.Listing)
-                {
-                    ListingManager.SecurityContext = session.ToSecurityContext();
-                    comment = ListingManager.AddCommentToListing(
-                        request.Environment.AppId,
-                        request.ObjectId,
-                        request.Content,
-                        request.FormatAsHtml);
-                }
-                else if (request.Type == ObjectType.Collection)
-                {
-                    CollectionManager.SecurityContext = session.ToSecurityContext();
-                    comment = CollectionManager.AddCommentToCollection(
-                        request.Environment.AppId,
-                        request.ObjectId,
-                        request.Content,
-                        request.FormatAsHtml);
-                }
+                ListingManager.SecurityContext = session.ToSecurityContext();
+                comment = ListingManager.AddCommentToListing(
+                    request.Environment.AppId,
+                    request.ListingId,
+                    request.Content,
+                    request.FormatAsHtml);
+
+                return new HttpResult(comment, HttpStatusCode.OK);
+            }
+            catch (KeyNotFoundException kex)
+            {
+                return new HttpError(HttpStatusCode.NotFound, kex.Message);
+            }
+        }
+
+        // add comment to post
+        [CustomAuthenticate]
+        public object Post(PostCollectionComment request)
+        {
+            try
+            {
+                var session = SessionAs<CustomUserSession>();
+                CommentView comment = null;
+
+                CollectionManager.SecurityContext = session.ToSecurityContext();
+                comment = CollectionManager.AddCommentToCollection(
+                    request.Environment.AppId,
+                    request.CollectionId,
+                    request.Content,
+                    request.FormatAsHtml);
 
                 return new HttpResult(comment, HttpStatusCode.OK);
             }
@@ -459,7 +471,7 @@ namespace classy.Services
                     false,
                     false,
                     false,
-                    true, 
+                    true,
                     false);
                 return new HttpResult(profile);
             }
@@ -497,7 +509,7 @@ namespace classy.Services
         {
             try
             {
-                var session = SessionAs<CustomUserSession>();   
+                var session = SessionAs<CustomUserSession>();
 
                 if (session.UserAuthId != request.ProfileId &&
                     !session.Permissions.Contains("admin")) throw new UnauthorizedAccessException("not yours to update");
@@ -1128,7 +1140,7 @@ namespace classy.Services
                 request.Environment.AppId,
                 request.Categories,
                 request.MaxCollections);
-            return new HttpResult(collections , HttpStatusCode.OK);
+            return new HttpResult(collections, HttpStatusCode.OK);
         }
 
         //
@@ -1236,7 +1248,7 @@ namespace classy.Services
         {
             var session = SessionAs<CustomUserSession>();
             var token = session.ProviderOAuthAccess.SingleOrDefault(x => x.Provider == "facebook").AccessToken;
-            var albums = ProfileManager.GetFacebookAlbums(request.Environment.AppId, session.UserAuthId, token);            
+            var albums = ProfileManager.GetFacebookAlbums(request.Environment.AppId, session.UserAuthId, token);
             return new HttpResult(albums, HttpStatusCode.OK);
         }
         //GET: /profile/google/contacts
@@ -1252,7 +1264,7 @@ namespace classy.Services
                 return new HttpResult(contacts, HttpStatusCode.OK);
             }
             return new HttpResult(null, HttpStatusCode.OK);
-            
+
         }
 
         [AddHeader(ContentType = "image/jpeg")]
