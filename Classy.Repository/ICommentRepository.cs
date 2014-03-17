@@ -12,5 +12,6 @@ namespace Classy.Repository
         string Save(Comment comment);
         IList<Comment> GetByListingId(string listingId, bool formatAsHtml);
         IList<Comment> GetByListingIds(IEnumerable<string> listingIds, bool formatAsHtml);
+        IList<Comment> GetByCollectionId(string collectionId, bool formatCommentsAsHtml);
     }
 }

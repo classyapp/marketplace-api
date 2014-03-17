@@ -17,5 +17,8 @@ namespace Classy.Models.Request
         public bool IncludeDrafts { get; set; }
         public bool IncreaseViewCounter { get; set; }
         public bool IncreaseViewCounterOnListings { get; set; }
+        public bool IncludeComments { get; set; }
+        public bool FormatCommentsAsHtml { get; set; }
+        public bool IncludeCommenterProfiles { get; set; }
     }
 }

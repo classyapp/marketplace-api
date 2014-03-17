@@ -181,7 +181,7 @@ namespace classy.Manager
                     if (c.IncludedListings != null)
                     {
                         c.Listings = ListingRepository.GetById(c.IncludedListings.Select(l => l.Id).ToArray(), appId, false).ToListingViewList();
-                        if (c.CoverPhotos == null || c.CoverPhotos.Count < 4)
+                        if (c.CoverPhotos == null || c.CoverPhotos.Count == 0)
                         {
                             c.CoverPhotos = ListingRepository.GetById(c.IncludedListings.Select(l => l.Id).Skip(Math.Max(0, c.IncludedListings.Count - 4)).ToArray(), appId, false).Select(l => l.ExternalMedia[0].Key).ToArray();
                         }

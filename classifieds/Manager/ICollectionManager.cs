@@ -90,6 +90,18 @@ namespace classy.Manager
             string collectionId);
 
         /// <summary>
+        /// Updates cover photos array for a collection
+        /// </summary>
+        /// <param name="appId"></param>
+        /// <param name="collectionId"></param>
+        /// <param name="photoKeys"></param>
+        /// <returns></returns>
+        CollectionView UpdateCollectionCover(
+            string appId, 
+            string collectionId, 
+            IList<string> photoKeys);
+
+        /// <summary>
         /// get a specific <see cref="CollectionView"/> by id
         /// </summary>
         /// <param name="appId"></param>
@@ -104,12 +116,14 @@ namespace classy.Manager
         CollectionView GetCollectionById(
             string appId,
             string collectionId,
-            string profileId,
             bool includeProfile,
             bool includeListings,
             bool includeDrafts,
             bool increaseViewCounter,
-            bool increaseViewCounterOnListings);
+            bool increaseViewCounterOnListings,
+            bool includeComments,
+            bool formatCommentsAsHtml,
+            bool includeCommenterProfiles);
 
         /// <summary>
         /// get a list of a user's <see cref="CollectionView"/>s
@@ -143,5 +157,7 @@ namespace classy.Manager
             string appId,
             string[] categories,
             int maxCollections);
+
+        CommentView AddCommentToCollection(string appId, string collectionId, string content, bool formatAsHtml);
     }
 }

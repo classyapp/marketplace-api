@@ -18,6 +18,10 @@ namespace Classy.Models
     /// </summary>
     public class Collection : BaseObject
     {
+        public Collection()
+        {
+            Hashtags = new List<string>();
+        }
         /// <summary>
         /// the profile id of the collection owner
         /// </summary>
@@ -87,6 +91,10 @@ namespace Classy.Models
         /// A collection of media files' keys to be used in creating the collage
         /// </summary>
         public IList<string> CoverPhotos { get; set; }
+        /// <summary>
+        /// tags that identify the collection in searches
+        /// </summary>
+        public IList<string> Hashtags { get; set; }
     }
 }
 

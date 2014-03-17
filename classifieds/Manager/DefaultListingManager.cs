@@ -490,12 +490,14 @@ namespace classy.Manager
         public CollectionView GetCollectionById(
             string appId,
             string collectionId,
-            string profileId,
             bool includeProfile,
-            bool includeDrafts,
             bool includeListings,
+            bool includeDrafts,
             bool increaseViewCounter,
-            bool increaseViewCounterOnListings)
+            bool increaseViewCounterOnListings,
+            bool includeComments,
+            bool formatCommentsAsHtml,
+            bool includeCommenterProfiles)
         {
             try
             {
@@ -512,7 +514,7 @@ namespace classy.Manager
                 if (increaseViewCounter)
                 {
                     int count = 0;
-                    TripleStore.LogActivity(appId, profileId, ActivityPredicate.VIEW_COLLECTION, collectionId, ref count);
+                    TripleStore.LogActivity(appId, SecurityContext.AuthenticatedProfileId, ActivityPredicate.VIEW_COLLECTION, collectionId, ref count);
                     //CollectionRepository.IncreaseCounter(appId, collectionId);
                     if (increaseViewCounterOnListings)
                     {
@@ -520,6 +522,23 @@ namespace classy.Manager
                     }
                     //    var update = Update<Listing>.Inc(x => x.ViewCount, 1);
                     //    ListingsCollection.Update(query, update, new MongoUpdateOptions { Flags = UpdateFlags.Multi });
+                }
+
+                if (includeComments)
+                {
+                    var comments = CommentRepository.GetByCollectionId(collectionId, formatCommentsAsHtml);
+                    IList<Profile> commenterProfiles = null;
+                    if (includeCommenterProfiles) commenterProfiles = ProfileRepository.GetByIds(appId, (from c in comments select c.ProfileId).ToArray());
+                    collectionView.Comments = new List<CommentView>();
+                    foreach (var c in comments)
+                    {
+                        var comment = c.TranslateTo<CommentView>();
+                        if (commenterProfiles != null)
+                        {
+                            comment.Profile = (from p in commenterProfiles where p.Id == comment.ProfileId select p).Single().ToProfileView();
+                        }
+                        collectionView.Comments.Add(comment.TranslateTo<CommentView>());
+                    }
                 }
 
                 return collectionView;
@@ -685,6 +704,78 @@ namespace classy.Manager
             }
         }
 
+        public CommentView AddCommentToCollection(string appId, string collectionId, string content, bool formatAsHtml)
+        {
+            var collection = GetVerifiedCollection(appId, collectionId);
+
+            // save to repository
+            var comment = new Comment
+            {
+                AppId = appId,
+                ProfileId = SecurityContext.AuthenticatedProfileId,
+                ListingId = collectionId,
+                Content = content
+            };
+
+            comment.Id = CommentRepository.Save(comment);
+
+            // increase comment count for listing
+            CollectionRepository.IncreaseCounter(collectionId, appId, CollectionCounters.Comments, 1);
+
+            // increase comment count for profile of commenter
+            ProfileRepository.IncreaseCounter(appId, SecurityContext.AuthenticatedProfileId, ProfileCounters.Comments, 1);
+
+            // increase rank of listing owner
+            ProfileRepository.IncreaseCounter(appId, collection.ProfileId, ProfileCounters.Rank, 1);
+
+            // add hashtags to listing if the comment is by the listing owner
+            if (SecurityContext.AuthenticatedProfileId == collection.ProfileId)
+            {
+                CollectionRepository.AddHashtags(collectionId, appId, content.ExtractHashtags());
+            }
+
+            // log a comment activity
+            int count = 0;
+            TripleStore.LogActivity(appId, SecurityContext.AuthenticatedProfileId, ActivityPredicate.COMMENT_ON_COLLECTION, collectionId, ref count);
+
+            // save mentions
+            foreach (var mentionedUsername in comment.Content.ExtractUsernames())
+            {
+                var mentionedProfile = ProfileRepository.GetByUsername(appId, mentionedUsername.TrimStart('@'), false);
+                TripleStore.LogActivity(appId, SecurityContext.AuthenticatedProfileId, ActivityPredicate.MENTION_PROFILE, mentionedProfile.Id, ref count);
+
+                // increase rank of mentioned profile
+                ProfileRepository.IncreaseCounter(appId, mentionedProfile.Id, ProfileCounters.Rank, 1);
+            }
+
+            // format as html
+            if (formatAsHtml) comment.Content = comment.Content.FormatAsHtml();
+
+            return comment.TranslateTo<CommentView>();
+        }
+
+        public CollectionView UpdateCollectionCover(
+            string appId,
+            string collectionId,
+            IList<string> photoKeys)
+        {
+            try
+            {
+                var collection = GetVerifiedCollection(appId, collectionId);
+                if (collection.ProfileId != SecurityContext.AuthenticatedProfileId) throw new UnauthorizedAccessException();
+                collection.CoverPhotos = photoKeys;
+
+                CollectionRepository.Update(collection);
+                var collectionView = collection.ToCollectionView();
+                collectionView.Listings = ListingRepository.GetById(collection.IncludedListings.Select(l => l.Id).ToArray(), appId, false).ToListingViewList();
+                return collectionView;
+            }
+            catch (Exception)
+            {
+                throw;
+            }
+        }
+
         public CollectionView SubmitCollectionForEditorialApproval(string appId, string collectionId)
         {
             var collection = GetVerifiedCollection(appId, collectionId);
@@ -712,10 +803,6 @@ namespace classy.Manager
         private Collection GetVerifiedCollection(string appId, string collectionId)
         {
             var collection = CollectionRepository.GetById(appId, collectionId);
-            if (collection.CoverPhotos == null || collection.CoverPhotos.Count == 0)
-            {
-                collection.CoverPhotos = ListingRepository.GetById(collection.IncludedListings.Select(l => l.Id).Skip(Math.Max(0, collection.IncludedListings.Count - 4)).ToArray(), appId, false).Select(l => l.ExternalMedia[0].Key).ToArray();
-            }
             if (collection == null) throw new KeyNotFoundException("invalid collection");
             return collection;
         }
