@@ -7,14 +7,14 @@ using ServiceStack.Common.Web;
 
 namespace Classy.Models.Request
 {
-    public class PostListingComment : PostComment
+    public class PostCommentForListing : PostComment
     {
         public string ListingId { get; set; }
     }
 
-    public class PostListingCommentValidator : AbstractValidator<PostListingComment>
+    public class PostCommentForListingValidator : AbstractValidator<PostCommentForListing>
     {
-        public PostListingCommentValidator()
+        public PostCommentForListingValidator()
         {
             RuleSet(HttpMethods.Post, () =>
             {
