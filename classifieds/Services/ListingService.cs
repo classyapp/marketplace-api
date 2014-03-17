@@ -959,7 +959,7 @@ namespace classy.Services
             try
             {
                 var session = SessionAs<CustomUserSession>();
-                ListingManager.SecurityContext = session.ToSecurityContext();
+                CollectionManager.SecurityContext = session.ToSecurityContext();
 
                 var collection = CollectionManager.CreateCollection(
                     request.Environment.AppId,
