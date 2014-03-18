@@ -29,6 +29,7 @@ namespace classy
             if (from.Avatar != null) to.Avatar = from.Avatar.ToMediaFileView();
             //proxy
             to.IsProxy = from.IsProxy;
+
             return to;
         }
 
@@ -40,6 +41,14 @@ namespace classy
                 to.Add(p.ToProfileView());
             }
             return to;
+        }
+
+        public static void Merge(this ProfileView profileView, ProfileTranslation translation)
+        {
+            foreach (var key in translation.Metadata.Keys)
+            {
+                profileView.Metadata[key] = translation.Metadata[key];
+            }
         }
     }
 }

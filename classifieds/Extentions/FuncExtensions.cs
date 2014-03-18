@@ -73,6 +73,7 @@ namespace classy.Extentions
             container.Register<IOrderRepository>(c => new MongoOrderRepository(c.Resolve<MongoDatabase>()));
             container.Register<ICollectionRepository>(c => new MongoCollectionRepository(c.Resolve<MongoDatabase>()));
             container.Register<ILocalizationRepository>(c => new MongoLocalizationProvider(c.Resolve<MongoDatabase>()));
+            container.Register<IProfileTranslationRepository>(c => new MongoProfileTranslationRepository(c.Resolve<MongoDatabase>()));
             container.Register<IAppManager>(c =>
                 new DefaultAppManager());
             container.Register<IPaymentGateway>(c =>
@@ -111,7 +112,8 @@ namespace classy.Extentions
                     c.TryResolve<IReviewRepository>(),
                     c.TryResolve<ICollectionRepository>(),
                     c.TryResolve<ITripleStore>(),
-                    c.TryResolve<IStorageRepository>()));
+                    c.TryResolve<IStorageRepository>(),
+                    c.TryResolve<IProfileTranslationRepository>()));
             container.Register<IReviewManager>(c =>
                 new DefaultProfileManager(
                     c.TryResolve<IAppManager>(),
@@ -120,7 +122,8 @@ namespace classy.Extentions
                     c.TryResolve<IReviewRepository>(),
                     c.TryResolve<ICollectionRepository>(),
                     c.TryResolve<ITripleStore>(),
-                    c.TryResolve<IStorageRepository>()));
+                    c.TryResolve<IStorageRepository>(),
+                    c.TryResolve<IProfileTranslationRepository>()));
             container.Register<ICollectionManager>(c =>
                 new DefaultListingManager(
                     c.TryResolve<IMessageQueueClient>(),
