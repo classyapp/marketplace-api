@@ -123,7 +123,7 @@ namespace classy.Manager
                 var view = c.ToListingView();
                 if (includeComments)
                 {
-                    view.Comments = comments.Where(x => x.ListingId == view.Id).ToCommentViewList();
+                    view.Comments = comments.Where(x => x.ObjectId == view.Id).ToCommentViewList();
                 }
                 listingViews.Add(view);
             }
@@ -156,7 +156,7 @@ namespace classy.Manager
                 var view = c.ToListingView();
                 if (includeComments)
                 {
-                    view.Comments = comments.Where(x => x.ListingId == view.Id).ToCommentViewList();
+                    view.Comments = comments.Where(x => x.ObjectId == view.Id).ToCommentViewList();
                 }
                 listingViews.Add(view);
             }
@@ -337,7 +337,7 @@ namespace classy.Manager
             {
                 AppId = appId,
                 ProfileId = SecurityContext.AuthenticatedProfileId,
-                ListingId = listingId,
+                ObjectId = listingId,
                 Content = content
             };
 
@@ -713,7 +713,7 @@ namespace classy.Manager
             {
                 AppId = appId,
                 ProfileId = SecurityContext.AuthenticatedProfileId,
-                ListingId = collectionId,
+                ObjectId = collectionId,
                 Content = content
             };
 

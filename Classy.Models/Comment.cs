@@ -9,7 +9,7 @@ namespace Classy.Models
 {
     public class Comment : BaseObject
     {
-        public string ListingId { get; set; }
+        public string ObjectId { get; set; }
         public string ProfileId { get; set; }
         public string Content { get; set; }
     }

@@ -35,7 +35,7 @@ namespace Classy.Repository
         public IList<Comment> GetByListingId(string listingId, bool formatAsHtml)
         {
             // get listing
-            var query = Query<Comment>.EQ(x => x.ListingId, listingId);
+            var query = Query<Comment>.EQ(x => x.ObjectId, listingId);
 
             var results = CommentsCollection.Find(query);
             if (results == null) return new List<Comment>();
