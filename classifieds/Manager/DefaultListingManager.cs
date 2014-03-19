@@ -148,7 +148,7 @@ namespace classy.Manager
             // TODO: cache listings
             if (tags != null && tags.Count() > 0)
             {
-                tags = tags.Select(x => string.Concat("#", x.TrimStart(new char[] { '#' }))).ToArray();
+                tags = tags.Where(x => x != null).Select(x => string.Concat("#", x.TrimStart(new char[] { '#' }))).ToArray();
             }
             var listings = ListingRepository.Search(tags, listingTypes, metadata, priceMin, priceMax, location, appId, false, false, page, pageSize, ref count);
             var comments = includeComments ?
