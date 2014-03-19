@@ -552,19 +552,21 @@ namespace classy.Services
         }
 
         [CustomAuthenticate]
-        public object Post(SetProfileTranslation request)
+        public object Post(SetTranslation request)
         {
             try
             {
                 var session = SessionAs<CustomUserSession>();
                 ProfileManager.SecurityContext = session.ToSecurityContext();
-                ProfileManager.SaveProfileTranslation(
+                ProfileManager.SaveTranslation(
                     request.Environment.AppId,
-                    request.ProfileId,
+                    request.ObjectId,
                     request.Culture,
-                    request.Metadata);
+                    request.Metadata,
+                    request.Title,
+                    request.Content);
 
-                return new HttpResult(new { ProfileId = request.ProfileId, Culture = request.Culture, Count = request.Metadata.Count }, HttpStatusCode.OK);
+                return new HttpResult(new { ObjectId = request.ObjectId, Culture = request.Culture }, HttpStatusCode.OK);
             }
             catch (KeyNotFoundException kex)
             {

@@ -7,11 +7,11 @@ using Classy.Models;
 
 namespace Classy.Repository
 {
-    public interface IProfileTranslationRepository
+    public interface ITranslationRepository
     {
-        ProfileTranslation GetById(string appId, string profileId, string culture);
-        string Insert(ProfileTranslation translation);
-        void Update(ProfileTranslation translation);
+        Translation GetById(string appId, string profileId, string culture);
+        string Insert(Translation translation);
+        void Update(Translation translation);
         void Delete(string appId, string profileId, string culture);
         void DeleteAll(string appId, string profileId);
     }

@@ -43,7 +43,7 @@ namespace classy
             return to;
         }
 
-        public static void Merge(this ProfileView profileView, ProfileTranslation translation)
+        public static void MergeTranslation(this ProfileView profileView, Translation translation)
         {
             foreach (var key in translation.Metadata.Keys)
             {

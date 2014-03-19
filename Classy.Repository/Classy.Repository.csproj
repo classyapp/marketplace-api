@@ -63,7 +63,7 @@
   <ItemGroup>
     <Compile Include="AmazonS3StorageRepository.cs" />
     <Compile Include="ILocalizationRepository.cs" />
-    <Compile Include="IProfileTranslationRepository.cs" />
+    <Compile Include="ITranslationRepository.cs" />
     <Compile Include="MongoCollectionRepository.cs" />
     <Compile Include="ICollectionRepository.cs" />
     <Compile Include="DummyCalculators.cs" />
@@ -86,7 +86,7 @@
     <Compile Include="MongoLocalizationProvider.cs" />
     <Compile Include="MongoOrderRepository.cs" />
     <Compile Include="MongoProfileRepository.cs" />
-    <Compile Include="MongoProfileTranslationRepository.cs" />
+    <Compile Include="MongoTranslationRepository.cs" />
     <Compile Include="MongoReviewRepository.cs" />
     <Compile Include="MongoTransactionRepository.cs" />
     <Compile Include="MongoTripleStore.cs" />

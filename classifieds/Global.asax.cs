@@ -196,7 +196,7 @@ namespace classy
                     .Add<SearchProfiles>("/profile/search", ApplyTo.Get | ApplyTo.Post)
                     .Add<GetFacebookAlbums>("/profile/social/facebook/albums", ApplyTo.Get)
                     .Add<GetGoogleContacts>("/profile/social/google/contacts", ApplyTo.Get)
-                    .Add<SetProfileTranslation>("/profile/{ProfileID}/translate", "POST")
+                    .Add<SetTranslation>("/profile/{ProfileID}/translate", "POST")
 
                     // Reviews
                     .Add<PostReviewForListing>("/listing/{ListingId}/reviews/new", "POST")

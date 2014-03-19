@@ -6,21 +6,21 @@ using ServiceStack.FluentValidation;
 
 namespace Classy.Models.Request
 {
-    public class SetProfileTranslation : BaseRequestDto
+    public class SetTranslation : BaseRequestDto
     {
-        public string ProfileId { get; set; }
+        public string ObjectId { get; set; }
         public string Culture { get; set; }
         public IDictionary<string, string> Metadata { get; set; }
+        public string Title { get; set; }
+        public string Content { get; set; }
     }
 
-    public class SetProfileTranslationValidator : AbstractValidator<SetProfileTranslation>
+    public class SetTranslationValidator : AbstractValidator<SetTranslation>
     {
-        public SetProfileTranslationValidator()
+        public SetTranslationValidator()
         {
-            //RuleFor(x => x.ProfileId).NotNull().NotEmpty();
-            //RuleFor(x => x.Culture).NotNull().NotEmpty();
-
-            //RuleFor(x => x.Metadata).NotNull();
+            RuleFor(x => x.ObjectId).NotNull().NotEmpty();
+            RuleFor(x => x.Culture).NotNull().NotEmpty();
         }
     }
 }

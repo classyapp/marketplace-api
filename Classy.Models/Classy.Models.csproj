@@ -76,7 +76,7 @@
     <Compile Include="MediaThumbnail.cs" />
     <Compile Include="LocalizationResource.cs" />
     <Compile Include="Profile.cs" />
-    <Compile Include="ProfileTranslation.cs" />
+    <Compile Include="Translation.cs" />
     <Compile Include="ProxyClaim.cs" />
     <Compile Include="ProfessionalInfo.cs" />
     <Compile Include="BankAccount.cs" />

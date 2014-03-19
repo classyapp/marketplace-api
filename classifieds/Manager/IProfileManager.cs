@@ -171,6 +171,6 @@ namespace classy.Manager
         /// <param name="profileId"></param>
         /// <param name="culture"></param>
         /// <param name="metadata"></param>
-        void SaveProfileTranslation(string appId, string profileId, string culture, IDictionary<string, string> metadata);
+        void SaveTranslation(string appId, string profileId, string culture, IDictionary<string, string> metadata, string title, string content);
     }
 }

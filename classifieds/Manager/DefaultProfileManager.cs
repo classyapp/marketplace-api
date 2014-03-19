@@ -25,7 +25,7 @@ namespace classy.Manager
         private ICollectionRepository CollectionRepository;
         private ITripleStore TripleStore;
         private IStorageRepository StorageRepository;
-        private IProfileTranslationRepository ProfileTranslationsRepository;
+        private ITranslationRepository TranslationsRepository;
 
         public DefaultProfileManager(
             IAppManager appManager,
@@ -35,7 +35,7 @@ namespace classy.Manager
             ICollectionRepository collectionRepository,
             ITripleStore tripleStore,
             IStorageRepository storageRepository,
-            IProfileTranslationRepository profileTranslationsRepository)
+            ITranslationRepository translationsRepository)
         {
             AppManager = appManager;
             ProfileRepository = profileRepository;
@@ -44,7 +44,7 @@ namespace classy.Manager
             CollectionRepository = collectionRepository;
             TripleStore = tripleStore;
             StorageRepository = storageRepository;
-            ProfileTranslationsRepository = profileTranslationsRepository;
+            TranslationsRepository = translationsRepository;
         }
 
         public ManagerSecurityContext SecurityContext { get; set; }
@@ -212,10 +212,10 @@ namespace classy.Manager
             // Get translations if culture is specified
             if (!string.IsNullOrEmpty(culture))
             {
-                var translation = ProfileTranslationsRepository.GetById(appId, profileId, culture);
+                var translation = TranslationsRepository.GetById(appId, profileId, culture);
                 if (translation != null)
                 {
-                    profileView.Merge(translation);
+                    profileView.MergeTranslation(translation);
                 }
             }
 
@@ -298,28 +298,32 @@ namespace classy.Manager
             return profile.ToProfileView();
         }
 
-        public void SaveProfileTranslation(
+        public void SaveTranslation(
             string appId, 
             string profileId, 
             string culture, 
-            IDictionary<string, string> metadata)
+            IDictionary<string, string> metadata,
+            string title,
+            string content)
         {
             if (SecurityContext.IsAdmin || SecurityContext.AuthenticatedProfileId == profileId)
             {
-                ProfileTranslation translation = ProfileTranslationsRepository.GetById(appId, profileId, culture);
+                Translation translation = TranslationsRepository.GetById(appId, profileId, culture);
                 if (translation == null)
                 {
-                    translation = new ProfileTranslation();
+                    translation = new Translation();
                     translation.AppId = appId;
                     translation.ProfileId = profileId;
                     translation.Culture = culture;
                     translation.Metadata = metadata;
-                    ProfileTranslationsRepository.Insert(translation);
+                    translation.Title = title;
+                    translation.Content = content;
+                    TranslationsRepository.Insert(translation);
                 }
                 else
                 {
                     translation.Metadata = metadata;
-                    ProfileTranslationsRepository.Update(translation);
+                    TranslationsRepository.Update(translation);
                 }
             }
         }
