@@ -132,9 +132,9 @@ namespace classy.Manager
 
         public SearchResultsView<ListingView> SearchListings(
             string appId,
-            string tag,
-            string listingType,
-            IDictionary<string, string> metadata,
+            string[] tags,
+            string[] listingTypes,
+            IDictionary<string, string[]> metadata,
             double? priceMin,
             double? priceMax,
             Location location,
@@ -146,8 +146,11 @@ namespace classy.Manager
             long count = 0;
 
             // TODO: cache listings
-            tag = string.IsNullOrEmpty(tag) ? null : string.Concat("#", tag.TrimStart(new char[] { '#' }));
-            var listings = ListingRepository.Search(tag, listingType, metadata, priceMin, priceMax, location, appId, false, false, page, pageSize, ref count);
+            if (tags != null && tags.Count() > 0)
+            {
+                tags = tags.Where(x => x != null).Select(x => string.Concat("#", x.TrimStart(new char[] { '#' }))).ToArray();
+            }
+            var listings = ListingRepository.Search(tags, listingTypes, metadata, priceMin, priceMax, location, appId, false, false, page, pageSize, ref count);
             var comments = includeComments ?
                 CommentRepository.GetByListingIds(listings.Select(x => x.Id).AsEnumerable(), formatCommentsAsHtml) : null;
             var listingViews = new List<ListingView>();
