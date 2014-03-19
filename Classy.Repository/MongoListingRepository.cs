@@ -233,29 +233,57 @@ namespace Classy.Repository
             throw new NotImplementedException();
         }
 
-        public IList<Listing> Search(string tag, string listingType, IDictionary<string, string> metadata, 
+        public IList<Listing> Search(string[] tags, string[] listingTypes, IDictionary<string, string[]> metadata, 
             double? priceMin, double? priceMax, Location location, string appId,
             bool includeDrafts, bool increaseViewCounter, int page, int pageSize, ref long count)
         {
-            var sortOrder = SortBy<Listing>.Descending(x => x.DisplayOrder);
+            // set sort order
+            var sortOrder = SortBy<Listing>.Descending(x => x.DisplayOrder).Descending(x => x.FavoriteCount);
+
+            // app id
             var queries = new List<IMongoQuery>() {
                 Query<Listing>.EQ(x => x.AppId, appId)
             };
-            if (!string.IsNullOrEmpty(listingType))
+
+            // listing types
+            if (listingTypes != null && listingTypes.Count() > 0)
             {
-                queries.Add(Query<Listing>.EQ(x => x.ListingType, listingType));
+                var listingTypesQueries = new List<IMongoQuery>();
+                foreach (var listingType in listingTypes)
+                {
+                    listingTypesQueries.Add(Query<Listing>.EQ(x => x.ListingType, listingType));
+                }
+                queries.Add(Query.Or(listingTypesQueries));
             }
-            if (!string.IsNullOrEmpty(tag))
+
+            // tags
+            if (tags != null && tags.Count() > 0)
             {
-                queries.Add(Query<Listing>.In(x => x.Hashtags, new string[] { tag }));
+                queries.Add(Query<Listing>.In(x => x.Hashtags, tags));
             }
-            if (metadata != null)
+
+            // metadata
+            if (metadata != null && metadata.Count() > 0)
             {
                 foreach (var m in metadata)
                 {
-                    queries.Add(Query.EQ(string.Concat("Metadata.", m.Key), m.Value));
+                    if (m.Value.Count() == 1)
+                    {
+                        queries.Add(Query.EQ(string.Concat("Metadata.", m.Key), m.Value[0]));
+                    }
+                    else
+                    {
+                        var mQueries = new List<IMongoQuery>();
+                        foreach (var s in m.Value)
+                        {
+                            mQueries.Add(Query.EQ(string.Concat("Metadata.", m.Key), s));
+                        }
+                        queries.Add(Query.Or(mQueries));
+                    }
                 }
             }
+
+            // price range
             if (priceMin.HasValue)
             {
                 queries.Add(Query<Listing>.GTE(x => x.PricingInfo.Price, priceMin));
@@ -264,16 +292,21 @@ namespace Classy.Repository
             {
                 queries.Add(Query<Listing>.LTE(x => x.PricingInfo.Price, priceMax));
             }
+
+            // geo
             if (location != null)
             {
                 //ListingsCollection.EnsureIndex(IndexKeys.GeoSpatial("Location"));
                 //queries.Add(Query<Listing>.Near(x => x.ContactInfo.Location, location.Longitude.Value, location.Latitude.Value, 1/111.12, true));
             }
+
+            // including drafts
             if (!includeDrafts)
             {
                 queries.Add(Query<Listing>.EQ(x => x.IsPublished, true));
             }
 
+            // add them all up
             var query = Query.And(queries);
             // now get the listings
             MongoCursor<Listing> listings = null;
