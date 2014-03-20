@@ -26,5 +26,10 @@ namespace Classy.Models
         public int SettlementPeriodInDays { get; set; }
         public int RollingReservePercent { get; set; }
         public int RollingReserveTimeInDays { get; set; }
+
+        /// <summary>
+        /// A collection of media files' keys to be used in creating the collage
+        /// </summary>
+        public IList<string> CoverPhotos { get; set; }
     }
 }

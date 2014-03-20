@@ -25,6 +25,7 @@ namespace Classy.Models
         public const string CONTACT_PROFILE = "contact-profile";
         public const string ADD_LISTING_TO_COLLECTION = "add-listing-to-collection";
         public const string EXTERNAL_WEBSITE_CLICK = "click-external-website";
+        public const string COMMENT_ON_COLLECTION = "comment-collection";
     }
 
     public class Triple : BaseObject

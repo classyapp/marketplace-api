@@ -23,5 +23,7 @@ namespace Classy.Models.Response
         public int FavoriteCount { get; set; }
         public IList<MediaThumbnailView> Thumbnails { get; set; }
         public IList<string> CoverPhotos { get; set; }
+        //
+        public IList<CommentView> Comments { get; set; }
     }
 }

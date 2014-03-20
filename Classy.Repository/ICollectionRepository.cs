@@ -7,6 +7,13 @@ using Classy.Models;
 
 namespace Classy.Repository
 {
+    [Flags]
+    public enum CollectionCounters
+    {
+        None = 0,
+        Comments = 1
+    }
+
     /// <summary>
     /// an interface for handling a <see cref="Collection"/> repository
     /// </summary>
@@ -76,5 +83,9 @@ namespace Classy.Repository
         /// <param name="categories"></param>
         /// <returns></returns>
         IList<Collection> GetApprovedCollections(string appId, string[] categories, int maxCollections);
+
+        void IncreaseCounter(string collectionId, string appId, CollectionCounters counters, int value);
+
+        void AddHashtags(string collectionId, string appId, string[] hashtags);
     }
 }

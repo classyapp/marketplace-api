@@ -80,16 +80,17 @@ namespace classy.Manager
 
         public SearchResultsView<ProfileView> SearchProfiles(
             string appId,
-            string partialUserName,
+            string searchQuery,
             string category,
             Location location,
             IDictionary<string, string> metadata,
             bool professionalsOnly,
+            bool ignoreLocation,
             int page,
             int pageSize)
         {
             long count = 0;
-            var profileList = ProfileRepository.Search(appId, partialUserName, category, location, metadata, professionalsOnly, page, pageSize, ref count);
+            var profileList = ProfileRepository.Search(appId, searchQuery, category, location, metadata, professionalsOnly, ignoreLocation, page, pageSize, ref count);
             IList<ProfileView> results = new List<ProfileView>();
             foreach (var profile in profileList)
             {
@@ -180,7 +181,7 @@ namespace classy.Manager
                     if (c.IncludedListings != null)
                     {
                         c.Listings = ListingRepository.GetById(c.IncludedListings.Select(l => l.Id).ToArray(), appId, false).ToListingViewList();
-                        if (c.CoverPhotos == null || c.CoverPhotos.Count < 4)
+                        if (c.CoverPhotos == null || c.CoverPhotos.Count == 0)
                         {
                             c.CoverPhotos = ListingRepository.GetById(c.IncludedListings.Select(l => l.Id).Skip(Math.Max(0, c.IncludedListings.Count - 4)).ToArray(), appId, false).Select(l => l.ExternalMedia[0].Key).ToArray();
                         }
@@ -220,10 +221,16 @@ namespace classy.Manager
             string profileImageContentType)
         {
             var profile = GetVerifiedProfile(appId, profileId);
+            var rankInc = 0;
 
             // copy seller info
             if (fields.HasFlag(ProfileUpdateFields.ProfessionalInfo))
             {
+                if (profile.ProfessionalInfo != null) 
+                {
+                    // increase rank if company contact info fields have been entered for the first time
+                    if (profile.ProfessionalInfo.CompanyContactInfo == null && professionalInfo.CompanyContactInfo != null) rankInc++;
+                }
                 profile.ProfessionalInfo = professionalInfo;
                 TryGeocoding(profile.ProfessionalInfo);
             }
@@ -231,6 +238,9 @@ namespace classy.Manager
             // copy metadata 
             if (fields.HasFlag(ProfileUpdateFields.Metadata))
             {
+                // increase rank if metadata fields have been entered for the first time
+                if (profile.Metadata == null || (metadata.Count > profile.Metadata.Count)) rankInc++;
+
                 if (profile.Metadata != null)
                 {
                     foreach (var attribute in metadata)
@@ -240,12 +250,16 @@ namespace classy.Manager
                 }
                 else profile.Metadata = metadata;
             }
+
             // copy contact info
             if (fields.HasFlag(ProfileUpdateFields.ContactInfo)) profile.ContactInfo = contactInfo;
 
             // image 
             if (fields.HasFlag(ProfileUpdateFields.ProfileImage))
             {
+                // increase rank if profile image fields is uploaded for the first time
+                if (profile.Avatar == null) rankInc++;
+
                 var avatarKey = string.Concat("profile_img_", profile.Id, "_", Guid.NewGuid().ToString());
                 StorageRepository.SaveFile(avatarKey, profileImage, profileImageContentType);
                 profile.Avatar = new MediaFile
@@ -257,6 +271,15 @@ namespace classy.Manager
                 };
             }
 
+            // cover photos
+            if (fields.HasFlag(ProfileUpdateFields.CoverPhotos))
+            {
+                if (profile.ProfessionalInfo.CoverPhotos == null) rankInc++;
+
+                profile.ProfessionalInfo.CoverPhotos = professionalInfo.CoverPhotos;
+            }
+
+            profile.Rank += rankInc;
             ProfileRepository.Save(profile);
             return profile.ToProfileView();
         }
@@ -299,14 +322,21 @@ namespace classy.Manager
             if (claim == null) throw new KeyNotFoundException("invalid proxy claim");
             var profile = GetVerifiedProfile(appId, claim.ProfileId);
             var proxyProfile = GetVerifiedProfile(appId, claim.ProxyProfileId);
+            var rankInc = 0;
 
             // copy seller info from proxy to profile
+            if (claim.ProfessionalInfo != null)
+            {
+                if (claim.ProfessionalInfo.CompanyContactInfo != null) rankInc++;
+            }
             profile.ProfessionalInfo = claim.ProfessionalInfo;
+
             // copy metadata from proxy to profile
             if (profile.Metadata != null)
             {
                 if (claim.Metadata != null)
                 {
+                    rankInc++;
                     foreach (var attribute in claim.Metadata)
                     {
                         profile.Metadata[attribute.Key] = attribute.Value;
@@ -320,6 +350,7 @@ namespace classy.Manager
             // TODO
 
             // save the new profile and delete the proxy
+            profile.Rank += rankInc;
             ProfileRepository.Save(profile);
             ProfileRepository.Delete(proxyProfile.Id);
 
@@ -457,7 +488,8 @@ namespace classy.Manager
             string reviewId,
             string profileId)
         {
-            var review = GetVerifiedReview(appId, reviewId, profileId);
+            var review = GetVerifiedReview(appId, reviewId);
+            if (review.Score > 3) ProfileRepository.IncreaseCounter(appId, profileId, ProfileCounters.Rank, 1);
             ReviewRepository.Publish(appId, reviewId);
             review.IsPublished = true;
             return review.TranslateTo<ReviewView>();
@@ -468,7 +500,7 @@ namespace classy.Manager
             string reviewId,
             string profileId)
         {
-            var review = GetVerifiedReview(appId, reviewId, profileId);
+            var review = GetVerifiedReview(appId, reviewId);
             ReviewRepository.Delete(appId, reviewId);
             review.IsDeleted = true;
             return review.TranslateTo<ReviewView>();
@@ -611,11 +643,10 @@ namespace classy.Manager
         /// <param name="reviewId"></param>
         /// <param name="profileId"></param>
         /// <returns></returns>
-        private Review GetVerifiedReview(string appId, string reviewId, string profileId)
+        private Review GetVerifiedReview(string appId, string reviewId)
         {
             var review = ReviewRepository.GetById(appId, reviewId);
             if (review == null) throw new KeyNotFoundException("invalid review");
-            if (review.RevieweeProfileId != profileId) throw new UnauthorizedAccessException("unauthorized");
             return review;
         }
 

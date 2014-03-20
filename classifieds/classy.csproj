@@ -108,6 +108,8 @@
     <Compile Include="DTO\Request\CancelSingleItemOrder.cs" />
     <Compile Include="DTO\Request\ClaimProxyProfile.cs" />
     <Compile Include="DTO\Request\AddListingToCollection.cs" />
+    <Compile Include="DTO\Request\PostComment.cs" />
+    <Compile Include="DTO\Request\PostCommentForCollection.cs" />
     <Compile Include="DTO\Request\DeleteCollection.cs" />
     <Compile Include="DTO\Request\DeleteListing.cs" />
     <Compile Include="DTO\Request\EditListing.cs" />
@@ -118,6 +120,7 @@
     <Compile Include="DTO\Request\GetResourceKeysForApp.cs" />
     <Compile Include="DTO\Request\GetThumbnail.cs" />
     <Compile Include="DTO\Request\RemoveListingFromCollection.cs" />
+    <Compile Include="DTO\Request\SetCollectionCoverPhotos.cs" />
     <Compile Include="DTO\Request\SetResourceListValues.cs" />
     <Compile Include="DTO\Request\SetResourceValues.cs" />
     <Compile Include="DTO\Request\GetResourceByKey.cs" />
@@ -144,7 +147,7 @@
     <Compile Include="DTO\Request\GetOrdersForProfileListings.cs" />
     <Compile Include="DTO\Request\GetProfileById.cs" />
     <Compile Include="DTO\Request\GetReviewsByProfileId.cs" />
-    <Compile Include="DTO\Request\PostComment.cs" />
+    <Compile Include="DTO\Request\PostCommentForListing.cs" />
     <Compile Include="DTO\Request\PostListing.cs" />
     <Compile Include="DTO\Request\PostReviewForListing.cs" />
     <Compile Include="DTO\Request\PostReviewForProfile.cs" />
