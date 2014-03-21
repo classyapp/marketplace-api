@@ -98,6 +98,7 @@ namespace classy.Manager
         /// <param name="includeCollections"></param>
         /// <param name="includeFavorites"></param>
         /// <param name="logImpression"></param>
+        /// <param name="culture"></param>
         /// <returns></returns>
         ProfileView GetProfileById(
             string appId,
@@ -109,8 +110,8 @@ namespace classy.Manager
             bool includeListings,
             bool includeCollections,
             bool includeFavorites,
-            bool logImpression);
-        
+            bool logImpression,
+            string culture);
         /// <summary>
         /// 
         /// </summary>
@@ -162,5 +163,14 @@ namespace classy.Manager
         /// <param name="token"></param>
         /// <returns></returns>
         IEnumerable<EmailContact> GetGoogleContacts(string appId, string profileId, string token);
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="appId"></param>
+        /// <param name="profileId"></param>
+        /// <param name="culture"></param>
+        /// <param name="metadata"></param>
+        void SaveTranslation(string appId, string profileId, string culture, IDictionary<string, string> metadata, string title, string content);
     }
 }

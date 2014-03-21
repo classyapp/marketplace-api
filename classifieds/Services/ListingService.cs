@@ -472,7 +472,8 @@ namespace classy.Services
                     false,
                     false,
                     true,
-                    false);
+                    false,
+                    request.Environment.CultureCode);
                 return new HttpResult(profile);
             }
         }
@@ -494,7 +495,8 @@ namespace classy.Services
                     request.IncludeListings,
                     request.IncludeCollections,
                     request.IncludeFavorites,
-                    request.LogImpression);
+                    request.LogImpression,
+                    request.Environment.CultureCode);
 
                 return new HttpResult(profile, HttpStatusCode.OK);
             }
@@ -542,6 +544,29 @@ namespace classy.Services
                     imageContentType);
 
                 return new HttpResult(profile, HttpStatusCode.OK);
+            }
+            catch (KeyNotFoundException kex)
+            {
+                return new HttpError(HttpStatusCode.NotFound, kex.Message);
+            }
+        }
+
+        [CustomAuthenticate]
+        public object Post(SetTranslation request)
+        {
+            try
+            {
+                var session = SessionAs<CustomUserSession>();
+                ProfileManager.SecurityContext = session.ToSecurityContext();
+                ProfileManager.SaveTranslation(
+                    request.Environment.AppId,
+                    request.ObjectId,
+                    request.Culture,
+                    request.Metadata,
+                    request.Title,
+                    request.Content);
+
+                return new HttpResult(new { ObjectId = request.ObjectId, Culture = request.Culture }, HttpStatusCode.OK);
             }
             catch (KeyNotFoundException kex)
             {
@@ -884,7 +909,8 @@ namespace classy.Services
                         false,
                         false,
                         false,
-                    false);
+                        false,
+                        request.Environment.CultureCode);
                 if (request.ReturnReviewerProfile)
                     response.ReviewerProfile = ProfileManager.GetProfileById(
                         request.Environment.AppId,
@@ -896,7 +922,8 @@ namespace classy.Services
                         false,
                         false,
                         false,
-                    false);
+                        false,
+                        request.Environment.CultureCode);
                 return new HttpResult(response, HttpStatusCode.OK);
             }
             catch (KeyNotFoundException kex)

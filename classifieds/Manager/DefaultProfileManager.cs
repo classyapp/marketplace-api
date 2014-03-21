@@ -25,6 +25,7 @@ namespace classy.Manager
         private ICollectionRepository CollectionRepository;
         private ITripleStore TripleStore;
         private IStorageRepository StorageRepository;
+        private ITranslationRepository TranslationsRepository;
 
         public DefaultProfileManager(
             IAppManager appManager,
@@ -33,7 +34,8 @@ namespace classy.Manager
             IReviewRepository reviewRepository,
             ICollectionRepository collectionRepository,
             ITripleStore tripleStore,
-            IStorageRepository storageRepository)
+            IStorageRepository storageRepository,
+            ITranslationRepository translationsRepository)
         {
             AppManager = appManager;
             ProfileRepository = profileRepository;
@@ -42,6 +44,7 @@ namespace classy.Manager
             CollectionRepository = collectionRepository;
             TripleStore = tripleStore;
             StorageRepository = storageRepository;
+            TranslationsRepository = translationsRepository;
         }
 
         public ManagerSecurityContext SecurityContext { get; set; }
@@ -133,7 +136,8 @@ namespace classy.Manager
             bool includeListings,
             bool includeCollections,
             bool includeFavorites,
-            bool logImpression)
+            bool logImpression,
+            string culture)
         {
             var profile = ProfileRepository.GetById(appId, profileId, logImpression);
             if (profile == null) throw new KeyNotFoundException("invalid profile id");
@@ -203,6 +207,16 @@ namespace classy.Manager
             {
                 int count = 1;
                 TripleStore.LogActivity(appId, requestedByProfileId.IsNullOrEmpty() ? "guest" : requestedByProfileId, ActivityPredicate.VIEW_PROFILE, profileId, ref count);
+            }
+
+            // Get translations if culture is specified
+            if (!string.IsNullOrEmpty(culture))
+            {
+                var translation = TranslationsRepository.GetById(appId, profileId, culture);
+                if (translation != null)
+                {
+                    profileView.MergeTranslation(translation);
+                }
             }
 
             // TODO: if requested by someone other than the profile owner, remove all non-public data!!
@@ -282,6 +296,36 @@ namespace classy.Manager
             profile.Rank += rankInc;
             ProfileRepository.Save(profile);
             return profile.ToProfileView();
+        }
+
+        public void SaveTranslation(
+            string appId, 
+            string profileId, 
+            string culture, 
+            IDictionary<string, string> metadata,
+            string title,
+            string content)
+        {
+            if (SecurityContext.IsAdmin || SecurityContext.AuthenticatedProfileId == profileId)
+            {
+                Translation translation = TranslationsRepository.GetById(appId, profileId, culture);
+                if (translation == null)
+                {
+                    translation = new Translation();
+                    translation.AppId = appId;
+                    translation.ProfileId = profileId;
+                    translation.Culture = culture;
+                    translation.Metadata = metadata;
+                    translation.Title = title;
+                    translation.Content = content;
+                    TranslationsRepository.Insert(translation);
+                }
+                else
+                {
+                    translation.Metadata = metadata;
+                    TranslationsRepository.Update(translation);
+                }
+            }
         }
 
         public ProxyClaimView SubmitProxyClaim(
