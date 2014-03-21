@@ -6,6 +6,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Web;
 using ServiceStack.Common;
+using StackExchange.DataExplorer.Helpers;
+using MarkdownSharp;
 
 namespace classy.Manager
 {
@@ -18,9 +20,18 @@ namespace classy.Manager
             LocalizationRepository = localizationRepository;
         }
 
-        public LocalizationResourceView GetResourceByKey(string appId, string key)
+        public LocalizationResourceView GetResourceByKey(string appId, string key, bool processMarkdown)
         {
             var resource = LocalizationRepository.GetResourceByKey(appId, key);
+            if (resource == null) return null;
+            if (processMarkdown)
+            {
+                var keys = new List<string>(resource.Values.Keys);
+                foreach(var k in keys)
+                {
+                    resource.Values[k] = resource.Values[k].Contains("\r\n") ? (new Markdown()).Transform(resource.Values[k]) : resource.Values[k];
+                }
+            }
             return resource.TranslateTo<LocalizationResourceView>();
         }
 
@@ -42,7 +53,7 @@ namespace classy.Manager
                 if (resource.Values == null) resource.Values = new Dictionary<string, string>();
                 foreach (var k in values.Keys)
                 {
-                    if (resource.Values.ContainsKey(k)) resource.Values[k] = values[k];
+                    if (resource.Values.ContainsKey(k)) resource.Values[k] = HtmlUtilities.RemoveTags(values[k]);
                     else resource.Values.Add(k, values[k]);
                 }
             }
