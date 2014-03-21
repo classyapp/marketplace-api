@@ -55,7 +55,8 @@ namespace classy.Manager
             bool formatCommentsAsHtml,
             bool includeCommenterProfiles,
             bool includeProfile,
-            bool includeFavoritedByProfiles)
+            bool includeFavoritedByProfiles,
+            string culture)
         {
             // TODO: cache listings
             var listing = GetVerifiedListing(appId, listingId);
@@ -70,7 +71,7 @@ namespace classy.Manager
             {
                 var comments = CommentRepository.GetByListingId(listingId, formatCommentsAsHtml);
                 IList<Profile> commenterProfiles = null;
-                if (includeCommenterProfiles) commenterProfiles = ProfileRepository.GetByIds(appId, (from c in comments select c.ProfileId).ToArray());
+                if (includeCommenterProfiles) commenterProfiles = ProfileRepository.GetByIds(appId, (from c in comments select c.ProfileId).ToArray(), culture);
                 listingView.Comments = new List<CommentView>();
                 foreach (var c in comments)
                 {
@@ -84,12 +85,12 @@ namespace classy.Manager
             }
             if (includeProfile)
             {
-                listingView.Profile = ProfileRepository.GetById(appId, listing.ProfileId, false).ToProfileView();
+                listingView.Profile = ProfileRepository.GetById(appId, listing.ProfileId, false, culture).ToProfileView();
             }
             if (includeFavoritedByProfiles)
             {
                 var favProfileIds = TripleStore.GetActivitySubjectList(appId, ActivityPredicate.FAVORITE_LISTING, listing.Id).ToArray();
-                var favProfiles = ProfileRepository.GetByIds(appId, favProfileIds);
+                var favProfiles = ProfileRepository.GetByIds(appId, favProfileIds, culture);
                 listingView.FavoritedBy = new List<ProfileView>();
                 foreach (var p in favProfiles)
                 {
@@ -109,12 +110,13 @@ namespace classy.Manager
             string profileId,
             bool includeComments,
             bool formatCommentsAsHtml,
-            bool includeDrafts)
+            bool includeDrafts,
+            string culture)
         {
-            var profile = GetVerifiedProfile(appId, profileId);
+            var profile = GetVerifiedProfile(appId, profileId, culture);
 
             // TODO: cache listings
-            var listings = ListingRepository.GetByProfileId(appId, profile.Id, includeDrafts);
+            var listings = ListingRepository.GetByProfileId(appId, profile.Id, includeDrafts, culture);
             var comments = includeComments ?
                 CommentRepository.GetByListingIds(listings.Select(x => x.Id).AsEnumerable(), formatCommentsAsHtml) : null;
             var listingViews = new List<ListingView>();
@@ -141,13 +143,14 @@ namespace classy.Manager
             bool includeComments,
             bool formatCommentsAsHtml,
             int page,
-            int pageSize)
+            int pageSize,
+            string culture)
         {
             long count = 0;
 
             // TODO: cache listings
             tag = string.IsNullOrEmpty(tag) ? null : string.Concat("#", tag.TrimStart(new char[] { '#' }));
-            var listings = ListingRepository.Search(tag, listingType, metadata, priceMin, priceMax, location, appId, false, false, page, pageSize, ref count);
+            var listings = ListingRepository.Search(tag, listingType, metadata, priceMin, priceMax, location, appId, false, false, page, pageSize, ref count, culture);
             var comments = includeComments ?
                 CommentRepository.GetByListingIds(listings.Select(x => x.Id).AsEnumerable(), formatCommentsAsHtml) : null;
             var listingViews = new List<ListingView>();
@@ -230,7 +233,7 @@ namespace classy.Manager
             string profileId)
         {
             var listing = GetVerifiedListing(appId, listingId, true, true);
-            var profile = ProfileRepository.GetById(appId, listing.ProfileId, false);
+            var profile = ProfileRepository.GetById(appId, listing.ProfileId, false, null);
 
             // can't publish a purchasable listing if 
             if ((listing.PricingInfo != null || listing.SchedulingTemplate != null) && !profile.IsVendor)
@@ -365,7 +368,7 @@ namespace classy.Manager
             // save mentions
             foreach (var mentionedUsername in comment.Content.ExtractUsernames())
             {
-                var mentionedProfile = ProfileRepository.GetByUsername(appId, mentionedUsername.TrimStart('@'), false);
+                var mentionedProfile = ProfileRepository.GetByUsername(appId, mentionedUsername.TrimStart('@'), false, null);
                 TripleStore.LogActivity(appId, SecurityContext.AuthenticatedProfileId, ActivityPredicate.MENTION_PROFILE, mentionedProfile.Id, ref count);
 
                 // increase rank of mentioned profile
@@ -497,19 +500,20 @@ namespace classy.Manager
             bool increaseViewCounterOnListings,
             bool includeComments,
             bool formatCommentsAsHtml,
-            bool includeCommenterProfiles)
+            bool includeCommenterProfiles,
+            string culture)
         {
             try
             {
-                var collection = GetVerifiedCollection(appId, collectionId);
+                var collection = GetVerifiedCollection(appId, collectionId, culture);
                 var collectionView = collection.ToCollectionView();
                 if (includeProfile)
                 {
-                    collectionView.Profile = ProfileRepository.GetById(appId, collection.ProfileId, false).ToProfileView();
+                    collectionView.Profile = ProfileRepository.GetById(appId, collection.ProfileId, false, culture).ToProfileView();
                 }
                 if (includeListings)
                 {
-                    collectionView.Listings = ListingRepository.GetById(collection.IncludedListings.Select(l => l.Id).ToArray(), appId, includeDrafts).ToListingViewList();
+                    collectionView.Listings = ListingRepository.GetById(collection.IncludedListings.Select(l => l.Id).ToArray(), appId, includeDrafts, culture).ToListingViewList();
                 }
                 if (increaseViewCounter)
                 {
@@ -528,14 +532,14 @@ namespace classy.Manager
                 {
                     var comments = CommentRepository.GetByCollectionId(collectionId, formatCommentsAsHtml);
                     IList<Profile> commenterProfiles = null;
-                    if (includeCommenterProfiles) commenterProfiles = ProfileRepository.GetByIds(appId, (from c in comments select c.ProfileId).ToArray());
+                    if (includeCommenterProfiles) commenterProfiles = ProfileRepository.GetByIds(appId, (from c in comments select c.ProfileId).ToArray(), culture);
                     collectionView.Comments = new List<CommentView>();
                     foreach (var c in comments)
                     {
                         var comment = c.TranslateTo<CommentView>();
                         if (commenterProfiles != null)
                         {
-                            comment.Profile = (from p in commenterProfiles where p.Id == comment.ProfileId select p).Single().ToProfileView();
+                            comment.Profile = (from p in commenterProfiles where p.Id == comment.ProfileId select p).Single().Translate(culture).ToProfileView();
                         }
                         collectionView.Comments.Add(comment.TranslateTo<CommentView>());
                     }
@@ -552,18 +556,19 @@ namespace classy.Manager
         public IList<CollectionView> GetCollectionsByProfileId(
             string appId,
             string profileId,
-            string collectionType)
+            string collectionType,
+            string culture)
         {
             try
             {
-                var profile = GetVerifiedProfile(appId, profileId);
-                var collections = CollectionRepository.GetByProfileId(appId, profileId, collectionType);
+                var profile = GetVerifiedProfile(appId, profileId, culture);
+                var collections = CollectionRepository.GetByProfileId(appId, profileId, collectionType, culture);
 
                 foreach (var collection in collections)
                 {
                     if (collection.CoverPhotos == null || collection.CoverPhotos.Count == 0)
                     {
-                        collection.CoverPhotos = ListingRepository.GetById(collection.IncludedListings.Select(l => l.Id).Skip(Math.Max(0, collection.IncludedListings.Count - 4)).ToArray(), appId, false).Select(l => l.ExternalMedia[0].Key).ToArray();
+                        collection.CoverPhotos = ListingRepository.GetById(collection.IncludedListings.Select(l => l.Id).Skip(Math.Max(0, collection.IncludedListings.Count - 4)).ToArray(), appId, false, null).Select(l => l.ExternalMedia[0].Key).ToArray();
                     }
                 }
 
@@ -578,11 +583,12 @@ namespace classy.Manager
         public CollectionView AddListingsToCollection(
             string appId,
             string collectionId,
-            IList<IncludedListing> includedListings)
+            IList<IncludedListing> includedListings,
+            string culture)
         {
             try
             {
-                var collection = GetVerifiedCollection(appId, collectionId);
+                var collection = GetVerifiedCollection(appId, collectionId, culture);
                 if (collection.ProfileId != SecurityContext.AuthenticatedProfileId && collection.Type != CollectionType.WebPhotos) throw new UnauthorizedAccessException();
                 // TODO: verify all listings exist
                 if (collection.IncludedListings == null) collection.IncludedListings = new List<Classy.Models.IncludedListing>();
@@ -623,7 +629,7 @@ namespace classy.Manager
         {
             try
             {
-                var collection = GetVerifiedCollection(appId, collectionId);
+                var collection = GetVerifiedCollection(appId, collectionId, null);
                 if (collection.ProfileId != profileId) throw new UnauthorizedAccessException();
 
                 foreach (string listingId in listingIds)
@@ -663,11 +669,12 @@ namespace classy.Manager
             string collectionId,
             string title,
             string content,
-            IList<IncludedListing> listings)
+            IList<IncludedListing> listings,
+            string culture)
         {
             try
             {
-                var collection = GetVerifiedCollection(appId, collectionId);
+                var collection = GetVerifiedCollection(appId, collectionId, culture);
                 if (collection.ProfileId != profileId) throw new UnauthorizedAccessException();
                 // TODO: verify all listings exist
                 if (collection.IncludedListings == null) collection.IncludedListings = new List<Classy.Models.IncludedListing>();
@@ -678,7 +685,7 @@ namespace classy.Manager
 
                 CollectionRepository.Update(collection);
                 var collectionView = collection.ToCollectionView();
-                collectionView.Listings = ListingRepository.GetById(collection.IncludedListings.Select(l => l.Id).ToArray(), appId, false).ToListingViewList();
+                collectionView.Listings = ListingRepository.GetById(collection.IncludedListings.Select(l => l.Id).ToArray(), appId, false, culture).ToListingViewList();
                 return collectionView;
             }
             catch (Exception)
@@ -693,7 +700,7 @@ namespace classy.Manager
         {
             try
             {
-                var collection = GetVerifiedCollection(appId, collectionId);
+                var collection = GetVerifiedCollection(appId, collectionId, null);
                 if (collection.ProfileId != SecurityContext.AuthenticatedProfileId && !SecurityContext.IsAdmin) throw new UnauthorizedAccessException();
                 
                 CollectionRepository.Delete(appId, collectionId);
@@ -706,7 +713,7 @@ namespace classy.Manager
 
         public CommentView AddCommentToCollection(string appId, string collectionId, string content, bool formatAsHtml)
         {
-            var collection = GetVerifiedCollection(appId, collectionId);
+            var collection = GetVerifiedCollection(appId, collectionId, null);
 
             // save to repository
             var comment = new Comment
@@ -741,7 +748,7 @@ namespace classy.Manager
             // save mentions
             foreach (var mentionedUsername in comment.Content.ExtractUsernames())
             {
-                var mentionedProfile = ProfileRepository.GetByUsername(appId, mentionedUsername.TrimStart('@'), false);
+                var mentionedProfile = ProfileRepository.GetByUsername(appId, mentionedUsername.TrimStart('@'), false, null);
                 TripleStore.LogActivity(appId, SecurityContext.AuthenticatedProfileId, ActivityPredicate.MENTION_PROFILE, mentionedProfile.Id, ref count);
 
                 // increase rank of mentioned profile
@@ -757,17 +764,18 @@ namespace classy.Manager
         public CollectionView UpdateCollectionCover(
             string appId,
             string collectionId,
-            IList<string> photoKeys)
+            IList<string> photoKeys,
+            string culture)
         {
             try
             {
-                var collection = GetVerifiedCollection(appId, collectionId);
+                var collection = GetVerifiedCollection(appId, collectionId, null);
                 if (collection.ProfileId != SecurityContext.AuthenticatedProfileId) throw new UnauthorizedAccessException();
                 collection.CoverPhotos = photoKeys;
 
                 CollectionRepository.Update(collection);
-                var collectionView = collection.ToCollectionView();
-                collectionView.Listings = ListingRepository.GetById(collection.IncludedListings.Select(l => l.Id).ToArray(), appId, false).ToListingViewList();
+                var collectionView = collection.Translate(culture).ToCollectionView();
+                collectionView.Listings = ListingRepository.GetById(collection.IncludedListings.Select(l => l.Id).ToArray(), appId, false, culture).ToListingViewList();
                 return collectionView;
             }
             catch (Exception)
@@ -778,7 +786,7 @@ namespace classy.Manager
 
         public CollectionView SubmitCollectionForEditorialApproval(string appId, string collectionId)
         {
-            var collection = GetVerifiedCollection(appId, collectionId);
+            var collection = GetVerifiedCollection(appId, collectionId, null);
             collection.SumittedForEditorialApproval = true;
             CollectionRepository.SubmitForEditorialApproval(appId, collectionId);
             return collection.ToCollectionView();
@@ -787,10 +795,11 @@ namespace classy.Manager
         public IList<CollectionView> GetApprovedCollections(
             string appId,
             string[] categories,
-            int maxCollections)
+            int maxCollections,
+            string culture)
         {
-            var collections = CollectionRepository.GetApprovedCollections(appId, categories, maxCollections);
-            var profiles = ProfileRepository.GetByIds(appId, collections.Select(x => x.ProfileId).ToArray());
+            var collections = CollectionRepository.GetApprovedCollections(appId, categories, maxCollections, culture);
+            var profiles = ProfileRepository.GetByIds(appId, collections.Select(x => x.ProfileId).ToArray(), culture);
             var view = collections.ToCollectionViewList();
             foreach (var c in view)
             {
@@ -799,17 +808,36 @@ namespace classy.Manager
             return view;
         }
 
-
-        private Collection GetVerifiedCollection(string appId, string collectionId)
+        public void SetTranslation(string appId, string collectionId, CollectionTranslation collectionTranslation)
         {
-            var collection = CollectionRepository.GetById(appId, collectionId);
+            Collection collection = GetVerifiedCollection(appId, collectionId, null);
+
+            if (SecurityContext.IsAdmin || SecurityContext.AuthenticatedProfileId == collection.ProfileId)
+            {
+                collection.Translations[collectionTranslation.Culture] = collectionTranslation;
+                CollectionRepository.Update(collection);
+            }
+        }
+
+        public void SetTranslation(string appId, string listingId, ListingTranslation listingTranslation)
+        {
+            Listing listing = GetVerifiedListing(appId, listingId);
+            if (SecurityContext.IsAdmin || SecurityContext.AuthenticatedProfileId == listing.ProfileId)
+            {
+                listing.Translations[listingTranslation.Culture] = listingTranslation;
+                ListingRepository.Update(listing);
+            }
+        }
+        private Collection GetVerifiedCollection(string appId, string collectionId, string culture)
+        {
+            var collection = CollectionRepository.GetById(appId, collectionId, culture);
             if (collection == null) throw new KeyNotFoundException("invalid collection");
             return collection;
         }
 
-        private Profile GetVerifiedProfile(string appId, string profileId)
+        private Profile GetVerifiedProfile(string appId, string profileId, string culture)
         {
-            var profile = ProfileRepository.GetById(appId, profileId, false);
+            var profile = ProfileRepository.GetById(appId, profileId, false, culture);
             if (profile == null) throw new KeyNotFoundException("invalid profile");
             return profile;
         }
@@ -840,7 +868,7 @@ namespace classy.Manager
         private Listing GetVerifiedListing(string appId, string listingId, bool includeDrafts)
         {
             Listing listing;
-            listing = ListingRepository.GetById(listingId, appId, includeDrafts);
+            listing = ListingRepository.GetById(listingId, appId, includeDrafts, null);
             if (listing == null) throw new KeyNotFoundException("invalid listing");
             return listing;
         }

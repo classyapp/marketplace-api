@@ -23,10 +23,10 @@ namespace Classy.Repository
     public interface IProfileRepository
     {
         string Save(Profile profile);
-        Profile GetById(string appId, string profileId, bool increaseViewCounter);
-        IList<Profile> GetByIds(string appId, string[] profileIds);
-        Profile GetByUsername(string appId, string username, bool increaseViewCounter);
-        IList<Profile> Search(string appId, string searchQuery, string category, Location location, IDictionary<string, string> metadata, bool professionalsOnly, bool ignoreLocation, int page, int pageSize, ref long count);
+        Profile GetById(string appId, string profileId, bool increaseViewCounter, string culture);
+        IList<Profile> GetByIds(string appId, string[] profileIds, string culture);
+        Profile GetByUsername(string appId, string username, bool increaseViewCounter, string culture);
+        IList<Profile> Search(string appId, string searchQuery, string category, Location location, IDictionary<string, string> metadata, bool professionalsOnly, bool ignoreLocation, int page, int pageSize, ref long count, string culture);
         void Delete(string profileId);
         void IncreaseCounter(string appId, string profileId, ProfileCounters counters, int value); // returns the profile id or null
         // proxies

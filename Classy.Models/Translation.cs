@@ -6,11 +6,24 @@ using System.Threading.Tasks;
 
 namespace Classy.Models
 {
-    public class Translation : BaseObject 
+    public class Translation
     {
-        public string ProfileId { get; set; }
         public string Culture { get; set; }
         public IDictionary<string, string> Metadata { get; set; }
+    }
+
+    public class ProfileTranslation : Translation
+    {
+    }
+
+    public class CollectionTranslation : Translation
+    {
+        public string Title { get; set; }
+        public string Content { get; set; }
+    }
+
+    public class ListingTranslation : Translation
+    {
         public string Title { get; set; }
         public string Content { get; set; }
     }

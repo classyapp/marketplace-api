@@ -139,6 +139,7 @@ namespace classy
                     .Add<SearchListings>("/listing/search", ApplyTo.Get | ApplyTo.Post) // search listings by tag and/or metadata
                     .Add<SearchListings>("/tags/{tag}", "GET") // search with a nicer url for tag
                     .Add<GetListingsByProfileId>("/profile/{ProfileId}/listing/list", "GET") // get list of listing for profile
+                    .Add<SetListingTranslation>("/listing/{ListingId}/translation", "POST")
 
                     // Collections
                     .Add<CreateCollection>("/collection/new", "POST") // create a new collection
@@ -157,6 +158,7 @@ namespace classy
                     //.Add<UpdateCollection>("/collection/{CollectionId}", "PUT") // update collection details
                     .Add<GetCollectionById>("/collection/{CollectionId}", "GET") // get a collection by id
                     .Add<GetCollectionByProfileId>("/profile/{ProfileId}/collection/list/{CollectionType}", "GET") // get a collection by id
+                    .Add<SetCollectionTranslation>("/collection/{CollectionId}/translation", "POST")
 
                     // Comments
                     .Add<PostCommentForListing>("/listing/{ListingId}/comment/new", "POST") // post new comment
@@ -196,7 +198,9 @@ namespace classy
                     .Add<SearchProfiles>("/profile/search", ApplyTo.Get | ApplyTo.Post)
                     .Add<GetFacebookAlbums>("/profile/social/facebook/albums", ApplyTo.Get)
                     .Add<GetGoogleContacts>("/profile/social/google/contacts", ApplyTo.Get)
-                    .Add<SetTranslation>("/profile/{ProfileID}/translate", "POST")
+                    .Add<SetProfileTranslation>("/profile/{ProfileID}/translation/{CultureCode}", "POST")
+                    .Add<GetProfileTranslation>("/profile/{ProfileID}/translation/{CultureCode}", "GET")
+                    .Add<DeleteProfileTranslation>("/profile/{ProfileID}/translation/{CultureCode}", "DELETE")
 
                     // Reviews
                     .Add<PostReviewForListing>("/listing/{ListingId}/reviews/new", "POST")

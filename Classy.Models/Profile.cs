@@ -12,7 +12,7 @@ namespace Classy.Models
     /// <summary>
     /// Custom User DataModel for harvesting UserAuth info into your own DB table
     /// </summary>   
-    public class Profile : BaseObject
+    public class Profile : BaseObject, ITranslatable<Profile>
     {
         public Profile()
         {
@@ -43,6 +43,7 @@ namespace Classy.Models
         public IDictionary<string, string> Metadata { get; set; }
         public ProfessionalInfo ProfessionalInfo { get; set; }
         public IList<string> Permissions { get; set; }
+        public string DefaultCulture { get; set; }
 
         //
         public bool IsProfessional {
@@ -79,6 +80,29 @@ namespace Classy.Models
             {
                 return this.IsProfessional && this.ProfessionalInfo.IsProxy;
             }
+        }
+
+        // Translations
+        public IDictionary<string, ProfileTranslation> Translations { get; set; }
+
+        public Profile Translate(string culture) 
+        {
+            if (Translations != null  && !string.IsNullOrEmpty(culture))
+            {
+                ProfileTranslation translation = null;
+                if (Translations.TryGetValue(culture, out translation))
+                {
+                    if (translation.Metadata != null)
+                    {
+                        foreach (var key in translation.Metadata.Keys)
+                        {
+                            Metadata[key] = translation.Metadata[key];
+                        }
+                    }
+                }
+            }
+
+            return this;
         }
     }
 }

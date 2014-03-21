@@ -42,5 +42,6 @@ namespace Classy.Models.Response
         public IList<string> FavoriteListingIds { get; set; }
         public IDictionary<string, string> Metadata { get; set; }
         public IList<string> Permissions { get; set; }
+        public string DefaultCulture { get; set; }
     }
 }

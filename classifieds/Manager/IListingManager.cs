@@ -33,7 +33,8 @@ namespace classy.Manager
             bool formatCommentsAsHtml, 
             bool includeCommenterProfiles,
             bool includeProfile,
-            bool includeFavoritedByProfiles);
+            bool includeFavoritedByProfiles,
+            string culture);
 
         /// <summary>
         /// 
@@ -48,7 +49,8 @@ namespace classy.Manager
             string profileId,
             bool includeComments,
             bool formatCommentsAsHtml,
-            bool includeDrafts);
+            bool includeDrafts,
+            string culture);
 
         /// <summary>
         /// 
@@ -74,7 +76,8 @@ namespace classy.Manager
             bool includeComments,
             bool formatCommentsAsHtml,
             int page,
-            int pageSize);
+            int pageSize,
+            string culture);
 
         /// <summary>
         /// 

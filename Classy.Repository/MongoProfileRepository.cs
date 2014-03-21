@@ -34,42 +34,55 @@ namespace Classy.Repository
             }
         }
 
-        public Profile GetByUsername(string appId, string username, bool increaseViewCounter)
+        public Profile GetByUsername(string appId, string username, bool increaseViewCounter, string culture)
         {
             var query = Query<Profile>.Where(x => x.UserName == username && x.AppId == appId);
+            Profile profile = null;
+
             if (increaseViewCounter)
             {
-                var profile = ProfilesCollection.FindAndModify(query, null, Update<Profile>.Inc(x => x.ViewCount, 1), true);
-                return profile.GetModifiedDocumentAs<Profile>();
+                var document = ProfilesCollection.FindAndModify(query, null, Update<Profile>.Inc(x => x.ViewCount, 1), true);
+                profile = document.GetModifiedDocumentAs<Profile>();
             }
             else
             {
-                var listing = ProfilesCollection.FindOne(query);
-                return listing;
+                profile = ProfilesCollection.FindOne(query);
             }
+
+            profile.Translate(culture);
+            return profile;
         }
 
 
-        public Profile GetById(string appId, string profileId, bool increaseViewCounter)
+        public Profile GetById(string appId, string profileId, bool increaseViewCounter, string culture)
         {
             var query = Query<Profile>.Where(x => x.Id == profileId && x.AppId == appId);
+            Profile profile = null;
             if (increaseViewCounter)
             {
-                var result = ProfilesCollection.FindAndModify(query, null, Update<Profile>.Inc(x => x.ViewCount, 1), true);
-                return result.GetModifiedDocumentAs<Profile>();
+                var document = ProfilesCollection.FindAndModify(query, null, Update<Profile>.Inc(x => x.ViewCount, 1), true);
+                profile = document.GetModifiedDocumentAs<Profile>();
             }
             else
             {
-                var profile = ProfilesCollection.FindOne(query);
-                return profile;
+                profile = ProfilesCollection.FindOne(query);
             }
+
+            profile.Translate(culture);
+            return profile;
         }
 
-        public IList<Profile> GetByIds(string appId, string[] profileIds)
+        public IList<Profile> GetByIds(string appId, string[] profileIds, string culture)
         {
             var profiles = ProfilesCollection.Find(Query.And(
                 Query<Profile>.Where(x => x.AppId == appId),
                 Query<Profile>.In(x => x.Id, new BsonArray(profileIds))));
+
+            foreach (var profile in profiles)
+            {
+                profile.Translate(culture);
+            }
+
             return profiles.ToList();
         }
 
@@ -87,8 +100,8 @@ namespace Classy.Repository
             ProfilesCollection.Update(query, update);
         }
 
-        public IList<Profile> Search(string appId, string searchQuery, string category, Location location, IDictionary<string, string> metadata, 
-            bool professionalsOnly, bool ignoreLocation, int page, int pageSize, ref long count)
+        public IList<Profile> Search(string appId, string searchQuery, string category, Location location, IDictionary<string, string> metadata,
+            bool professionalsOnly, bool ignoreLocation, int page, int pageSize, ref long count, string culture)
         {
             // sort order
             var sortOrder = SortBy<Profile>.Descending(x => x.Rank, x => x.UserName);
@@ -195,6 +208,11 @@ namespace Classy.Repository
                 profiles =  ProfilesCollection.Find(query).SetSortOrder(sortOrder).SetSkip((page - 1) * pageSize).SetLimit(pageSize);
             }
             count = ProfilesCollection.Count(query);
+
+            foreach (var profile in profiles)
+            {
+                profile.Translate(culture);
+            }
 
             return profiles.ToList();
         }

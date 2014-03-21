@@ -13,7 +13,7 @@ namespace Classy.Models
     /// <summary>
     /// a <see cref="Listing"/> is the basic unit of the marketplace
     /// </summary>
-    public class Listing : BaseObject
+    public class Listing : BaseObject, ITranslatable<Listing>
     {
         public Listing()
         {
@@ -106,5 +106,30 @@ namespace Classy.Models
         /// a dictionary of app specific key-value pairs that can be used to extend the listing object, and can be used in search
         /// </summary>
         public IDictionary<string, string> Metadata { get; set; }
+
+        // Translations
+        public IDictionary<string, ListingTranslation> Translations { get; set; }
+
+        public Listing Translate(string culture)
+        {
+            if (Translations != null && !string.IsNullOrEmpty(culture))
+            {
+                ListingTranslation translation = Translations[culture];
+                if (translation != null)
+                {
+                    Title = string.IsNullOrEmpty(translation.Title) ? Title : translation.Title;
+                    Content = string.IsNullOrEmpty(translation.Content) ? Content : translation.Content;
+                    if (translation.Metadata != null)
+                    {
+                        foreach (var key in translation.Metadata.Keys)
+                        {
+                            Metadata[key] = translation.Metadata[key];
+                        }
+                    }
+                }
+            }
+
+            return this;
+        }
     }
 }

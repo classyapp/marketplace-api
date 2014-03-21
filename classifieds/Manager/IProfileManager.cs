@@ -83,7 +83,8 @@ namespace classy.Manager
             bool professionalsOnly,
             bool ignoreLocation,
             int page,
-            int pageSize);
+            int pageSize,
+            string culture);
 
         /// <summary>
         /// 
@@ -141,7 +142,8 @@ namespace classy.Manager
             IDictionary<string, string> metadata,
             ProfileUpdateFields fields,
             byte[] profileImage,
-            string profileImagContentType);
+            string profileImagContentType,
+            string defaultCulture);
 
         /// <summary>
         /// 
@@ -169,8 +171,24 @@ namespace classy.Manager
         /// </summary>
         /// <param name="appId"></param>
         /// <param name="profileId"></param>
+        /// <param name="profileTranslation"></param>
+        void SetTranslation(string appId, string profileId, ProfileTranslation profileTranslation);
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="appId"></param>
+        /// <param name="profileId"></param>
         /// <param name="culture"></param>
-        /// <param name="metadata"></param>
-        void SaveTranslation(string appId, string profileId, string culture, IDictionary<string, string> metadata, string title, string content);
+        /// <returns></returns>
+        ProfileTranslationView GetTranslation(string appId, string profileId, string culture);
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="appId"></param>
+        /// <param name="profileId"></param>
+        /// <param name="culture"></param>
+        void DeleteTranslation(string appId, string profileId, string culture);
     }
 }
