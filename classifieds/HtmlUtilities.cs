@@ -17,7 +17,7 @@ namespace classy
         /// </summary>
         public static string RemoveTags(string html)
         {
-            if (html.IsNullOrEmpty()) return "";
+            if (string.IsNullOrEmpty(html)) return "";
             return _tags.Replace(html, "");
         }
     }

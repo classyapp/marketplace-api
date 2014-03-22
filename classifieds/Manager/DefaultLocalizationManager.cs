@@ -26,7 +26,7 @@ namespace classy.Manager
                 var keys = new List<string>(resource.Values.Keys);
                 foreach(var k in keys)
                 {
-                    resource.Values[k] = (new MarkdownSharp.Markdown()).Transform(resource.Values[k]);
+                    resource.Values[k] = resource.Values[k].Contains("\r\n") ? (new MarkdownSharp.Markdown()).Transform(resource.Values[k]) : resource.Values[k];
                 }
             }
             return resource.TranslateTo<LocalizationResourceView>();

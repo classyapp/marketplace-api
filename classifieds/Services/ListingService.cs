@@ -1200,7 +1200,7 @@ namespace classy.Services
         // get resource by key
         public object Get(GetResourceByKey request)
         {
-            var resource = LocalizationManager.GetResourceByKey(request.Environment.AppId, request.Key);
+            var resource = LocalizationManager.GetResourceByKey(request.Environment.AppId, request.Key, request.ProcessMarkdown);
             return new HttpResult(resource, HttpStatusCode.OK);
         }
 
