@@ -8,6 +8,11 @@ namespace Classy.Models.Request
 {
     public class GetResourceByKey : BaseRequestDto
     {
+        public GetResourceByKey()
+        {
+            ProcessMarkdown = true;
+        }
+
         public string Key { get; set; }
         public bool ProcessMarkdown { get; set; }
     }

@@ -18,7 +18,7 @@ namespace classy.Manager
                 ProxyClaimNeedsVerification = true,
                 AllowUnmoderatedComments = true,
                 AllowUnmoderatedReviews = true,
-                DefaultProfileImage = "http://d107oye3n9eb07.cloudfront.net/profile_img_69064",
+                DefaultProfileImage = "//d107oye3n9eb07.cloudfront.net/profile_img_69064",
                 PagesCount = 5,
                 PageSize = 12,
                 DefaultCountry = "FR",
