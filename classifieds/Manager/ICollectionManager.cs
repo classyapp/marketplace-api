@@ -65,7 +65,6 @@ namespace classy.Manager
         /// updates existing collection
         /// </summary>
         /// <param name="appId"></param>
-        /// <param name="profileId"></param>
         /// <param name="collectionId"></param>
         /// <param name="title"></param>
         /// <param name="content"></param>
@@ -73,7 +72,6 @@ namespace classy.Manager
         /// <returns>the collection with the updated listings</returns>
         CollectionView UpdateCollection(
             string appId,
-            string profileId,
             string collectionId,
             string title,
             string content,

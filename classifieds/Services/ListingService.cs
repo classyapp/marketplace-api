@@ -1058,9 +1058,9 @@ namespace classy.Services
             try
             {
                 var session = SessionAs<CustomUserSession>();
+                CollectionManager.SecurityContext = session.ToSecurityContext();
                 var collection = CollectionManager.UpdateCollection(
                     request.Environment.AppId,
-                    session.UserAuthId,
                     request.CollectionId,
                     request.Title,
                     request.Content,

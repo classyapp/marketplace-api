@@ -662,7 +662,6 @@ namespace classy.Manager
 
         public CollectionView UpdateCollection(
             string appId,
-            string profileId,
             string collectionId,
             string title,
             string content,
@@ -671,7 +670,7 @@ namespace classy.Manager
             try
             {
                 var collection = GetVerifiedCollection(appId, collectionId);
-                if (collection.ProfileId != profileId) throw new UnauthorizedAccessException();
+                if (collection.ProfileId != SecurityContext.AuthenticatedProfileId && !SecurityContext.IsAdmin) throw new UnauthorizedAccessException();
                 // TODO: verify all listings exist
                 if (collection.IncludedListings == null) collection.IncludedListings = new List<Classy.Models.IncludedListing>();
                 // log an activity, and increase the counter for the listings that were included
