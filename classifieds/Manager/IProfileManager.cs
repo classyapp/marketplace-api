@@ -1,9 +1,11 @@
-﻿using Classy.Auth;
+﻿using classy.Extentions;
+using Classy.Auth;
 using Classy.Models;
 using Classy.Models.Request;
 using Classy.Models.Response;
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -74,7 +76,7 @@ namespace classy.Manager
         /// <param name="metadata"></param>
         /// <param name="professionalsOnly"></param>
         /// <returns></returns>
-        SearchResultsView<ProfileView> SearchProfiles(
+        SearchResultsView<object> SearchProfiles(
             string appId,
             string searchQuery,
             string category,
