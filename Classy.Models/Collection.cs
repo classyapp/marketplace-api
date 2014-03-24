@@ -96,20 +96,31 @@ namespace Classy.Models
         /// </summary>
         public IList<string> Hashtags { get; set; }
 
+        public string DefaultCulture { get; set; }
+
         // Translations
         public IDictionary<string, CollectionTranslation> Translations { get; set; }
 
         public Collection Translate(string culture)
         {
-            if (Translations != null && !string.IsNullOrEmpty(culture))
+            if (!string.IsNullOrEmpty(culture))
             {
-                CollectionTranslation translation = Translations[culture];
-                if (translation != null)
+                if (Translations != null)
                 {
-                    Title = string.IsNullOrEmpty(translation.Title) ? Title : translation.Title;
-                    Content = string.IsNullOrEmpty(translation.Content) ? Content : translation.Content;
+                    CollectionTranslation translation = null;
+                    if (Translations.TryGetValue(culture, out translation))
+                    {
+                        Title = string.IsNullOrEmpty(translation.Title) ? Title : translation.Title;
+                        Content = string.IsNullOrEmpty(translation.Content) ? Content : translation.Content;
+                    }
                 }
-            }
+
+                // Translate included listings
+                foreach (var listing in IncludedListings)
+                {
+                    listing.Translate(culture);
+                }
+            }            
 
             return this;
         }

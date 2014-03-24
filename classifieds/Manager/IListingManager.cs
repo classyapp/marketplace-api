@@ -190,5 +190,30 @@ namespace classy.Manager
             string appId,
             string listingId,
             FlagReason FlagReason);
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="appId"></param>
+        /// <param name="listingId"></param>
+        /// <param name="cultureCode"></param>
+        /// <returns></returns>
+        ListingTranslationView GetTranslation(string appId, string listingId, string cultureCode);
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="appId"></param>
+        /// <param name="listingId"></param>
+        /// <param name="translation"></param>
+        void SetTranslation(string appId, string listingId, ListingTranslation translation);
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="appId"></param>
+        /// <param name="listingId"></param>
+        /// <param name="cultureCode"></param>
+        void DeleteTranslation(string appId, string listingId, string cultureCode);
     }
 }

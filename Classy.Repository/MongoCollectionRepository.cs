@@ -162,7 +162,7 @@ namespace Classy.Repository
         {
             try
             {
-                var query = Query<Collection>.Where(x => x.AppId == appId && x.EditorialApprovalDate != null);
+                var query = Query<Collection>.Where(x => x.AppId == appId && x.EditorialApprovalDate != null && x.DefaultCulture == culture);
                 if (categories != null) query = Query.And(query, Query<Collection>.In(x => x.Category, categories));
 
                 var collections = CollectionsCollection.Find(query)

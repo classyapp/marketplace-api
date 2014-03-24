@@ -27,4 +27,9 @@ namespace Classy.Models
         public string Title { get; set; }
         public string Content { get; set; }
     }
+
+    public class IncludedListingTranslation : Translation
+    {
+        public string Comments { get; set; }
+    }
 }

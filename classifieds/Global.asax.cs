@@ -140,6 +140,9 @@ namespace classy
                     .Add<SearchListings>("/tags/{tag}", "GET") // search with a nicer url for tag
                     .Add<GetListingsByProfileId>("/profile/{ProfileId}/listing/list", "GET") // get list of listing for profile
                     .Add<SetListingTranslation>("/listing/{ListingId}/translation", "POST")
+                    .Add<SetListingTranslation>("/listing/{ListingId}/translation/{CultureCode}", "POST")
+                    .Add<GetListingTranslation>("/listing/{ListingId}/translation/{CultureCode}", "GET")
+                    .Add<DeleteListingTranslation>("/listing/{ListingId}/translation/{CultureCode}", "DELETE")
 
                     // Collections
                     .Add<CreateCollection>("/collection/new", "POST") // create a new collection
@@ -159,6 +162,9 @@ namespace classy
                     .Add<GetCollectionById>("/collection/{CollectionId}", "GET") // get a collection by id
                     .Add<GetCollectionByProfileId>("/profile/{ProfileId}/collection/list/{CollectionType}", "GET") // get a collection by id
                     .Add<SetCollectionTranslation>("/collection/{CollectionId}/translation", "POST")
+                    .Add<SetIncludedListingTranslation>("/collection/{CollectionId}/{ListingId}/translation/{CultureCode}", "POST")
+                    .Add<GetIncludedListingTranslation>("/collection/{CollectionId}/{ListingId}/translation/{CultureCode}", "GET")
+                    .Add<DeleteIncludedListingTranslation>("/collection/{CollectionId}/{ListingId}/translation/{CultureCode}", "DELETE")
 
                     // Comments
                     .Add<PostCommentForListing>("/listing/{ListingId}/comment/new", "POST") // post new comment

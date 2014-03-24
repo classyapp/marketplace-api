@@ -38,4 +38,11 @@ namespace Classy.Models.Request
         public string Title { get; set; }
         public string Content { get; set; }
     }
+
+    public class SetIncludedListingTranslation : SetTranslation
+    {
+        public string CollectionId { get; set; }
+        public string ListingId { get; set; }
+        public string Comment { get; set; }
+    }
 }

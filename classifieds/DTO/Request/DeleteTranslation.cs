@@ -34,4 +34,11 @@ namespace Classy.Models.Request
     {
         public string CollectionId { get; set; }
     }
+
+    public class DeleteIncludedListingTranslation : DeleteTranslation
+    {
+        public string CollectionId { get; set; }
+        public string ListingId { get; set; }
+    }
+
 }

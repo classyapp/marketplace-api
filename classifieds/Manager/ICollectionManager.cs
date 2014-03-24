@@ -165,5 +165,11 @@ namespace classy.Manager
             string culture);
 
         CommentView AddCommentToCollection(string appId, string collectionId, string content, bool formatAsHtml);
+
+        IncludedListingTranslationView GetIncludedListingTranslation(string appId, string collectionId, string listingId, string culture);
+
+        void SetTranslation(string appId, string collectionId, string listingId, IncludedListingTranslation translation);
+
+        void DeleteTranslation(string appId, string collectionId, string listingId, string culture);
     }
 }

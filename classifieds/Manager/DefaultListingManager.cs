@@ -808,6 +808,22 @@ namespace classy.Manager
             return view;
         }
 
+        public ListingTranslationView GetTranslation(string appId, string listingId, string culture)
+        {
+            Listing listing = GetVerifiedListing(appId, listingId);
+            ListingTranslation translation = null;
+            if (listing.Translations == null || !listing.Translations.TryGetValue(culture, out translation))
+            {
+                if (culture == listing.DefaultCulture || string.IsNullOrEmpty(culture))
+                {
+                    return new ListingTranslationView { CultureCode = culture, Title = listing.Title, Content = listing.Content };
+                }
+                return new ListingTranslationView { CultureCode = culture, Title = string.Empty, Content = string.Empty };
+            }
+
+            return new ListingTranslationView { CultureCode = culture, Title = translation.Title, Content = translation.Content };
+        }
+
         public void SetTranslation(string appId, string collectionId, CollectionTranslation collectionTranslation)
         {
             Collection collection = GetVerifiedCollection(appId, collectionId, null);
@@ -824,10 +840,85 @@ namespace classy.Manager
             Listing listing = GetVerifiedListing(appId, listingId);
             if (SecurityContext.IsAdmin || SecurityContext.AuthenticatedProfileId == listing.ProfileId)
             {
+                if (listing.Translations == null)
+                {
+                    listing.Translations = new Dictionary<string, ListingTranslation>();
+                }
                 listing.Translations[listingTranslation.Culture] = listingTranslation;
                 ListingRepository.Update(listing);
             }
         }
+
+        public void DeleteTranslation(string appId, string listingId, string culture)
+        {
+            Listing listing = GetVerifiedListing(appId, listingId);
+            if (SecurityContext.IsAdmin || SecurityContext.AuthenticatedProfileId == listing.ProfileId)
+            {
+                if (listing.Translations != null)
+                {
+                    listing.Translations.Remove(culture);
+                    ListingRepository.Update(listing);
+                }
+            }
+        }
+
+        public IncludedListingTranslationView GetIncludedListingTranslation(string appId, string collectionId, string listingId, string culture)
+        {
+            Collection collection = GetVerifiedCollection(appId, collectionId, null);
+            IncludedListing includedListing = collection.IncludedListings.FirstOrDefault(l => l.Id == listingId);
+            if (includedListing.Translations == null)
+            {
+                return new IncludedListingTranslationView 
+                {
+                    CultureCode = culture,
+                    Comments = string.Empty
+                };
+            }
+            else
+            {
+                return new IncludedListingTranslationView 
+                {
+                    CultureCode = culture,
+                    Comments = includedListing.Translations.ContainsKey(culture) ? includedListing.Translations[culture].Comments : string.Empty
+                };
+            }
+        }
+
+        public void SetTranslation(string appId, string collectionId, string listingId, IncludedListingTranslation translation)
+        {
+            Collection collection = GetVerifiedCollection(appId, collectionId, null);
+            if (SecurityContext.IsAdmin || SecurityContext.AuthenticatedProfileId == collection.ProfileId)
+            {
+                IncludedListing includedListing = collection.IncludedListings.FirstOrDefault(l => l.Id == listingId);
+                if (includedListing != null)
+                {
+                    if (includedListing.Translations == null)
+                    {
+                        includedListing.Translations = new Dictionary<string, IncludedListingTranslation>();
+                    }
+
+                    includedListing.Translations.Add(translation.Culture, new IncludedListingTranslation { Culture = translation.Culture, Comments = translation.Comments, Metadata = new Dictionary<string, string>() });
+                }
+            }
+        }
+
+        public void DeleteTranslation(string appId, string collectionId, string listingId, string culture)
+        {
+            Collection collection = GetVerifiedCollection(appId, collectionId, null);
+            if (SecurityContext.IsAdmin || SecurityContext.AuthenticatedProfileId == collection.ProfileId)
+            {
+                IncludedListing includedListing = collection.IncludedListings.FirstOrDefault(l => l.Id == listingId);
+                if (includedListing != null)
+                {
+                    if (includedListing.Translations != null)
+                    {
+                        includedListing.Translations.Remove(culture);
+                        CollectionRepository.Update(collection);
+                    }
+                }
+            }
+        }
+
         private Collection GetVerifiedCollection(string appId, string collectionId, string culture)
         {
             var collection = CollectionRepository.GetById(appId, collectionId, culture);

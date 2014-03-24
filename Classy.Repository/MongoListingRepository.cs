@@ -86,7 +86,8 @@ namespace Classy.Repository
                     Query<Listing>.EQ(x => x.AppId, listing.AppId));
                 var update = new UpdateBuilder<Listing>()
                     .Set(x => x.Title, listing.Title)
-                    .Set(x => x.Content, listing.Content);
+                    .Set(x => x.Content, listing.Content)
+                    .Set(x => x.Translations, listing.Translations);
                 if (listing.ContactInfo != null) update.Set(x => x.ContactInfo, listing.ContactInfo);
                 if (listing.PricingInfo != null) update.Set(x => x.PricingInfo, listing.PricingInfo);
                 if (listing.SchedulingTemplate != null) update.Set(x => x.SchedulingTemplate, listing.SchedulingTemplate);
