@@ -94,7 +94,7 @@ namespace Classy.Repository
 
         public string KeyToUrl(string key)
         {
-            return string.Concat("http://", ConfigurationManager.AppSettings["CloudFrontDistributionUrl"].TrimEnd('/'), '/', key);
+            return string.Concat("//", ConfigurationManager.AppSettings["CloudFrontDistributionUrl"].TrimEnd('/'), '/', key);
         }
 
         private void CacheStream(string originKey, Stream stream)
