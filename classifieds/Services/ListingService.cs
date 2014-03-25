@@ -1385,25 +1385,24 @@ namespace classy.Services
         }
 
         [CustomAuthenticate]
-        public object Get(GetIncludedListingTranslation request)
+        public object Get(GetCollectionTranslation request)
         {
-            return new HttpResult(CollectionManager.GetIncludedListingTranslation(request.Environment.AppId, request.CollectionId, request.ListingId, request.CultureCode), HttpStatusCode.OK);
+            return new HttpResult(CollectionManager.GetCollectionTranslation(request.Environment.AppId, request.CollectionId, request.CultureCode), HttpStatusCode.OK);
         }
 
         [CustomAuthenticate]
-        public object Post(SetIncludedListingTranslation request)
+        public object Post(SetCollectionTranslation request)
         {
             try
             {
                 var session = SessionAs<CustomUserSession>();
                 CollectionManager.SecurityContext = session.ToSecurityContext();
-                CollectionManager.SetTranslation(
+                CollectionManager.SetCollectionTranslation(
                     request.Environment.AppId,
                     request.CollectionId,
-                    request.ListingId,
-                    new IncludedListingTranslation { Culture = request.CultureCode, Metadata = new Dictionary<string, string>(), Comments = request.Comment });
+                    new CollectionTranslation { Culture = request.CultureCode, Metadata = new Dictionary<string, string>(), Title = request.Title, Content = request.Content });
 
-                return new HttpResult(new { ObjectId = request.ListingId, Culture = request.CultureCode }, HttpStatusCode.OK);
+                return new HttpResult(new { ObjectId = request.CollectionId, Culture = request.CultureCode }, HttpStatusCode.OK);
             }
             catch (KeyNotFoundException kex)
             {
@@ -1412,19 +1411,18 @@ namespace classy.Services
         }
 
         [CustomAuthenticate]
-        public object Delete(DeleteIncludedListingTranslation request)
+        public object Delete(DeleteCollectionTranslation request)
         {
             try
             {
                 var session = SessionAs<CustomUserSession>();
                 CollectionManager.SecurityContext = session.ToSecurityContext();
-                CollectionManager.DeleteTranslation(
+                CollectionManager.DeleteCollectionTranslation(
                     request.Environment.AppId,
                     request.CollectionId,
-                    request.ListingId,
                     request.CultureCode);
 
-                return new HttpResult(new { ObjectId = request.ListingId, Culture = request.CultureCode }, HttpStatusCode.OK);
+                return new HttpResult(new { ObjectId = request.CollectionId, Culture = request.CultureCode }, HttpStatusCode.OK);
             }
             catch (KeyNotFoundException kex)
             {

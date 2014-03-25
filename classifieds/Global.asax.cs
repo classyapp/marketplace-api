@@ -161,10 +161,9 @@ namespace classy
                     //.Add<UpdateCollection>("/collection/{CollectionId}", "PUT") // update collection details
                     .Add<GetCollectionById>("/collection/{CollectionId}", "GET") // get a collection by id
                     .Add<GetCollectionByProfileId>("/profile/{ProfileId}/collection/list/{CollectionType}", "GET") // get a collection by id
-                    .Add<SetCollectionTranslation>("/collection/{CollectionId}/translation", "POST")
-                    .Add<SetIncludedListingTranslation>("/collection/{CollectionId}/{ListingId}/translation/{CultureCode}", "POST")
-                    .Add<GetIncludedListingTranslation>("/collection/{CollectionId}/{ListingId}/translation/{CultureCode}", "GET")
-                    .Add<DeleteIncludedListingTranslation>("/collection/{CollectionId}/{ListingId}/translation/{CultureCode}", "DELETE")
+                    .Add<GetCollectionTranslation>("/collection/{CollectionID}/translation/{CultureCode}", "GET")
+                    .Add<SetCollectionTranslation>("/collection/{CollectionId}/translation/{CultureCode}", "POST")
+                    .Add<DeleteCollectionTranslation>("/collection/{CollectionID}/translation/{CultureCode}", "DELETE")
 
                     // Comments
                     .Add<PostCommentForListing>("/listing/{ListingId}/comment/new", "POST") // post new comment

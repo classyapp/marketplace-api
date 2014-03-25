@@ -166,10 +166,10 @@ namespace classy.Manager
 
         CommentView AddCommentToCollection(string appId, string collectionId, string content, bool formatAsHtml);
 
-        IncludedListingTranslationView GetIncludedListingTranslation(string appId, string collectionId, string listingId, string culture);
+        CollectionTranslationView GetCollectionTranslation(string appId, string collectionId, string culture);
 
-        void SetTranslation(string appId, string collectionId, string listingId, IncludedListingTranslation translation);
+        void SetCollectionTranslation(string appId, string collectionId, CollectionTranslation collectionTranslation);
 
-        void DeleteTranslation(string appId, string collectionId, string listingId, string culture);
+        void DeleteCollectionTranslation(string appId, string collectionId, string culture);
     }
 }

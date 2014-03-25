@@ -824,12 +824,16 @@ namespace classy.Manager
             return new ListingTranslationView { CultureCode = culture, Title = translation.Title, Content = translation.Content };
         }
 
-        public void SetTranslation(string appId, string collectionId, CollectionTranslation collectionTranslation)
+        public void SetCollectionTranslation(string appId, string collectionId, CollectionTranslation collectionTranslation)
         {
             Collection collection = GetVerifiedCollection(appId, collectionId, null);
 
             if (SecurityContext.IsAdmin || SecurityContext.AuthenticatedProfileId == collection.ProfileId)
             {
+                if (collection.Translations == null)
+                {
+                    collection.Translations = new Dictionary<string, CollectionTranslation>();
+                }
                 collection.Translations[collectionTranslation.Culture] = collectionTranslation;
                 CollectionRepository.Update(collection);
             }
@@ -862,60 +866,39 @@ namespace classy.Manager
             }
         }
 
-        public IncludedListingTranslationView GetIncludedListingTranslation(string appId, string collectionId, string listingId, string culture)
+        public void DeleteCollectionTranslation(string appId, string collectionId, string culture)
         {
             Collection collection = GetVerifiedCollection(appId, collectionId, null);
-            IncludedListing includedListing = collection.IncludedListings.FirstOrDefault(l => l.Id == listingId);
-            if (includedListing.Translations == null)
+            if (SecurityContext.IsAdmin || SecurityContext.AuthenticatedProfileId == collection.ProfileId)
             {
-                return new IncludedListingTranslationView 
+                if (collection.Translations != null)
+                {
+                    collection.Translations.Remove(culture);
+                    CollectionRepository.Update(collection);
+                }
+            }
+        }
+
+        public CollectionTranslationView GetCollectionTranslation(string appId, string collectionId, string culture)
+        {
+            Collection collection = GetVerifiedCollection(appId, collectionId, null);
+            if (collection.Translations == null)
+            {
+                return new CollectionTranslationView
                 {
                     CultureCode = culture,
-                    Comments = string.Empty
+                    Title = string.Empty,
+                    Content = string.Empty
                 };
             }
             else
             {
-                return new IncludedListingTranslationView 
+                return new CollectionTranslationView
                 {
                     CultureCode = culture,
-                    Comments = includedListing.Translations.ContainsKey(culture) ? includedListing.Translations[culture].Comments : string.Empty
+                    Title = collection.Translations.ContainsKey(culture) ? collection.Translations[culture].Title : string.Empty,
+                    Content = collection.Translations.ContainsKey(culture) ? collection.Translations[culture].Content : string.Empty
                 };
-            }
-        }
-
-        public void SetTranslation(string appId, string collectionId, string listingId, IncludedListingTranslation translation)
-        {
-            Collection collection = GetVerifiedCollection(appId, collectionId, null);
-            if (SecurityContext.IsAdmin || SecurityContext.AuthenticatedProfileId == collection.ProfileId)
-            {
-                IncludedListing includedListing = collection.IncludedListings.FirstOrDefault(l => l.Id == listingId);
-                if (includedListing != null)
-                {
-                    if (includedListing.Translations == null)
-                    {
-                        includedListing.Translations = new Dictionary<string, IncludedListingTranslation>();
-                    }
-
-                    includedListing.Translations.Add(translation.Culture, new IncludedListingTranslation { Culture = translation.Culture, Comments = translation.Comments, Metadata = new Dictionary<string, string>() });
-                }
-            }
-        }
-
-        public void DeleteTranslation(string appId, string collectionId, string listingId, string culture)
-        {
-            Collection collection = GetVerifiedCollection(appId, collectionId, null);
-            if (SecurityContext.IsAdmin || SecurityContext.AuthenticatedProfileId == collection.ProfileId)
-            {
-                IncludedListing includedListing = collection.IncludedListings.FirstOrDefault(l => l.Id == listingId);
-                if (includedListing != null)
-                {
-                    if (includedListing.Translations != null)
-                    {
-                        includedListing.Translations.Remove(culture);
-                        CollectionRepository.Update(collection);
-                    }
-                }
             }
         }
 
