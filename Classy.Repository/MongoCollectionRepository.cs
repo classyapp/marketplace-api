@@ -101,12 +101,12 @@ namespace Classy.Repository
             try
             {
                 var getByProfileId = Query<Collection>.Where(x => x.AppId == appId && x.ProfileId == profileId);
-                var collections = CollectionsCollection.Find(getByProfileId);
+                var collections = CollectionsCollection.Find(getByProfileId).ToList();
                 foreach (var collection in collections)
                 {
                     collection.Translate(culture);
                 }
-                return collections.ToList();
+                return collections;
             }
             catch (MongoException)
             {
