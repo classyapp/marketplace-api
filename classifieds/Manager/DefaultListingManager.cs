@@ -770,7 +770,7 @@ namespace classy.Manager
             try
             {
                 var collection = GetVerifiedCollection(appId, collectionId, null);
-                if (collection.ProfileId != SecurityContext.AuthenticatedProfileId) throw new UnauthorizedAccessException();
+                if (collection.ProfileId != SecurityContext.AuthenticatedProfileId && !SecurityContext.IsAdmin) throw new UnauthorizedAccessException();
                 collection.CoverPhotos = photoKeys;
 
                 CollectionRepository.Update(collection);
