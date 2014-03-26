@@ -830,6 +830,8 @@ namespace classy.Manager
 
             if (SecurityContext.IsAdmin || SecurityContext.AuthenticatedProfileId == collection.ProfileId)
             {
+                if (collection.DefaultCulture == collectionTranslation.Culture)
+                    throw new InvalidOperationException("Cannot translate default culture values");
                 if (collection.Translations == null)
                 {
                     collection.Translations = new Dictionary<string, CollectionTranslation>();
@@ -844,6 +846,8 @@ namespace classy.Manager
             Listing listing = GetVerifiedListing(appId, listingId);
             if (SecurityContext.IsAdmin || SecurityContext.AuthenticatedProfileId == listing.ProfileId)
             {
+                if (listing.DefaultCulture == listingTranslation.Culture)
+                    throw new InvalidOperationException("Cannot translate default culture values");
                 if (listing.Translations == null)
                 {
                     listing.Translations = new Dictionary<string, ListingTranslation>();

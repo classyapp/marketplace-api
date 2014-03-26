@@ -629,6 +629,8 @@ namespace classy.Manager
             if (SecurityContext.IsAdmin || SecurityContext.AuthenticatedProfileId == profileId)
             {
                 Profile profile = GetVerifiedProfile(appId, profileId);
+                if (profile.DefaultCulture == profileTranslation.Culture)
+                    throw new InvalidOperationException("Cannot translate default culture values");
                 if (profile.Translations == null)
                 {
                     profile.Translations = new Dictionary<string, ProfileTranslation>();
