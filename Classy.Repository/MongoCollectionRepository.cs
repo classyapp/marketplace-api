@@ -50,12 +50,13 @@ namespace Classy.Repository
             }
         }
 
-        public Collection GetById(string appId, string collectionId)
+        public Collection GetById(string appId, string collectionId, string culture)
         {
             try
             {
                 var getById = Query<Collection>.Where(x => x.AppId == appId && x.Id == collectionId);
                 var collection = CollectionsCollection.FindOne(getById);
+                collection.Translate(culture);
                 return collection;
             }
             catch(MongoException)
@@ -77,12 +78,16 @@ namespace Classy.Repository
             }
         }
 
-        public IList<Collection> GetByProfileId(string appId, string profileId, string collectionType)
+        public IList<Collection> GetByProfileId(string appId, string profileId, string collectionType, string culture)
         {
             try
             {
                 var getByProfileId = Query<Collection>.Where(x => x.AppId == appId && x.ProfileId == profileId && x.Type == collectionType);
-                var collections = CollectionsCollection.Find(getByProfileId);
+                var collections = CollectionsCollection.Find(getByProfileId).ToList();
+                foreach (var collection in collections)
+                {
+                    collection.Translate(culture);
+                }
                 return collections.ToList();
             }
             catch (MongoException)
@@ -91,13 +96,17 @@ namespace Classy.Repository
             }
         }
 
-        public IList<Collection> GetByProfileId(string appId, string profileId)
+        public IList<Collection> GetByProfileId(string appId, string profileId, string culture)
         {
             try
             {
                 var getByProfileId = Query<Collection>.Where(x => x.AppId == appId && x.ProfileId == profileId);
-                var collections = CollectionsCollection.Find(getByProfileId);
-                return collections.ToList();
+                var collections = CollectionsCollection.Find(getByProfileId).ToList();
+                foreach (var collection in collections)
+                {
+                    collection.Translate(culture);
+                }
+                return collections;
             }
             catch (MongoException)
             {
@@ -149,16 +158,21 @@ namespace Classy.Repository
             }
         }
 
-        public IList<Collection> GetApprovedCollections(string appId, string[] categories, int maxCollections)
+        public IList<Collection> GetApprovedCollections(string appId, string[] categories, int maxCollections, string culture)
         {
             try
             {
-                var query = Query<Collection>.Where(x => x.AppId == appId && x.EditorialApprovalDate != null);
+                var query = Query<Collection>.Where(x => x.AppId == appId && x.EditorialApprovalDate != null && x.DefaultCulture == culture);
                 if (categories != null) query = Query.And(query, Query<Collection>.In(x => x.Category, categories));
 
                 var collections = CollectionsCollection.Find(query)
                     .SetSortOrder(SortBy<Collection>.Descending(x => x.EditorialApprovalDate))
                     .SetLimit(maxCollections);
+                
+                foreach (var collection in collections)
+                {
+                    collection.Translate(culture);
+                }
                 return collections.ToList();
             }
             catch (MongoException)

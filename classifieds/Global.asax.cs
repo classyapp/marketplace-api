@@ -139,6 +139,10 @@ namespace classy
                     .Add<SearchListings>("/listing/search", ApplyTo.Get | ApplyTo.Post) // search listings by tag and/or metadata
                     .Add<SearchListings>("/tags/{tag}", "GET") // search with a nicer url for tag
                     .Add<GetListingsByProfileId>("/profile/{ProfileId}/listing/list", "GET") // get list of listing for profile
+                    .Add<SetListingTranslation>("/listing/{ListingId}/translation", "POST")
+                    .Add<SetListingTranslation>("/listing/{ListingId}/translation/{CultureCode}", "POST")
+                    .Add<GetListingTranslation>("/listing/{ListingId}/translation/{CultureCode}", "GET")
+                    .Add<DeleteListingTranslation>("/listing/{ListingId}/translation/{CultureCode}", "DELETE")
 
                     // Collections
                     .Add<CreateCollection>("/collection/new", "POST") // create a new collection
@@ -157,6 +161,9 @@ namespace classy
                     //.Add<UpdateCollection>("/collection/{CollectionId}", "PUT") // update collection details
                     .Add<GetCollectionById>("/collection/{CollectionId}", "GET") // get a collection by id
                     .Add<GetCollectionByProfileId>("/profile/{ProfileId}/collection/list/{CollectionType}", "GET") // get a collection by id
+                    .Add<GetCollectionTranslation>("/collection/{CollectionID}/translation/{CultureCode}", "GET")
+                    .Add<SetCollectionTranslation>("/collection/{CollectionId}/translation/{CultureCode}", "POST")
+                    .Add<DeleteCollectionTranslation>("/collection/{CollectionID}/translation/{CultureCode}", "DELETE")
 
                     // Comments
                     .Add<PostCommentForListing>("/listing/{ListingId}/comment/new", "POST") // post new comment
@@ -196,6 +203,9 @@ namespace classy
                     .Add<SearchProfiles>("/profile/search", ApplyTo.Get | ApplyTo.Post)
                     .Add<GetFacebookAlbums>("/profile/social/facebook/albums", ApplyTo.Get)
                     .Add<GetGoogleContacts>("/profile/social/google/contacts", ApplyTo.Get)
+                    .Add<SetProfileTranslation>("/profile/{ProfileID}/translation/{CultureCode}", "POST")
+                    .Add<GetProfileTranslation>("/profile/{ProfileID}/translation/{CultureCode}", "GET")
+                    .Add<DeleteProfileTranslation>("/profile/{ProfileID}/translation/{CultureCode}", "DELETE")
 
                     // Reviews
                     .Add<PostReviewForListing>("/listing/{ListingId}/reviews/new", "POST")

@@ -25,7 +25,7 @@ namespace Classy.Repository
         /// <param name="appId"></param>
         /// <param name="collectionId"></param>
         /// <returns></returns>
-        Collection GetById(string appId, string collectionId);
+        Collection GetById(string appId, string collectionId, string culture);
         /// <summary>
         /// get a a list of the user's <see cref="Collection"/>s
         /// </summary>
@@ -33,14 +33,14 @@ namespace Classy.Repository
         /// <param name="profileId"></param>
         /// <param name="collectionType"></param>
         /// <returns></returns>
-        IList<Collection> GetByProfileId(string appId, string profileId, string collectionType);
+        IList<Collection> GetByProfileId(string appId, string profileId, string collectionType, string culture);
         /// <summary>
         /// get a a list of the user's <see cref="Collection"/>s
         /// </summary>
         /// <param name="appId"></param>
         /// <param name="profileId"></param>
         /// <returns></returns>
-        IList<Collection> GetByProfileId(string appId, string profileId);
+        IList<Collection> GetByProfileId(string appId, string profileId, string culture);
         /// <summary>
         /// insert a new <see cref="Collection"/>
         /// </summary>
@@ -82,7 +82,7 @@ namespace Classy.Repository
         /// <param name="appId"></param>
         /// <param name="categories"></param>
         /// <returns></returns>
-        IList<Collection> GetApprovedCollections(string appId, string[] categories, int maxCollections);
+        IList<Collection> GetApprovedCollections(string appId, string[] categories, int maxCollections, string culture);
 
         void IncreaseCounter(string collectionId, string appId, CollectionCounters counters, int value);
 

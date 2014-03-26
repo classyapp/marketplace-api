@@ -21,14 +21,14 @@ namespace Classy.Repository
             ListingsCollection = db.GetCollection<Listing>("classifieds");
         }
 
-        public Listing GetById(string listingId, string appId, bool includeDrafts)
+        public Listing GetById(string listingId, string appId, bool includeDrafts, string culture)
         {
-            var listings = GetById(new string[] { listingId }, appId, includeDrafts);
+            var listings = GetById(new string[] { listingId }, appId, includeDrafts, culture);
             if (listings == null || listings.Count() == 0) return null;
             return listings[0];
         }
 
-        public IList<Listing> GetById(string[] listingId, string appId, bool includeDrafts)
+        public IList<Listing> GetById(string[] listingId, string appId, bool includeDrafts, string culture)
         {
             var query = Query.And(
                     Query<Listing>.In(x => x.Id, listingId),
@@ -38,10 +38,14 @@ namespace Classy.Repository
                 query = Query.And(query, Query<Listing>.EQ(x => x.IsPublished, true));
             }
             var listings = ListingsCollection.Find(query);
+            foreach (var listing in listings)
+            {
+                listing.Translate(culture);
+            }
             return listings.ToList(); 
         }
 
-        public IList<Listing> GetByProfileId(string appId, string profileId, bool includeDrafts)
+        public IList<Listing> GetByProfileId(string appId, string profileId, bool includeDrafts, string culture)
         {
             var query = Query.And(
                     Query<Listing>.EQ(x => x.ProfileId, profileId),
@@ -52,8 +56,11 @@ namespace Classy.Repository
             }
 
             // now get the listings
-            MongoCursor<Listing> listings = listings = ListingsCollection.Find(query);
-            
+            MongoCursor<Listing> listings = ListingsCollection.Find(query);
+            foreach (var listing in listings)
+            {
+                listing.Translate(culture);
+            }
             return listings.ToList();
         }
 
@@ -79,7 +86,8 @@ namespace Classy.Repository
                     Query<Listing>.EQ(x => x.AppId, listing.AppId));
                 var update = new UpdateBuilder<Listing>()
                     .Set(x => x.Title, listing.Title)
-                    .Set(x => x.Content, listing.Content);
+                    .Set(x => x.Content, listing.Content)
+                    .Set(x => x.Translations, listing.Translations);
                 if (listing.ContactInfo != null) update.Set(x => x.ContactInfo, listing.ContactInfo);
                 if (listing.PricingInfo != null) update.Set(x => x.PricingInfo, listing.PricingInfo);
                 if (listing.SchedulingTemplate != null) update.Set(x => x.SchedulingTemplate, listing.SchedulingTemplate);
@@ -235,7 +243,7 @@ namespace Classy.Repository
 
         public IList<Listing> Search(string[] tags, string[] listingTypes, IDictionary<string, string[]> metadata, 
             double? priceMin, double? priceMax, Location location, string appId,
-            bool includeDrafts, bool increaseViewCounter, int page, int pageSize, ref long count)
+            bool includeDrafts, bool increaseViewCounter, int page, int pageSize, ref long count, string culture)
         {
             // set sort order
             var sortOrder = SortBy<Listing>.Descending(x => x.DisplayOrder).Descending(x => x.FavoriteCount);
@@ -324,6 +332,12 @@ namespace Classy.Repository
                 var ids = listings.Select(l => l.Id).ToArray();
                 if (increaseViewCounter) ListingsCollection.Update(Query<Listing>.Where(l => ids.Contains(l.Id)), Update<Listing>.Inc(x => x.ViewCount, 1), UpdateFlags.Multi);
             }
+
+            foreach (var listing in listings)
+            {
+                listing.Translate(culture);
+            }
+
             return listings.ToList();
         }
     }

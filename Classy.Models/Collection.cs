@@ -16,7 +16,7 @@ namespace Classy.Models
     /// <summary>
     /// represents a collection of listings curated by a user, with the ability to collaborate with other users
     /// </summary>
-    public class Collection : BaseObject
+    public class Collection : BaseObject, ITranslatable<Collection>
     {
         public Collection()
         {
@@ -95,6 +95,35 @@ namespace Classy.Models
         /// tags that identify the collection in searches
         /// </summary>
         public IList<string> Hashtags { get; set; }
+
+        public string DefaultCulture { get; set; }
+
+        // Translations
+        public IDictionary<string, CollectionTranslation> Translations { get; set; }
+
+        public Collection Translate(string culture)
+        {
+            if (!string.IsNullOrEmpty(culture))
+            {
+                if (Translations != null)
+                {
+                    CollectionTranslation translation = null;
+                    if (Translations.TryGetValue(culture, out translation))
+                    {
+                        Title = string.IsNullOrEmpty(translation.Title) ? Title : translation.Title;
+                        Content = string.IsNullOrEmpty(translation.Content) ? Content : translation.Content;
+                    }
+                }
+
+                // Translate included listings
+                foreach (var listing in IncludedListings)
+                {
+                    listing.Translate(culture);
+                }
+            }            
+
+            return this;
+        }
     }
 }
 

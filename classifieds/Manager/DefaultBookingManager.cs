@@ -85,7 +85,7 @@ namespace classy.Manager
             DateRange dateRange,
             bool includeCancelled)
         {
-            var listings = ListingRepository.GetByProfileId(profileId, appId, false);
+            var listings = ListingRepository.GetByProfileId(profileId, appId, false, null);
             var listingIds = listings.Select(x => x.Id).ToArray();
             return BookingRepository.GetByListingId(listingIds, appId, dateRange, includeCancelled);
         }
@@ -208,7 +208,7 @@ namespace classy.Manager
         /// <returns></returns>
         private Listing GetVerifiedListing(string appId, string listingId)
         {
-            var listing = ListingRepository.GetById(listingId, appId, false);
+            var listing = ListingRepository.GetById(listingId, appId, false, null);
             if (listing == null) throw new KeyNotFoundException("Invalid Listing");
             return listing;
         }

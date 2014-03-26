@@ -24,11 +24,12 @@ namespace Classy.Repository
 
     public interface IListingRepository
     {
-        Listing GetById(string listingId, string appId, bool includeDrafts);
-        IList<Listing> GetById(string[] listingId, string appId, bool includeDrafts);
-        IList<Listing> GetByProfileId(string appId, string profileId, bool includeDrafts);
+        Listing GetById(string listingId, string appId, bool includeDrafts, string culture);
+        IList<Listing> GetById(string[] listingId, string appId, bool includeDrafts, string culture);
+        IList<Listing> GetByProfileId(string appId, string profileId, bool includeDrafts, string culture);
         IList<Listing> Search(string[] tags, string[] listingTypes, IDictionary<string, string[]> metadata, double? priceMin,
-            double? priceMax, Location location, string appId, bool includeDrafts, bool increaseViewCounter, int page, int pageSize, ref long count);
+            double? priceMax, Location location, string appId, bool includeDrafts, bool increaseViewCounter, 
+            int page, int pageSize, ref long count, string culture);
         void AddExternalMedia(string listingId, string appId, IList<MediaFile> media);
         void UpdateExternalMedia(string listingId, string appId, MediaFile media);
         void DeleteExternalMedia(string listingId, string appId, string url);

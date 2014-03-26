@@ -31,7 +31,7 @@ namespace Classy.Models
 
         public static string[] ExtractHashtags(this string from)
         {
-            var tagRegex = new Regex(@"\B#\w\w+");
+            var tagRegex = new Regex(@"\B#\w*[-]*\w+");
             var hashtags = tagRegex.Matches(from)
                 .Cast<Match>()
                 .Select(m => m.Value)

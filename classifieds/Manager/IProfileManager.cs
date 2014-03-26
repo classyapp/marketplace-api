@@ -83,7 +83,8 @@ namespace classy.Manager
             bool professionalsOnly,
             bool ignoreLocation,
             int page,
-            int pageSize);
+            int pageSize,
+            string culture);
 
         /// <summary>
         /// 
@@ -98,6 +99,7 @@ namespace classy.Manager
         /// <param name="includeCollections"></param>
         /// <param name="includeFavorites"></param>
         /// <param name="logImpression"></param>
+        /// <param name="culture"></param>
         /// <returns></returns>
         ProfileView GetProfileById(
             string appId,
@@ -109,8 +111,8 @@ namespace classy.Manager
             bool includeListings,
             bool includeCollections,
             bool includeFavorites,
-            bool logImpression);
-        
+            bool logImpression,
+            string culture);
         /// <summary>
         /// 
         /// </summary>
@@ -140,7 +142,8 @@ namespace classy.Manager
             IDictionary<string, string> metadata,
             ProfileUpdateFields fields,
             byte[] profileImage,
-            string profileImagContentType);
+            string profileImagContentType,
+            string defaultCulture);
 
         /// <summary>
         /// 
@@ -162,5 +165,30 @@ namespace classy.Manager
         /// <param name="token"></param>
         /// <returns></returns>
         IEnumerable<EmailContact> GetGoogleContacts(string appId, string profileId, string token);
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="appId"></param>
+        /// <param name="profileId"></param>
+        /// <param name="profileTranslation"></param>
+        void SetTranslation(string appId, string profileId, ProfileTranslation profileTranslation);
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="appId"></param>
+        /// <param name="profileId"></param>
+        /// <param name="culture"></param>
+        /// <returns></returns>
+        ProfileTranslationView GetTranslation(string appId, string profileId, string culture);
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="appId"></param>
+        /// <param name="profileId"></param>
+        /// <param name="culture"></param>
+        void DeleteTranslation(string appId, string profileId, string culture);
     }
 }
