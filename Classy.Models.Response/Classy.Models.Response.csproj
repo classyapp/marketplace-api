@@ -53,10 +53,14 @@
     <Compile Include="BaseDeleteResponse.cs" />
     <Compile Include="CancelBookingResponse.cs" />
     <Compile Include="CancelOrderResponse.cs" />
+    <Compile Include="CollectionTranslationView.cs" />
     <Compile Include="CollectionView.cs" />
     <Compile Include="CommentView.cs" />
     <Compile Include="ContactInfoView.cs" />
     <Compile Include="CoordsView.cs" />
+    <Compile Include="IncludedListingTranslationView.cs" />
+    <Compile Include="ListingTranslationView.cs" />
+    <Compile Include="ProfileTranslationView.cs" />
     <Compile Include="SocialPhotoAlbumView.cs" />
     <Compile Include="EmailContact.cs" />
     <Compile Include="IncludedListingView.cs" />

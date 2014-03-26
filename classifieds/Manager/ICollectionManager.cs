@@ -46,7 +46,8 @@ namespace classy.Manager
         CollectionView AddListingsToCollection(
             string appId,
             string collectionId,
-            IList<IncludedListing> listingIds);
+            IList<IncludedListing> listingIds,
+            string culture);
 
         /// <summary>
         /// 
@@ -75,7 +76,8 @@ namespace classy.Manager
             string collectionId,
             string title,
             string content,
-            IList<Classy.Models.IncludedListing> listings);
+            IList<Classy.Models.IncludedListing> listings,
+            string culture);
 
         /// <summary>
         /// deletes existing collection
@@ -97,7 +99,8 @@ namespace classy.Manager
         CollectionView UpdateCollectionCover(
             string appId, 
             string collectionId, 
-            IList<string> photoKeys);
+            IList<string> photoKeys,
+            string culture);
 
         /// <summary>
         /// get a specific <see cref="CollectionView"/> by id
@@ -121,7 +124,8 @@ namespace classy.Manager
             bool increaseViewCounterOnListings,
             bool includeComments,
             bool formatCommentsAsHtml,
-            bool includeCommenterProfiles);
+            bool includeCommenterProfiles,
+            string culture);
 
         /// <summary>
         /// get a list of a user's <see cref="CollectionView"/>s
@@ -132,7 +136,8 @@ namespace classy.Manager
         IList<CollectionView> GetCollectionsByProfileId(
             string appId,
             string profileId,
-            string collectionType);
+            string collectionType,
+            string culture);
 
         /// <summary>
         /// 
@@ -154,8 +159,15 @@ namespace classy.Manager
         IList<CollectionView> GetApprovedCollections(
             string appId,
             string[] categories,
-            int maxCollections);
+            int maxCollections,
+            string culture);
 
         CommentView AddCommentToCollection(string appId, string collectionId, string content, bool formatAsHtml);
+
+        CollectionTranslationView GetCollectionTranslation(string appId, string collectionId, string culture);
+
+        void SetCollectionTranslation(string appId, string collectionId, CollectionTranslation collectionTranslation);
+
+        void DeleteCollectionTranslation(string appId, string collectionId, string culture);
     }
 }

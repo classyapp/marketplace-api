@@ -68,7 +68,8 @@ namespace classy.Services
                     request.FormatCommentsAsHtml,
                     request.IncludeCommenterProfiles,
                     request.IncludeProfile,
-                    request.IncludeFavoritedByProfiles);
+                    request.IncludeFavoritedByProfiles,
+                    request.Environment.CultureCode);
 
                 return new HttpResult(listingView, HttpStatusCode.OK);
             }
@@ -87,7 +88,8 @@ namespace classy.Services
                     request.ProfileId,
                     request.IncludeComments,
                     request.FormatCommentsAsHtml,
-                    request.IncludeDrafts);
+                    request.IncludeDrafts,
+                    request.Environment.CultureCode);
 
                 return new HttpResult(listingViews, HttpStatusCode.OK);
             }
@@ -115,7 +117,8 @@ namespace classy.Services
                 request.IncludeComments,
                 request.FormatCommentsAsHtml,
                 request.Page,
-                AppManager.GetAppById(request.Environment.AppId).PageSize);
+                AppManager.GetAppById(request.Environment.AppId).PageSize,
+                request.Environment.CultureCode);
 
             return new HttpResult(listingViews, HttpStatusCode.OK);
         }
@@ -472,7 +475,8 @@ namespace classy.Services
                     false,
                     false,
                     true,
-                    false);
+                    false,
+                    request.Environment.CultureCode);
                 return new HttpResult(profile);
             }
         }
@@ -494,7 +498,8 @@ namespace classy.Services
                     request.IncludeListings,
                     request.IncludeCollections,
                     request.IncludeFavorites,
-                    request.LogImpression);
+                    request.LogImpression,
+                    request.Environment.CultureCode);
 
                 return new HttpResult(profile, HttpStatusCode.OK);
             }
@@ -539,9 +544,50 @@ namespace classy.Services
                     request.Metadata,
                     request.Fields,
                     imageData,
-                    imageContentType);
+                    imageContentType,
+                    request.Environment.CultureCode);
 
                 return new HttpResult(profile, HttpStatusCode.OK);
+            }
+            catch (KeyNotFoundException kex)
+            {
+                return new HttpError(HttpStatusCode.NotFound, kex.Message);
+            }
+        }
+
+        [CustomAuthenticate]
+        public object Post(SetProfileTranslation request)
+        {
+            try
+            {
+                var session = SessionAs<CustomUserSession>();
+                ProfileManager.SecurityContext = session.ToSecurityContext();
+                ProfileManager.SetTranslation(
+                    request.Environment.AppId,
+                    request.ProfileId,
+                    new ProfileTranslation { Culture = request.CultureCode, Metadata = request.Metadata });
+
+                return new HttpResult(new { ObjectId = request.ProfileId, Culture = request.CultureCode }, HttpStatusCode.OK);
+            }
+            catch (KeyNotFoundException kex)
+            {
+                return new HttpError(HttpStatusCode.NotFound, kex.Message);
+            }
+        }
+
+        [CustomAuthenticate]
+        public object Delete(DeleteProfileTranslation request)
+        {
+            try
+            {
+                var session = SessionAs<CustomUserSession>();
+                ProfileManager.SecurityContext = session.ToSecurityContext();
+                ProfileManager.DeleteTranslation(
+                    request.Environment.AppId,
+                    request.ProfileId,
+                    request.CultureCode);
+
+                return new HttpResult(new { ObjectId = request.ProfileId, Culture = request.CultureCode }, HttpStatusCode.OK);
             }
             catch (KeyNotFoundException kex)
             {
@@ -566,7 +612,8 @@ namespace classy.Services
                 request.ProfessionalsOnly,
                 request.IgnoreLocation,
                 request.Page,
-                AppManager.GetAppById(request.Environment.AppId).PageSize);
+                AppManager.GetAppById(request.Environment.AppId).PageSize,
+                request.Environment.CultureCode);
 
             return new HttpResult(profiles, HttpStatusCode.OK);
         }
@@ -884,7 +931,8 @@ namespace classy.Services
                         false,
                         false,
                         false,
-                    false);
+                        false,
+                        request.Environment.CultureCode);
                 if (request.ReturnReviewerProfile)
                     response.ReviewerProfile = ProfileManager.GetProfileById(
                         request.Environment.AppId,
@@ -896,7 +944,8 @@ namespace classy.Services
                         false,
                         false,
                         false,
-                    false);
+                        false,
+                        request.Environment.CultureCode);
                 return new HttpResult(response, HttpStatusCode.OK);
             }
             catch (KeyNotFoundException kex)
@@ -1018,7 +1067,8 @@ namespace classy.Services
                 var collection = CollectionManager.AddListingsToCollection(
                     request.Environment.AppId,
                     request.CollectionId,
-                    request.IncludedListings);
+                    request.IncludedListings,
+                    request.Environment.CultureCode);
                 return new HttpResult(collection, HttpStatusCode.OK);
             }
             catch (KeyNotFoundException kex)
@@ -1064,7 +1114,8 @@ namespace classy.Services
                     request.CollectionId,
                     request.Title,
                     request.Content,
-                    request.IncludedListings);
+                    request.IncludedListings,
+                    request.Environment.CultureCode);
                 return new HttpResult(collection, HttpStatusCode.OK);
             }
             catch (KeyNotFoundException kex)
@@ -1107,7 +1158,8 @@ namespace classy.Services
                 var collection = CollectionManager.UpdateCollectionCover(
                     request.Environment.AppId,
                     request.CollectionId,
-                    request.Keys);
+                    request.Keys,
+                    request.Environment.CultureCode);
                 return new HttpResult(collection, HttpStatusCode.OK);
             }
             catch (KeyNotFoundException kex)
@@ -1143,7 +1195,8 @@ namespace classy.Services
             var collections = CollectionManager.GetApprovedCollections(
                 request.Environment.AppId,
                 request.Categories,
-                request.MaxCollections);
+                request.MaxCollections,
+                request.Environment.CultureCode);
             return new HttpResult(collections, HttpStatusCode.OK);
         }
 
@@ -1167,7 +1220,8 @@ namespace classy.Services
                     request.IncreaseViewCounterOnListings,
                     request.IncludeComments,
                     request.FormatCommentsAsHtml,
-                    request.IncludeCommenterProfiles);
+                    request.IncludeCommenterProfiles,
+                    request.Environment.CultureCode);
                 return new HttpResult(collection, HttpStatusCode.OK);
             }
             catch (KeyNotFoundException kex)
@@ -1186,7 +1240,8 @@ namespace classy.Services
                 var collection = CollectionManager.GetCollectionsByProfileId(
                     request.Environment.AppId,
                     request.ProfileId,
-                    request.CollectionType);
+                    request.CollectionType,
+                    request.Environment.CultureCode);
                 return new HttpResult(collection, HttpStatusCode.OK);
             }
             catch (KeyNotFoundException kex)
@@ -1277,5 +1332,102 @@ namespace classy.Services
             return new HttpResult(ThumbnailManager.CreateThumbnail(request.ImageKey, request.Width, request.Height), "image/jpeg");
         }
 
+        [CustomAuthenticate]
+        public object Get(GetProfileTranslation request)
+        {
+            return new HttpResult(ProfileManager.GetTranslation(request.Environment.AppId, request.ProfileId, request.CultureCode), HttpStatusCode.OK);
+        }
+
+        [CustomAuthenticate]
+        public object Get(GetListingTranslation request)
+        {
+            return new HttpResult(ListingManager.GetTranslation(request.Environment.AppId, request.ListingId, request.CultureCode), HttpStatusCode.OK);
+        }
+
+        [CustomAuthenticate]
+        public object Post(SetListingTranslation request)
+        {
+            try
+            {
+                var session = SessionAs<CustomUserSession>();
+                ListingManager.SecurityContext = session.ToSecurityContext();
+                ListingManager.SetTranslation(
+                    request.Environment.AppId,
+                    request.ListingId,
+                    new ListingTranslation { Culture = request.CultureCode, Metadata = new Dictionary<string, string>(), Title = request.Title, Content = request.Content });
+
+                return new HttpResult(new { ObjectId = request.ListingId, Culture = request.CultureCode }, HttpStatusCode.OK);
+            }
+            catch (KeyNotFoundException kex)
+            {
+                return new HttpError(HttpStatusCode.NotFound, kex.Message);
+            }
+        }
+
+        [CustomAuthenticate]
+        public object Delete(DeleteListingTranslation request)
+        {
+            try
+            {
+                var session = SessionAs<CustomUserSession>();
+                ListingManager.SecurityContext = session.ToSecurityContext();
+                ListingManager.DeleteTranslation(
+                    request.Environment.AppId,
+                    request.ListingId,
+                    request.CultureCode);
+
+                return new HttpResult(new { ObjectId = request.ListingId, Culture = request.CultureCode }, HttpStatusCode.OK);
+            }
+            catch (KeyNotFoundException kex)
+            {
+                return new HttpError(HttpStatusCode.NotFound, kex.Message);
+            }
+        }
+
+        [CustomAuthenticate]
+        public object Get(GetCollectionTranslation request)
+        {
+            return new HttpResult(CollectionManager.GetCollectionTranslation(request.Environment.AppId, request.CollectionId, request.CultureCode), HttpStatusCode.OK);
+        }
+
+        [CustomAuthenticate]
+        public object Post(SetCollectionTranslation request)
+        {
+            try
+            {
+                var session = SessionAs<CustomUserSession>();
+                CollectionManager.SecurityContext = session.ToSecurityContext();
+                CollectionManager.SetCollectionTranslation(
+                    request.Environment.AppId,
+                    request.CollectionId,
+                    new CollectionTranslation { Culture = request.CultureCode, Metadata = new Dictionary<string, string>(), Title = request.Title, Content = request.Content });
+
+                return new HttpResult(new { ObjectId = request.CollectionId, Culture = request.CultureCode }, HttpStatusCode.OK);
+            }
+            catch (KeyNotFoundException kex)
+            {
+                return new HttpError(HttpStatusCode.NotFound, kex.Message);
+            }
+        }
+
+        [CustomAuthenticate]
+        public object Delete(DeleteCollectionTranslation request)
+        {
+            try
+            {
+                var session = SessionAs<CustomUserSession>();
+                CollectionManager.SecurityContext = session.ToSecurityContext();
+                CollectionManager.DeleteCollectionTranslation(
+                    request.Environment.AppId,
+                    request.CollectionId,
+                    request.CultureCode);
+
+                return new HttpResult(new { ObjectId = request.CollectionId, Culture = request.CultureCode }, HttpStatusCode.OK);
+            }
+            catch (KeyNotFoundException kex)
+            {
+                return new HttpError(HttpStatusCode.NotFound, kex.Message);
+            }
+        }
     }
 }

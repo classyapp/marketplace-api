@@ -52,7 +52,7 @@ namespace classy.Manager
             // get the listing
             var listing = GetVerifiedListing(appId, listingId);
             if (listing.PricingInfo == null) throw new ApplicationException("this listing cannot be purchased");
-            var profile = ProfileRepository.GetById(appId, listing.ProfileId, false);
+            var profile = ProfileRepository.GetById(appId, listing.ProfileId, false, null);
 
             // calculate the price of the sku
             var price = listing.PricingInfo.GetPriceForSKU(sku);
@@ -177,7 +177,7 @@ namespace classy.Manager
             string profileId,
             bool includeCancelled)
         {
-            var listings = ListingRepository.GetByProfileId(profileId, appId, false);
+            var listings = ListingRepository.GetByProfileId(profileId, appId, false, null);
             var listingIds = listings.Select(x => x.Id).ToArray();
             return OrderRepository.GetByListingId(appId, listingIds, includeCancelled);
         }
@@ -204,7 +204,7 @@ namespace classy.Manager
         /// <returns></returns>
         private Listing GetVerifiedListing(string appId, string listingId)
         {
-            var listing = ListingRepository.GetById(listingId, appId, false);
+            var listing = ListingRepository.GetById(listingId, appId, false, null);
             if (listing == null) throw new KeyNotFoundException("invalid listing");
             return listing;
         }

@@ -87,10 +87,11 @@ namespace classy.Manager
             bool professionalsOnly,
             bool ignoreLocation,
             int page,
-            int pageSize)
+            int pageSize,
+            string culture)
         {
             long count = 0;
-            var profileList = ProfileRepository.Search(appId, searchQuery, category, location, metadata, professionalsOnly, ignoreLocation, page, pageSize, ref count);
+            var profileList = ProfileRepository.Search(appId, searchQuery, category, location, metadata, professionalsOnly, ignoreLocation, page, pageSize, ref count, culture);
             IList<ProfileView> results = new List<ProfileView>();
             foreach (var profile in profileList)
             {
@@ -104,8 +105,8 @@ namespace classy.Manager
             string profileId,
             string followeeProfileId)
         {
-            var follower = ProfileRepository.GetById(appId, profileId, false);
-            var followee = ProfileRepository.GetById(appId, followeeProfileId, false);
+            var follower = ProfileRepository.GetById(appId, profileId, false, null);
+            var followee = ProfileRepository.GetById(appId, followeeProfileId, false, null);
             if (followee == null) throw new KeyNotFoundException("invalid username");
 
             // save triple
@@ -133,9 +134,10 @@ namespace classy.Manager
             bool includeListings,
             bool includeCollections,
             bool includeFavorites,
-            bool logImpression)
+            bool logImpression,
+            string culture)
         {
-            var profile = ProfileRepository.GetById(appId, profileId, logImpression);
+            var profile = ProfileRepository.GetById(appId, profileId, logImpression, culture);
             if (profile == null) throw new KeyNotFoundException("invalid profile id");
 
             var profileView = profile.ToProfileView();
@@ -143,14 +145,14 @@ namespace classy.Manager
             if (includeFollowedByProfiles)
             {
                 var profileIds = TripleStore.GetActivitySubjectList(appId, ActivityPredicate.FOLLOW_PROFILE, profileId);
-                var followedby = ProfileRepository.GetByIds(appId, profileIds.ToArray());
+                var followedby = ProfileRepository.GetByIds(appId, profileIds.ToArray(), culture);
                 profileView.FollowedBy = followedby.ToProfileViewList();
             }
 
             if (includeFollowingProfiles)
             {
                 var profileIds = TripleStore.GetActivityObjectList(appId, ActivityPredicate.FOLLOW_PROFILE, profileId);
-                var following = ProfileRepository.GetByIds(appId, profile.FolloweeProfileIds.ToArray());
+                var following = ProfileRepository.GetByIds(appId, profile.FolloweeProfileIds.ToArray(), culture);
                 profileView.Following = following.ToProfileViewList();
             }
 
@@ -158,7 +160,7 @@ namespace classy.Manager
             {
                 var reviews = ReviewRepository.GetByRevieweeProfileId(appId, profileId, false, false);
                 profileView.Reviews = reviews.ToReviewViewList();
-                var reviewers = ProfileRepository.GetByIds(appId, reviews.Select(x => x.ProfileId).ToArray());
+                var reviewers = ProfileRepository.GetByIds(appId, reviews.Select(x => x.ProfileId).ToArray(), culture);
                 foreach (var r in profileView.Reviews)
                 {
                     r.ReviewerUsername = reviewers.Single(x => x.Id == r.ProfileId).UserName;
@@ -168,22 +170,22 @@ namespace classy.Manager
 
             if (includeListings)
             {
-                var listings = ListingRepository.GetByProfileId(appId, profileId, false);
+                var listings = ListingRepository.GetByProfileId(appId, profileId, false, culture);
                 profileView.Listings = listings.ToListingViewList();
             }
 
             if (includeCollections)
             {
-                var collections = CollectionRepository.GetByProfileId(appId, profileId);
+                var collections = CollectionRepository.GetByProfileId(appId, profileId, culture);
                 profileView.Collections = collections.ToCollectionViewList();
                 foreach (var c in profileView.Collections)
                 {
                     if (c.IncludedListings != null)
                     {
-                        c.Listings = ListingRepository.GetById(c.IncludedListings.Select(l => l.Id).ToArray(), appId, false).ToListingViewList();
+                        c.Listings = ListingRepository.GetById(c.IncludedListings.Select(l => l.Id).ToArray(), appId, false, culture).ToListingViewList();
                         if (c.CoverPhotos == null || c.CoverPhotos.Count == 0)
                         {
-                            c.CoverPhotos = ListingRepository.GetById(c.IncludedListings.Select(l => l.Id).Skip(Math.Max(0, c.IncludedListings.Count - 4)).ToArray(), appId, false).Select(l => l.ExternalMedia[0].Key).ToArray();
+                            c.CoverPhotos = ListingRepository.GetById(c.IncludedListings.Select(l => l.Id).Skip(Math.Max(0, c.IncludedListings.Count - 4)).ToArray(), appId, false, null).Select(l => l.ExternalMedia[0].Key).ToArray();
                         }
                     }
                     else
@@ -218,7 +220,8 @@ namespace classy.Manager
             IDictionary<string, string> metadata,
             ProfileUpdateFields fields,
             byte[] profileImage,
-            string profileImageContentType)
+            string profileImageContentType,
+            string defaultCulture)
         {
             var profile = GetVerifiedProfile(appId, profileId);
             var rankInc = 0;
@@ -226,7 +229,7 @@ namespace classy.Manager
             // copy seller info
             if (fields.HasFlag(ProfileUpdateFields.ProfessionalInfo))
             {
-                if (profile.ProfessionalInfo != null) 
+                if (profile.ProfessionalInfo != null)
                 {
                     // increase rank if company contact info fields have been entered for the first time
                     if (profile.ProfessionalInfo.CompanyContactInfo == null && professionalInfo.CompanyContactInfo != null) rankInc++;
@@ -277,6 +280,11 @@ namespace classy.Manager
                 if (profile.ProfessionalInfo.CoverPhotos == null) rankInc++;
 
                 profile.ProfessionalInfo.CoverPhotos = professionalInfo.CoverPhotos;
+            }
+
+            if (string.IsNullOrEmpty(profile.DefaultCulture))
+            {
+                profile.DefaultCulture = defaultCulture;
             }
 
             profile.Rank += rankInc;
@@ -518,7 +526,7 @@ namespace classy.Manager
         }
 
         public IList<SocialPhotoAlbumView> GetFacebookAlbums(
-            string appId, 
+            string appId,
             string profileId,
             string token)
         {
@@ -529,7 +537,7 @@ namespace classy.Manager
             var albums = url.GetStringFromUrl();
             var albumsObj = Newtonsoft.Json.JsonConvert.DeserializeObject<dynamic>(albums);
             var albumList = new List<SocialPhotoAlbumView>();
-            foreach(dynamic a in albumsObj["data"])
+            foreach (dynamic a in albumsObj["data"])
             {
                 var album = new SocialPhotoAlbumView
                 {
@@ -615,10 +623,64 @@ namespace classy.Manager
         /// </summary>
         /// <param name="appId"></param>
         /// <param name="profileId"></param>
-        /// <returns></returns>
+        /// <param name="profileTranslation"></param>
+        public void SetTranslation(string appId, string profileId, ProfileTranslation profileTranslation)
+        {
+            if (SecurityContext.IsAdmin || SecurityContext.AuthenticatedProfileId == profileId)
+            {
+                Profile profile = GetVerifiedProfile(appId, profileId);
+                if (profile.Translations == null)
+                {
+                    profile.Translations = new Dictionary<string, ProfileTranslation>();
+                }
+                profile.Translations[profileTranslation.Culture] = profileTranslation;
+                ProfileRepository.Save(profile);
+            }
+        }
+
+        public ProfileTranslationView GetTranslation(string appId, string profileId, string culture)
+        {
+            Profile profile = GetVerifiedProfile(appId, profileId);
+            ProfileTranslation translation = null;
+            if (profile.Translations == null || !profile.Translations.TryGetValue(culture, out translation))
+            {
+                if (culture == profile.DefaultCulture || string.IsNullOrEmpty(culture))
+                {
+                    return new ProfileTranslationView { CultureCode = culture, Metadata = new Dictionary<string, string>(profile.Metadata) };
+                }
+                return new ProfileTranslationView { CultureCode = culture, Metadata = new Dictionary<string, string>() };
+            }
+
+            return new ProfileTranslationView { CultureCode = culture, Metadata = new Dictionary<string,string>(translation.Metadata) };
+        }
+
+        public void DeleteTranslation(string appId, string profileId, string culture)
+        {
+            if (SecurityContext.IsAdmin || SecurityContext.AuthenticatedProfileId == profileId)
+            {
+                Profile profile = GetVerifiedProfile(appId, profileId);
+                if (profile.Translations != null)
+                {
+                    profile.Translations.Remove(culture);
+                    ProfileRepository.Save(profile);
+                }
+            }
+        }
+
         private Profile GetVerifiedProfile(string appId, string profileId)
         {
-            var profile = ProfileRepository.GetById(appId, profileId, false);
+            return GetVerifiedProfile(appId, profileId, null);
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="appId"></param>
+        /// <param name="profileId"></param>
+        /// <returns></returns>
+        private Profile GetVerifiedProfile(string appId, string profileId, string culture)
+        {
+            var profile = ProfileRepository.GetById(appId, profileId, false, culture);
             if (profile == null) throw new KeyNotFoundException("invalid profile");
             return profile;
         }
@@ -631,7 +693,7 @@ namespace classy.Manager
         /// <returns></returns>
         private Listing GetVerifiedListing(string appId, string listingId)
         {
-            var listing = ListingRepository.GetById(listingId, appId, false);
+            var listing = ListingRepository.GetById(listingId, appId, false, null);
             if (listing == null) throw new KeyNotFoundException("invalid listing");
             return listing;
         }

@@ -36,7 +36,7 @@ namespace Classy.Auth
             // TODO: does this get called on eveyr call? if so find a different way.
             var repo = authService.TryResolve<IProfileRepository>();
             var storage = authService.TryResolve<IStorageRepository>();
-            var profile = repo.GetById(Environment.AppId, session.UserAuthId, false);
+            var profile = repo.GetById(Environment.AppId, session.UserAuthId, false, Environment.CultureCode);
             if (profile == null)
             {
                 isNew = true;
