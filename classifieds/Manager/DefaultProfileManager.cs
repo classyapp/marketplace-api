@@ -648,12 +648,19 @@ namespace classy.Manager
             {
                 if (culture == profile.DefaultCulture || string.IsNullOrEmpty(culture))
                 {
-                    return new ProfileTranslationView { CultureCode = culture, Metadata = new Dictionary<string, string>(profile.Metadata) };
+                    return new ProfileTranslationView { 
+                        CultureCode = culture, 
+                        CompanyName = profile.IsProfessional ? profile.ProfessionalInfo.CompanyName : string.Empty,
+                        Metadata = new Dictionary<string, string>(profile.Metadata) };
                 }
-                return new ProfileTranslationView { CultureCode = culture, Metadata = new Dictionary<string, string>() };
+                return new ProfileTranslationView { CultureCode = culture, CompanyName = string.Empty, Metadata = new Dictionary<string, string>() };
             }
 
-            return new ProfileTranslationView { CultureCode = culture, Metadata = new Dictionary<string,string>(translation.Metadata) };
+            return new ProfileTranslationView { 
+                CultureCode = culture,
+                CompanyName = profile.IsProfessional ? translation.CompanyName : string.Empty,
+                Metadata = new Dictionary<string, string>(translation.Metadata)
+            };
         }
 
         public void DeleteTranslation(string appId, string profileId, string culture)

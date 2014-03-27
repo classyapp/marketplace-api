@@ -92,6 +92,10 @@ namespace Classy.Models
                 ProfileTranslation translation = null;
                 if (Translations.TryGetValue(culture, out translation))
                 {
+                    if (this.IsProfessional && !string.IsNullOrEmpty(translation.CompanyName))
+                    {
+                        this.ProfessionalInfo.CompanyName = translation.CompanyName;
+                    }
                     if (translation.Metadata != null)
                     {
                         foreach (var key in translation.Metadata.Keys)

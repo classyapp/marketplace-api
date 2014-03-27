@@ -14,6 +14,7 @@ namespace Classy.Models.Response
         }
 
         public string CultureCode { get; set; }
+        public string CompanyName { get; set; }
         public Dictionary<string, string> Metadata { get; set; }
     }
 }
