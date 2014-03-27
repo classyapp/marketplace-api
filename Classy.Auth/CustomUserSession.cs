@@ -45,6 +45,7 @@ namespace Classy.Auth
                 profile.ContactInfo.FirstName = session.FirstName;
                 profile.ContactInfo.LastName = session.LastName;
                 profile.ContactInfo.Email = session.Email;
+                profile.DefaultCulture = Environment.CultureCode;
             }
 
             foreach (var authToken in session.ProviderOAuthAccess)

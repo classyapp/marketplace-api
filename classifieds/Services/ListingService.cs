@@ -31,6 +31,7 @@ namespace classy.Services
         public ILocalizationManager LocalizationManager { get; set; }
         public IThumbnailManager ThumbnailManager { get; set; }
         public IAppManager AppManager { get; set; }
+        public IUserAuthRepository UserAuthRepository { get; set; }
 
         [CustomAuthenticate]
         public object Post(CreateProfileProxy request)
@@ -546,6 +547,12 @@ namespace classy.Services
                     imageData,
                     imageContentType,
                     request.Environment.CultureCode);
+
+                // update email on user auth if needed
+                if (profile.IsProfessional && session.Email != profile.ProfessionalInfo.CompanyContactInfo.Email)
+                {
+                    UserAuthRepository.SaveUserAuth(session);
+                }
 
                 return new HttpResult(profile, HttpStatusCode.OK);
             }
@@ -1428,6 +1435,52 @@ namespace classy.Services
             {
                 return new HttpError(HttpStatusCode.NotFound, kex.Message);
             }
+        }
+
+        public object Post(ForgotPasswordRequest request)
+        {
+            IUserAuthRepository authRepo = ResolveService<IUserAuthRepository>();
+            UserAuth userAuth = authRepo.GetUserAuthByUserName(request.Environment.AppId, request.Email);
+
+            if (userAuth != null)
+            {
+                // create hash
+                if (userAuth.Meta == null)
+                {
+                    userAuth.Meta = new Dictionary<string, string>();
+                }
+                userAuth.Meta["ResetPasswordHash"] = userAuth.PasswordHash;
+                authRepo.SaveUserAuth(userAuth);
+
+                // Send Email
+            }
+            return new HttpError("Email not found");
+        }
+
+        public object Get(VerifyPasswordResetRequest request)
+        {
+            IUserAuthRepository authRepo = ResolveService<IUserAuthRepository>();
+            UserAuth userAuth = authRepo.GetUserAuthByResetHash(request.Environment.AppId, request.Hash);
+
+            if (userAuth != null)
+            {
+                return new HttpResult(new { }, HttpStatusCode.OK);
+            }
+            return new HttpError("Invalid hash");
+        }
+
+        public object Post(PasswordResetRequest request)
+        {
+            IUserAuthRepository authRepo = ResolveService<IUserAuthRepository>();
+            UserAuth userAuth = authRepo.GetUserAuthByResetHash(request.Environment.AppId, request.Hash);
+
+            if (userAuth != null)
+            {
+                authRepo.ResetUserPassword(userAuth, request.Password);
+
+                return new HttpResult(new { }, HttpStatusCode.OK);
+            }
+            return new HttpError("Invalid hash");
         }
     }
 }
