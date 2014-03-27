@@ -56,7 +56,7 @@ namespace Classy.Repository
             {
                 var getById = Query<Collection>.Where(x => x.AppId == appId && x.Id == collectionId);
                 var collection = CollectionsCollection.FindOne(getById);
-                collection.Translate(culture);
+                if (collection != null) collection.Translate(culture);
                 return collection;
             }
             catch(MongoException)

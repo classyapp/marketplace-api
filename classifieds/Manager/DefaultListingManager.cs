@@ -359,7 +359,7 @@ namespace classy.Manager
             ProfileRepository.IncreaseCounter(appId, listing.ProfileId, ProfileCounters.Rank, 1);
 
             // add hashtags to listing if the comment is by the listing owner
-            if (SecurityContext.AuthenticatedProfileId == listing.ProfileId)
+            if (SecurityContext.AuthenticatedProfileId == listing.ProfileId || SecurityContext.IsAdmin)
             {
                 ListingRepository.AddHashtags(listingId, appId, content.ExtractHashtags());
             }
@@ -741,7 +741,7 @@ namespace classy.Manager
             ProfileRepository.IncreaseCounter(appId, collection.ProfileId, ProfileCounters.Rank, 1);
 
             // add hashtags to listing if the comment is by the listing owner
-            if (SecurityContext.AuthenticatedProfileId == collection.ProfileId)
+            if (SecurityContext.AuthenticatedProfileId == collection.ProfileId || SecurityContext.IsAdmin)
             {
                 CollectionRepository.AddHashtags(collectionId, appId, content.ExtractHashtags());
             }
@@ -775,7 +775,7 @@ namespace classy.Manager
             try
             {
                 var collection = GetVerifiedCollection(appId, collectionId, null);
-                if (collection.ProfileId != SecurityContext.AuthenticatedProfileId) throw new UnauthorizedAccessException();
+                if (collection.ProfileId != SecurityContext.AuthenticatedProfileId && !SecurityContext.IsAdmin) throw new UnauthorizedAccessException();
                 collection.CoverPhotos = photoKeys;
 
                 CollectionRepository.Update(collection);

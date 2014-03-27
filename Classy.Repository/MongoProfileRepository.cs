@@ -49,7 +49,7 @@ namespace Classy.Repository
                 profile = ProfilesCollection.FindOne(query);
             }
 
-            profile.Translate(culture);
+            if (profile != null) profile.Translate(culture);
             return profile;
         }
 
@@ -68,7 +68,7 @@ namespace Classy.Repository
                 profile = ProfilesCollection.FindOne(query);
             }
 
-            profile.Translate(culture);
+            if (profile != null) profile.Translate(culture);
             return profile;
         }
 
