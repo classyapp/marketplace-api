@@ -8,6 +8,7 @@ namespace Classy.Models.Request
 {
     public class ForgotPasswordRequest : BaseRequestDto
     {
+        public string Host { get; set; }
         public string Email { get; set; }
     }
 
@@ -15,6 +16,7 @@ namespace Classy.Models.Request
     {
         public ForgotPasswordRequestValidator()
         {
+            RuleFor(x => x.Host).NotEmpty();
             RuleFor(x => x.Email).NotEmpty();
         }
     }

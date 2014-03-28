@@ -9,6 +9,8 @@ namespace classy.Manager
     {
         public List<Mandrill.EmailResult> SendHtmlMessage(string apiKey, string replyTo, string[] to, string subject, string body, string template,  Dictionary<string, string> variables)
         {
+            List<Mandrill.EmailResult> results = null;
+
             var message = new Mandrill.EmailMessage
             {
                 subject = subject,
@@ -32,12 +34,14 @@ namespace classy.Manager
             var api = new Mandrill.MandrillApi(apiKey);
             if (string.IsNullOrEmpty(template))
             {
-                return api.SendMessage(message);
+                results = api.SendMessage(message);
             }
             else
             {
-                return api.SendMessage(message, template, null);
+                results = api.SendMessage(message, template, null);
             }
+
+            return results;
         }
     }
 }

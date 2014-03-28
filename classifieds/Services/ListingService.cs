@@ -16,6 +16,8 @@ using Classy.Auth;
 using System.IO;
 using classy.Manager;
 using Classy.Repository;
+using System.Security.Cryptography;
+using System.Text;
 
 namespace classy.Services
 {
@@ -573,7 +575,8 @@ namespace classy.Services
                 ProfileManager.SetTranslation(
                     request.Environment.AppId,
                     request.ProfileId,
-                    new ProfileTranslation { 
+                    new ProfileTranslation
+                    {
                         Culture = request.CultureCode,
                         CompanyName = request.CompanyName,
                         Metadata = request.Metadata
@@ -1451,14 +1454,14 @@ namespace classy.Services
                 EmailManager.SendHtmlMessage(
                     AppManager.GetAppById(request.Environment.AppId).MandrilAPIKey,
                     request.ReplyTo, request.To, request.Subject, request.Body, request.Template, request.Variables);
-    			return new HttpResult(new { }, HttpStatusCode.OK);
+                return new HttpResult(new { }, HttpStatusCode.OK);
             }
             catch (KeyNotFoundException kex)
             {
                 return new HttpError(HttpStatusCode.NotFound, kex.Message);
             }
-		}
-		
+        }
+
         public object Post(ForgotPasswordRequest request)
         {
             IUserAuthRepository authRepo = ResolveService<IUserAuthRepository>();
@@ -1471,10 +1474,31 @@ namespace classy.Services
                 {
                     userAuth.Meta = new Dictionary<string, string>();
                 }
-                userAuth.Meta["ResetPasswordHash"] = userAuth.PasswordHash;
+
+                MD5 md5 = System.Security.Cryptography.MD5.Create();
+                byte[] inputBytes = System.Text.Encoding.ASCII.GetBytes(userAuth.PasswordHash);
+                byte[] hash = md5.ComputeHash(inputBytes);
+                StringBuilder sb = new StringBuilder();
+                for (int i = 0; i < hash.Length; i++)
+                {
+                    sb.Append(hash[i].ToString("X2"));
+                }
+                userAuth.Meta["ResetPasswordHash"] = sb.ToString();
                 authRepo.SaveUserAuth(userAuth);
 
                 // Send Email
+                EmailManager.SendHtmlMessage(
+                    AppManager.GetAppById(request.Environment.AppId).MandrilAPIKey,
+                    null, new string[] { request.Email },
+                    //LocalizationManager.GetResourceByKey(request.Environment.AppId, "ForgotPassword_ResetEmailSubject", false).Values[request.Environment.CultureCode],
+                    //LocalizationManager.GetResourceByKey(request.Environment.AppId, "ForgotPassword_ResetEmailBody", false).Values[request.Environment.CultureCode],
+                    "Password Reset Instructions",
+                    "Please click the following link *|RESET_URL|* and follow the instructions to reset your password.",
+                    "reset_password_template",
+                    new Dictionary<string, string> { { "RESET_URL", string.Format("http://{0}/reset/{1}", request.Host, sb.ToString()) } }
+                    );
+                return new HttpResult(new { }, HttpStatusCode.OK);
+
             }
             return new HttpError("Email not found");
         }
