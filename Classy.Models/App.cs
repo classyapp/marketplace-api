@@ -22,5 +22,6 @@ namespace Classy.Models
         public string GPSLocationCookieName { get; set; }
         public string CountryCookieName { get; set; }
         public string CultureCookieName { get; set; }
+        public string MandrilAPIKey { get; set; }
     }
 }

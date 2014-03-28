@@ -30,6 +30,7 @@ namespace classy.Services
         public IAnalyticsManager AnalyticsManager { get; set; }
         public ILocalizationManager LocalizationManager { get; set; }
         public IThumbnailManager ThumbnailManager { get; set; }
+        public IEmailManager EmailManager { get; set; }
         public IAppManager AppManager { get; set; }
 
         [CustomAuthenticate]
@@ -1427,6 +1428,24 @@ namespace classy.Services
                     request.CultureCode);
 
                 return new HttpResult(new { ObjectId = request.CollectionId, Culture = request.CultureCode }, HttpStatusCode.OK);
+            }
+            catch (KeyNotFoundException kex)
+            {
+                return new HttpError(HttpStatusCode.NotFound, kex.Message);
+            }
+        }
+
+        [CustomAuthenticate]
+        public object Post(SendEmailRequest request)
+        {
+            try
+            {
+                var session = SessionAs<CustomUserSession>();
+                EmailManager.SendHtmlMessage(
+                    AppManager.GetAppById(request.Environment.AppId).MandrilAPIKey,
+                    request.ReplyTo, request.To, request.Subject, request.Body, request.Template, request.Variables);
+
+                return new HttpResult(new { }, HttpStatusCode.OK);
             }
             catch (KeyNotFoundException kex)
             {
