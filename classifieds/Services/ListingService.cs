@@ -565,7 +565,11 @@ namespace classy.Services
                 ProfileManager.SetTranslation(
                     request.Environment.AppId,
                     request.ProfileId,
-                    new ProfileTranslation { Culture = request.CultureCode, Metadata = request.Metadata });
+                    new ProfileTranslation { 
+                        Culture = request.CultureCode,
+                        CompanyName = request.CompanyName,
+                        Metadata = request.Metadata
+                    });
 
                 return new HttpResult(new { ObjectId = request.ProfileId, Culture = request.CultureCode }, HttpStatusCode.OK);
             }

@@ -22,7 +22,8 @@ namespace Classy.Models.Request
 
     public class SetProfileTranslation : SetTranslation
     {
-        public string ProfileId { get; set; }   
+        public string ProfileId { get; set; }
+        public string CompanyName { get; set; }
     }
 
     public class SetListingTranslation : SetTranslation
