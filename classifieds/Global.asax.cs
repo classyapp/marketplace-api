@@ -225,6 +225,7 @@ namespace classy
                     // Localization
                     .Add<GetListResourceByKey>("/resource/list/{Key}", "GET")
                     .Add<GetResourceByKey>("/resource/{Key}", "GET")
+                    .Add<GetUntranslatedResourcesByCulture>("/resources/untranslated/{Culture}", "GET")
                     .Add<GetResourceKeysForApp>("/resource/keys", "GET")
                     .Add<SetResourceValues>("/resource/{Key}", "POST")
                     .Add<SetResourceListValues>("/resource/list/{Key}", "POST")

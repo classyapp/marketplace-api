@@ -1,0 +1,81 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 2013
+VisualStudioVersion = 12.0.21005.1
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "classy", "classifieds\classy.csproj", "{F03039CF-DC12-4A37-A2B6-9E9B78E59FB1}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Classy.Auth", "Classy.Auth\Classy.Auth.csproj", "{C40E22DB-95CD-4E86-BF84-718AEADF064C}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Classy.Interfaces", "Classy.Interfaces\Classy.Interfaces.csproj", "{9C0DED9F-8160-4BDF-A599-6B33A983353A}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Classy.Models", "Classy.Models\Classy.Models.csproj", "{AC13DF42-51BB-4798-A0AB-9B2776B4844F}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Classy.Models.Response", "Classy.Models.Response\Classy.Models.Response.csproj", "{7DBA45E3-CB30-4F3C-9577-27E955DD3F49}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Classy.Repository", "Classy.Repository\Classy.Repository.csproj", "{8BB8C610-FFDB-49DE-AF0C-0E4CB37E4B1E}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Classy.Tests", "Classy.Tests\Classy.Tests.csproj", "{FBF99D6F-7815-49C7-99B6-BFA9B8FDBEDE}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Classy.AppHarbor.Deploy", "Classy.AppHarbor.Deploy\Classy.AppHarbor.Deploy.csproj", "{41BEA23E-8759-492B-BFA5-E3B691C2E7F0}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		AppHarbor|Any CPU = AppHarbor|Any CPU
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{F03039CF-DC12-4A37-A2B6-9E9B78E59FB1}.AppHarbor|Any CPU.ActiveCfg = AppHarbor|Any CPU
+		{F03039CF-DC12-4A37-A2B6-9E9B78E59FB1}.AppHarbor|Any CPU.Build.0 = AppHarbor|Any CPU
+		{F03039CF-DC12-4A37-A2B6-9E9B78E59FB1}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F03039CF-DC12-4A37-A2B6-9E9B78E59FB1}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F03039CF-DC12-4A37-A2B6-9E9B78E59FB1}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F03039CF-DC12-4A37-A2B6-9E9B78E59FB1}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C40E22DB-95CD-4E86-BF84-718AEADF064C}.AppHarbor|Any CPU.ActiveCfg = AppHarbor|Any CPU
+		{C40E22DB-95CD-4E86-BF84-718AEADF064C}.AppHarbor|Any CPU.Build.0 = AppHarbor|Any CPU
+		{C40E22DB-95CD-4E86-BF84-718AEADF064C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C40E22DB-95CD-4E86-BF84-718AEADF064C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C40E22DB-95CD-4E86-BF84-718AEADF064C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C40E22DB-95CD-4E86-BF84-718AEADF064C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{9C0DED9F-8160-4BDF-A599-6B33A983353A}.AppHarbor|Any CPU.ActiveCfg = Release|Any CPU
+		{9C0DED9F-8160-4BDF-A599-6B33A983353A}.AppHarbor|Any CPU.Build.0 = Release|Any CPU
+		{9C0DED9F-8160-4BDF-A599-6B33A983353A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9C0DED9F-8160-4BDF-A599-6B33A983353A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{9C0DED9F-8160-4BDF-A599-6B33A983353A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{9C0DED9F-8160-4BDF-A599-6B33A983353A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{AC13DF42-51BB-4798-A0AB-9B2776B4844F}.AppHarbor|Any CPU.ActiveCfg = AppHarbor|Any CPU
+		{AC13DF42-51BB-4798-A0AB-9B2776B4844F}.AppHarbor|Any CPU.Build.0 = AppHarbor|Any CPU
+		{AC13DF42-51BB-4798-A0AB-9B2776B4844F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{AC13DF42-51BB-4798-A0AB-9B2776B4844F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{AC13DF42-51BB-4798-A0AB-9B2776B4844F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{AC13DF42-51BB-4798-A0AB-9B2776B4844F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{7DBA45E3-CB30-4F3C-9577-27E955DD3F49}.AppHarbor|Any CPU.ActiveCfg = AppHarbor|Any CPU
+		{7DBA45E3-CB30-4F3C-9577-27E955DD3F49}.AppHarbor|Any CPU.Build.0 = AppHarbor|Any CPU
+		{7DBA45E3-CB30-4F3C-9577-27E955DD3F49}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7DBA45E3-CB30-4F3C-9577-27E955DD3F49}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7DBA45E3-CB30-4F3C-9577-27E955DD3F49}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7DBA45E3-CB30-4F3C-9577-27E955DD3F49}.Release|Any CPU.Build.0 = Release|Any CPU
+		{8BB8C610-FFDB-49DE-AF0C-0E4CB37E4B1E}.AppHarbor|Any CPU.ActiveCfg = AppHarbor|Any CPU
+		{8BB8C610-FFDB-49DE-AF0C-0E4CB37E4B1E}.AppHarbor|Any CPU.Build.0 = AppHarbor|Any CPU
+		{8BB8C610-FFDB-49DE-AF0C-0E4CB37E4B1E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8BB8C610-FFDB-49DE-AF0C-0E4CB37E4B1E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8BB8C610-FFDB-49DE-AF0C-0E4CB37E4B1E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8BB8C610-FFDB-49DE-AF0C-0E4CB37E4B1E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{FBF99D6F-7815-49C7-99B6-BFA9B8FDBEDE}.AppHarbor|Any CPU.ActiveCfg = Release|Any CPU
+		{FBF99D6F-7815-49C7-99B6-BFA9B8FDBEDE}.AppHarbor|Any CPU.Build.0 = Release|Any CPU
+		{FBF99D6F-7815-49C7-99B6-BFA9B8FDBEDE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{FBF99D6F-7815-49C7-99B6-BFA9B8FDBEDE}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{FBF99D6F-7815-49C7-99B6-BFA9B8FDBEDE}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{FBF99D6F-7815-49C7-99B6-BFA9B8FDBEDE}.Release|Any CPU.Build.0 = Release|Any CPU
+		{41BEA23E-8759-492B-BFA5-E3B691C2E7F0}.AppHarbor|Any CPU.ActiveCfg = Release|Any CPU
+		{41BEA23E-8759-492B-BFA5-E3B691C2E7F0}.AppHarbor|Any CPU.Build.0 = Release|Any CPU
+		{41BEA23E-8759-492B-BFA5-E3B691C2E7F0}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{41BEA23E-8759-492B-BFA5-E3B691C2E7F0}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{41BEA23E-8759-492B-BFA5-E3B691C2E7F0}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{41BEA23E-8759-492B-BFA5-E3B691C2E7F0}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal

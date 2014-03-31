@@ -1277,6 +1277,32 @@ namespace classy.Services
         }
 
         //
+        // GET: /resources/untranslated/{Culture}
+        // get untranslated resources by culture
+        public object Get(GetUntranslatedResourcesByCulture request)
+        {
+            var resources = LocalizationManager.GetAllResources(request.Environment.AppId);
+            var resourceKeys = new List<string>();
+            foreach (var r in resources)
+            {
+                if (!r.Values.Any(x => x.Key == request.Culture)) {
+                    resourceKeys.Add(r.Key);
+                    continue;
+                }
+
+                var valueInCulture = r.Values.First(x => x.Key == request.Culture);
+
+                if (valueInCulture.Value == "#" + valueInCulture.Key + "#"
+                    || valueInCulture.Value == valueInCulture.Key /* TODO: remove once this is no longer true */)
+                {
+                    resourceKeys.Add(r.Key);
+                }
+            }
+
+            return new HttpResult(resourceKeys, HttpStatusCode.OK);
+        }
+
+        //
         // GET: /resource/keys
         // get all available resource keys for an app
         public object Get(GetResourceKeysForApp request)

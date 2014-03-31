@@ -121,6 +121,7 @@
     <Compile Include="DTO\Request\DeleteTranslation.cs" />
     <Compile Include="DTO\Request\GetProfileTranslation.cs" />
     <Compile Include="DTO\Request\GetCitiesByCountry.cs" />
+    <Compile Include="DTO\Request\GetUntranslatedResourcesByCulture.cs" />
     <Compile Include="DTO\Request\PasswordResetRequest.cs" />
     <Compile Include="DTO\Request\PostComment.cs" />
     <Compile Include="DTO\Request\PostCommentForCollection.cs" />
@@ -232,6 +233,10 @@
     </Content>
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\Build\LocalizationMigrator\LocalizationMigrator.csproj">
+      <Project>{e6a6a831-8199-4e1a-8e95-709df447cc86}</Project>
+      <Name>LocalizationMigrator</Name>
+    </ProjectReference>
     <ProjectReference Include="..\Classy.Auth\Classy.Auth.csproj">
       <Project>{c40e22db-95cd-4e86-bf84-718aeadf064c}</Project>
       <Name>Classy.Auth</Name>
@@ -254,6 +259,11 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup />
+  <ItemGroup>
+    <Content Include="migrations\localizations\20140401170605_example.json.sample">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
   <PropertyGroup>
     <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">10.0</VisualStudioVersion>
     <VSToolsPath Condition="'$(VSToolsPath)' == ''">$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)</VSToolsPath>
@@ -290,6 +300,10 @@
       </FlavorProperties>
     </VisualStudio>
   </ProjectExtensions>
+  <PropertyGroup>
+    <PostBuildEvent>
+    </PostBuildEvent>
+  </PropertyGroup>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
   <Target Name="BeforeBuild">
