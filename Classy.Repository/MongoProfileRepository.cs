@@ -14,7 +14,7 @@ namespace Classy.Repository
     {
         private MongoCollection<Profile> ProfilesCollection;
         private MongoCollection<ProxyClaim> ProxyClaimsCollection;
-
+        
         public MongoProfileRepository(MongoDatabase db)
         {
             ProfilesCollection = db.GetCollection<Profile>("profiles");

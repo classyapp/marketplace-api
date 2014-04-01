@@ -296,6 +296,8 @@ namespace classy.Manager
             }
             if (isNewListing)
             {
+                var profile = GetVerifiedProfile(appId, SecurityContext.AuthenticatedProfileId, null);
+                listing.DefaultCulture = profile.DefaultCulture;
                 listing.Id = ListingRepository.Insert(listing);
             }
             else
@@ -448,6 +450,8 @@ namespace classy.Manager
         {
             try
             {
+                var profile = GetVerifiedProfile(appId, string.IsNullOrEmpty(profileId) ? SecurityContext.AuthenticatedProfileId : profileId, null);
+
                 // create and save new collection
                 var collection = new Collection
                 {
@@ -459,7 +463,8 @@ namespace classy.Manager
                     IsPublic = isPublic,
                     IncludedListings = includedListings,
                     Collaborators = collaborators,
-                    PermittedViewers = permittedViewers
+                    PermittedViewers = permittedViewers,
+                    DefaultCulture = profile.DefaultCulture
                 };
 
                 // TODO: thumbnails should be created async and show a grid of recent items in the collection
