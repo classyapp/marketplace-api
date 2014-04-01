@@ -1476,7 +1476,7 @@ namespace classy.Services
                 }
 
                 MD5 md5 = System.Security.Cryptography.MD5.Create();
-                byte[] inputBytes = System.Text.Encoding.ASCII.GetBytes(userAuth.PasswordHash);
+                byte[] inputBytes = System.Text.Encoding.ASCII.GetBytes(Guid.NewGuid().ToString());
                 byte[] hash = md5.ComputeHash(inputBytes);
                 StringBuilder sb = new StringBuilder();
                 for (int i = 0; i < hash.Length; i++)
@@ -1493,7 +1493,7 @@ namespace classy.Services
                 var bodyRes = LocalizationManager.GetResourceByKey(request.Environment.AppId, "ForgotPassword_ResetEmailBody", true);
                 EmailManager.SendHtmlMessage(
                     AppManager.GetAppById(request.Environment.AppId).MandrilAPIKey,
-                    null, new string[] { request.Email },
+                    null, new string[] { userAuth.Email },
                     subjectRes == null ? subject : subjectRes.Values[request.Environment.CultureCode],
                     bodyRes == null ? body : bodyRes.Values[request.Environment.CultureCode],
                     "reset_password_template",
