@@ -16,6 +16,8 @@ using Classy.Auth;
 using System.IO;
 using classy.Manager;
 using Classy.Repository;
+using System.Security.Cryptography;
+using System.Text;
 
 namespace classy.Services
 {
@@ -32,6 +34,7 @@ namespace classy.Services
         public IThumbnailManager ThumbnailManager { get; set; }
         public IEmailManager EmailManager { get; set; }
         public IAppManager AppManager { get; set; }
+        public IUserAuthRepository UserAuthRepository { get; set; }
 
         [CustomAuthenticate]
         public object Post(CreateProfileProxy request)
@@ -548,6 +551,12 @@ namespace classy.Services
                     imageContentType,
                     request.Environment.CultureCode);
 
+                // update email on user auth if needed
+                if (profile.IsProfessional && session.Email != profile.ProfessionalInfo.CompanyContactInfo.Email)
+                {
+                    UserAuthRepository.SaveUserAuth(session);
+                }
+
                 return new HttpResult(profile, HttpStatusCode.OK);
             }
             catch (KeyNotFoundException kex)
@@ -566,7 +575,8 @@ namespace classy.Services
                 ProfileManager.SetTranslation(
                     request.Environment.AppId,
                     request.ProfileId,
-                    new ProfileTranslation { 
+                    new ProfileTranslation
+                    {
                         Culture = request.CultureCode,
                         CompanyName = request.CompanyName,
                         Metadata = request.Metadata
@@ -1444,13 +1454,81 @@ namespace classy.Services
                 EmailManager.SendHtmlMessage(
                     AppManager.GetAppById(request.Environment.AppId).MandrilAPIKey,
                     request.ReplyTo, request.To, request.Subject, request.Body, request.Template, request.Variables);
-
                 return new HttpResult(new { }, HttpStatusCode.OK);
             }
             catch (KeyNotFoundException kex)
             {
                 return new HttpError(HttpStatusCode.NotFound, kex.Message);
             }
+        }
+
+        public object Post(ForgotPasswordRequest request)
+        {
+            IUserAuthRepository authRepo = ResolveService<IUserAuthRepository>();
+            UserAuth userAuth = authRepo.GetUserAuthByUserName(request.Environment.AppId, request.Email);
+
+            if (userAuth != null)
+            {
+                // create hash
+                if (userAuth.Meta == null)
+                {
+                    userAuth.Meta = new Dictionary<string, string>();
+                }
+
+                MD5 md5 = System.Security.Cryptography.MD5.Create();
+                byte[] inputBytes = System.Text.Encoding.ASCII.GetBytes(Guid.NewGuid().ToString());
+                byte[] hash = md5.ComputeHash(inputBytes);
+                StringBuilder sb = new StringBuilder();
+                for (int i = 0; i < hash.Length; i++)
+                {
+                    sb.Append(hash[i].ToString("X2"));
+                }
+                userAuth.Meta["ResetPasswordHash"] = sb.ToString();
+                authRepo.SaveUserAuth(userAuth);
+
+                // Send Email
+                string subject = "ForgotPassword_ResetEmailSubject";
+                string body = "ForgotPassword_ResetEmailBody";
+                var subjectRes = LocalizationManager.GetResourceByKey(request.Environment.AppId, "ForgotPassword_ResetEmailSubject", true);
+                var bodyRes = LocalizationManager.GetResourceByKey(request.Environment.AppId, "ForgotPassword_ResetEmailBody", true);
+                EmailManager.SendHtmlMessage(
+                    AppManager.GetAppById(request.Environment.AppId).MandrilAPIKey,
+                    null, new string[] { userAuth.Email },
+                    subjectRes == null ? subject : subjectRes.Values[request.Environment.CultureCode],
+                    bodyRes == null ? body : bodyRes.Values[request.Environment.CultureCode],
+                    "reset_password_template",
+                    new Dictionary<string, string> { { "RESET_URL", string.Format("http://{0}/reset/{1}", request.Host, sb.ToString()) } }
+                    );
+                return new HttpResult(new { }, HttpStatusCode.OK);
+
+            }
+            return new HttpError("Email not found");
+        }
+
+        public object Get(VerifyPasswordResetRequest request)
+        {
+            IUserAuthRepository authRepo = ResolveService<IUserAuthRepository>();
+            UserAuth userAuth = authRepo.GetUserAuthByResetHash(request.Environment.AppId, request.Hash);
+
+            if (userAuth != null)
+            {
+                return new HttpResult(new { }, HttpStatusCode.OK);
+            }
+            return new HttpError("Invalid hash");
+        }
+
+        public object Post(PasswordResetRequest request)
+        {
+            IUserAuthRepository authRepo = ResolveService<IUserAuthRepository>();
+            UserAuth userAuth = authRepo.GetUserAuthByResetHash(request.Environment.AppId, request.Hash);
+
+            if (userAuth != null)
+            {
+                authRepo.ResetUserPassword(userAuth, request.Password);
+
+                return new HttpResult(new { }, HttpStatusCode.OK);
+            }
+            return new HttpError("Invalid hash");
         }
     }
 }

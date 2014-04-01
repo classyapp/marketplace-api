@@ -29,7 +29,8 @@ namespace classy.Manager
                     resource.Values[k] = resource.Values[k].Contains("\r\n") ? (new MarkdownSharp.Markdown()).Transform(resource.Values[k]) : resource.Values[k];
                 }
             }
-            return resource.TranslateTo<LocalizationResourceView>();
+
+            return resource == null ? null : resource.TranslateTo<LocalizationResourceView>();
         }
 
         public LocalizationResourceView SetResourceValues(string appId, string key, IDictionary<string, string> values)
