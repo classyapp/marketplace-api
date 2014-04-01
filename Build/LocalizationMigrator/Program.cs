@@ -1,8 +1,6 @@
 ﻿using MongoDB.Bson;
 using MongoDB.Driver;
 using MongoDB.Driver.Builders;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Schema;
 using System;
 using System.Collections.Generic;
 using System.Configuration;
@@ -28,19 +26,11 @@ namespace LocalizationMigrator
 
             LocalizationCollection localizations = new LocalizationCollection(db);
 
-            DirectoryInfo migrationDirectory = new DirectoryInfo(Path.Combine(projectPath, "Localizations"));
-            
-            localizations.Migrate(Path.Combine(projectPath, "Localizations"));
+            DirectoryInfo migrationDirectory = new DirectoryInfo(Path.Combine(projectPath, "migrations", "localizations"));
+
+            localizations.Migrate(migrationDirectory);
         }
 
-        private static void AddLocalizedWordsFromJson(string json, MongoDatabase db)
-        {
-            JsonSchema schema = JsonSchema.Parse(json);
-            foreach (var p in schema.Properties)
-            {
-                var word = p.Key;
-            }
-        }
         private static MongoDB.Driver.MongoDatabase getDatabase(string mongoUri) {
             MongoClient mongoClient = new MongoClient(mongoUri);
             var databaseName = MongoUrl.Create(mongoUri).DatabaseName;
