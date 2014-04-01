@@ -234,6 +234,10 @@
     </Content>
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\Build\LocalizationMigrator\LocalizationMigrator.csproj">
+      <Project>{e6a6a831-8199-4e1a-8e95-709df447cc86}</Project>
+      <Name>LocalizationMigrator</Name>
+    </ProjectReference>
     <ProjectReference Include="..\Classy.Auth\Classy.Auth.csproj">
       <Project>{c40e22db-95cd-4e86-bf84-718aeadf064c}</Project>
       <Name>Classy.Auth</Name>
@@ -292,7 +296,7 @@
     </VisualStudio>
   </ProjectExtensions>
   <PropertyGroup>
-    <PostBuildEvent>$(SolutionDir)Build\LocalizationMigrator\bin\Release\LocalizationMigrator.exe $(ProjectDir)</PostBuildEvent>
+    <PostBuildEvent>$(SolutionDir)Build\LocalizationMigrator\bin\$(ConfigurationName)\LocalizationMigrator.exe $(ProjectDir)</PostBuildEvent>
   </PropertyGroup>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
