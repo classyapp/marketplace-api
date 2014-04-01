@@ -5,9 +5,9 @@ using System.Web;
 
 namespace classy.Manager
 {
-    public class DefaultEmailManager : IEmailManager
+    public class MandrillEmailManager : IEmailManager
     {
-        public List<Mandrill.EmailResult> SendHtmlMessage(string apiKey, string replyTo, string[] to, string subject, string body, string template,  Dictionary<string, string> variables)
+        public EmailResult SendHtmlMessage(string apiKey, string replyTo, string[] to, string subject, string body, string template,  Dictionary<string, string> variables)
         {
             List<Mandrill.EmailResult> results = null;
 
@@ -41,7 +41,17 @@ namespace classy.Manager
                 results = api.SendMessage(message, template, null);
             }
 
-            return results;
+            EmailResult result = new EmailResult();
+            result.Status = results.Any(r => r.Status == Mandrill.EmailResultStatus.Rejected || r.Status == Mandrill.EmailResultStatus.Invalid) ? EmailResultStatus.Failed : EmailResultStatus.Sent;
+            if (result.Status == EmailResultStatus.Failed)
+            {
+                foreach (var item in results)
+                {
+                    result.Reason += string.IsNullOrEmpty(item.RejectReason) ? string.Empty : (item.RejectReason + "\r\n");
+                }
+            }
+
+            return result;
         }
     }
 }

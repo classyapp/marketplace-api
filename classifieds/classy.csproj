@@ -195,7 +195,8 @@
     </Compile>
     <Compile Include="HtmlUtilities.cs" />
     <Compile Include="Manager\DefaultAnalyticsManager.cs" />
-    <Compile Include="Manager\DefaultEmailManager.cs" />
+    <Compile Include="Manager\EmailResult.cs" />
+    <Compile Include="Manager\MandrillEmailManager.cs" />
     <Compile Include="Manager\DefaultLocalizationManager.cs" />
     <Compile Include="Manager\DefaultThumbnailManager.cs" />
     <Compile Include="Manager\IAnalyticsManager.cs" />

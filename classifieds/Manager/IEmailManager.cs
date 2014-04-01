@@ -7,6 +7,6 @@ namespace classy.Manager
 {
     public interface IEmailManager
     {
-        List<Mandrill.EmailResult> SendHtmlMessage(string apiKey, string replyTo, string[] to, string subject, string body, string template, Dictionary<string, string> variables);
+        EmailResult SendHtmlMessage(string apiKey, string replyTo, string[] to, string subject, string body, string template, Dictionary<string, string> variables);
     }
 }

@@ -1487,13 +1487,15 @@ namespace classy.Services
                 authRepo.SaveUserAuth(userAuth);
 
                 // Send Email
+                string subject = "ForgotPassword_ResetEmailSubject";
+                string body = "ForgotPassword_ResetEmailBody";
+                var subjectRes = LocalizationManager.GetResourceByKey(request.Environment.AppId, "ForgotPassword_ResetEmailSubject", true);
+                var bodyRes = LocalizationManager.GetResourceByKey(request.Environment.AppId, "ForgotPassword_ResetEmailBody", true);
                 EmailManager.SendHtmlMessage(
                     AppManager.GetAppById(request.Environment.AppId).MandrilAPIKey,
                     null, new string[] { request.Email },
-                    //LocalizationManager.GetResourceByKey(request.Environment.AppId, "ForgotPassword_ResetEmailSubject", false).Values[request.Environment.CultureCode],
-                    //LocalizationManager.GetResourceByKey(request.Environment.AppId, "ForgotPassword_ResetEmailBody", false).Values[request.Environment.CultureCode],
-                    "Password Reset Instructions",
-                    "Please click the following link *|RESET_URL|* and follow the instructions to reset your password.",
+                    subjectRes == null ? subject : subjectRes.Values[request.Environment.CultureCode],
+                    bodyRes == null ? body : bodyRes.Values[request.Environment.CultureCode],
                     "reset_password_template",
                     new Dictionary<string, string> { { "RESET_URL", string.Format("http://{0}/reset/{1}", request.Host, sb.ToString()) } }
                     );
