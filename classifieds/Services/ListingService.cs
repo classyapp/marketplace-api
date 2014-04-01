@@ -549,7 +549,7 @@ namespace classy.Services
                     request.Fields,
                     imageData,
                     imageContentType,
-                    request.Environment.CultureCode);
+                    string.IsNullOrEmpty(request.DefaultCulture) ? request.Environment.CultureCode : request.DefaultCulture);
 
                 // update email on user auth if needed
                 if (profile.IsProfessional && session.Email != profile.ProfessionalInfo.CompanyContactInfo.Email)
