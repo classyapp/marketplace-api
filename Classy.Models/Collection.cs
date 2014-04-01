@@ -84,10 +84,6 @@ namespace Classy.Models
         /// </summary>
         public int FavoriteCount { get; set; }
         /// <summary>
-        /// a set of thumbnails that give a peek into the listings the collection holds
-        /// </summary>
-        public IList<MediaThumbnail> Thumbnails { get; set; }
-        /// <summary>
         /// A collection of media files' keys to be used in creating the collage
         /// </summary>
         public IList<string> CoverPhotos { get; set; }
