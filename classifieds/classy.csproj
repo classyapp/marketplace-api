@@ -251,8 +251,9 @@
       <Name>Classy.Repository</Name>
     </ProjectReference>
   </ItemGroup>
+  <ItemGroup />
   <ItemGroup>
-    <Folder Include="migrations\localizations\" />
+    <Content Include="migrations\localizations\20140401170605_example.json.sample" />
   </ItemGroup>
   <PropertyGroup>
     <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">10.0</VisualStudioVersion>
