@@ -13,6 +13,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Classy.Repository", "Classy
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Classy.Models.Response", "Classy.Models.Response\Classy.Models.Response.csproj", "{7DBA45E3-CB30-4F3C-9577-27E955DD3F49}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LocalizationMigrator", "Build\LocalizationMigrator\LocalizationMigrator.csproj", "{E6A6A831-8199-4E1A-8E95-709DF447CC86}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		AppHarbor|Any CPU = AppHarbor|Any CPU
@@ -50,6 +52,12 @@ Global
 		{7DBA45E3-CB30-4F3C-9577-27E955DD3F49}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{7DBA45E3-CB30-4F3C-9577-27E955DD3F49}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{7DBA45E3-CB30-4F3C-9577-27E955DD3F49}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E6A6A831-8199-4E1A-8E95-709DF447CC86}.AppHarbor|Any CPU.ActiveCfg = Release|Any CPU
+		{E6A6A831-8199-4E1A-8E95-709DF447CC86}.AppHarbor|Any CPU.Build.0 = Release|Any CPU
+		{E6A6A831-8199-4E1A-8E95-709DF447CC86}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E6A6A831-8199-4E1A-8E95-709DF447CC86}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E6A6A831-8199-4E1A-8E95-709DF447CC86}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E6A6A831-8199-4E1A-8E95-709DF447CC86}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
