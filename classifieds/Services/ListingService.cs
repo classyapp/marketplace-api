@@ -1489,8 +1489,8 @@ namespace classy.Services
                 // Send Email
                 string subject = "ForgotPassword_ResetEmailSubject";
                 string body = "ForgotPassword_ResetEmailBody";
-                var subjectRes = LocalizationManager.GetResourceByKey(request.Environment.AppId, "ForgotPassword_ResetEmailSubject", true);
-                var bodyRes = LocalizationManager.GetResourceByKey(request.Environment.AppId, "ForgotPassword_ResetEmailBody", true);
+                var subjectRes = LocalizationManager.GetResourceByKey(request.Environment.AppId, "ForgotPassword_ResetEmailSubject", false);
+                var bodyRes = LocalizationManager.GetResourceByKey(request.Environment.AppId, "ForgotPassword_ResetEmailBody", false);
                 EmailManager.SendHtmlMessage(
                     AppManager.GetAppById(request.Environment.AppId).MandrilAPIKey,
                     null, new string[] { userAuth.Email },
