@@ -22,9 +22,9 @@ namespace classy
                 to.IsVendor = from.IsVendor;
                 to.IsProfessional = from.IsProfessional;
                 to.ProfessionalInfo = from.ProfessionalInfo.ToSellerView();
-                to.IsFacebookConnected = !from.FacebookUserId.IsNullOrEmpty();
                 to.IsGoogleConnected = !from.GoogleUserName.IsNullOrEmpty();
             }
+            to.IsFacebookConnected = !from.FacebookUserId.IsNullOrEmpty();
             // avatar
             if (from.Avatar != null) to.Avatar = from.Avatar.ToMediaFileView();
             //proxy
