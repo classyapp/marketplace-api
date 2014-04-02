@@ -96,6 +96,28 @@ namespace Classy.Auth
             //
             profile.Permissions = session.Permissions;
             repo.Save(profile);
+
+            // log events
+            var tracker = authService.TryResolve<IEventTracker>();
+            if (tracker != null)
+            {
+                if (isNew)
+                {
+                    // registration event
+                    tracker.Track<GenericEvent>(new GenericEvent("register")
+                    {
+                        AppId = this.Environment.AppId,
+                        ProfileId = profile.Id
+                    });
+                }
+                // login event
+                tracker.Track<GenericEvent>(new GenericEvent("login")
+                {
+                    AppId = this.Environment.AppId,
+                    ProfileId = profile.Id,
+                    IsProfessional = profile.IsProfessional && !profile.Permissions.Contains("admin")
+                });
+            }
         }
 
         public string SaveFileFromUrl(IStorageRepository storage, string key, string url)

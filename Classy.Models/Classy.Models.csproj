@@ -74,9 +74,9 @@
     <Compile Include="IncludedListing.cs" />
     <Compile Include="ITranslatable.cs" />
     <Compile Include="LocalizationListResource.cs" />
-    <Compile Include="MediaThumbnail.cs" />
     <Compile Include="LocalizationResource.cs" />
     <Compile Include="Profile.cs" />
+    <Compile Include="TrackableEvent.cs" />
     <Compile Include="Translation.cs" />
     <Compile Include="ProxyClaim.cs" />
     <Compile Include="ProfessionalInfo.cs" />

@@ -1,4 +1,5 @@
 ﻿using classy.Manager;
+using Classy.Models;
 using Classy.Repository;
 using MongoDB.Driver;
 using ServiceStack.CacheAccess;
@@ -73,6 +74,7 @@ namespace classy.Extentions
             container.Register<IOrderRepository>(c => new MongoOrderRepository(c.Resolve<MongoDatabase>()));
             container.Register<ICollectionRepository>(c => new MongoCollectionRepository(c.Resolve<MongoDatabase>()));
             container.Register<ILocalizationRepository>(c => new MongoLocalizationProvider(c.Resolve<MongoDatabase>()));
+            container.Register<IEventTracker>(c => new MongoEventTracker(c.Resolve<MongoDatabase>()));
             container.Register<IAppManager>(c =>
                 new DefaultAppManager());
             container.Register<IPaymentGateway>(c =>
@@ -111,6 +113,7 @@ namespace classy.Extentions
                     c.TryResolve<IReviewRepository>(),
                     c.TryResolve<ICollectionRepository>(),
                     c.TryResolve<ITripleStore>(),
+                    c.TryResolve<IEventTracker>(),
                     c.TryResolve<IStorageRepository>()));
             container.Register<IReviewManager>(c =>
                 new DefaultProfileManager(
@@ -120,6 +123,7 @@ namespace classy.Extentions
                     c.TryResolve<IReviewRepository>(),
                     c.TryResolve<ICollectionRepository>(),
                     c.TryResolve<ITripleStore>(),
+                    c.TryResolve<IEventTracker>(),
                     c.TryResolve<IStorageRepository>()));
             container.Register<ICollectionManager>(c =>
                 new DefaultListingManager(

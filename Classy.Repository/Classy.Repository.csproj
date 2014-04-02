@@ -81,6 +81,7 @@
     <Compile Include="ITripleStore.cs" />
     <Compile Include="MongoBookingRepository.cs" />
     <Compile Include="MongoCommentRepository.cs" />
+    <Compile Include="MongoEventTracker.cs" />
     <Compile Include="MongoListingRepository.cs" />
     <Compile Include="MongoLocalizationProvider.cs" />
     <Compile Include="MongoOrderRepository.cs" />

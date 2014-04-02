@@ -25,6 +25,7 @@ namespace classy.Manager
         private ICollectionRepository CollectionRepository;
         private ITripleStore TripleStore;
         private IStorageRepository StorageRepository;
+        private IEventTracker Tracker;
 
         public DefaultProfileManager(
             IAppManager appManager,
@@ -33,6 +34,7 @@ namespace classy.Manager
             IReviewRepository reviewRepository,
             ICollectionRepository collectionRepository,
             ITripleStore tripleStore,
+            IEventTracker tracker,
             IStorageRepository storageRepository)
         {
             AppManager = appManager;
@@ -42,6 +44,7 @@ namespace classy.Manager
             CollectionRepository = collectionRepository;
             TripleStore = tripleStore;
             StorageRepository = storageRepository;
+            Tracker = tracker;
         }
 
         public ManagerSecurityContext SecurityContext { get; set; }
@@ -234,6 +237,14 @@ namespace classy.Manager
                     // increase rank if company contact info fields have been entered for the first time
                     if (profile.ProfessionalInfo.CompanyContactInfo == null && professionalInfo.CompanyContactInfo != null) rankInc++;
                 }
+                else
+                {
+                    Tracker.Track<GenericEvent>(new GenericEvent("go-pro")
+                    {
+                        AppId = appId,
+                        ProfileId = profileId                       
+                    });
+                }
                 profile.ProfessionalInfo = professionalInfo;
                 TryGeocoding(profile.ProfessionalInfo);
             }
@@ -317,6 +328,13 @@ namespace classy.Manager
             {
                 ApproveProxyClaim(claim.AppId, claim.Id);
             }
+
+            Tracker.Track<ClaimProxyEvent>(new ClaimProxyEvent
+            {
+                AppId = appId,
+                ProfileId = profileId,
+                ClaimId = claim.Id
+            });
 
             return claim.ToProxyClaimView();
         }

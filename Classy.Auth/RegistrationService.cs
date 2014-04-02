@@ -10,6 +10,7 @@ using ServiceStack.ServiceInterface.ServiceModel;
 using ServiceStack.ServiceInterface.Validation;
 using ServiceStack.WebHost.Endpoints;
 using ServiceStack.ServiceInterface;
+using Classy.Models;
 
 namespace Classy.Auth
 {
