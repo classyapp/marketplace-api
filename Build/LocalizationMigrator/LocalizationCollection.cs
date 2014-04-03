@@ -23,7 +23,7 @@ namespace LocalizationMigrator
         {
             _migrationCollection = db.GetCollection<LocalizationMigration>("LocalizationMigrations");
             _resourceCollection = db.GetCollection<LocalizationResource>("resources");
-            _resourceListCollection = db.GetCollection<LocalizationListResource>("listresourcess");
+            _resourceListCollection = db.GetCollection<LocalizationListResource>("listresources");
             loadCurrentMigrations();
         }
 

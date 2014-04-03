@@ -1,6 +1,7 @@
 ﻿using Classy.Models;
 using MongoDB.Driver;
 using MongoDB.Driver.Builders;
+using MongoDB.Driver.Linq;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -25,6 +26,11 @@ namespace Classy.Repository
             var query = Query<LocalizationResource>.Where(x => x.AppId == appId && x.Key == key);
             var resource = ResourcesCollection.FindOne(query);
             return resource;
+        }
+
+        public IEnumerable<LocalizationResource> GetResourcesForApp(string appId)
+        {
+            return ResourcesCollection.AsQueryable<LocalizationResource>().Where(x => x.AppId == appId).AsEnumerable();
         }
 
         public string SetResource(LocalizationResource resource)
