@@ -415,7 +415,8 @@ namespace classy.Services
                     session.UserAuthId,
                     request.ProxyProfileId,
                     request.ProfessionalInfo,
-                    request.Metadata);
+                    request.Metadata,
+                    request.DefaultCulture);
 
                 return new HttpResult(claim, HttpStatusCode.OK);
             }

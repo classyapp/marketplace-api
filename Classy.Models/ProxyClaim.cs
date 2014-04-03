@@ -20,5 +20,6 @@ namespace Classy.Models
         public ProfessionalInfo ProfessionalInfo { get; set; }
         public IDictionary<string, string> Metadata { get; set; }
         public ProxyClaimStatus Status { get; set; }
+        public string DefaultCulture { get; set; }
     }
 }

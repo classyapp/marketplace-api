@@ -297,7 +297,8 @@ namespace classy.Manager
             string profileId,
             string proxyProfileId,
             ProfessionalInfo ProfessionalInfo,
-            IDictionary<string, string> metadata)
+            IDictionary<string, string> metadata,
+            string defaultCulture)
         {
             var proxyProfile = GetVerifiedProfile(appId, proxyProfileId);
             if (!proxyProfile.IsProxy) throw new ApplicationException("can't claim. not a proxy.");
@@ -308,7 +309,8 @@ namespace classy.Manager
                 ProfileId = profileId,
                 ProxyProfileId = proxyProfileId,
                 ProfessionalInfo = ProfessionalInfo,
-                Metadata = metadata
+                Metadata = metadata,
+                DefaultCulture = defaultCulture
             };
             ProfileRepository.SaveProxyClaim(claim);
 
@@ -331,6 +333,8 @@ namespace classy.Manager
             var profile = GetVerifiedProfile(appId, claim.ProfileId);
             var proxyProfile = GetVerifiedProfile(appId, claim.ProxyProfileId);
             var rankInc = 0;
+
+            profile.DefaultCulture = claim.DefaultCulture;
 
             // copy seller info from proxy to profile
             if (claim.ProfessionalInfo != null)

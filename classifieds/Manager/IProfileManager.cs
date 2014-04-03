@@ -42,7 +42,8 @@ namespace classy.Manager
             string profileId,
             string proxyProfileId,
             ProfessionalInfo ProfessionalInfo,
-            IDictionary<string, string> metadata);
+            IDictionary<string, string> metadata,
+            string defaultCulture);
         
         /// <summary>
         /// 
