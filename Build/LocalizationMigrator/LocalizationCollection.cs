@@ -1,6 +1,7 @@
 ﻿using Classy.Models;
 using MongoDB.Bson;
 using MongoDB.Driver;
+using MongoDB.Driver.Linq;
 using ServiceStack.Text;
 using System;
 using System.Collections.Generic;
@@ -37,7 +38,7 @@ namespace LocalizationMigrator
             {
                 var version = file.Name;
                 var contents = File.ReadAllText(file.FullName);
-                saveResourcesFromJson(contents);
+                saveResourcesFromJson(getSupportedCultures(), contents);
                 _migrationCollection.Insert(new LocalizationMigration()
                 {
                     Version = version
@@ -45,7 +46,7 @@ namespace LocalizationMigrator
             }
         }
 
-        private void saveResourcesFromJson(string jsonString)
+        private void saveResourcesFromJson(IEnumerable<string> supportedCultures, string jsonString)
         {
             var resources = JsonObject.Parse(jsonString);
             foreach (var word in resources.Keys)
@@ -64,7 +65,9 @@ namespace LocalizationMigrator
                     var items = JsonSerializer.DeserializeFromString<List<string>>(props.Child("items"));
                     foreach (var i in items)
                     {
-                        resourceListDoc.ListItems.Add(new ListItem() { Value = i });
+                        var li = new ListItem() { Value = i, Text = new Dictionary<string,string>() };
+                        addSupportedCulturesToResource(li.Text, word, supportedCultures);
+                        resourceListDoc.ListItems.Add(li);
                     }
                     _resourceListCollection.Insert(resourceListDoc);
                 }
@@ -74,13 +77,26 @@ namespace LocalizationMigrator
                     {
                         AppId = appId,
                         Key = word,
-                        Description = description
+                        Description = description,
+                        Values = new Dictionary<string, string>()
                     };
+                    addSupportedCulturesToResource(resourceDoc.Values, word, supportedCultures);
                     _resourceCollection.Insert(resourceDoc);
                 }
             }
         }
 
+        private void addSupportedCulturesToResource(IDictionary<string,string> item, string word, IEnumerable<string> cultures)
+        {
+            foreach(var c in cultures) 
+            {
+                item.Add(c, "#" + word + "#");
+            }
+        }
+        private IEnumerable<string> getSupportedCultures()
+        {
+            return _resourceListCollection.AsQueryable<LocalizationListResource>().First(x => x.Key == "supported-cultures").ListItems.Select(x => x.Value);
+        }
         private void loadCurrentMigrations()
         {
             _currentMigrations = new Dictionary<string, bool>();
