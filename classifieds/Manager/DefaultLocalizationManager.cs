@@ -20,6 +20,17 @@ namespace classy.Manager
             LocalizationRepository = localizationRepository;
         }
 
+        public IEnumerable<LocalizationResourceView> GetAllResources(string appId)
+        {
+            return LocalizationRepository.GetResourcesForApp(appId).Select(x => new LocalizationResourceView()
+            {
+                Key = x.Key,
+                Values = x.Values,
+                Description = x.Description
+            });
+
+        }
+
         public LocalizationResourceView GetResourceByKey(string appId, string key, bool processMarkdown = true)
         {
             var resource = LocalizationRepository.GetResourceByKey(appId, key);
@@ -31,7 +42,8 @@ namespace classy.Manager
                     resource.Values[k] = resource.Values[k].Contains("\r\n") ? (new MarkdownSharp.Markdown()).Transform(resource.Values[k]) : resource.Values[k];
                 }
             }
-            return resource.TranslateTo<LocalizationResourceView>();
+
+            return resource == null ? null : resource.TranslateTo<LocalizationResourceView>();
         }
 
         public LocalizationResourceView SetResourceValues(string appId, string key, IDictionary<string, string> values)

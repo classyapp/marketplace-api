@@ -25,6 +25,7 @@ namespace Classy.Models.Request
         public ContactInfo ContactInfo { get; set; }
         public ProfileUpdateFields Fields { get; set; }
         public string Password { get; set; }
+        public string DefaultCulture { get; set; }
     }
 
     public class UpdateProfileValidator : AbstractValidator<UpdateProfile>
@@ -36,6 +37,7 @@ namespace Classy.Models.Request
             {
                 RuleFor(x => x.ProfessionalInfo).Cascade(CascadeMode.StopOnFirstFailure).NotNull();
                 RuleFor(x => x.ProfessionalInfo.CompanyName).NotEmpty();
+                RuleFor(x => x.DefaultCulture).NotNull();
             });
 
             When(x => x.Fields.HasFlag(ProfileUpdateFields.Metadata), () =>
