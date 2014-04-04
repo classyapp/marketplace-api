@@ -301,7 +301,13 @@
     </VisualStudio>
   </ProjectExtensions>
   <PropertyGroup>
-    <PostBuildEvent>$(TargetDir)LocalizationMigrator.exe $(WebProjectOutputDir)\$(OutputPath)$(TargetFileName).config</PostBuildEvent>
+    <CfgFileName>classifieds.dll.config</CfgFileName>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)'=='Release'">
+    <CfgFileName>Web.config</CfgFileName>
+  </PropertyGroup>
+  <PropertyGroup>
+    <PostBuildEvent>$(TargetDir)LocalizationMigrator.exe $(WebProjectOutputDir)\$(OutputPath)$(CfgFileName)</PostBuildEvent>
   </PropertyGroup>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
