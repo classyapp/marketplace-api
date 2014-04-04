@@ -18,6 +18,7 @@ using classy.Manager;
 using Classy.Repository;
 using System.Security.Cryptography;
 using System.Text;
+using Classy.Interfaces.Managers;
 
 namespace classy.Services
 {

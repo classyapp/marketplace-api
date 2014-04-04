@@ -10,6 +10,8 @@ using Classy.Repository;
 using Classy.Models;
 using System.Net;
 using System;
+using Classy.Interfaces.Managers;
+using classy.Manager;
 
 namespace Classy.Auth
 {
@@ -97,6 +99,30 @@ namespace Classy.Auth
             //
             profile.Permissions = session.Permissions;
             repo.Save(profile);
+
+            if (isNew) 
+            {
+                //send welcome email
+                IEmailManager emailManager = authService.TryResolve<IEmailManager>();
+                IAppManager appManager = authService.TryResolve<IAppManager>();
+                ILocalizationManager localizationManager = authService.TryResolve<ILocalizationManager>();
+                string body = null;
+                if (!string.IsNullOrEmpty(profile.ContactInfo.FirstName))
+                {
+                    body = string.Format(localizationManager.GetResourceByKey(Environment.AppId, "WelcomeEmail_BodyWithName", true).Values[Environment.CultureCode], 
+                        string.Format("{0} {1}", profile.ContactInfo.FirstName, profile.ContactInfo.LastName));
+                }
+                else
+                {
+                    body = localizationManager.GetResourceByKey(Environment.AppId, "WelcomeEmail_BodyNoName", true).Values[Environment.CultureCode];
+                }
+                emailManager.SendHtmlMessage(
+                    appManager.GetAppById(Environment.AppId).MandrilAPIKey,
+                    null, new string[] { profile.ContactInfo.Email },
+                    localizationManager.GetResourceByKey(Environment.AppId, "WelcomeEmail_Subject", true).Values[Environment.CultureCode],
+                    body, "welcome_email", null
+                    );
+            }
         }
 
         public string SaveFileFromUrl(IStorageRepository storage, string key, string url)

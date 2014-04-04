@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-namespace classy.Manager
+namespace Classy.Interfaces.Managers
 {
     public enum EmailResultStatus
     {

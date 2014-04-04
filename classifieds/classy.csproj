@@ -195,27 +195,23 @@
     </Compile>
     <Compile Include="HtmlUtilities.cs" />
     <Compile Include="Manager\DefaultAnalyticsManager.cs" />
-    <Compile Include="Manager\EmailResult.cs" />
+    <Compile Include="Manager\IAnalyticsManager.cs" />
+    <Compile Include="Manager\IBookingManager.cs" />
+    <Compile Include="Manager\ICollectionManager.cs" />
+    <Compile Include="Manager\IListingManager.cs" />
+    <Compile Include="Manager\IManager.cs" />
+    <Compile Include="Manager\IOrderManager.cs" />
+    <Compile Include="Manager\IProfileManager.cs" />
+    <Compile Include="Manager\IReviewManager.cs" />
+    <Compile Include="Manager\IThumbnailManager.cs" />
     <Compile Include="Manager\MandrillEmailManager.cs" />
     <Compile Include="Manager\DefaultLocalizationManager.cs" />
     <Compile Include="Manager\DefaultThumbnailManager.cs" />
-    <Compile Include="Manager\IAnalyticsManager.cs" />
-    <Compile Include="Manager\ICollectionManager.cs" />
-    <Compile Include="Manager\IEmailManager.cs" />
-    <Compile Include="Manager\ILocalizationManager.cs" />
-    <Compile Include="Manager\IManager.cs" />
-    <Compile Include="Manager\IReviewManager.cs" />
     <Compile Include="Manager\DefaultAppManager.cs" />
     <Compile Include="Manager\DefaultBookingManager.cs" />
     <Compile Include="Manager\DefaultListingManager.cs" />
     <Compile Include="Manager\DefaultOrderManager.cs" />
     <Compile Include="Manager\DefaultProfileManager.cs" />
-    <Compile Include="Manager\IAppManager.cs" />
-    <Compile Include="Manager\IBookingManager.cs" />
-    <Compile Include="Manager\IListingManager.cs" />
-    <Compile Include="Manager\IOrderManager.cs" />
-    <Compile Include="Manager\IProfileManager.cs" />
-    <Compile Include="Manager\IThumbnailManager.cs" />
     <Compile Include="Operations\IOperator.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Services\ListingService.cs" />
@@ -237,6 +233,10 @@
     <ProjectReference Include="..\Classy.Auth\Classy.Auth.csproj">
       <Project>{c40e22db-95cd-4e86-bf84-718aeadf064c}</Project>
       <Name>Classy.Auth</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Classy.Interfaces\Classy.Interfaces.csproj">
+      <Project>{9c0ded9f-8160-4bdf-a599-6b33a983353a}</Project>
+      <Name>Classy.Interfaces</Name>
     </ProjectReference>
     <ProjectReference Include="..\Classy.Models.Response\Classy.Models.Response.csproj">
       <Project>{7dba45e3-cb30-4f3c-9577-27e955dd3f49}</Project>

@@ -102,6 +102,14 @@
     <Compile Include="UserAuth.cs" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\Classy.Interfaces\Classy.Interfaces.csproj">
+      <Project>{9c0ded9f-8160-4bdf-a599-6b33a983353a}</Project>
+      <Name>Classy.Interfaces</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Classy.Models.Response\Classy.Models.Response.csproj">
+      <Project>{7dba45e3-cb30-4f3c-9577-27e955dd3f49}</Project>
+      <Name>Classy.Models.Response</Name>
+    </ProjectReference>
     <ProjectReference Include="..\Classy.Models\Classy.Models.csproj">
       <Project>{ac13df42-51bb-4798-a0ab-9b2776b4844f}</Project>
       <Name>Classy.Models</Name>
