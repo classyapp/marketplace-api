@@ -11,6 +11,7 @@ using System.Configuration;
 using System.Linq;
 using System.Web;
 using Classy.Auth;
+using Classy.Interfaces.Managers;
 
 namespace classy.Extentions
 {
