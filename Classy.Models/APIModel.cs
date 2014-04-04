@@ -18,28 +18,38 @@ namespace Classy.Models
 
         public object Include(params Expression<Func<T, object>>[] includedProperties)
         {
+            var objectType = _object.GetType();
             Dictionary<string, object> dict = new Dictionary<string, object>();
 
-            string[] names = new string[includedProperties.Length];
             for (var i = 0; i < includedProperties.Length; i++)
             {
-                names[i] = GetMemberName(includedProperties[i].Body);
-            }
-
-            var props = _object.GetType().GetProperties();
-
-            foreach (var p in props)
-            {
-                if (names.Any(x => x == p.Name))
-                {
-                    dict.Add(p.Name, p.GetValue(_object));
-                }
+                var propertyGraph = GetMemberNameGraph(includedProperties[i].Body);
+                PropertyGraphToDictionary(dict, _object, propertyGraph.First);
             }
 
             return new ReadOnlyDictionary<string, object>(dict);
         }
 
-        private static string GetMemberName(Expression expression)
+        private void PropertyGraphToDictionary(Dictionary<string, object> dict, object o, LinkedListNode<string> propertyNode)
+        {
+            var propertyName = propertyNode.Value;
+            var propertyValue = o.GetType().GetProperty(propertyName).GetValue(o);
+            if (propertyNode.Next == null)
+            {
+                dict[propertyName] = propertyValue;
+            }
+            else
+            {
+                if (!dict.ContainsKey(propertyName) || !(dict[propertyName] is Dictionary<string, object>))
+                {
+                    dict[propertyName] = new Dictionary<string, object>();
+                }
+                Dictionary<string, object> propertyDict = (Dictionary<string, object>) dict[propertyName];
+                PropertyGraphToDictionary(propertyDict, propertyValue, propertyNode.Next);
+            }
+        }
+
+        private static LinkedList<string> GetMemberNameGraph(Expression expression)
         {
             if (expression == null)
             {
@@ -51,7 +61,7 @@ namespace Classy.Models
             {
                 // Reference type property or field
                 var memberExpression = (MemberExpression)expression;
-                return memberExpression.Member.Name;
+                return new LinkedList<string>(new string[] { memberExpression.Member.Name });
             }
 
             if (expression is MethodCallExpression)
@@ -59,31 +69,52 @@ namespace Classy.Models
                 // Reference type method
                 var methodCallExpression =
                     (MethodCallExpression)expression;
-                return methodCallExpression.Method.Name;
+                return new LinkedList<string>(new string[] { methodCallExpression.Method.Name });
             }
 
             if (expression is UnaryExpression)
             {
                 // Property, field of method returning value type
                 var unaryExpression = (UnaryExpression)expression;
-                return GetMemberName(unaryExpression);
+                return GetMemberNameGraph(unaryExpression);
             }
 
             throw new ArgumentException("Invalid expression");
         }
 
-        private static string GetMemberName(
+        private static LinkedList<string> GetMemberNameGraph(
                 UnaryExpression unaryExpression)
         {
+            var memberExpression = ((MemberExpression)unaryExpression.Operand);
+
+            LinkedList<string> parentMemberGraph = new LinkedList<string>();
+            if (memberExpression.Expression is MemberExpression)
+            {
+                parentMemberGraph = GetMemberNameGraph((MemberExpression)memberExpression.Expression);
+            }
+
+            var memberName = "";
             if (unaryExpression.Operand is MethodCallExpression)
             {
                 var methodExpression =
                     (MethodCallExpression)unaryExpression.Operand;
-                return methodExpression.Method.Name;
+                memberName = methodExpression.Method.Name;
+            }
+            else
+            {
+                memberName = memberExpression.Member.Name;
             }
 
-            return ((MemberExpression)unaryExpression.Operand)
-                        .Member.Name;
+
+            if (parentMemberGraph.Count == 0)
+            {
+                return new LinkedList<string>(new string[] {memberName});
+            }
+            else
+            {
+                parentMemberGraph.AddLast(memberExpression.Member.Name);
+                return parentMemberGraph;
+            }
         }
 
     }

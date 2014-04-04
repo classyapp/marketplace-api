@@ -94,7 +94,7 @@ namespace classy.Manager
         {
             long count = 0;
             var profileList = ProfileRepository.Search(appId, searchQuery, category, location, metadata, professionalsOnly, ignoreLocation, page, pageSize, ref count, culture);
-            IList<ProfileView> results = new List<ProfileView>();
+            IList<object> results = new List<object>();
             foreach (var profile in profileList)
             {
                 results.Add(profile.ToProfileView().ToAPIModel().Include(x => x.ProfessionalInfo, x => x.ContactInfo, x => x.Id, x => x.IsProfessional, x => x.IsProxy, x => x.IsVendor, x => x.IsVerifiedProfessional, x => x.ListingCount, x => x.Listings));

@@ -2,6 +2,7 @@
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using classy.Extentions;
 using System.Collections.ObjectModel;
+using System.Collections.Generic;
 
 namespace Classy.Tests
 {
@@ -25,7 +26,8 @@ namespace Classy.Tests
                 MyInt = 42,
                 MyChild = new ViewModel()
                 {
-                    MyString = "ChildString"
+                    MyString = "ChildString",
+                    MyInt = 24
                 }
             };
         }
@@ -49,6 +51,15 @@ namespace Classy.Tests
         {
             ReadOnlyDictionary<string, object> dict = (ReadOnlyDictionary<string, object>)_viewModel.ToAPIModel().Include(x => x.MyChild);
             Assert.AreEqual(_viewModel.MyChild, dict["MyChild"]);
+        }
+
+        [TestMethod]
+        public void SpecifyingSubPropertiesEnsuresOnlyThosePropertiesAreSet()
+        {
+            ReadOnlyDictionary<string, object> dict = (ReadOnlyDictionary<string, object>)_viewModel.ToAPIModel().Include(x => x.MyChild.MyInt);
+            var propertyDict = (IDictionary<string, object>)dict["MyChild"];
+            Assert.AreEqual(_viewModel.MyChild.MyInt, propertyDict["MyInt"]);
+            Assert.IsFalse(propertyDict.ContainsKey("MyString"));
         }
 
         [TestMethod]
