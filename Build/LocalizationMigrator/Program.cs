@@ -4,6 +4,7 @@ using MongoDB.Driver.Builders;
 using System;
 using System.Collections.Generic;
 using System.Configuration;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -15,10 +16,11 @@ namespace LocalizationMigrator
     { 
         static void Main(string[] args)
         {
-            var projectPath = args[0];
+            var configPath = args[0];
+            Debug.WriteLine("config path: " + configPath);
             var config = ConfigurationManager.OpenMappedExeConfiguration(new ExeConfigurationFileMap()
             {
-                ExeConfigFilename = Path.Combine(projectPath, "Web.config")
+                ExeConfigFilename = configPath
             }, ConfigurationUserLevel.None);
 
             var mongoUri = getMongoUri(config);
@@ -26,7 +28,9 @@ namespace LocalizationMigrator
 
             LocalizationCollection localizations = new LocalizationCollection(db);
 
-            DirectoryInfo migrationDirectory = new DirectoryInfo(Path.Combine(projectPath, "migrations", "localizations"));
+            var path = Path.GetDirectoryName(configPath);
+            DirectoryInfo migrationDirectory = new DirectoryInfo(Path.Combine(path, "migrations", "localizations"));
+            Debug.WriteLine("path to migrations", migrationDirectory.FullName);
 
             localizations.Migrate(migrationDirectory);
         }

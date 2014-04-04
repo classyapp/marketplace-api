@@ -258,7 +258,9 @@
   </ItemGroup>
   <ItemGroup />
   <ItemGroup>
-    <Content Include="migrations\localizations\20140401170605_example.json.sample" />
+    <Content Include="migrations\localizations\20140401170605_example.json.sample">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
   </ItemGroup>
   <PropertyGroup>
     <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">10.0</VisualStudioVersion>
@@ -297,7 +299,7 @@
     </VisualStudio>
   </ProjectExtensions>
   <PropertyGroup>
-    <PostBuildEvent>$(TargetDir)LocalizationMigrator.exe $(ProjectDir)</PostBuildEvent>
+    <PostBuildEvent>$(TargetDir)LocalizationMigrator.exe $(TargetDir)$(TargetFileName).config</PostBuildEvent>
   </PropertyGroup>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
