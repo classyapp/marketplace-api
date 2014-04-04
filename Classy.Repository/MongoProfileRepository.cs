@@ -113,6 +113,12 @@ namespace Classy.Repository
             if (professionalsOnly)
             {
                 queries.Add(Query.NE("ProfessionalInfo", BsonNull.Value));
+
+                var cultureQuery = Query.Or(
+                        Query<Profile>.EQ(x => x.DefaultCulture, culture),
+                        Query.Exists("Translations." + culture)
+                        );
+                queries.Add(cultureQuery);
             }
             if (!string.IsNullOrEmpty(searchQuery))
             {
