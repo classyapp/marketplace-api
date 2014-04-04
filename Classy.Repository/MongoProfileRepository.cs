@@ -153,7 +153,7 @@ namespace Classy.Repository
             }
 
             IMongoQuery locationQueryByGPS = null;
-            IMongoQuery locationByCountry = null;
+            IMongoQuery locationByAddress = null;
             if (!ignoreLocation)
             {
                 if (location != null)
@@ -167,7 +167,8 @@ namespace Classy.Repository
                         }
                         if (location.Address != null && !string.IsNullOrEmpty(location.Address.Country))
                         {
-                            locationByCountry = Query<Profile>.EQ(x => x.ProfessionalInfo.CompanyContactInfo.Location.Address.Country, location.Address.Country);
+                            locationByAddress = Query<Profile>.EQ(x => x.ProfessionalInfo.CompanyContactInfo.Location.Address.Country, location.Address.Country);
+                            if (!string.IsNullOrEmpty(location.Address.City)) locationByAddress = Query.And(locationByAddress, Query<Profile>.EQ(x => x.ProfessionalInfo.CompanyContactInfo.Location.Address.City, location.Address.City));
                         }
                     }
                     else
@@ -179,7 +180,8 @@ namespace Classy.Repository
                         }
                         if (location.Address != null && !string.IsNullOrEmpty(location.Address.Country))
                         {
-                            locationByCountry = Query<Profile>.EQ(x => x.ContactInfo.Location.Address.Country, location.Address.Country);
+                            locationByAddress = Query<Profile>.EQ(x => x.ContactInfo.Location.Address.Country, location.Address.Country);
+                            if (!string.IsNullOrEmpty(location.Address.City)) locationByAddress = Query.And(locationByAddress, Query<Profile>.EQ(x => x.ContactInfo.Location.Address.City, location.Address.City));
                         }
                     }
                 }
@@ -187,9 +189,9 @@ namespace Classy.Repository
                 {
                     queries.Add(locationQueryByGPS);
                 }
-                else if (locationByCountry != null)
+                else if (locationByAddress != null)
                 {
-                    queries.Add(locationByCountry);
+                    queries.Add(locationByAddress);
                 }
             }
 
@@ -198,10 +200,10 @@ namespace Classy.Repository
             MongoCursor<Profile> profiles = null;
             if (ProfilesCollection.Count(query) == 0)
             {
-                if (locationQueryByGPS != null && locationByCountry != null)
+                if (locationQueryByGPS != null && locationByAddress != null)
                 {
                     queries.Remove(locationQueryByGPS);
-                    queries.Add(locationByCountry);
+                    queries.Add(locationByAddress);
                     query = Query.And(queries);
                 }
             }
