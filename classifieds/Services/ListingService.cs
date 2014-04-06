@@ -1532,5 +1532,10 @@ namespace classy.Services
             }
             return new HttpError("Invalid hash");
         }
+
+        public object Get(GetCitiesByCountry request)
+        {
+            return LocalizationManager.GetCitiesByCountry(request.Environment.AppId, request.CountryCode);
+        }
     }
 }

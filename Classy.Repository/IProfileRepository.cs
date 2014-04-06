@@ -32,5 +32,7 @@ namespace Classy.Repository
         // proxies
         string SaveProxyClaim(ProxyClaim claim);
         ProxyClaim GetProxyClaimById(string appId, string claimId);
+        // cities (for localization)
+        IList<string> GetDistinctCitiesByCountry(string appId, string countryCode);
     }
 }

@@ -113,12 +113,6 @@ namespace Classy.Repository
             if (professionalsOnly)
             {
                 queries.Add(Query.NE("ProfessionalInfo", BsonNull.Value));
-
-                var cultureQuery = Query.Or(
-                        Query<Profile>.EQ(x => x.DefaultCulture, culture),
-                        Query.Exists("Translations." + culture)
-                        );
-                queries.Add(cultureQuery);
             }
             if (!string.IsNullOrEmpty(searchQuery))
             {
@@ -246,6 +240,17 @@ namespace Classy.Repository
         public ProxyClaim GetProxyClaimById(string appId, string claimId)
         {
             return ProxyClaimsCollection.FindOne(Query<ProxyClaim>.Where(x => x.AppId == appId && x.Id == claimId));
+        }
+
+        public IList<string> GetDistinctCitiesByCountry(string appId, string countryCode)
+        {
+            return ProfilesCollection.Distinct<string>(
+                "ProfessionalInfo.CompanyContactInfo.Location.Address.City", 
+                Query<Profile>.Where(
+                    x => x.AppId == appId && 
+                        x.ProfessionalInfo.CompanyContactInfo.Location.Address.Country == countryCode &&
+                        !string.IsNullOrEmpty(x.ProfessionalInfo.CompanyContactInfo.Location.Address.City)
+                    )).ToList();
         }
     }
 }

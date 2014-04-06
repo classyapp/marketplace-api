@@ -12,10 +12,12 @@ namespace classy.Manager
     public class DefaultLocalizationManager : ILocalizationManager
     {
         private ILocalizationRepository LocalizationRepository;
+        private IProfileRepository ProfileRepository;
 
-        public DefaultLocalizationManager(ILocalizationRepository localizationRepository)
+        public DefaultLocalizationManager(ILocalizationRepository localizationRepository, IProfileRepository profileRepository)
         {
             LocalizationRepository = localizationRepository;
+            ProfileRepository = profileRepository;
         }
 
         public LocalizationResourceView GetResourceByKey(string appId, string key, bool processMarkdown = true)
@@ -107,6 +109,11 @@ namespace classy.Manager
         public IList<string> GetResourceKeysForApp(string appId)
         {
             return LocalizationRepository.GetResourceKeysForApp(appId);
+        }
+
+        public IList<string> GetCitiesByCountry(string appId, string countryCode)
+        {
+            return ProfileRepository.GetDistinctCitiesByCountry(appId, countryCode);
         }
     }
 }

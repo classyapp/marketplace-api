@@ -228,6 +228,7 @@ namespace classy
                     .Add<GetResourceKeysForApp>("/resource/keys", "GET")
                     .Add<SetResourceValues>("/resource/{Key}", "POST")
                     .Add<SetResourceListValues>("/resource/list/{Key}", "POST")
+                    .Add<GetCitiesByCountry>("/resource/list/cities/{countryCode}", "GET")
 
                     // Email
                     .Add<SendEmailRequest>("/email", "POST")
