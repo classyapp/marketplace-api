@@ -13,6 +13,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Classy.Models.Response", "C
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Classy.Interfaces", "Classy.Interfaces\Classy.Interfaces.csproj", "{9C0DED9F-8160-4BDF-A599-6B33A983353A}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Classy.Tests", "Classy.Tests\Classy.Tests.csproj", "{FBF99D6F-7815-49C7-99B6-BFA9B8FDBEDE}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		AppHarbor|Any CPU = AppHarbor|Any CPU
@@ -56,6 +58,12 @@ Global
 		{9C0DED9F-8160-4BDF-A599-6B33A983353A}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{9C0DED9F-8160-4BDF-A599-6B33A983353A}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{9C0DED9F-8160-4BDF-A599-6B33A983353A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{FBF99D6F-7815-49C7-99B6-BFA9B8FDBEDE}.AppHarbor|Any CPU.ActiveCfg = Release|Any CPU
+		{FBF99D6F-7815-49C7-99B6-BFA9B8FDBEDE}.AppHarbor|Any CPU.Build.0 = Release|Any CPU
+		{FBF99D6F-7815-49C7-99B6-BFA9B8FDBEDE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{FBF99D6F-7815-49C7-99B6-BFA9B8FDBEDE}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{FBF99D6F-7815-49C7-99B6-BFA9B8FDBEDE}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{FBF99D6F-7815-49C7-99B6-BFA9B8FDBEDE}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
