@@ -87,20 +87,23 @@ namespace Classy.Models
 
         public Profile Translate(string culture) 
         {
-            if (Translations != null  && !string.IsNullOrEmpty(culture))
+            if (culture != this.DefaultCulture)
             {
-                ProfileTranslation translation = null;
-                if (Translations.TryGetValue(culture, out translation))
+                if (Translations != null && !string.IsNullOrEmpty(culture))
                 {
-                    if (this.IsProfessional && !string.IsNullOrEmpty(translation.CompanyName))
+                    ProfileTranslation translation = null;
+                    if (Translations.TryGetValue(culture, out translation))
                     {
-                        this.ProfessionalInfo.CompanyName = translation.CompanyName;
-                    }
-                    if (translation.Metadata != null)
-                    {
-                        foreach (var key in translation.Metadata.Keys)
+                        if (this.IsProfessional && !string.IsNullOrEmpty(translation.CompanyName))
                         {
-                            Metadata[key] = translation.Metadata[key];
+                            this.ProfessionalInfo.CompanyName = translation.CompanyName;
+                        }
+                        if (translation.Metadata != null)
+                        {
+                            foreach (var key in translation.Metadata.Keys)
+                            {
+                                Metadata[key] = translation.Metadata[key];
+                            }
                         }
                     }
                 }
