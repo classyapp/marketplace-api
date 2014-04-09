@@ -20,17 +20,6 @@ namespace classy.Manager
             ProfileRepository = profileRepository;
         }
 
-        public IEnumerable<LocalizationResourceView> GetAllResources(string appId)
-        {
-            return LocalizationRepository.GetResourcesForApp(appId).Select(x => new LocalizationResourceView()
-            {
-                Key = x.Key,
-                Values = x.Values,
-                Description = x.Description
-            });
-
-        }
-
         public LocalizationResourceView GetResourceByKey(string appId, string key, bool processMarkdown = true)
         {
             var resource = LocalizationRepository.GetResourceByKey(appId, key);
