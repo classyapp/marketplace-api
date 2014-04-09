@@ -1,4 +1,4 @@
-﻿using Classy.Models;
+using Classy.Models;
 using Classy.Models.Response;
 using Classy.Repository;
 using System;
@@ -74,7 +74,17 @@ namespace classy.Manager
             // return
             return resource.TranslateTo<LocalizationResourceView>();
         }
+        
+        public IEnumerable<LocalizationResourceView> GetAllResources(string appId)
+        {
+            return LocalizationRepository.GetResourcesForApp(appId).Select(x => new LocalizationResourceView()
+            {
+                Key = x.Key,
+                Values = x.Values,
+                Description = x.Description
+            });
 
+        }
 
         public LocalizationListResourceView GetListResourceByKey(string appId, string key)
         {
