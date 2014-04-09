@@ -103,7 +103,8 @@ namespace Classy.Repository
         public IList<Profile> Search(string appId, string searchQuery, string category, Location location, IDictionary<string, string> metadata,
             bool professionalsOnly, bool ignoreLocation, int page, int pageSize, ref long count, string culture)
         {
-            IList<Profile> profiles = new List<Profile>();
+
+            var sort = SortBy.Descending("Languages." + culture, "Rank", "Username");
 
             #region Build queries for match
             var queries = new List<IMongoQuery>() {
@@ -113,12 +114,6 @@ namespace Classy.Repository
             if (professionalsOnly)
             {
                 queries.Add(Query.NE("ProfessionalInfo", BsonNull.Value));
-
-                var cultureQuery = Query.Or(
-                        Query<Profile>.EQ(x => x.DefaultCulture, culture),
-                        Query.Exists("Translations." + culture)
-                        );
-                queries.Add(cultureQuery);
             }
 
             if (!string.IsNullOrEmpty(searchQuery))
@@ -156,120 +151,74 @@ namespace Classy.Repository
 
             IMongoQuery locationQueryByGPS = null;
             IMongoQuery locationByAddress = null;
-            //if (!ignoreLocation)
-            //{
-            //    if (location != null)
-            //    {
-            //        if (professionalsOnly)
-            //        {
-            //            if (location.Coords != null)
-            //            {
-            //                ProfilesCollection.EnsureIndex(IndexKeys.GeoSpatial("ProfessionalInfo.CompanyContactInfo.Location.Coords"));
-            //                locationQueryByGPS = Query<Profile>.Near(x => x.ProfessionalInfo.CompanyContactInfo.Location.Coords, location.Coords.Longitude.Value, location.Coords.Latitude.Value, 1 / 111.12, true);
-            //            }
-            //            if (location.Address != null && !string.IsNullOrEmpty(location.Address.Country))
-            //            {
-            //                locationByAddress = Query<Profile>.EQ(x => x.ProfessionalInfo.CompanyContactInfo.Location.Address.Country, location.Address.Country);
-            //                if (!string.IsNullOrEmpty(location.Address.City)) locationByAddress = Query.And(locationByAddress, Query<Profile>.EQ(x => x.ProfessionalInfo.CompanyContactInfo.Location.Address.City, location.Address.City));
-            //            }
-            //        }
-            //        else
-            //        {
-            //            if (location.Coords != null)
-            //            {
-            //                ProfilesCollection.EnsureIndex(IndexKeys.GeoSpatial("ContactInfo.Location.Coords"));
-            //                locationQueryByGPS = Query<Profile>.Near(x => x.ContactInfo.Location.Coords, location.Coords.Longitude.Value, location.Coords.Latitude.Value, 1 / 111.12, true);
-            //            }
-            //            if (location.Address != null && !string.IsNullOrEmpty(location.Address.Country))
-            //            {
-            //                locationByAddress = Query<Profile>.EQ(x => x.ContactInfo.Location.Address.Country, location.Address.Country);
-            //                if (!string.IsNullOrEmpty(location.Address.City)) locationByAddress = Query.And(locationByAddress, Query<Profile>.EQ(x => x.ContactInfo.Location.Address.City, location.Address.City));
-            //            }
-            //        }
-            //    }
-            //    if (locationQueryByGPS != null)
-            //    {
-            //        queries.Add(locationQueryByGPS);
-            //    }
-            //    else if (locationByAddress != null)
-            //    {
-            //        queries.Add(locationByAddress);
-            //    }
-            //}
+            if (!ignoreLocation)
+            {
+                if (location != null)
+                {
+                    if (professionalsOnly)
+                    {
+                        if (location.Coords != null)
+                        {
+                            ProfilesCollection.EnsureIndex(IndexKeys.GeoSpatial("ProfessionalInfo.CompanyContactInfo.Location.Coords"));
+                            locationQueryByGPS = Query<Profile>.Near(x => x.ProfessionalInfo.CompanyContactInfo.Location.Coords, location.Coords.Longitude.Value, location.Coords.Latitude.Value, 1 / 111.12, true);
+                        }
+                        if (location.Address != null && !string.IsNullOrEmpty(location.Address.Country))
+                        {
+                            locationByAddress = Query<Profile>.EQ(x => x.ProfessionalInfo.CompanyContactInfo.Location.Address.Country, location.Address.Country);
+                            if (!string.IsNullOrEmpty(location.Address.City)) locationByAddress = Query.And(locationByAddress, Query<Profile>.EQ(x => x.ProfessionalInfo.CompanyContactInfo.Location.Address.City, location.Address.City));
+                        }
+                    }
+                    else
+                    {
+                        if (location.Coords != null)
+                        {
+                            ProfilesCollection.EnsureIndex(IndexKeys.GeoSpatial("ContactInfo.Location.Coords"));
+                            locationQueryByGPS = Query<Profile>.Near(x => x.ContactInfo.Location.Coords, location.Coords.Longitude.Value, location.Coords.Latitude.Value, 1 / 111.12, true);
+                        }
+                        if (location.Address != null && !string.IsNullOrEmpty(location.Address.Country))
+                        {
+                            locationByAddress = Query<Profile>.EQ(x => x.ContactInfo.Location.Address.Country, location.Address.Country);
+                            if (!string.IsNullOrEmpty(location.Address.City)) locationByAddress = Query.And(locationByAddress, Query<Profile>.EQ(x => x.ContactInfo.Location.Address.City, location.Address.City));
+                        }
+                    }
+                }
+                if (locationQueryByGPS != null)
+                {
+                    queries.Add(locationQueryByGPS);
+                }
+                else if (locationByAddress != null)
+                {
+                    queries.Add(locationByAddress);
+                }
+            }
             #endregion
 
-            BsonDocument match = new BsonDocument
-            { 
-                { 
-                    "$match", Query.And(queries).ToBsonDocument()
-                } 
-            };
-
-            BsonDocument project = new BsonDocument 
-            {
-                { "$project", new BsonDocument
-                    {
-                        { "ranking", new BsonDocument
-                            {
-                                { "$cond", new BsonArray 
-                                    {
-                                        new BsonDocument 
-                                            {
-                                                { "$eq", new BsonArray(new string[] {"$DefaultCulture", culture}) }
-                                            }, 
-                                        5, 3
-                                    }
-                                }
-                            }
-                        },
-                        { "Rank", 1 },
-                        { "Username", 1 },
-                        { "Avatar", 1 },
-                        { "ContactInfo", 1 },
-                        { "Metadata", 1 },
-                        { "ProfessionalInfo", 1 }
-                    }
-                }
-            };
-
-            BsonDocument sort = new BsonDocument
-            {
-                { "$sort", new BsonDocument
-                    { 
-                        { "ranking", -1 },
-                        { "Rank", -1 }
-                    }
-                }
-            };
-
-            IEnumerable<BsonDocument> bsonProfiles = ProfilesCollection.Aggregate(match, project, sort).ResultDocuments;
-            if (bsonProfiles.Count() == 0)
+            // try query, and redo for entire country if nothing found nearby
+            var query = Query.And(queries);
+            MongoCursor<Profile> profiles = null;
+            if (ProfilesCollection.Count(query) == 0)
             {
                 if (locationQueryByGPS != null && locationByAddress != null)
                 {
                     queries.Remove(locationQueryByGPS);
                     queries.Add(locationByAddress);
-                    match = new BsonDocument
-                            { 
-                                { 
-                                    "$match", Query.And(queries).ToBsonDocument()
-                                } 
-                            };
-                    bsonProfiles = ProfilesCollection.Aggregate(match, project, sort).ResultDocuments;
+                    query = Query.And(queries);
                 }
             }
 
-            count = bsonProfiles.Count();
-
-            if (page > 0)
+            if (page <= 0)
             {
-                bsonProfiles = bsonProfiles.Skip((page - 1) * pageSize).Take(pageSize);
+                profiles = ProfilesCollection.Find(query).SetSortOrder(sort);
             }
-
-            foreach (var bsonProfile in bsonProfiles)
+            else
             {
-                Profile profile = Newtonsoft.Json.JsonConvert.DeserializeObject<Profile>(bsonProfile.ToJson());
-                profiles.Add(profile.Translate(culture));
+                profiles = ProfilesCollection.Find(query).SetSortOrder(sort).SetSkip((page - 1) * pageSize).SetLimit(pageSize);
+            }
+            count = ProfilesCollection.Count(query);
+
+            foreach (var profile in profiles)
+            {
+                profile.Translate(culture);
             }
 
             return profiles.ToList();

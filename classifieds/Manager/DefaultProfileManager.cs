@@ -228,6 +228,16 @@ namespace classy.Manager
             var profile = GetVerifiedProfile(appId, profileId);
             var rankInc = 0;
 
+            // update language ranking if default culture is sent
+            if (!string.IsNullOrEmpty(defaultCulture))
+            {
+                if (profile.Languages == null)
+                {
+                    profile.Languages = new Dictionary<string, int>();
+                }
+                profile.Languages[defaultCulture] = 2;
+            }
+
             // copy seller info
             if (fields.HasFlag(ProfileUpdateFields.ProfessionalInfo))
             {
@@ -642,6 +652,13 @@ namespace classy.Manager
                     profile.Translations = new Dictionary<string, ProfileTranslation>();
                 }
                 profile.Translations[profileTranslation.Culture] = profileTranslation;
+                // update languages ranks
+                if (profile.Languages == null)
+                {
+                    profile.Languages = new Dictionary<string, int>();
+                }
+                profile.Languages[profileTranslation.Culture] = 1;
+
                 ProfileRepository.Save(profile);
             }
         }
