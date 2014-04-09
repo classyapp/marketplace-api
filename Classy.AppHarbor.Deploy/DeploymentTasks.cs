@@ -14,8 +14,8 @@ namespace Classy.AppHarbor.Deploy
         [TestMethod]
         public void AddLocalizations()
         {
-            var config = GetConfig();
-            var db = GetDatabase(config);
+            //var config = GetConfig();
+            var db = GetDatabase();
 
             LocalizationCollection localizations = new LocalizationCollection(db);
 
@@ -24,35 +24,37 @@ namespace Classy.AppHarbor.Deploy
             localizations.Migrate(migrationsPath);
         }
 
-        private Configuration GetConfig()
+        //private Configuration GetConfig()
+        //{
+        //    string assemblyFolder = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
+        //    var config = ConfigurationManager.OpenMappedExeConfiguration(new ExeConfigurationFileMap()
+        //    {
+        //        ExeConfigFilename = Path.Combine(assemblyFolder, "_PublishedWebsites", "classy", "Web.AppHarbor.config")
+        //    }, ConfigurationUserLevel.None);
+        //    return config;
+        //}
+
+        private MongoDB.Driver.MongoDatabase GetDatabase()
         {
-            string assemblyFolder = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
-            var config = ConfigurationManager.OpenMappedExeConfiguration(new ExeConfigurationFileMap()
-            {
-                ExeConfigFilename = Path.Combine(assemblyFolder, "_PublishedWebsites", "classy", "Web.AppHarbor.config")
-            }, ConfigurationUserLevel.None);
-            return config;
-        }
+            //string connectionString = null;
+            //foreach (KeyValueConfigurationElement element in config.AppSettings.Settings)
+            //{
+            //    if (element.Key == "MONGO_URI")
+            //        connectionString = element.Value;
+            //}
 
-        private MongoDB.Driver.MongoDatabase GetDatabase(Configuration config)
-        {
-            string connectionString = null;
-            foreach (KeyValueConfigurationElement element in config.AppSettings.Settings)
-            {
-                if (element.Key == "MONGO_URI")
-                    connectionString = element.Value;
-            }
+            //foreach (ConnectionStringSettings element in config.ConnectionStrings.ConnectionStrings)
+            //{
+            //    if (element.Name == "MONGO")
+            //        connectionString = element.ConnectionString;
+            //}
 
-            foreach (ConnectionStringSettings element in config.ConnectionStrings.ConnectionStrings)
-            {
-                if (element.Name == "MONGO")
-                    connectionString = element.ConnectionString;
-            }
+            //if (connectionString == null)
+            //{
+            //    throw new Exception("mongo config setting not found");
+            //}
 
-            if (connectionString == null)
-            {
-                throw new Exception("mongo config setting not found");
-            }
+            string connectionString = ConfigurationManager.AppSettings["MONGO"];
 
             MongoClient mongoClient = new MongoClient(connectionString);
             var databaseName = MongoUrl.Create(connectionString).DatabaseName;
