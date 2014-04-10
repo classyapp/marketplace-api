@@ -60,7 +60,7 @@ namespace Classy.Repository
                     }
                     throw t.Exception;
                 }
-            });
+            }
         }
 
         public Stream GetFile(string key)
