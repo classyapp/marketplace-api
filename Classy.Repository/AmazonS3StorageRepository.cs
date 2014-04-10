@@ -45,27 +45,28 @@ namespace Classy.Repository
             if (cacheStream)
             {
                 memoryCache.Add(key, new MemoryStream(content));
-                Task<PutObjectResponse> response = s3Client.PutObjectAsync(request);
-                keys.Add(response.Id, key);
-                response.ContinueWith(t => {
-                        if (t.IsFaulted)
-                        {
-                            if (listingRepository != null)
-                            {
-                                listingRepository.SetListingErrorForMediaFile(keys[t.Id], t.Exception.Message);
-                            }
-                            throw t.Exception;
-                        } 
-                        else if (t.IsCompleted)
-                        {
-                            memoryCache.Remove(keys[t.Id]);
-                        }
-                    });
             }
-            else
+
+            Task<PutObjectResponse> response = s3Client.PutObjectAsync(request);
+            keys.Add(response.Id, key);
+            response.ContinueWith(t =>
             {
-                s3Client.PutObjectAsync(request);
-            }
+                if (t.IsFaulted)
+                {
+                    if (listingRepository != null)
+                    {
+                        listingRepository.SetListingErrorForMediaFile(keys[t.Id], t.Exception.ToString());
+                    }
+                    throw t.Exception;
+                }
+                else if (t.IsCompleted)
+                {
+                    if (cacheStream)
+                    {
+                        memoryCache.Remove(keys[t.Id]);
+                    }
+                }
+            });
         }
 
         public Stream GetFile(string key)
