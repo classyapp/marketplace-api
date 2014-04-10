@@ -41,5 +41,6 @@ namespace Classy.Repository
         void RemoveHashtags(string listingId, string appId, string[] hashtags);
         string Insert(Listing listing);
         void Update(Listing listing);
+        void SetListingErrorForMediaFile(string key, string error);
     }
 }

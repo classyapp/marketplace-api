@@ -31,10 +31,10 @@ namespace Classy.Repository
 
         public void SaveFile(string key, byte[] content, string contentType)
         {
-            SaveFile(key, content, contentType, false);
+            SaveFile(key, content, contentType, false, null);
         }
 
-        public void SaveFile(string key, byte[] content, string contentType, bool cacheStream)
+        public void SaveFile(string key, byte[] content, string contentType, bool cacheStream, IListingRepository listingRepository)
         {
             PutObjectRequest request = new PutObjectRequest();
             request.BucketName = bucketName;
@@ -48,7 +48,15 @@ namespace Classy.Repository
                 Task<PutObjectResponse> response = s3Client.PutObjectAsync(request);
                 keys.Add(response.Id, key);
                 response.ContinueWith(t => {
-                        if (t.IsCompleted)
+                        if (t.IsFaulted)
+                        {
+                            if (listingRepository != null)
+                            {
+                                listingRepository.SetListingErrorForMediaFile(keys[t.Id], t.Exception.Message);
+                            }
+                            throw t.Exception;
+                        } 
+                        else if (t.IsCompleted)
                         {
                             memoryCache.Remove(keys[t.Id]);
                         }

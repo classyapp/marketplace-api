@@ -187,7 +187,7 @@ namespace classy.Manager
                         {
                             var key = Guid.NewGuid().ToString();
                             var content = reader.ReadBytes((int)file.ContentLength);
-                            StorageRepository.SaveFile(key, content, file.ContentType, true);
+                            StorageRepository.SaveFile(key, content, file.ContentType, true, ListingRepository);
                             var mediaFile = new MediaFile
                             {
                                 Type = MediaFileType.Image,
