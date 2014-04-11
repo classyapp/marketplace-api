@@ -214,7 +214,6 @@
     <Compile Include="Manager\DefaultListingManager.cs" />
     <Compile Include="Manager\DefaultOrderManager.cs" />
     <Compile Include="Manager\DefaultProfileManager.cs" />
-    <Compile Include="Manager\IAppManager.cs" />
     <Compile Include="Util\ExtensionMethods.cs" />
     <Compile Include="Util\HtmlUtilities.cs" />
     <Compile Include="Operations\IOperator.cs" />
