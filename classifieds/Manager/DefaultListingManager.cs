@@ -187,7 +187,7 @@ namespace classy.Manager
                         {
                             var key = Guid.NewGuid().ToString();
                             var content = reader.ReadBytes((int)file.ContentLength);
-                            StorageRepository.SaveFile(key, content, file.ContentType, true);
+                            StorageRepository.SaveFile(key, content, file.ContentType, true, ListingRepository);
                             var mediaFile = new MediaFile
                             {
                                 Type = MediaFileType.Image,
@@ -216,10 +216,6 @@ namespace classy.Manager
             MediaFile file = listing.ExternalMedia.SingleOrDefault(e => e.Url == url);
             if (file != null)
             {
-                foreach (var thumb in file.Thumbnails)
-                {
-                    StorageRepository.DeleteFile(thumb.Key);
-                }
                 ListingRepository.DeleteExternalMedia(listingId, appId, url);
                 StorageRepository.DeleteFile(url);
 
@@ -319,10 +315,6 @@ namespace classy.Manager
 
             foreach (var file in listing.ExternalMedia)
             {
-                foreach (var thumb in file.Thumbnails)
-                {
-                    StorageRepository.DeleteFile(thumb.Key);
-                }
                 StorageRepository.DeleteFile(file.Key);
             }
             ListingRepository.Delete(listingId, appId);
@@ -467,12 +459,6 @@ namespace classy.Manager
                     DefaultCulture = profile.DefaultCulture
                 };
 
-                // TODO: thumbnails should be created async and show a grid of recent items in the collection
-                if (includedListings.Count > 0)
-                {
-                    var last = GetVerifiedListing(appId, includedListings.Last().Id);
-                    collection.Thumbnails = last.ExternalMedia[0].Thumbnails;
-                }
                 CollectionRepository.Insert(collection);
 
                 // log an activity, and increase the counter for the listings that were included
@@ -613,9 +599,6 @@ namespace classy.Manager
                 }
                 if (changed)
                 {
-                    // TODO: thumbnails should be created async and show a grid of recent items in the collection
-                    var last = GetVerifiedListing(appId, includedListings.Last().Id);
-                    collection.Thumbnails = last.ExternalMedia[0].Thumbnails;
                     // save
                     CollectionRepository.Update(collection);
                 }
@@ -647,16 +630,6 @@ namespace classy.Manager
 
                         int count = 0;
                         TripleStore.DeleteActivity(appId, profileId, ActivityPredicate.ADD_LISTING_TO_COLLECTION, listing.Id, ref count);
-
-                        if (collection.IncludedListings.Count > 0)
-                        {
-                            var last = GetVerifiedListing(appId, collection.IncludedListings.Last().Id);
-                            collection.Thumbnails = last.ExternalMedia[0].Thumbnails;
-                        }
-                        else
-                        {
-                            collection.Thumbnails = new MediaThumbnail[0];
-                        }
 
                         // save
                         CollectionRepository.Update(collection);

@@ -13,6 +13,8 @@ using ServiceStack.ServiceClient.Web;
 using System.IO;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+using classy.Extentions;
+using System.Collections.ObjectModel;
 
 namespace classy.Manager
 {
@@ -78,7 +80,7 @@ namespace classy.Manager
             return profile.ToProfileView();
         }
 
-        public SearchResultsView<ProfileView> SearchProfiles(
+        public SearchResultsView<object> SearchProfiles(
             string appId,
             string searchQuery,
             string category,
@@ -92,12 +94,12 @@ namespace classy.Manager
         {
             long count = 0;
             var profileList = ProfileRepository.Search(appId, searchQuery, category, location, metadata, professionalsOnly, ignoreLocation, page, pageSize, ref count, culture);
-            IList<ProfileView> results = new List<ProfileView>();
+            IList<object> results = new List<object>();
             foreach (var profile in profileList)
             {
-                results.Add(profile.ToProfileView());
+                results.Add(profile.ToProfileView().ToAPIModel().Include(x => x.ProfessionalInfo, x => x.ContactInfo, x => x.Id, x => x.IsProfessional, x => x.IsProxy, x => x.IsVendor, x => x.IsVerifiedProfessional, x => x.ListingCount, x => x.Listings));
             }
-            return new SearchResultsView<ProfileView> { Results = results, Count = count };
+            return new SearchResultsView<object> { Results = results, Count = count };
         }
 
         public void FollowProfile(
@@ -226,6 +228,16 @@ namespace classy.Manager
             var profile = GetVerifiedProfile(appId, profileId);
             var rankInc = 0;
 
+            // update language ranking if default culture is sent
+            if (!string.IsNullOrEmpty(defaultCulture))
+            {
+                if (profile.Languages == null)
+                {
+                    profile.Languages = new Dictionary<string, int>();
+                }
+                profile.Languages[defaultCulture] = 2;
+            }
+
             // copy seller info
             if (fields.HasFlag(ProfileUpdateFields.ProfessionalInfo))
             {
@@ -297,7 +309,8 @@ namespace classy.Manager
             string profileId,
             string proxyProfileId,
             ProfessionalInfo ProfessionalInfo,
-            IDictionary<string, string> metadata)
+            IDictionary<string, string> metadata,
+            string defaultCulture)
         {
             var proxyProfile = GetVerifiedProfile(appId, proxyProfileId);
             if (!proxyProfile.IsProxy) throw new ApplicationException("can't claim. not a proxy.");
@@ -308,7 +321,8 @@ namespace classy.Manager
                 ProfileId = profileId,
                 ProxyProfileId = proxyProfileId,
                 ProfessionalInfo = ProfessionalInfo,
-                Metadata = metadata
+                Metadata = metadata,
+                DefaultCulture = defaultCulture
             };
             ProfileRepository.SaveProxyClaim(claim);
 
@@ -331,6 +345,8 @@ namespace classy.Manager
             var profile = GetVerifiedProfile(appId, claim.ProfileId);
             var proxyProfile = GetVerifiedProfile(appId, claim.ProxyProfileId);
             var rankInc = 0;
+
+            profile.DefaultCulture = claim.DefaultCulture;
 
             // copy seller info from proxy to profile
             if (claim.ProfessionalInfo != null)
@@ -636,6 +652,13 @@ namespace classy.Manager
                     profile.Translations = new Dictionary<string, ProfileTranslation>();
                 }
                 profile.Translations[profileTranslation.Culture] = profileTranslation;
+                // update languages ranks
+                if (profile.Languages == null)
+                {
+                    profile.Languages = new Dictionary<string, int>();
+                }
+                profile.Languages[profileTranslation.Culture] = 1;
+
                 ProfileRepository.Save(profile);
             }
         }

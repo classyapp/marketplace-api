@@ -10,6 +10,8 @@ using System.Collections.Generic;
 using System.Configuration;
 using System.Linq;
 using System.Web;
+using Classy.Auth;
+using Classy.Interfaces.Managers;
 
 namespace classy.Extentions
 {
@@ -73,6 +75,8 @@ namespace classy.Extentions
             container.Register<IOrderRepository>(c => new MongoOrderRepository(c.Resolve<MongoDatabase>()));
             container.Register<ICollectionRepository>(c => new MongoCollectionRepository(c.Resolve<MongoDatabase>()));
             container.Register<ILocalizationRepository>(c => new MongoLocalizationProvider(c.Resolve<MongoDatabase>()));
+            container.Register<IEmailManager>(c => 
+                new MandrillEmailManager());
             container.Register<IAppManager>(c =>
                 new DefaultAppManager());
             container.Register<IPaymentGateway>(c =>
@@ -135,7 +139,8 @@ namespace classy.Extentions
                     c.TryResolve<ITripleStore>()));
             container.Register<ILocalizationManager>(c =>
                 new DefaultLocalizationManager(
-                    c.TryResolve<ILocalizationRepository>()));
+                    c.TryResolve<ILocalizationRepository>(),
+                    c.TryResolve<IProfileRepository>()));
             container.Register<IThumbnailManager>(c =>
                 new DefaultThumbnailManager(
                     c.TryResolve<IStorageRepository>()));

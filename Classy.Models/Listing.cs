@@ -7,6 +7,7 @@ using System.Text.RegularExpressions;
 using ServiceStack.FluentValidation;
 using MongoDB.Bson.Serialization.IdGenerators;
 using System.ComponentModel.DataAnnotations;
+using MongoDB.Bson.Serialization.Attributes;
 
 namespace Classy.Models
 {
@@ -109,6 +110,10 @@ namespace Classy.Models
 
         // Translations
         public string DefaultCulture { get; set; }
+
+        // Errors
+        [BsonIgnoreIfNull]
+        public string Errors { get; set; }
 
         public IDictionary<string, ListingTranslation> Translations { get; set; }
 

@@ -14,7 +14,7 @@ namespace Classy.Repository
     {
         private MongoCollection<Profile> ProfilesCollection;
         private MongoCollection<ProxyClaim> ProxyClaimsCollection;
-        
+
         public MongoProfileRepository(MongoDatabase db)
         {
             ProfilesCollection = db.GetCollection<Profile>("profiles");
@@ -103,37 +103,40 @@ namespace Classy.Repository
         public IList<Profile> Search(string appId, string searchQuery, string category, Location location, IDictionary<string, string> metadata,
             bool professionalsOnly, bool ignoreLocation, int page, int pageSize, ref long count, string culture)
         {
-            // sort order
-            var sortOrder = SortBy<Profile>.Descending(x => x.Rank, x => x.UserName);
 
-            // query building
+            var sort = SortBy.Descending("Languages." + culture, "Rank", "Username");
+
+            #region Build queries for match
             var queries = new List<IMongoQuery>() {
                 Query<Profile>.EQ(x => x.AppId, appId)
             };
+
             if (professionalsOnly)
             {
                 queries.Add(Query.NE("ProfessionalInfo", BsonNull.Value));
             }
+
             if (!string.IsNullOrEmpty(searchQuery))
             {
                 // escape 
                 searchQuery = searchQuery.Replace("?", "\\?");
                 // search for professional with matching company name, contact name, or website
                 var nameQuery = Query.Or(
-                    Query<Profile>.Matches(x => x.ProfessionalInfo.CompanyContactInfo.FirstName, BsonRegularExpression.Create(new Regex(searchQuery, RegexOptions.IgnoreCase))),
-                    Query<Profile>.Matches(x => x.ProfessionalInfo.CompanyContactInfo.LastName, BsonRegularExpression.Create(new Regex(searchQuery, RegexOptions.IgnoreCase))),
-                    Query<Profile>.Matches(x => x.ProfessionalInfo.CompanyName, BsonRegularExpression.Create(new Regex(searchQuery, RegexOptions.IgnoreCase))),
-                    Query<Profile>.Matches(x => x.ProfessionalInfo.CompanyContactInfo.WebsiteUrl, BsonRegularExpression.Create(new Regex(searchQuery, RegexOptions.IgnoreCase)))
+                    Query<Profile>.Matches(x => x.ProfessionalInfo.CompanyContactInfo.FirstName, new BsonRegularExpression(new Regex(searchQuery, RegexOptions.IgnoreCase))),
+                    Query<Profile>.Matches(x => x.ProfessionalInfo.CompanyContactInfo.LastName, new BsonRegularExpression(new Regex(searchQuery, RegexOptions.IgnoreCase))),
+                    Query<Profile>.Matches(x => x.ProfessionalInfo.CompanyName, new BsonRegularExpression(new Regex(searchQuery, RegexOptions.IgnoreCase))),
+                    Query<Profile>.Matches(x => x.ProfessionalInfo.CompanyContactInfo.WebsiteUrl, new BsonRegularExpression(new Regex(searchQuery, RegexOptions.IgnoreCase)))
                     );
                 if (!professionalsOnly)
                     nameQuery = Query.Or(
                         nameQuery,
                         // search in contact info of user 
-                        Query<Profile>.Matches(x => x.ContactInfo.FirstName, BsonRegularExpression.Create(new Regex(searchQuery, RegexOptions.IgnoreCase))),
-                        Query<Profile>.Matches(x => x.ContactInfo.LastName, BsonRegularExpression.Create(new Regex(searchQuery, RegexOptions.IgnoreCase)))
+                        Query<Profile>.Matches(x => x.ContactInfo.FirstName, new BsonRegularExpression(new Regex(searchQuery, RegexOptions.IgnoreCase))),
+                        Query<Profile>.Matches(x => x.ContactInfo.LastName, new BsonRegularExpression(new Regex(searchQuery, RegexOptions.IgnoreCase)))
                 );
                 queries.Add(nameQuery);
             }
+
             if (!string.IsNullOrEmpty(category))
             {
                 queries.Add(Query<Profile>.EQ(x => x.ProfessionalInfo.Category, category));
@@ -142,12 +145,12 @@ namespace Classy.Repository
             {
                 foreach (var m in metadata)
                 {
-                    queries.Add(Query.EQ(string.Concat("Metadata", m.Key), m.Value));
+                    queries.Add(Query.EQ(string.Concat("Metadata.", m.Key), m.Value));
                 }
             }
 
             IMongoQuery locationQueryByGPS = null;
-            IMongoQuery locationByCountry = null;
+            IMongoQuery locationByAddress = null;
             if (!ignoreLocation)
             {
                 if (location != null)
@@ -161,7 +164,8 @@ namespace Classy.Repository
                         }
                         if (location.Address != null && !string.IsNullOrEmpty(location.Address.Country))
                         {
-                            locationByCountry = Query<Profile>.EQ(x => x.ProfessionalInfo.CompanyContactInfo.Location.Address.Country, location.Address.Country);
+                            locationByAddress = Query<Profile>.EQ(x => x.ProfessionalInfo.CompanyContactInfo.Location.Address.Country, location.Address.Country);
+                            if (!string.IsNullOrEmpty(location.Address.City)) locationByAddress = Query.And(locationByAddress, Query<Profile>.EQ(x => x.ProfessionalInfo.CompanyContactInfo.Location.Address.City, location.Address.City));
                         }
                     }
                     else
@@ -173,7 +177,8 @@ namespace Classy.Repository
                         }
                         if (location.Address != null && !string.IsNullOrEmpty(location.Address.Country))
                         {
-                            locationByCountry = Query<Profile>.EQ(x => x.ContactInfo.Location.Address.Country, location.Address.Country);
+                            locationByAddress = Query<Profile>.EQ(x => x.ContactInfo.Location.Address.Country, location.Address.Country);
+                            if (!string.IsNullOrEmpty(location.Address.City)) locationByAddress = Query.And(locationByAddress, Query<Profile>.EQ(x => x.ContactInfo.Location.Address.City, location.Address.City));
                         }
                     }
                 }
@@ -181,31 +186,33 @@ namespace Classy.Repository
                 {
                     queries.Add(locationQueryByGPS);
                 }
-                else if (locationByCountry != null)
+                else if (locationByAddress != null)
                 {
-                    queries.Add(locationByCountry);
+                    queries.Add(locationByAddress);
                 }
             }
+            #endregion
 
             // try query, and redo for entire country if nothing found nearby
             var query = Query.And(queries);
             MongoCursor<Profile> profiles = null;
             if (ProfilesCollection.Count(query) == 0)
             {
-                if (locationQueryByGPS != null && locationByCountry != null)
+                if (locationQueryByGPS != null && locationByAddress != null)
                 {
                     queries.Remove(locationQueryByGPS);
-                    queries.Add(locationByCountry);
+                    queries.Add(locationByAddress);
                     query = Query.And(queries);
                 }
             }
+
             if (page <= 0)
-            {   
-                profiles = ProfilesCollection.Find(query).SetSortOrder(sortOrder);
+            {
+                profiles = ProfilesCollection.Find(query).SetSortOrder(sort);
             }
             else
             {
-                profiles =  ProfilesCollection.Find(query).SetSortOrder(sortOrder).SetSkip((page - 1) * pageSize).SetLimit(pageSize);
+                profiles = ProfilesCollection.Find(query).SetSortOrder(sort).SetSkip((page - 1) * pageSize).SetLimit(pageSize);
             }
             count = ProfilesCollection.Count(query);
 
@@ -238,6 +245,17 @@ namespace Classy.Repository
         public ProxyClaim GetProxyClaimById(string appId, string claimId)
         {
             return ProxyClaimsCollection.FindOne(Query<ProxyClaim>.Where(x => x.AppId == appId && x.Id == claimId));
+        }
+
+        public IList<string> GetDistinctCitiesByCountry(string appId, string countryCode)
+        {
+            return ProfilesCollection.Distinct<string>(
+                "ProfessionalInfo.CompanyContactInfo.Location.Address.City",
+                Query<Profile>.Where(
+                    x => x.AppId == appId &&
+                        x.ProfessionalInfo.CompanyContactInfo.Location.Address.Country == countryCode &&
+                        !string.IsNullOrEmpty(x.ProfessionalInfo.CompanyContactInfo.Location.Address.City)
+                    )).ToList();
         }
     }
 }

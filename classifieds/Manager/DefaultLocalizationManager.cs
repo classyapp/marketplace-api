@@ -14,10 +14,12 @@ namespace classy.Manager
     public class DefaultLocalizationManager : ILocalizationManager
     {
         private ILocalizationRepository LocalizationRepository;
+        private IProfileRepository ProfileRepository;
 
-        public DefaultLocalizationManager(ILocalizationRepository localizationRepository)
+        public DefaultLocalizationManager(ILocalizationRepository localizationRepository, IProfileRepository profileRepository)
         {
             LocalizationRepository = localizationRepository;
+            ProfileRepository = profileRepository;
         }
 
         public LocalizationResourceView GetResourceByKey(string appId, string key, bool processMarkdown = true)
@@ -31,7 +33,8 @@ namespace classy.Manager
                     resource.Values[k] = resource.Values[k].Contains("\r\n") ? (new MarkdownSharp.Markdown()).Transform(resource.Values[k]) : resource.Values[k];
                 }
             }
-            return resource.TranslateTo<LocalizationResourceView>();
+
+            return resource == null ? null : resource.TranslateTo<LocalizationResourceView>();
         }
 
         public LocalizationResourceView SetResourceValues(string appId, string key, IDictionary<string, string> values)
@@ -108,6 +111,11 @@ namespace classy.Manager
         public IList<string> GetResourceKeysForApp(string appId)
         {
             return LocalizationRepository.GetResourceKeysForApp(appId);
+        }
+
+        public IList<string> GetCitiesByCountry(string appId, string countryCode)
+        {
+            return ProfileRepository.GetDistinctCitiesByCountry(appId, countryCode);
         }
     }
 }
