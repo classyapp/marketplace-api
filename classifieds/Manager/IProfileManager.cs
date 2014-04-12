@@ -116,6 +116,7 @@ namespace classy.Manager
             bool includeFavorites,
             bool logImpression,
             string culture);
+
         /// <summary>
         /// 
         /// </summary>
@@ -123,6 +124,17 @@ namespace classy.Manager
         /// <param name="profileId"></param>
         /// <param name="followeeProfileId"></param>
         void FollowProfile(
+            string appId,
+            string profileId,
+            string followeeProfileId);
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="appId"></param>
+        /// <param name="profileId"></param>
+        /// <param name="followeeProfileId"></param>
+        void UnfollowProfile(
             string appId,
             string profileId,
             string followeeProfileId);
