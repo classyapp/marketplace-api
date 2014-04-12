@@ -403,6 +403,27 @@ namespace classy.Services
             }
         }
 
+        // unfollow a profile
+        [CustomAuthenticate]
+        public object Delete(FollowProfile request)
+        {
+            try
+            {
+                var session = SessionAs<CustomUserSession>();
+
+                ProfileManager.UnfollowProfile(
+                    request.Environment.AppId,
+                    session.UserAuthId,
+                    request.FolloweeProfileId);
+
+                return new HttpResult(HttpStatusCode.OK);
+            }
+            catch (KeyNotFoundException kex)
+            {
+                return new HttpError(HttpStatusCode.NotFound, kex.Message);
+            }
+        }
+
         // submit proxy claim
         [CustomAuthenticate]
         public object Post(ClaimProxyProfile request)
