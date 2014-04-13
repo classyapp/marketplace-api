@@ -20,5 +20,6 @@ namespace Classy.Models.Response
         public string GPSLocationCookieName { get; set; }
         public string CountryCookieName { get; set; }
         public string CultureCookieName { get; set; }
+        public string Hostname { get; set; }
     }
 }
