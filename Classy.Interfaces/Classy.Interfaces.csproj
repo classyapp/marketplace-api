@@ -43,6 +43,7 @@
     <Compile Include="Managers\IAppManager.cs" />
     <Compile Include="Managers\IEmailManager.cs" />
     <Compile Include="Managers\ILocalizationManager.cs" />
+    <Compile Include="Managers\ITranslationProvider.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>

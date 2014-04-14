@@ -43,7 +43,7 @@ namespace Classy.Models.Response
         public bool HasInventoryInfo { get; set; }
         public int? Quantity { get; set; }
         //
-        public IList<string> Hashtags { get; set; }
+        public IDictionary<string, string> Hashtags { get; set; }
         //
         public ProfileView Profile { get; set; }
         public IList<ProfileView> FavoritedBy { get; set; }

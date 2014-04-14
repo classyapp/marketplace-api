@@ -46,7 +46,7 @@ namespace Classy.Models
         /// <summary>
         /// tags that identify the listing in searches
         /// </summary>
-        public IList<string> Hashtags { get; set; }
+        public IDictionary<string, string> Hashtags { get; set; }
         /// <summary>
         /// external media files relating to the listing (images, video, etc)
         /// </summary>

@@ -147,6 +147,8 @@ namespace classy.Extentions
                 new DefaultThumbnailManager(
                     c.TryResolve<IAppManager>(),
                     c.TryResolve<IStorageRepository>()));
+            container.Register<ITranslationProvider>(c => 
+                new GoogleTranslationProvider(ConfigurationManager.AppSettings["google.translateapi.key"]));
         }
     }
 }

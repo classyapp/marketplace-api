@@ -201,6 +201,7 @@
     </Compile>
     <Compile Include="HtmlUtilities.cs" />
     <Compile Include="Manager\DefaultAnalyticsManager.cs" />
+    <Compile Include="Manager\GoogleTranslationProvider.cs" />
     <Compile Include="Manager\IAnalyticsManager.cs" />
     <Compile Include="Manager\IBookingManager.cs" />
     <Compile Include="Manager\ICollectionManager.cs" />
@@ -210,7 +211,6 @@
     <Compile Include="Manager\IProfileManager.cs" />
     <Compile Include="Manager\IReviewManager.cs" />
     <Compile Include="Manager\IThumbnailManager.cs" />
-    <Compile Include="Manager\ITranslationProvider.cs" />
     <Compile Include="Manager\MandrillEmailManager.cs" />
     <Compile Include="Manager\DefaultLocalizationManager.cs" />
     <Compile Include="Manager\DefaultThumbnailManager.cs" />
