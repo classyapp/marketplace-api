@@ -458,5 +458,20 @@ namespace Classy.Auth
 
             SaveUserAuth(userAuth);
         }
+
+        public void UpdateUserEmail(string appId, string profileId, string email)
+        {
+            IMongoQuery query = Query.EQ("_id", long.Parse(profileId));
+            var collection = mongoDatabase.GetCollection<UserAuth>(UserAuth_Col);
+
+            UserAuth userAuth = collection.FindOne(Query.And(
+                query,
+                Query.EQ("AppId", appId)));
+
+            if (userAuth != null)
+            {
+                collection.Save(userAuth);
+            }
+        }
     }
 }
