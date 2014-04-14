@@ -577,7 +577,7 @@ namespace classy.Services
                 // update email on user auth if needed
                 if (profile.IsProfessional && session.Email != profile.ProfessionalInfo.CompanyContactInfo.Email)
                 {
-                    UserAuthRepository.SaveUserAuth(session);
+                    UserAuthRepository.UpdateUserEmail(request.Environment.AppId, profile.Id, profile.ProfessionalInfo.CompanyContactInfo.Email);
                 }
 
                 return new HttpResult(profile, HttpStatusCode.OK);
