@@ -1474,9 +1474,14 @@ namespace classy.Services
             try
             {
                 var session = SessionAs<CustomUserSession>();
-                EmailManager.SendHtmlMessage(
+                EmailResult result = EmailManager.SendHtmlMessage(
                     AppManager.GetAppById(request.Environment.AppId).MandrilAPIKey,
                     request.ReplyTo, request.To, request.Subject, request.Body, request.Template, request.Variables);
+                
+                if (result.Status == EmailResultStatus.Failed)
+                {
+                    return new HttpError(HttpStatusCode.NotFound, result.Reason);
+                }
                 return new HttpResult(new { }, HttpStatusCode.OK);
             }
             catch (KeyNotFoundException kex)
