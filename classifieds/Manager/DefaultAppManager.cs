@@ -24,6 +24,7 @@ namespace classy.Manager
                 DefaultCountry = "FR",
                 DefaultCulture = "en",
                 GPSLocationCookieName = "classy.env.gps_location",
+                GPSOriginCookieName = "classy.env.gps_origin",
                 CountryCookieName = "classy.env.country",
                 CultureCookieName = "classy.env.culture",
                 Hostname = "www.homelab.com",
