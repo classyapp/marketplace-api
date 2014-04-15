@@ -1518,7 +1518,7 @@ namespace classy.Services
                     AppManager.GetAppById(request.Environment.AppId).MandrilAPIKey,
                     null, new string[] { userAuth.Email },
                     subjectRes == null ? subject : subjectRes.Values[request.Environment.CultureCode],
-                    bodyRes == null ? body : string.Format(bodyRes.Values[request.Environment.CultureCode], string.Format("http://{0}/reset/{1}", request.Host, sb.ToString())),
+                    bodyRes == null ? body : string.Format(bodyRes.Values[request.Environment.CultureCode], string.Format("http://{0}/reset/{1}", AppManager.GetAppById(request.Environment.AppId).Hostname, sb.ToString())),
                     "reset_password_template",
                     null
                     );
