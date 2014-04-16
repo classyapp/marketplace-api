@@ -110,6 +110,7 @@ namespace classy.Extentions
             container.Register<IProfileManager>(c =>
                 new DefaultProfileManager(
                     c.TryResolve<IAppManager>(),
+                    c.TryResolve<ILocalizationManager>(),
                     c.TryResolve<IProfileRepository>(),
                     c.TryResolve<IListingRepository>(),
                     c.TryResolve<IReviewRepository>(),
@@ -119,6 +120,7 @@ namespace classy.Extentions
             container.Register<IReviewManager>(c =>
                 new DefaultProfileManager(
                     c.TryResolve<IAppManager>(),
+                    c.TryResolve<ILocalizationManager>(),
                     c.TryResolve<IProfileRepository>(),
                     c.TryResolve<IListingRepository>(),
                     c.TryResolve<IReviewRepository>(),
