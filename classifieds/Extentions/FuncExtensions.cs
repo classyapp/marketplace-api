@@ -75,10 +75,10 @@ namespace classy.Extentions
             container.Register<IOrderRepository>(c => new MongoOrderRepository(c.Resolve<MongoDatabase>()));
             container.Register<ICollectionRepository>(c => new MongoCollectionRepository(c.Resolve<MongoDatabase>()));
             container.Register<ILocalizationRepository>(c => new MongoLocalizationProvider(c.Resolve<MongoDatabase>()));
-            container.Register<IEmailManager>(c => 
-                new MandrillEmailManager());
             container.Register<IAppManager>(c =>
                 new DefaultAppManager());
+            container.Register<IEmailManager>(c =>
+                new MandrillEmailManager(c.TryResolve<IAppManager>()));
             container.Register<IPaymentGateway>(c =>
                 new TranzilaPaymentGateway(
                     c.TryResolve<ITransactionRepository>()));

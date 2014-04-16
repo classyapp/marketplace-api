@@ -8,7 +8,14 @@ namespace classy.Manager
 {
     public class MandrillEmailManager : IEmailManager
     {
-        public EmailResult SendHtmlMessage(string apiKey, string replyTo, string[] to, string subject, string body, string template,  Dictionary<string, string> variables)
+        private IAppManager AppManager;
+
+        public MandrillEmailManager(IAppManager appManager)
+        {
+            AppManager = appManager;
+        }
+
+        public EmailResult SendHtmlMessage(string apiKey, string replyTo, string[] to, string subject, string body, string template, Dictionary<string, string> variables)
         {
             List<Mandrill.EmailResult> results = null;
 

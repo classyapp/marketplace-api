@@ -575,7 +575,8 @@ namespace classy.Services
                     string.IsNullOrEmpty(request.DefaultCulture) ? request.Environment.CultureCode : request.DefaultCulture);
 
                 // update email on user auth if needed
-                if (profile.IsProfessional && session.Email != profile.ProfessionalInfo.CompanyContactInfo.Email)
+                if ((profile.IsProfessional && session.Email != profile.ProfessionalInfo.CompanyContactInfo.Email) ||
+                    (!profile.IsProfessional && session.Email != profile.ContactInfo.Email))
                 {
                     UserAuthRepository.UpdateUserEmail(request.Environment.AppId, profile.Id, profile.ProfessionalInfo.CompanyContactInfo.Email);
                 }
@@ -1523,7 +1524,7 @@ namespace classy.Services
                     AppManager.GetAppById(request.Environment.AppId).MandrilAPIKey,
                     null, new string[] { userAuth.Email },
                     subjectRes == null ? subject : subjectRes.Values[request.Environment.CultureCode],
-                    bodyRes == null ? body : string.Format(bodyRes.Values[request.Environment.CultureCode], string.Format("http://{0}/reset/{1}", request.Host, sb.ToString())),
+                    bodyRes == null ? body : string.Format(bodyRes.Values[request.Environment.CultureCode], string.Format("http://{0}/reset/{1}", AppManager.GetAppById(request.Environment.AppId).Hostname, sb.ToString())),
                     "reset_password_template",
                     null
                     );
