@@ -267,7 +267,11 @@ namespace classy.Manager
                     // increase rank if company contact info fields have been entered for the first time
                     if (profile.ProfessionalInfo.CompanyContactInfo == null && professionalInfo.CompanyContactInfo != null) rankInc++;
                 }
+                // remember the cover photos since although they are stored 
+                // under prof info they are not sent for update as a part of prof info
+                var coverPhotos = profile.ProfessionalInfo.CoverPhotos;
                 profile.ProfessionalInfo = professionalInfo;
+                profile.ProfessionalInfo.CoverPhotos = coverPhotos;
                 TryGeocoding(profile.ProfessionalInfo);
             }
 
