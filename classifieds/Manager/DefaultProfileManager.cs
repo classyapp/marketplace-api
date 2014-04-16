@@ -244,7 +244,8 @@ namespace classy.Manager
             ProfileUpdateFields fields,
             byte[] profileImage,
             string profileImageContentType,
-            string defaultCulture)
+            string defaultCulture,
+            IList<string> coverPhotos)
         {
             var profile = GetVerifiedProfile(appId, profileId);
             var rankInc = 0;
@@ -267,11 +268,7 @@ namespace classy.Manager
                     // increase rank if company contact info fields have been entered for the first time
                     if (profile.ProfessionalInfo.CompanyContactInfo == null && professionalInfo.CompanyContactInfo != null) rankInc++;
                 }
-                // remember the cover photos since although they are stored 
-                // under prof info they are not sent for update as a part of prof info
-                var coverPhotos = profile.ProfessionalInfo.CoverPhotos;
                 profile.ProfessionalInfo = professionalInfo;
-                profile.ProfessionalInfo.CoverPhotos = coverPhotos;
                 TryGeocoding(profile.ProfessionalInfo);
             }
 
@@ -314,9 +311,9 @@ namespace classy.Manager
             // cover photos
             if (fields.HasFlag(ProfileUpdateFields.CoverPhotos))
             {
-                if (profile.ProfessionalInfo.CoverPhotos == null) rankInc++;
+                if (profile.CoverPhotos == null) rankInc++;
 
-                profile.ProfessionalInfo.CoverPhotos = professionalInfo.CoverPhotos;
+                profile.CoverPhotos = coverPhotos;
             }
 
             if (string.IsNullOrEmpty(profile.DefaultCulture))
