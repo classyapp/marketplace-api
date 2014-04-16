@@ -167,7 +167,7 @@ namespace classy.Manager
 
             // add followee and save follower profile
             follower.FolloweeProfileIds.Remove(followeeProfileId);
-            follower.FollowingCount--;
+            if (follower.FollowingCount > 0) follower.FollowingCount--;
             ProfileRepository.Save(follower);
         }
 
