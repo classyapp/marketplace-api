@@ -470,6 +470,8 @@ namespace Classy.Auth
 
             if (userAuth != null)
             {
+                userAuth.Email = email;
+                userAuth.PrimaryEmail = email;
                 collection.Save(userAuth);
             }
         }
