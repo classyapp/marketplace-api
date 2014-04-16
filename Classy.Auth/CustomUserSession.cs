@@ -74,7 +74,7 @@ namespace Classy.Auth
                     if (isNew)
                     {
                         profile.UserName = authToken.UserName;
-                        profile.Avatar = CreateAvatar(storage, string.Format("https://plus.google.com/s2/photos/profile/{0}?sz=220", authToken.UserId), session.UserAuthId);
+                        //profile.Avatar = CreateAvatar(storage, string.Format("https://plus.google.com/s2/photos/profile/{0}?sz=220", authToken.UserId), session.UserAuthId);
                     }
                 }
                 else if (authToken.Provider == TwitterAuthProvider.Name)
