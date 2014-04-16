@@ -46,6 +46,11 @@ namespace Classy.Models
         public string DefaultCulture { get; set; }
         public Dictionary<string, int> Languages { get; set; }
 
+        /// <summary>
+        /// A collection of media files' keys to be used in creating the collage
+        /// </summary>
+        public IList<string> CoverPhotos { get; set; }
+
         //
         public bool IsProfessional {
             get {
