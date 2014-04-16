@@ -35,6 +35,7 @@ namespace classy.Manager
             var api = new Mandrill.MandrillApi(apiKey);
             if (string.IsNullOrEmpty(template))
             {
+                message.from_email = replyTo;
                 results = api.SendMessage(message);
             }
             else
