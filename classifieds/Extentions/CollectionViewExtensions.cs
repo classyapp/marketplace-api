@@ -21,12 +21,12 @@ namespace classy
             return to;
         }
 
-        public static IList<CollectionView> ToCollectionViewList(this IEnumerable<Collection> from)
+        public static IList<CollectionView> ToCollectionViewList(this IEnumerable<Collection> from, string culture)
         {
             var to = new List<CollectionView>();
             foreach (var c in from)
             {
-                CollectionView v = c.ToCollectionView();
+                CollectionView v = c.Translate(culture).ToCollectionView();
                 to.Add(v);
             }
             return to;
