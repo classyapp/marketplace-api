@@ -572,7 +572,8 @@ namespace classy.Services
                     request.Fields,
                     imageData,
                     imageContentType,
-                    string.IsNullOrEmpty(request.DefaultCulture) ? request.Environment.CultureCode : request.DefaultCulture);
+                    string.IsNullOrEmpty(request.DefaultCulture) ? request.Environment.CultureCode : request.DefaultCulture,
+                    request.CoverPhotos);
 
                 // update email on user auth if needed
                 if ((profile.IsProfessional && session.Email != profile.ProfessionalInfo.CompanyContactInfo.Email) ||

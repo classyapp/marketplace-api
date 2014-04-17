@@ -100,7 +100,7 @@ namespace classy.Manager
             IList<object> results = new List<object>();
             foreach (var profile in profileList)
             {
-                results.Add(profile.ToProfileView().ToAPIModel().Include(x => x.ProfessionalInfo, x => x.ContactInfo, x => x.Id, x => x.IsProfessional, x => x.IsProxy, x => x.IsVendor, x => x.IsVerifiedProfessional, x => x.ListingCount, x => x.Listings, x => x.Metadata, x => x.Avatar));
+                results.Add(profile.ToProfileView().ToAPIModel().Include(x => x.ProfessionalInfo, x => x.ContactInfo, x => x.Id, x => x.IsProfessional, x => x.IsProxy, x => x.IsVendor, x => x.IsVerifiedProfessional, x => x.ListingCount, x => x.Listings, x => x.Metadata, x => x.Avatar, x => x.CoverPhotos));
             }
             return new SearchResultsView<object> { Results = results, Count = count };
         }
@@ -247,7 +247,8 @@ namespace classy.Manager
             ProfileUpdateFields fields,
             byte[] profileImage,
             string profileImageContentType,
-            string defaultCulture)
+            string defaultCulture,
+            IList<string> coverPhotos)
         {
             var profile = GetVerifiedProfile(appId, profileId);
             var rankInc = 0;
@@ -313,9 +314,9 @@ namespace classy.Manager
             // cover photos
             if (fields.HasFlag(ProfileUpdateFields.CoverPhotos))
             {
-                if (profile.ProfessionalInfo.CoverPhotos == null) rankInc++;
+                if (profile.CoverPhotos == null) rankInc++;
 
-                profile.ProfessionalInfo.CoverPhotos = professionalInfo.CoverPhotos;
+                profile.CoverPhotos = coverPhotos;
             }
 
             if (string.IsNullOrEmpty(profile.DefaultCulture))

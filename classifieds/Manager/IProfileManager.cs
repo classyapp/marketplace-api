@@ -158,7 +158,8 @@ namespace classy.Manager
             ProfileUpdateFields fields,
             byte[] profileImage,
             string profileImagContentType,
-            string defaultCulture);
+            string defaultCulture,
+            IList<string> coverPhotos);
 
         /// <summary>
         /// 
