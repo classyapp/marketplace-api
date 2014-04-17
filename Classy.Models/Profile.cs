@@ -44,7 +44,6 @@ namespace Classy.Models
         public ProfessionalInfo ProfessionalInfo { get; set; }
         public IList<string> Permissions { get; set; }
         public string DefaultCulture { get; set; }
-        [BsonIgnoreIfNull]
         public Dictionary<string, int> Languages { get; set; }
 
         /// <summary>
