@@ -572,12 +572,14 @@ namespace classy.Services
                     request.Fields,
                     imageData,
                     imageContentType,
-                    string.IsNullOrEmpty(request.DefaultCulture) ? request.Environment.CultureCode : request.DefaultCulture);
+                    string.IsNullOrEmpty(request.DefaultCulture) ? request.Environment.CultureCode : request.DefaultCulture,
+                    request.CoverPhotos);
 
                 // update email on user auth if needed
-                if (profile.IsProfessional && session.Email != profile.ProfessionalInfo.CompanyContactInfo.Email)
+                if ((profile.IsProfessional && session.Email != profile.ProfessionalInfo.CompanyContactInfo.Email) ||
+                    (!profile.IsProfessional && session.Email != profile.ContactInfo.Email))
                 {
-                    UserAuthRepository.SaveUserAuth(session);
+                    UserAuthRepository.UpdateUserEmail(request.Environment.AppId, profile.Id, profile.ProfessionalInfo.CompanyContactInfo.Email);
                 }
 
                 return new HttpResult(profile, HttpStatusCode.OK);
@@ -1474,9 +1476,14 @@ namespace classy.Services
             try
             {
                 var session = SessionAs<CustomUserSession>();
-                EmailManager.SendHtmlMessage(
+                EmailResult result = EmailManager.SendHtmlMessage(
                     AppManager.GetAppById(request.Environment.AppId).MandrilAPIKey,
                     request.ReplyTo, request.To, request.Subject, request.Body, request.Template, request.Variables);
+                
+                if (result.Status == EmailResultStatus.Failed)
+                {
+                    return new HttpError(HttpStatusCode.NotFound, result.Reason);
+                }
                 return new HttpResult(new { }, HttpStatusCode.OK);
             }
             catch (KeyNotFoundException kex)
@@ -1518,7 +1525,7 @@ namespace classy.Services
                     AppManager.GetAppById(request.Environment.AppId).MandrilAPIKey,
                     null, new string[] { userAuth.Email },
                     subjectRes == null ? subject : subjectRes.Values[request.Environment.CultureCode],
-                    bodyRes == null ? body : string.Format(bodyRes.Values[request.Environment.CultureCode], string.Format("http://{0}/reset/{1}", request.Host, sb.ToString())),
+                    bodyRes == null ? body : string.Format(bodyRes.Values[request.Environment.CultureCode], string.Format("http://{0}/reset/{1}", AppManager.GetAppById(request.Environment.AppId).Hostname, sb.ToString())),
                     "reset_password_template",
                     null
                     );

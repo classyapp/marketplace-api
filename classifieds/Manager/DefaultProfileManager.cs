@@ -21,6 +21,7 @@ namespace classy.Manager
     public class DefaultProfileManager : IProfileManager, IReviewManager
     {
         private IAppManager AppManager;
+        private ILocalizationManager LocalizationManager;
         private IProfileRepository ProfileRepository;
         private IListingRepository ListingRepository;
         private IReviewRepository ReviewRepository;
@@ -30,6 +31,7 @@ namespace classy.Manager
 
         public DefaultProfileManager(
             IAppManager appManager,
+            ILocalizationManager localizationManager,
             IProfileRepository profileRepository,
             IListingRepository listingRepository,
             IReviewRepository reviewRepository,
@@ -38,6 +40,7 @@ namespace classy.Manager
             IStorageRepository storageRepository)
         {
             AppManager = appManager;
+            LocalizationManager = localizationManager;
             ProfileRepository = profileRepository;
             ListingRepository = listingRepository;
             ReviewRepository = reviewRepository;
@@ -97,7 +100,7 @@ namespace classy.Manager
             IList<object> results = new List<object>();
             foreach (var profile in profileList)
             {
-                results.Add(profile.ToProfileView().ToAPIModel().Include(x => x.ProfessionalInfo, x => x.ContactInfo, x => x.Id, x => x.IsProfessional, x => x.IsProxy, x => x.IsVendor, x => x.IsVerifiedProfessional, x => x.ListingCount, x => x.Listings, x => x.Metadata, x => x.Avatar));
+                results.Add(profile.ToProfileView().ToAPIModel().Include(x => x.ProfessionalInfo, x => x.ContactInfo, x => x.Id, x => x.IsProfessional, x => x.IsProxy, x => x.IsVendor, x => x.IsVerifiedProfessional, x => x.ListingCount, x => x.Listings, x => x.Metadata, x => x.Avatar, x => x.CoverPhotos));
             }
             return new SearchResultsView<object> { Results = results, Count = count };
         }
@@ -244,17 +247,18 @@ namespace classy.Manager
             ProfileUpdateFields fields,
             byte[] profileImage,
             string profileImageContentType,
-            string defaultCulture)
+            string defaultCulture,
+            IList<string> coverPhotos)
         {
             var profile = GetVerifiedProfile(appId, profileId);
             var rankInc = 0;
 
             // update language ranking if default culture is sent
-            if (!string.IsNullOrEmpty(defaultCulture))
+            if (string.IsNullOrEmpty(profile.DefaultCulture) && !string.IsNullOrEmpty(defaultCulture))
             {
                 if (profile.Languages == null)
                 {
-                    profile.Languages = new Dictionary<string, int>();
+                    InitializeLanguageRanks(appId, profile);
                 }
                 profile.Languages[defaultCulture] = 2;
             }
@@ -310,9 +314,9 @@ namespace classy.Manager
             // cover photos
             if (fields.HasFlag(ProfileUpdateFields.CoverPhotos))
             {
-                if (profile.ProfessionalInfo.CoverPhotos == null) rankInc++;
+                if (profile.CoverPhotos == null) rankInc++;
 
-                profile.ProfessionalInfo.CoverPhotos = professionalInfo.CoverPhotos;
+                profile.CoverPhotos = coverPhotos;
             }
 
             if (string.IsNullOrEmpty(profile.DefaultCulture))
@@ -323,6 +327,16 @@ namespace classy.Manager
             profile.Rank += rankInc;
             ProfileRepository.Save(profile);
             return profile.ToProfileView();
+        }
+
+        private void InitializeLanguageRanks(string appId, Profile profile)
+        {
+            LocalizationListResourceView cultures = LocalizationManager.GetListResourceByKey(appId, "supported-cultures");
+            profile.Languages = new Dictionary<string, int>();
+            foreach (var culture in cultures.ListItems)
+            {
+                profile.Languages.Add(culture.Value, 0);
+            }
         }
 
         public ProxyClaimView SubmitProxyClaim(
@@ -676,7 +690,8 @@ namespace classy.Manager
                 // update languages ranks
                 if (profile.Languages == null)
                 {
-                    profile.Languages = new Dictionary<string, int>();
+                    InitializeLanguageRanks(appId, profile);
+                    profile.Languages[profile.DefaultCulture] = 2;
                 }
                 profile.Languages[profileTranslation.Culture] = 1;
 

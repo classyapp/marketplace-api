@@ -19,5 +19,6 @@ namespace Classy.Auth
         UserAuth GetUserAuth(IAuthSession authSession, IOAuthTokens tokens);
         string CreateOrMergeAuthSession(IAuthSession authSession, IOAuthTokens tokens);
         void ResetUserPassword(UserAuth userAuth, string password);
+        void UpdateUserEmail(string appId, string profileId, string email);
     }
 }

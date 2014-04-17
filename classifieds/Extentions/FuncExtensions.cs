@@ -75,10 +75,10 @@ namespace classy.Extentions
             container.Register<IOrderRepository>(c => new MongoOrderRepository(c.Resolve<MongoDatabase>()));
             container.Register<ICollectionRepository>(c => new MongoCollectionRepository(c.Resolve<MongoDatabase>()));
             container.Register<ILocalizationRepository>(c => new MongoLocalizationProvider(c.Resolve<MongoDatabase>()));
-            container.Register<IEmailManager>(c => 
-                new MandrillEmailManager());
             container.Register<IAppManager>(c =>
                 new DefaultAppManager());
+            container.Register<IEmailManager>(c =>
+                new MandrillEmailManager(c.TryResolve<IAppManager>()));
             container.Register<IPaymentGateway>(c =>
                 new TranzilaPaymentGateway(
                     c.TryResolve<ITransactionRepository>()));
@@ -110,6 +110,7 @@ namespace classy.Extentions
             container.Register<IProfileManager>(c =>
                 new DefaultProfileManager(
                     c.TryResolve<IAppManager>(),
+                    c.TryResolve<ILocalizationManager>(),
                     c.TryResolve<IProfileRepository>(),
                     c.TryResolve<IListingRepository>(),
                     c.TryResolve<IReviewRepository>(),
@@ -119,6 +120,7 @@ namespace classy.Extentions
             container.Register<IReviewManager>(c =>
                 new DefaultProfileManager(
                     c.TryResolve<IAppManager>(),
+                    c.TryResolve<ILocalizationManager>(),
                     c.TryResolve<IProfileRepository>(),
                     c.TryResolve<IListingRepository>(),
                     c.TryResolve<IReviewRepository>(),
