@@ -576,8 +576,9 @@ namespace classy.Services
                     request.CoverPhotos);
 
                 // update email on user auth if needed
-                if ((profile.IsProfessional && session.Email != profile.ProfessionalInfo.CompanyContactInfo.Email) ||
-                    (!profile.IsProfessional && session.Email != profile.ContactInfo.Email))
+                if (!session.Permissions.Contains("admin") && 
+                    ((profile.IsProfessional && (session.Email != profile.ProfessionalInfo.CompanyContactInfo.Email)) ||
+                    (!profile.IsProfessional && (session.Email != profile.ContactInfo.Email))))
                 {
                     UserAuthRepository.UpdateUserEmail(request.Environment.AppId, profile.Id, profile.ProfessionalInfo.CompanyContactInfo.Email);
                 }
