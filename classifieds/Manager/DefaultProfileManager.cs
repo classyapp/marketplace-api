@@ -197,18 +197,18 @@ namespace classy.Manager
             if (includeListings)
             {
                 var listings = ListingRepository.GetByProfileId(appId, profileId, false, culture);
-                profileView.Listings = listings.ToListingViewList();
+                profileView.Listings = listings.ToListingViewList(culture);
             }
 
             if (includeCollections)
             {
                 var collections = CollectionRepository.GetByProfileId(appId, profileId, culture);
-                profileView.Collections = collections.ToCollectionViewList();
+                profileView.Collections = collections.ToCollectionViewList(culture);
                 foreach (var c in profileView.Collections)
                 {
                     if (c.IncludedListings != null)
                     {
-                        c.Listings = ListingRepository.GetById(c.IncludedListings.Select(l => l.Id).ToArray(), appId, false, culture).ToListingViewList();
+                        c.Listings = ListingRepository.GetById(c.IncludedListings.Select(l => l.Id).ToArray(), appId, false, culture).ToListingViewList(culture);
                         if (c.CoverPhotos == null || c.CoverPhotos.Count == 0)
                         {
                             c.CoverPhotos = ListingRepository.GetById(c.IncludedListings.Select(l => l.Id).Skip(Math.Max(0, c.IncludedListings.Count - 4)).ToArray(), appId, false, null).Select(l => l.ExternalMedia[0].Key).ToArray();

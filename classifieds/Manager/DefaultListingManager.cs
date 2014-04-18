@@ -60,6 +60,7 @@ namespace classy.Manager
         {
             // TODO: cache listings
             var listing = GetVerifiedListing(appId, listingId);
+            listing.Translate(culture);
             var listingView = listing.ToListingView();
 
             if (logImpression)
@@ -122,7 +123,7 @@ namespace classy.Manager
             var listingViews = new List<ListingView>();
             foreach (var c in listings)
             {
-                var view = c.ToListingView();
+                var view = c.Translate(culture).ToListingView();
                 if (includeComments)
                 {
                     view.Comments = comments.Where(x => x.ObjectId == view.Id).ToCommentViewList();
@@ -159,7 +160,7 @@ namespace classy.Manager
             var listingViews = new List<ListingView>();
             foreach (var c in listings)
             {
-                var view = c.ToListingView();
+                var view = c.Translate(culture).ToListingView();
                 if (includeComments)
                 {
                     view.Comments = comments.Where(x => x.ObjectId == view.Id).ToCommentViewList();
@@ -498,14 +499,14 @@ namespace classy.Manager
             try
             {
                 var collection = GetVerifiedCollection(appId, collectionId, culture);
-                var collectionView = collection.ToCollectionView();
+                var collectionView = collection.Translate(culture).ToCollectionView();
                 if (includeProfile)
                 {
                     collectionView.Profile = ProfileRepository.GetById(appId, collection.ProfileId, false, culture).ToProfileView();
                 }
                 if (includeListings)
                 {
-                    collectionView.Listings = ListingRepository.GetById(collection.IncludedListings.Select(l => l.Id).ToArray(), appId, includeDrafts, culture).ToListingViewList();
+                    collectionView.Listings = ListingRepository.GetById(collection.IncludedListings.Select(l => l.Id).ToArray(), appId, includeDrafts, culture).ToListingViewList(culture);
                 }
                 if (increaseViewCounter)
                 {
@@ -564,7 +565,7 @@ namespace classy.Manager
                     }
                 }
 
-                return collections.ToCollectionViewList();
+                return collections.ToCollectionViewList(culture);
             }
             catch (Exception)
             {
@@ -663,7 +664,7 @@ namespace classy.Manager
 
                 CollectionRepository.Update(collection);
                 var collectionView = collection.ToCollectionView();
-                collectionView.Listings = ListingRepository.GetById(collection.IncludedListings.Select(l => l.Id).ToArray(), appId, false, culture).ToListingViewList();
+                collectionView.Listings = ListingRepository.GetById(collection.IncludedListings.Select(l => l.Id).ToArray(), appId, false, culture).ToListingViewList(culture);
                 return collectionView;
             }
             catch (Exception)
@@ -753,7 +754,7 @@ namespace classy.Manager
 
                 CollectionRepository.Update(collection);
                 var collectionView = collection.Translate(culture).ToCollectionView();
-                collectionView.Listings = ListingRepository.GetById(collection.IncludedListings.Select(l => l.Id).ToArray(), appId, false, culture).ToListingViewList();
+                collectionView.Listings = ListingRepository.GetById(collection.IncludedListings.Select(l => l.Id).ToArray(), appId, false, culture).ToListingViewList(culture);
                 return collectionView;
             }
             catch (Exception)
@@ -778,7 +779,7 @@ namespace classy.Manager
         {
             var collections = CollectionRepository.GetApprovedCollections(appId, categories, maxCollections, culture);
             var profiles = ProfileRepository.GetByIds(appId, collections.Select(x => x.ProfileId).ToArray(), culture);
-            var view = collections.ToCollectionViewList();
+            var view = collections.ToCollectionViewList(culture);
             foreach (var c in view)
             {
                 c.Profile = profiles.SingleOrDefault(p => p.Id == c.ProfileId).ToProfileView();

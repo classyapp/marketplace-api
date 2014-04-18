@@ -32,12 +32,12 @@ namespace classy
             return to;
         }
 
-        public static IList<ListingView> ToListingViewList(this IList<Listing> from)
+        public static IList<ListingView> ToListingViewList(this IList<Listing> from, string culture)
         {
             var to = new List<ListingView>();
             foreach (var l in from)
             {
-                to.Add(l.ToListingView());
+                to.Add(l.Translate(culture).ToListingView());
             }
             return to;
         }
