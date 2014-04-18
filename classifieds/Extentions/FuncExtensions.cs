@@ -17,7 +17,7 @@ namespace classy.Extentions
 {
     public static class FunqExtensions
     {
-        private static string GetConnectionString(string key) {
+        public static string GetConnectionString(string key) {
             // try app settings
             string connectionString = ConfigurationManager.AppSettings.Get(key + "_URI");
             if (string.IsNullOrEmpty(connectionString))
