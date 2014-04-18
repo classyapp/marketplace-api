@@ -25,7 +25,9 @@ namespace classy.Manager
                 DefaultCulture = "en",
                 GPSLocationCookieName = "classy.env.gps_location",
                 CountryCookieName = "classy.env.country",
-                CultureCookieName = "classy.env.culture"
+                CultureCookieName = "classy.env.culture",
+                Hostname = "www.homelab.com",
+                MandrilAPIKey = "ndg42WcyRHVLtLbvGqBjUA"
             };
         }
     }

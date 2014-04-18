@@ -56,7 +56,7 @@ namespace Classy.Repository
             {
                 var getById = Query<Collection>.Where(x => x.AppId == appId && x.Id == collectionId);
                 var collection = CollectionsCollection.FindOne(getById);
-                collection.Translate(culture);
+                if (collection != null) collection.Translate(culture);
                 return collection;
             }
             catch(MongoException)
@@ -119,7 +119,7 @@ namespace Classy.Repository
             try
             {
                 var getByProfileId = Query<Collection>.Where(x => x.AppId == appId && x.IncludedListings.Any(y => y.Id == listingId));
-                CollectionsCollection.Update(getByProfileId, MongoDB.Driver.Builders.Update.Pull("IncludedListings", Query.EQ("ListingId", listingId)));
+                CollectionsCollection.Update(getByProfileId, MongoDB.Driver.Builders.Update.Pull("IncludedListings", Query<IncludedListing>.EQ(x => x.Id, listingId)));
             }
             catch (MongoException)
             {

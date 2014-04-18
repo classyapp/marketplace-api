@@ -125,6 +125,11 @@ namespace classy
                     // App settings
                     .Add<GetAppSettings>("/app/settings", "GET")
 
+                    // ResetPassword
+                    .Add<ForgotPasswordRequest>("/auth/forgot", "POST")
+                    .Add<VerifyPasswordResetRequest>("/auth/reset", "GET")
+                    .Add<PasswordResetRequest>("/auth/reset", "POST")
+
                     // Thumbnails
                     .Add<GetThumbnail>("/thumbnail/{ImageKey}", "GET")
 
@@ -223,6 +228,10 @@ namespace classy
                     .Add<GetResourceKeysForApp>("/resource/keys", "GET")
                     .Add<SetResourceValues>("/resource/{Key}", "POST")
                     .Add<SetResourceListValues>("/resource/list/{Key}", "POST")
+                    .Add<GetCitiesByCountry>("/resource/list/cities/{countryCode}", "GET")
+
+                    // Email
+                    .Add<SendEmailRequest>("/email", "POST")
                 ;
             }
         }

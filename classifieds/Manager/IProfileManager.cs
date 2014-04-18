@@ -1,9 +1,11 @@
-﻿using Classy.Auth;
+﻿using classy.Extentions;
+using Classy.Auth;
 using Classy.Models;
 using Classy.Models.Request;
 using Classy.Models.Response;
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -42,7 +44,8 @@ namespace classy.Manager
             string profileId,
             string proxyProfileId,
             ProfessionalInfo ProfessionalInfo,
-            IDictionary<string, string> metadata);
+            IDictionary<string, string> metadata,
+            string defaultCulture);
         
         /// <summary>
         /// 
@@ -74,7 +77,7 @@ namespace classy.Manager
         /// <param name="metadata"></param>
         /// <param name="professionalsOnly"></param>
         /// <returns></returns>
-        SearchResultsView<ProfileView> SearchProfiles(
+        SearchResultsView<object> SearchProfiles(
             string appId,
             string searchQuery,
             string category,
@@ -113,6 +116,7 @@ namespace classy.Manager
             bool includeFavorites,
             bool logImpression,
             string culture);
+
         /// <summary>
         /// 
         /// </summary>
@@ -120,6 +124,17 @@ namespace classy.Manager
         /// <param name="profileId"></param>
         /// <param name="followeeProfileId"></param>
         void FollowProfile(
+            string appId,
+            string profileId,
+            string followeeProfileId);
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="appId"></param>
+        /// <param name="profileId"></param>
+        /// <param name="followeeProfileId"></param>
+        void UnfollowProfile(
             string appId,
             string profileId,
             string followeeProfileId);
@@ -143,7 +158,8 @@ namespace classy.Manager
             ProfileUpdateFields fields,
             byte[] profileImage,
             string profileImagContentType,
-            string defaultCulture);
+            string defaultCulture,
+            IList<string> coverPhotos);
 
         /// <summary>
         /// 

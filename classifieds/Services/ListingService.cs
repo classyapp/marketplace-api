@@ -16,6 +16,9 @@ using Classy.Auth;
 using System.IO;
 using classy.Manager;
 using Classy.Repository;
+using System.Security.Cryptography;
+using System.Text;
+using Classy.Interfaces.Managers;
 
 namespace classy.Services
 {
@@ -30,7 +33,9 @@ namespace classy.Services
         public IAnalyticsManager AnalyticsManager { get; set; }
         public ILocalizationManager LocalizationManager { get; set; }
         public IThumbnailManager ThumbnailManager { get; set; }
+        public IEmailManager EmailManager { get; set; }
         public IAppManager AppManager { get; set; }
+        public IUserAuthRepository UserAuthRepository { get; set; }
 
         [CustomAuthenticate]
         public object Post(CreateProfileProxy request)
@@ -398,6 +403,27 @@ namespace classy.Services
             }
         }
 
+        // unfollow a profile
+        [CustomAuthenticate]
+        public object Delete(FollowProfile request)
+        {
+            try
+            {
+                var session = SessionAs<CustomUserSession>();
+
+                ProfileManager.UnfollowProfile(
+                    request.Environment.AppId,
+                    session.UserAuthId,
+                    request.FolloweeProfileId);
+
+                return new HttpResult(HttpStatusCode.OK);
+            }
+            catch (KeyNotFoundException kex)
+            {
+                return new HttpError(HttpStatusCode.NotFound, kex.Message);
+            }
+        }
+
         // submit proxy claim
         [CustomAuthenticate]
         public object Post(ClaimProxyProfile request)
@@ -411,7 +437,8 @@ namespace classy.Services
                     session.UserAuthId,
                     request.ProxyProfileId,
                     request.ProfessionalInfo,
-                    request.Metadata);
+                    request.Metadata,
+                    request.DefaultCulture);
 
                 return new HttpResult(claim, HttpStatusCode.OK);
             }
@@ -545,7 +572,15 @@ namespace classy.Services
                     request.Fields,
                     imageData,
                     imageContentType,
-                    request.Environment.CultureCode);
+                    string.IsNullOrEmpty(request.DefaultCulture) ? request.Environment.CultureCode : request.DefaultCulture,
+                    request.CoverPhotos);
+
+                // update email on user auth if needed
+                if ((profile.IsProfessional && session.Email != profile.ProfessionalInfo.CompanyContactInfo.Email) ||
+                    (!profile.IsProfessional && session.Email != profile.ContactInfo.Email))
+                {
+                    UserAuthRepository.UpdateUserEmail(request.Environment.AppId, profile.Id, profile.ProfessionalInfo.CompanyContactInfo.Email);
+                }
 
                 return new HttpResult(profile, HttpStatusCode.OK);
             }
@@ -565,7 +600,12 @@ namespace classy.Services
                 ProfileManager.SetTranslation(
                     request.Environment.AppId,
                     request.ProfileId,
-                    new ProfileTranslation { Culture = request.CultureCode, Metadata = request.Metadata });
+                    new ProfileTranslation
+                    {
+                        Culture = request.CultureCode,
+                        CompanyName = request.CompanyName,
+                        Metadata = request.Metadata
+                    });
 
                 return new HttpResult(new { ObjectId = request.ProfileId, Culture = request.CultureCode }, HttpStatusCode.OK);
             }
@@ -1428,6 +1468,102 @@ namespace classy.Services
             {
                 return new HttpError(HttpStatusCode.NotFound, kex.Message);
             }
+        }
+
+        [CustomAuthenticate]
+        public object Post(SendEmailRequest request)
+        {
+            try
+            {
+                var session = SessionAs<CustomUserSession>();
+                EmailResult result = EmailManager.SendHtmlMessage(
+                    AppManager.GetAppById(request.Environment.AppId).MandrilAPIKey,
+                    request.ReplyTo, request.To, request.Subject, request.Body, request.Template, request.Variables);
+                
+                if (result.Status == EmailResultStatus.Failed)
+                {
+                    return new HttpError(HttpStatusCode.NotFound, result.Reason);
+                }
+                return new HttpResult(new { }, HttpStatusCode.OK);
+            }
+            catch (KeyNotFoundException kex)
+            {
+                return new HttpError(HttpStatusCode.NotFound, kex.Message);
+            }
+        }
+
+        public object Post(ForgotPasswordRequest request)
+        {
+            IUserAuthRepository authRepo = ResolveService<IUserAuthRepository>();
+            UserAuth userAuth = authRepo.GetUserAuthByUserName(request.Environment.AppId, request.Email);
+
+            if (userAuth != null)
+            {
+                // create hash
+                if (userAuth.Meta == null)
+                {
+                    userAuth.Meta = new Dictionary<string, string>();
+                }
+
+                MD5 md5 = System.Security.Cryptography.MD5.Create();
+                byte[] inputBytes = System.Text.Encoding.ASCII.GetBytes(Guid.NewGuid().ToString());
+                byte[] hash = md5.ComputeHash(inputBytes);
+                StringBuilder sb = new StringBuilder();
+                for (int i = 0; i < hash.Length; i++)
+                {
+                    sb.Append(hash[i].ToString("X2"));
+                }
+                userAuth.Meta["ResetPasswordHash"] = sb.ToString();
+                authRepo.SaveUserAuth(userAuth);
+
+                // Send Email
+                string subject = "ForgotPassword_ResetEmailSubject";
+                string body = "ForgotPassword_ResetEmailBody";
+                var subjectRes = LocalizationManager.GetResourceByKey(request.Environment.AppId, "ForgotPassword_ResetEmailSubject", true);
+                var bodyRes = LocalizationManager.GetResourceByKey(request.Environment.AppId, "ForgotPassword_ResetEmailBody", true);
+                EmailManager.SendHtmlMessage(
+                    AppManager.GetAppById(request.Environment.AppId).MandrilAPIKey,
+                    null, new string[] { userAuth.Email },
+                    subjectRes == null ? subject : subjectRes.Values[request.Environment.CultureCode],
+                    bodyRes == null ? body : string.Format(bodyRes.Values[request.Environment.CultureCode], string.Format("http://{0}/reset/{1}", AppManager.GetAppById(request.Environment.AppId).Hostname, sb.ToString())),
+                    "reset_password_template",
+                    null
+                    );
+                return new HttpResult(new { }, HttpStatusCode.OK);
+
+            }
+            return new HttpError("Email not found");
+        }
+
+        public object Get(VerifyPasswordResetRequest request)
+        {
+            IUserAuthRepository authRepo = ResolveService<IUserAuthRepository>();
+            UserAuth userAuth = authRepo.GetUserAuthByResetHash(request.Environment.AppId, request.Hash);
+
+            if (userAuth != null)
+            {
+                return new HttpResult(new { }, HttpStatusCode.OK);
+            }
+            return new HttpError("Invalid hash");
+        }
+
+        public object Post(PasswordResetRequest request)
+        {
+            IUserAuthRepository authRepo = ResolveService<IUserAuthRepository>();
+            UserAuth userAuth = authRepo.GetUserAuthByResetHash(request.Environment.AppId, request.Hash);
+
+            if (userAuth != null)
+            {
+                authRepo.ResetUserPassword(userAuth, request.Password);
+
+                return new HttpResult(new { }, HttpStatusCode.OK);
+            }
+            return new HttpError("Invalid hash");
+        }
+
+        public object Get(GetCitiesByCountry request)
+        {
+            return LocalizationManager.GetCitiesByCountry(request.Environment.AppId, request.CountryCode);
         }
     }
 }

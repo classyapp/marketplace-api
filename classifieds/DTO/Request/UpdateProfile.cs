@@ -25,6 +25,8 @@ namespace Classy.Models.Request
         public ContactInfo ContactInfo { get; set; }
         public ProfileUpdateFields Fields { get; set; }
         public string Password { get; set; }
+        public string DefaultCulture { get; set; }
+        public IList<string> CoverPhotos { get; set; }
     }
 
     public class UpdateProfileValidator : AbstractValidator<UpdateProfile>
@@ -36,6 +38,7 @@ namespace Classy.Models.Request
             {
                 RuleFor(x => x.ProfessionalInfo).Cascade(CascadeMode.StopOnFirstFailure).NotNull();
                 RuleFor(x => x.ProfessionalInfo.CompanyName).NotEmpty();
+                RuleFor(x => x.DefaultCulture).NotNull();
             });
 
             When(x => x.Fields.HasFlag(ProfileUpdateFields.Metadata), () =>
@@ -55,9 +58,8 @@ namespace Classy.Models.Request
 
             When(x => x.Fields.HasFlag(ProfileUpdateFields.CoverPhotos), () =>
             {
-                RuleFor(x => x.ProfessionalInfo).Cascade(CascadeMode.StopOnFirstFailure).NotNull();
-                RuleFor(x => x.ProfessionalInfo.CoverPhotos).NotEmpty();
-                RuleFor(x => x.ProfessionalInfo.CoverPhotos.Count).LessThanOrEqualTo(4).GreaterThanOrEqualTo(1);
+                RuleFor(x => x.CoverPhotos).NotEmpty();
+                RuleFor(x => x.CoverPhotos.Count).LessThanOrEqualTo(4).GreaterThanOrEqualTo(1);
             });
         }
     }

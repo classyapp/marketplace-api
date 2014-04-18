@@ -46,6 +46,9 @@
     <Reference Include="DotNetOpenAuth">
       <HintPath>..\packages\DotNetOpenAuth.Ultimate.4.3.4.13329\lib\net45-full\DotNetOpenAuth.dll</HintPath>
     </Reference>
+    <Reference Include="Mandrill">
+      <HintPath>..\packages\Mandrill.1.0.75\lib\net40\Mandrill.dll</HintPath>
+    </Reference>
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="MongoDB.Bson">
       <HintPath>..\lib\MongoDB.Bson.dll</HintPath>
@@ -56,6 +59,9 @@
     <Reference Include="Newtonsoft.Json, Version=6.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\packages\Newtonsoft.Json.6.0.1\lib\net45\Newtonsoft.Json.dll</HintPath>
+    </Reference>
+    <Reference Include="RestSharp">
+      <HintPath>..\packages\RestSharp.104.4.0\lib\net4\RestSharp.dll</HintPath>
     </Reference>
     <Reference Include="ServiceStack">
       <HintPath>..\lib\ServiceStack.dll</HintPath>
@@ -108,11 +114,14 @@
     <Compile Include="DTO\Request\CancelSingleItemOrder.cs" />
     <Compile Include="DTO\Request\ClaimProxyProfile.cs" />
     <Compile Include="DTO\Request\AddListingToCollection.cs" />
+    <Compile Include="DTO\Request\ForgotPasswordRequest.cs" />
     <Compile Include="DTO\Request\GetCollectionTranslation.cs" />
     <Compile Include="DTO\Request\GetIncludedListingTranslation.cs" />
     <Compile Include="DTO\Request\GetListingTranslation.cs" />
     <Compile Include="DTO\Request\DeleteTranslation.cs" />
     <Compile Include="DTO\Request\GetProfileTranslation.cs" />
+    <Compile Include="DTO\Request\GetCitiesByCountry.cs" />
+    <Compile Include="DTO\Request\PasswordResetRequest.cs" />
     <Compile Include="DTO\Request\PostComment.cs" />
     <Compile Include="DTO\Request\PostCommentForCollection.cs" />
     <Compile Include="DTO\Request\DeleteCollection.cs" />
@@ -125,6 +134,7 @@
     <Compile Include="DTO\Request\GetResourceKeysForApp.cs" />
     <Compile Include="DTO\Request\GetThumbnail.cs" />
     <Compile Include="DTO\Request\RemoveListingFromCollection.cs" />
+    <Compile Include="DTO\Request\SendEmailRequest.cs" />
     <Compile Include="DTO\Request\SetCollectionCoverPhotos.cs" />
     <Compile Include="DTO\Request\SetTranslation.cs" />
     <Compile Include="DTO\Request\SetResourceListValues.cs" />
@@ -165,11 +175,13 @@
     <Compile Include="DTO\Request\SearchProfiles.cs" />
     <Compile Include="DTO\Request\UpdateBooking.cs" />
     <Compile Include="DTO\Request\UpdateSingleItemOrder.cs" />
+    <Compile Include="DTO\Request\VerifyPasswordResetRequest.cs" />
     <Compile Include="Extentions\LocalizationListResourceViewExtenstions.cs" />
     <Compile Include="Extentions\CommentViewExtensions.cs" />
     <Compile Include="Extentions\ContactInfoViewExtensions.cs" />
     <Compile Include="Extentions\CollectionViewExtensions.cs" />
     <Compile Include="Extentions\FuncExtensions.cs" />
+    <Compile Include="Extentions\ModelExtensions.cs" />
     <Compile Include="Extentions\PricingInfoViewExtensions.cs" />
     <Compile Include="Extentions\MediaFileViewExtensions.cs" />
     <Compile Include="Extentions\LocationViewExtensions.cs" />
@@ -185,24 +197,23 @@
     </Compile>
     <Compile Include="HtmlUtilities.cs" />
     <Compile Include="Manager\DefaultAnalyticsManager.cs" />
+    <Compile Include="Manager\IAnalyticsManager.cs" />
+    <Compile Include="Manager\IBookingManager.cs" />
+    <Compile Include="Manager\ICollectionManager.cs" />
+    <Compile Include="Manager\IListingManager.cs" />
+    <Compile Include="Manager\IManager.cs" />
+    <Compile Include="Manager\IOrderManager.cs" />
+    <Compile Include="Manager\IProfileManager.cs" />
+    <Compile Include="Manager\IReviewManager.cs" />
+    <Compile Include="Manager\IThumbnailManager.cs" />
+    <Compile Include="Manager\MandrillEmailManager.cs" />
     <Compile Include="Manager\DefaultLocalizationManager.cs" />
     <Compile Include="Manager\DefaultThumbnailManager.cs" />
-    <Compile Include="Manager\IAnalyticsManager.cs" />
-    <Compile Include="Manager\ICollectionManager.cs" />
-    <Compile Include="Manager\ILocalizationManager.cs" />
-    <Compile Include="Manager\IManager.cs" />
-    <Compile Include="Manager\IReviewManager.cs" />
     <Compile Include="Manager\DefaultAppManager.cs" />
     <Compile Include="Manager\DefaultBookingManager.cs" />
     <Compile Include="Manager\DefaultListingManager.cs" />
     <Compile Include="Manager\DefaultOrderManager.cs" />
     <Compile Include="Manager\DefaultProfileManager.cs" />
-    <Compile Include="Manager\IAppManager.cs" />
-    <Compile Include="Manager\IBookingManager.cs" />
-    <Compile Include="Manager\IListingManager.cs" />
-    <Compile Include="Manager\IOrderManager.cs" />
-    <Compile Include="Manager\IProfileManager.cs" />
-    <Compile Include="Manager\IThumbnailManager.cs" />
     <Compile Include="Operations\IOperator.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Services\ListingService.cs" />
@@ -224,6 +235,10 @@
     <ProjectReference Include="..\Classy.Auth\Classy.Auth.csproj">
       <Project>{c40e22db-95cd-4e86-bf84-718aeadf064c}</Project>
       <Name>Classy.Auth</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Classy.Interfaces\Classy.Interfaces.csproj">
+      <Project>{9c0ded9f-8160-4bdf-a599-6b33a983353a}</Project>
+      <Name>Classy.Interfaces</Name>
     </ProjectReference>
     <ProjectReference Include="..\Classy.Models.Response\Classy.Models.Response.csproj">
       <Project>{7dba45e3-cb30-4f3c-9577-27e955dd3f49}</Project>

@@ -15,6 +15,5 @@ namespace Classy.Models.Response
         public int SettlementPeriodInDays { get; set; }
         public int RollingReservePercent { get; set; }
         public int RollingReserveTimeInDays { get; set; }
-        public IList<string> CoverPhotos { get; set; }
     }
 }

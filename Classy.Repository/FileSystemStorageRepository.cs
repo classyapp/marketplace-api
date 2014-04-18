@@ -17,9 +17,9 @@ namespace Classy.Repository
         }
         public void SaveFile(string key, byte[] content, string contentType)
         {
-            SaveFile(key, content, contentType, false);
+            SaveFile(key, content, contentType, false, null);
         }
-        public void SaveFile(string key, byte[] content, string contentType, bool cacheStream)
+        public void SaveFile(string key, byte[] content, string contentType, bool cacheStream, IListingRepository listingRepository)
         {
             var ms = new MemoryStream(content);
             var img = System.Drawing.Image.FromStream(ms);

@@ -8,6 +8,7 @@ namespace Classy.Auth
         UserAuth CreateUserAuth(UserAuth newUser, string password);
         UserAuth UpdateUserAuth(UserAuth existingUser, UserAuth newUser, string password);
         UserAuth GetUserAuthByUserName(string appId, string userNameOrEmail);
+        UserAuth GetUserAuthByResetHash(string appId, string resetHash);
         bool TryAuthenticate(string appId, string userName, string password, out UserAuth userAuth);
         bool TryAuthenticate(string appId, Dictionary<string, string> digestHeaders, string PrivateKey, int NonceTimeOut, string sequence, out UserAuth userAuth);
         void LoadUserAuth(IAuthSession session, IOAuthTokens tokens);
@@ -17,5 +18,7 @@ namespace Classy.Auth
         List<UserOAuthProvider> GetUserOAuthProviders(string appId, string userAuthId);
         UserAuth GetUserAuth(IAuthSession authSession, IOAuthTokens tokens);
         string CreateOrMergeAuthSession(IAuthSession authSession, IOAuthTokens tokens);
+        void ResetUserPassword(UserAuth userAuth, string password);
+        void UpdateUserEmail(string appId, string profileId, string email);
     }
 }

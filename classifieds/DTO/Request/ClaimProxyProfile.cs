@@ -11,6 +11,7 @@ namespace Classy.Models.Request
         public string ProxyProfileId { get; set; }
         public ProfessionalInfo ProfessionalInfo { get; set; }
         public IDictionary<string, string> Metadata { get; set; }
+        public string DefaultCulture { get; set; }
     }
 
     public class ClaimProxyProfileValidator : AbstractValidator<ClaimProxyProfile>
@@ -18,6 +19,7 @@ namespace Classy.Models.Request
         public ClaimProxyProfileValidator()
         {
             RuleFor(x => x.ProfessionalInfo).NotEmpty();
+            RuleFor(x => x.DefaultCulture).NotNull();
         }
     }
 }

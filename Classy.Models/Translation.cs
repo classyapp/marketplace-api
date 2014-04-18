@@ -14,6 +14,7 @@ namespace Classy.Models
 
     public class ProfileTranslation : Translation
     {
+        public string CompanyName { get; set; }
     }
 
     public class CollectionTranslation : Translation

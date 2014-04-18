@@ -66,6 +66,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="APIModel.cs" />
     <Compile Include="App.cs" />
     <Compile Include="Collection.cs" />
     <Compile Include="ContactInfo.cs" />
@@ -74,7 +75,6 @@
     <Compile Include="IncludedListing.cs" />
     <Compile Include="ITranslatable.cs" />
     <Compile Include="LocalizationListResource.cs" />
-    <Compile Include="MediaThumbnail.cs" />
     <Compile Include="LocalizationResource.cs" />
     <Compile Include="Profile.cs" />
     <Compile Include="Translation.cs" />

@@ -44,6 +44,12 @@ namespace Classy.Models
         public ProfessionalInfo ProfessionalInfo { get; set; }
         public IList<string> Permissions { get; set; }
         public string DefaultCulture { get; set; }
+        public Dictionary<string, int> Languages { get; set; }
+
+        /// <summary>
+        /// A collection of media files' keys to be used in creating the collage
+        /// </summary>
+        public IList<string> CoverPhotos { get; set; }
 
         //
         public bool IsProfessional {
@@ -87,16 +93,23 @@ namespace Classy.Models
 
         public Profile Translate(string culture) 
         {
-            if (Translations != null  && !string.IsNullOrEmpty(culture))
+            if (culture != this.DefaultCulture)
             {
-                ProfileTranslation translation = null;
-                if (Translations.TryGetValue(culture, out translation))
+                if (Translations != null && !string.IsNullOrEmpty(culture))
                 {
-                    if (translation.Metadata != null)
+                    ProfileTranslation translation = null;
+                    if (Translations.TryGetValue(culture, out translation))
                     {
-                        foreach (var key in translation.Metadata.Keys)
+                        if (this.IsProfessional && !string.IsNullOrEmpty(translation.CompanyName))
                         {
-                            Metadata[key] = translation.Metadata[key];
+                            this.ProfessionalInfo.CompanyName = translation.CompanyName;
+                        }
+                        if (translation.Metadata != null)
+                        {
+                            foreach (var key in translation.Metadata.Keys)
+                            {
+                                Metadata[key] = translation.Metadata[key];
+                            }
                         }
                     }
                 }

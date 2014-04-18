@@ -60,6 +60,7 @@ namespace classy.Manager
         {
             // TODO: cache listings
             var listing = GetVerifiedListing(appId, listingId);
+            listing.Translate(culture);
             var listingView = listing.ToListingView();
 
             if (logImpression)
@@ -122,7 +123,7 @@ namespace classy.Manager
             var listingViews = new List<ListingView>();
             foreach (var c in listings)
             {
-                var view = c.ToListingView();
+                var view = c.Translate(culture).ToListingView();
                 if (includeComments)
                 {
                     view.Comments = comments.Where(x => x.ObjectId == view.Id).ToCommentViewList();
@@ -159,7 +160,7 @@ namespace classy.Manager
             var listingViews = new List<ListingView>();
             foreach (var c in listings)
             {
-                var view = c.ToListingView();
+                var view = c.Translate(culture).ToListingView();
                 if (includeComments)
                 {
                     view.Comments = comments.Where(x => x.ObjectId == view.Id).ToCommentViewList();
@@ -187,7 +188,7 @@ namespace classy.Manager
                         {
                             var key = Guid.NewGuid().ToString();
                             var content = reader.ReadBytes((int)file.ContentLength);
-                            StorageRepository.SaveFile(key, content, file.ContentType, true);
+                            StorageRepository.SaveFile(key, content, file.ContentType, true, ListingRepository);
                             var mediaFile = new MediaFile
                             {
                                 Type = MediaFileType.Image,
@@ -216,10 +217,6 @@ namespace classy.Manager
             MediaFile file = listing.ExternalMedia.SingleOrDefault(e => e.Url == url);
             if (file != null)
             {
-                foreach (var thumb in file.Thumbnails)
-                {
-                    StorageRepository.DeleteFile(thumb.Key);
-                }
                 ListingRepository.DeleteExternalMedia(listingId, appId, url);
                 StorageRepository.DeleteFile(url);
 
@@ -296,6 +293,8 @@ namespace classy.Manager
             }
             if (isNewListing)
             {
+                var profile = GetVerifiedProfile(appId, SecurityContext.AuthenticatedProfileId, null);
+                listing.DefaultCulture = profile.DefaultCulture;
                 listing.Id = ListingRepository.Insert(listing);
             }
             else
@@ -317,10 +316,6 @@ namespace classy.Manager
 
             foreach (var file in listing.ExternalMedia)
             {
-                foreach (var thumb in file.Thumbnails)
-                {
-                    StorageRepository.DeleteFile(thumb.Key);
-                }
                 StorageRepository.DeleteFile(file.Key);
             }
             ListingRepository.Delete(listingId, appId);
@@ -357,7 +352,7 @@ namespace classy.Manager
             ProfileRepository.IncreaseCounter(appId, listing.ProfileId, ProfileCounters.Rank, 1);
 
             // add hashtags to listing if the comment is by the listing owner
-            if (SecurityContext.AuthenticatedProfileId == listing.ProfileId)
+            if (SecurityContext.AuthenticatedProfileId == listing.ProfileId || SecurityContext.IsAdmin)
             {
                 ListingRepository.AddHashtags(listingId, appId, content.ExtractHashtags());
             }
@@ -448,6 +443,8 @@ namespace classy.Manager
         {
             try
             {
+                var profile = GetVerifiedProfile(appId, string.IsNullOrEmpty(profileId) ? SecurityContext.AuthenticatedProfileId : profileId, null);
+
                 // create and save new collection
                 var collection = new Collection
                 {
@@ -459,15 +456,10 @@ namespace classy.Manager
                     IsPublic = isPublic,
                     IncludedListings = includedListings,
                     Collaborators = collaborators,
-                    PermittedViewers = permittedViewers
+                    PermittedViewers = permittedViewers,
+                    DefaultCulture = profile.DefaultCulture
                 };
 
-                // TODO: thumbnails should be created async and show a grid of recent items in the collection
-                if (includedListings.Count > 0)
-                {
-                    var last = GetVerifiedListing(appId, includedListings.Last().Id);
-                    collection.Thumbnails = last.ExternalMedia[0].Thumbnails;
-                }
                 CollectionRepository.Insert(collection);
 
                 // log an activity, and increase the counter for the listings that were included
@@ -507,14 +499,14 @@ namespace classy.Manager
             try
             {
                 var collection = GetVerifiedCollection(appId, collectionId, culture);
-                var collectionView = collection.ToCollectionView();
+                var collectionView = collection.Translate(culture).ToCollectionView();
                 if (includeProfile)
                 {
                     collectionView.Profile = ProfileRepository.GetById(appId, collection.ProfileId, false, culture).ToProfileView();
                 }
                 if (includeListings)
                 {
-                    collectionView.Listings = ListingRepository.GetById(collection.IncludedListings.Select(l => l.Id).ToArray(), appId, includeDrafts, culture).ToListingViewList();
+                    collectionView.Listings = ListingRepository.GetById(collection.IncludedListings.Select(l => l.Id).ToArray(), appId, includeDrafts, culture).ToListingViewList(culture);
                 }
                 if (increaseViewCounter)
                 {
@@ -573,7 +565,7 @@ namespace classy.Manager
                     }
                 }
 
-                return collections.ToCollectionViewList();
+                return collections.ToCollectionViewList(culture);
             }
             catch (Exception)
             {
@@ -608,9 +600,6 @@ namespace classy.Manager
                 }
                 if (changed)
                 {
-                    // TODO: thumbnails should be created async and show a grid of recent items in the collection
-                    var last = GetVerifiedListing(appId, includedListings.Last().Id);
-                    collection.Thumbnails = last.ExternalMedia[0].Thumbnails;
                     // save
                     CollectionRepository.Update(collection);
                 }
@@ -642,16 +631,6 @@ namespace classy.Manager
 
                         int count = 0;
                         TripleStore.DeleteActivity(appId, profileId, ActivityPredicate.ADD_LISTING_TO_COLLECTION, listing.Id, ref count);
-
-                        if (collection.IncludedListings.Count > 0)
-                        {
-                            var last = GetVerifiedListing(appId, collection.IncludedListings.Last().Id);
-                            collection.Thumbnails = last.ExternalMedia[0].Thumbnails;
-                        }
-                        else
-                        {
-                            collection.Thumbnails = new MediaThumbnail[0];
-                        }
 
                         // save
                         CollectionRepository.Update(collection);
@@ -685,7 +664,7 @@ namespace classy.Manager
 
                 CollectionRepository.Update(collection);
                 var collectionView = collection.ToCollectionView();
-                collectionView.Listings = ListingRepository.GetById(collection.IncludedListings.Select(l => l.Id).ToArray(), appId, false, culture).ToListingViewList();
+                collectionView.Listings = ListingRepository.GetById(collection.IncludedListings.Select(l => l.Id).ToArray(), appId, false, culture).ToListingViewList(culture);
                 return collectionView;
             }
             catch (Exception)
@@ -736,7 +715,7 @@ namespace classy.Manager
             ProfileRepository.IncreaseCounter(appId, collection.ProfileId, ProfileCounters.Rank, 1);
 
             // add hashtags to listing if the comment is by the listing owner
-            if (SecurityContext.AuthenticatedProfileId == collection.ProfileId)
+            if (SecurityContext.AuthenticatedProfileId == collection.ProfileId || SecurityContext.IsAdmin)
             {
                 CollectionRepository.AddHashtags(collectionId, appId, content.ExtractHashtags());
             }
@@ -775,7 +754,7 @@ namespace classy.Manager
 
                 CollectionRepository.Update(collection);
                 var collectionView = collection.Translate(culture).ToCollectionView();
-                collectionView.Listings = ListingRepository.GetById(collection.IncludedListings.Select(l => l.Id).ToArray(), appId, false, culture).ToListingViewList();
+                collectionView.Listings = ListingRepository.GetById(collection.IncludedListings.Select(l => l.Id).ToArray(), appId, false, culture).ToListingViewList(culture);
                 return collectionView;
             }
             catch (Exception)
@@ -800,7 +779,7 @@ namespace classy.Manager
         {
             var collections = CollectionRepository.GetApprovedCollections(appId, categories, maxCollections, culture);
             var profiles = ProfileRepository.GetByIds(appId, collections.Select(x => x.ProfileId).ToArray(), culture);
-            var view = collections.ToCollectionViewList();
+            var view = collections.ToCollectionViewList(culture);
             foreach (var c in view)
             {
                 c.Profile = profiles.SingleOrDefault(p => p.Id == c.ProfileId).ToProfileView();

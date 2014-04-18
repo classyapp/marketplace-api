@@ -340,5 +340,16 @@ namespace Classy.Repository
 
             return listings.ToList();
         }
+
+        public void SetListingErrorForMediaFile(string key, string error)
+        {
+            MongoCursor<Listing> listings = ListingsCollection.Find(Query.ElemMatch("ExternalMedia", Query.EQ("Key", key)));
+            Listing listing = listings.FirstOrDefault();
+            if (listing != null)
+            {
+                listing.Errors = error;
+                ListingsCollection.Save(listing);
+            }
+        }
     }
 }

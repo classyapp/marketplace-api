@@ -10,6 +10,8 @@ using System.Collections.Generic;
 using System.Configuration;
 using System.Linq;
 using System.Web;
+using Classy.Auth;
+using Classy.Interfaces.Managers;
 
 namespace classy.Extentions
 {
@@ -75,6 +77,8 @@ namespace classy.Extentions
             container.Register<ILocalizationRepository>(c => new MongoLocalizationProvider(c.Resolve<MongoDatabase>()));
             container.Register<IAppManager>(c =>
                 new DefaultAppManager());
+            container.Register<IEmailManager>(c =>
+                new MandrillEmailManager(c.TryResolve<IAppManager>()));
             container.Register<IPaymentGateway>(c =>
                 new TranzilaPaymentGateway(
                     c.TryResolve<ITransactionRepository>()));
@@ -106,6 +110,7 @@ namespace classy.Extentions
             container.Register<IProfileManager>(c =>
                 new DefaultProfileManager(
                     c.TryResolve<IAppManager>(),
+                    c.TryResolve<ILocalizationManager>(),
                     c.TryResolve<IProfileRepository>(),
                     c.TryResolve<IListingRepository>(),
                     c.TryResolve<IReviewRepository>(),
@@ -115,6 +120,7 @@ namespace classy.Extentions
             container.Register<IReviewManager>(c =>
                 new DefaultProfileManager(
                     c.TryResolve<IAppManager>(),
+                    c.TryResolve<ILocalizationManager>(),
                     c.TryResolve<IProfileRepository>(),
                     c.TryResolve<IListingRepository>(),
                     c.TryResolve<IReviewRepository>(),
@@ -135,7 +141,8 @@ namespace classy.Extentions
                     c.TryResolve<ITripleStore>()));
             container.Register<ILocalizationManager>(c =>
                 new DefaultLocalizationManager(
-                    c.TryResolve<ILocalizationRepository>()));
+                    c.TryResolve<ILocalizationRepository>(),
+                    c.TryResolve<IProfileRepository>()));
             container.Register<IThumbnailManager>(c =>
                 new DefaultThumbnailManager(
                     c.TryResolve<IStorageRepository>()));

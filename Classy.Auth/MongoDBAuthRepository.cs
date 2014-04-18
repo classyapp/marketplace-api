@@ -244,6 +244,18 @@ namespace Classy.Auth
             return userAuth;
         }
 
+        public UserAuth GetUserAuthByResetHash(string appId, string resetHash)
+        {
+            var collection = mongoDatabase.GetCollection<UserAuth>(UserAuth_Col);
+
+            IMongoQuery query = Query.EQ("Meta.ResetPasswordHash", resetHash);
+
+            UserAuth userAuth = collection.FindOne(Query.And(
+                query,
+                Query.EQ("AppId", appId)));
+            return userAuth;
+        }
+
         public bool TryAuthenticate(string appId, string userName, string password, out UserAuth userAuth)
         {
             //userId = null;
@@ -426,6 +438,42 @@ namespace Classy.Auth
         public void Clear()
         {
             DropAndReCreateCollections();
+        }
+
+        public void ResetUserPassword(UserAuth userAuth, string password)
+        {
+            var saltedHash = new SaltedHash();
+            string salt;
+            string hash;
+            saltedHash.GetHashAndSaltString(password, out hash, out salt);
+            var digestHelper = new ServiceStack.ServiceInterface.Auth.DigestAuthFunctions();
+            userAuth.DigestHA1Hash = digestHelper.CreateHa1(userAuth.UserName, ServiceStack.ServiceInterface.Auth.DigestAuthProvider.Realm, password);
+            userAuth.PasswordHash = hash;
+            userAuth.Salt = salt;
+
+            if (userAuth.Meta != null)
+            {
+                userAuth.Meta.Remove("ResetPasswordHash");
+            }
+
+            SaveUserAuth(userAuth);
+        }
+
+        public void UpdateUserEmail(string appId, string profileId, string email)
+        {
+            IMongoQuery query = Query.EQ("_id", long.Parse(profileId));
+            var collection = mongoDatabase.GetCollection<UserAuth>(UserAuth_Col);
+
+            UserAuth userAuth = collection.FindOne(Query.And(
+                query,
+                Query.EQ("AppId", appId)));
+
+            if (userAuth != null)
+            {
+                userAuth.Email = email;
+                userAuth.PrimaryEmail = email;
+                collection.Save(userAuth);
+            }
         }
     }
 }
