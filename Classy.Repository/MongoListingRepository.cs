@@ -9,6 +9,7 @@ using System.Web;
 using MongoDB.Driver.Builders;
 using Classy.Models;
 using System.IO;
+using System.Text.RegularExpressions;
 
 namespace Classy.Repository
 {
@@ -267,7 +268,7 @@ namespace Classy.Repository
             // tags
             if (tags != null && tags.Count() > 0)
             {
-                queries.Add(Query<Listing>.In(x => x.Hashtags, tags));
+                queries.Add(Query.In("Hashtags", tags.Select(x => new BsonRegularExpression(new Regex(x, RegexOptions.IgnoreCase)))));
             }
 
             // metadata
