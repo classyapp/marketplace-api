@@ -268,7 +268,7 @@ namespace Classy.Repository
             // tags
             if (tags != null && tags.Count() > 0)
             {
-                queries.Add(Query.In("Hashtags", tags.Select(x => new BsonRegularExpression(new Regex(string.Concat("/", x, "/"), RegexOptions.IgnoreCase)))));
+                queries.Add(Query.In("Hashtags", tags.Select(x => new BsonRegularExpression(new Regex(x, RegexOptions.IgnoreCase)))));
             }
 
             // metadata
