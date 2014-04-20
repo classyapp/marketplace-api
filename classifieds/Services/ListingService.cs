@@ -1371,7 +1371,7 @@ namespace classy.Services
         [AddHeader(CacheControl = "max-age: 315360000")]
         public object Get(GetThumbnail request)
         {
-            return new HttpResult(ThumbnailManager.CreateThumbnail(request.ImageKey, request.Width, request.Height));
+            return new HttpResult(ThumbnailManager.CreateThumbnail(request.ImageKey, request.Width, request.Height), "image/jpeg");
         }
 
         [CustomAuthenticate]
