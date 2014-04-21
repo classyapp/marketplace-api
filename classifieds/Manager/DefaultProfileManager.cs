@@ -298,7 +298,7 @@ namespace classy.Manager
                 if (profile.Avatar == null) rankInc++;
 
                 var avatarKey = string.Concat("profile_img_", profile.Id, "_", Guid.NewGuid().ToString());
-                StorageRepository.SaveFile(avatarKey, profileImage, profileImageContentType);
+                StorageRepository.SaveFile(avatarKey, profileImage, profileImageContentType, true, null);
                 profile.Avatar = new MediaFile
                 {
                     Key = avatarKey,
