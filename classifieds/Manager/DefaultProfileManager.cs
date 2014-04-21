@@ -254,12 +254,9 @@ namespace classy.Manager
             var rankInc = 0;
 
             // update language ranking if default culture is sent
-            if (string.IsNullOrEmpty(profile.DefaultCulture) && !string.IsNullOrEmpty(defaultCulture))
+            if (!string.IsNullOrEmpty(profile.DefaultCulture) && profile.Languages == null)
             {
-                if (profile.Languages == null)
-                {
-                    InitializeLanguageRanks(appId, profile);
-                }
+                InitializeLanguageRanks(appId, profile);
                 profile.Languages[defaultCulture] = 2;
             }
 
