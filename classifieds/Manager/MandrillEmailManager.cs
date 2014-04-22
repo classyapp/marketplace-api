@@ -19,6 +19,13 @@ namespace classy.Manager
         {
             List<Mandrill.EmailResult> results = null;
 
+            // check body direction and correct if needed
+            System.Text.RegularExpressions.Regex dirRegex = new System.Text.RegularExpressions.Regex("[\\p{IsHebrew}]");
+            if (dirRegex.IsMatch(body.Substring(0, Math.Min(body.Length, 10))))
+            {
+                body = "<div style=\"direction: rtl\">" + body + "</div>";
+            }
+
             var message = new Mandrill.EmailMessage
             {
                 subject = subject,
