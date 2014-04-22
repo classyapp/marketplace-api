@@ -133,6 +133,7 @@
     <Compile Include="DTO\Request\GetListResourceByKey.cs" />
     <Compile Include="DTO\Request\GetResourceKeysForApp.cs" />
     <Compile Include="DTO\Request\GetThumbnail.cs" />
+    <Compile Include="DTO\Request\UpdateListing.cs" />
     <Compile Include="DTO\Request\RemoveListingFromCollection.cs" />
     <Compile Include="DTO\Request\SendEmailRequest.cs" />
     <Compile Include="DTO\Request\SetCollectionCoverPhotos.cs" />

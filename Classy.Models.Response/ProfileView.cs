@@ -27,6 +27,9 @@ namespace Classy.Models.Response
         public IDictionary<string, decimal> ReviewAverageSubCriteria { get; set; }
         public bool IsVerifiedProfessional { get; set; }
         public bool IsProfessional { get; set; }
+        public bool IsEditor { get; set; }
+        public bool IsCmsUser { get; set; }
+        public bool IsAdmin { get; set; }
         public bool IsVendor { get; set; }
         public bool IsProxy { get; set; }
         public bool IsFacebookConnected { get; set; }
