@@ -116,12 +116,12 @@ namespace Classy.Auth
                 {
                     body = localizationManager.GetResourceByKey(Environment.AppId, "WelcomeEmail_BodyNoName", true).Values[Environment.CultureCode];
                 }
-                emailManager.SendHtmlMessage(
-                    appManager.GetAppById(Environment.AppId).MandrilAPIKey,
-                    null, new string[] { profile.ContactInfo.Email },
-                    localizationManager.GetResourceByKey(Environment.AppId, "WelcomeEmail_Subject", true).Values[Environment.CultureCode],
-                    body, "welcome_email", null
-                    );
+                //emailManager.SendHtmlMessage(
+                //    appManager.GetAppById(Environment.AppId).MandrilAPIKey,
+                //    null, new string[] { profile.ContactInfo.Email },
+                //    localizationManager.GetResourceByKey(Environment.AppId, "WelcomeEmail_Subject", true).Values[Environment.CultureCode],
+                //    body, "welcome_email", null
+                //    );
             }
         }
 
