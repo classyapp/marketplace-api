@@ -104,7 +104,7 @@ namespace Classy.Repository
             bool professionalsOnly, bool ignoreLocation, int page, int pageSize, ref long count, string culture)
         {
 
-            var sort = SortBy.Descending("Languages." + culture, "Rank", "Username");
+            var sort = SortBy.Ascending("ProfessionalInfo.IsProxy").Descending("Languages." + culture, "Rank", "Username");
 
             #region Build queries for match
             var queries = new List<IMongoQuery>() {
