@@ -53,6 +53,11 @@ namespace Classy.Models.Request
                 {
                     RuleFor(x => x.Pricing).SetValidator(new PricingInfoValidator());
                 });
+            When(x => x.Fields.HasFlag(ListingUpdateFields.Metadata), () =>
+            {
+                RuleFor(x => x.Metadata).NotNull();
+            });
+
         }
     }
 }

@@ -85,7 +85,7 @@ namespace classy.Services
         }
 
         public object Get(GetListingsByProfileId request)
-       { 
+        { 
             try
             {
                 var listingViews = ListingManager.GetListingsByProfileId(

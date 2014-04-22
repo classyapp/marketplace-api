@@ -334,7 +334,6 @@ namespace classy.Manager
             {
                 listing.Content = content;
                 var newTags = string.IsNullOrEmpty(content) ? new string[0] : content.ExtractHashtags();
-                listing.Hashtags = hashtags.EmptyIfNull().Union(newTags).ToList();
             }
             if (fields.HasFlag(ListingUpdateFields.Pricing)) listing.PricingInfo = pricingInfo;
             if (fields.HasFlag(ListingUpdateFields.ContactInfo)) listing.ContactInfo = contactInfo;
