@@ -254,12 +254,9 @@ namespace classy.Manager
             var rankInc = 0;
 
             // update language ranking if default culture is sent
-            if (string.IsNullOrEmpty(profile.DefaultCulture) && !string.IsNullOrEmpty(defaultCulture))
+            if (!string.IsNullOrEmpty(profile.DefaultCulture) && profile.Languages == null)
             {
-                if (profile.Languages == null)
-                {
-                    InitializeLanguageRanks(appId, profile);
-                }
+                InitializeLanguageRanks(appId, profile);
                 profile.Languages[defaultCulture] = 2;
             }
 
@@ -301,7 +298,7 @@ namespace classy.Manager
                 if (profile.Avatar == null) rankInc++;
 
                 var avatarKey = string.Concat("profile_img_", profile.Id, "_", Guid.NewGuid().ToString());
-                StorageRepository.SaveFile(avatarKey, profileImage, profileImageContentType);
+                StorageRepository.SaveFile(avatarKey, profileImage, profileImageContentType, true, null);
                 profile.Avatar = new MediaFile
                 {
                     Key = avatarKey,

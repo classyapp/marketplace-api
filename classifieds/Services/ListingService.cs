@@ -223,23 +223,23 @@ namespace classy.Services
 
         // update listing
         [CustomAuthenticate]
-        public object Put(PostListing request)
+        public object Put(UpdateListing request)
         {
             try
             {
                 var session = SessionAs<CustomUserSession>();
                 ListingManager.SecurityContext = session.ToSecurityContext();
 
-                var listing = ListingManager.SaveListing(
+                var listing = ListingManager.UpdateListing(
                     request.Environment.AppId,
                     request.ListingId,
                     request.Title,
                     request.Content,
-                    null,
                     request.Pricing,
-                    request.ContactInfo ?? session.GetDefaultContactInfo(AppManager.GetAppById(request.Environment.AppId).DefaultCountry),
+                    request.ContactInfo,
                     request.SchedulingTemplate,
-                    request.Metadata);
+                    request.Metadata,
+                    request.Fields);
 
                 return new HttpResult(listing, HttpStatusCode.OK);
             }

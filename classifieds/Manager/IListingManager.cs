@@ -1,4 +1,5 @@
 ﻿using Classy.Models;
+using Classy.Models.Request;
 using Classy.Models.Response;
 using ServiceStack.ServiceHost;
 using System;
@@ -102,6 +103,30 @@ namespace classy.Manager
             ContactInfo contactInfo,
             TimeslotSchedule timeslotSchedule,
             IDictionary<string, string> customAttributes);
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="appId"></param>
+        /// <param name="listingId"></param>
+        /// <param name="title"></param>
+        /// <param name="content"></param>
+        /// <param name="pricingInfo"></param>
+        /// <param name="contactInfo"></param>
+        /// <param name="timeslotSchedule"></param>
+        /// <param name="metadata"></param>
+        /// <param name="fields"></param>
+        /// <returns></returns>
+        ListingView UpdateListing(
+            string appId,
+            string listingId,
+            string title,
+            string content,
+            PricingInfo pricingInfo,
+            ContactInfo contactInfo,
+            TimeslotSchedule timeslotSchedule,
+            IDictionary<string, string> metadata,
+            ListingUpdateFields fields);
 
         /// <summary>
         /// delete listing and update relevant collections
