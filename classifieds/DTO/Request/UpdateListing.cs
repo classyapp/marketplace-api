@@ -16,7 +16,8 @@ namespace Classy.Models.Request
         Pricing = 4,
         ContactInfo = 8,
         SchedulingTemplate = 16,
-        Metadata = 32
+        Metadata = 32,
+        Hashtags = 64
     }
 
     public class UpdateListing : BaseRequestDto
@@ -29,6 +30,7 @@ namespace Classy.Models.Request
         public ContactInfo ContactInfo { get; set; }
         public TimeslotSchedule SchedulingTemplate { get; set; }
         public IDictionary<string, string> Metadata { get; set; }
+        public IList<string> Hashtags { get; set; }
         public ListingUpdateFields Fields { get; set; }
     }
 
@@ -53,7 +55,10 @@ namespace Classy.Models.Request
             {
                 RuleFor(x => x.Metadata).NotNull();
             });
-
+            When(x => x.Fields.HasFlag(ListingUpdateFields.Hashtags), () =>
+            {
+                RuleFor(x => x.Hashtags).NotNull();
+            });
         }
     }
 }

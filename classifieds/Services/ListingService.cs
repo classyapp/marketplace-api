@@ -239,6 +239,7 @@ namespace classy.Services
                     request.ContactInfo,
                     request.SchedulingTemplate,
                     request.Metadata,
+                    request.Hashtags,
                     request.Fields);
 
                 return new HttpResult(listing, HttpStatusCode.OK);

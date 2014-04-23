@@ -126,6 +126,7 @@ namespace classy.Manager
             ContactInfo contactInfo,
             TimeslotSchedule timeslotSchedule,
             IDictionary<string, string> metadata,
+            IList<string> Hashtags,
             ListingUpdateFields fields);
 
         /// <summary>
