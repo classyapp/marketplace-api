@@ -57,7 +57,10 @@ namespace Classy.Models.Request
             {
                 RuleFor(x => x.Metadata).NotNull();
             });
-
+            When(x => x.Fields.HasFlag(ListingUpdateFields.Hashtags), () =>
+            {
+                RuleFor(x => x.Hashtags).NotNull();
+            });
         }
     }
 }
