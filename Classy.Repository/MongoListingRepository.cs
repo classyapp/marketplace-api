@@ -93,6 +93,7 @@ namespace Classy.Repository
                 if (listing.PricingInfo != null) update.Set(x => x.PricingInfo, listing.PricingInfo);
                 if (listing.SchedulingTemplate != null) update.Set(x => x.SchedulingTemplate, listing.SchedulingTemplate);
                 if (listing.Metadata != null) update.Set(x => x.Metadata, listing.Metadata);
+                if (listing.Hashtags != null && listing.Hashtags.Count > 0) update.Set(x => x.Hashtags, listing.Hashtags);
 
                 ListingsCollection.FindAndModify(query, null, update);
             }

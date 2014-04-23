@@ -314,16 +314,20 @@ namespace classy.Manager
             ContactInfo contactInfo,
             TimeslotSchedule timeslotSchedule,
             IDictionary<string, string> metadata,
+            IList<string> hashtags,
             ListingUpdateFields fields)
         {
             var listing = GetVerifiedListing(appId, listingId, true, true);
 
             // include basic listing info
             if (fields.HasFlag(ListingUpdateFields.Title)) listing.Title = title;
+            if (fields.HasFlag(ListingUpdateFields.Hashtags)) listing.Hashtags = hashtags;
             if (fields.HasFlag(ListingUpdateFields.Content))
             {
                 listing.Content = content;
-                listing.Hashtags = content.ExtractHashtags();
+                var newTags = content.ExtractHashtags();
+                if (fields.HasFlag(ListingUpdateFields.Hashtags)) listing.Hashtags = hashtags.Union(newTags).ToList();
+                else listing.Hashtags = newTags;
             }
             if (fields.HasFlag(ListingUpdateFields.Pricing)) listing.PricingInfo = pricingInfo;
             if (fields.HasFlag(ListingUpdateFields.ContactInfo)) listing.ContactInfo = contactInfo;
