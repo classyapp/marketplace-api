@@ -332,7 +332,7 @@ namespace classy.Manager
             if (fields.HasFlag(ListingUpdateFields.Content))
             {
                 listing.Content = content;
-                var newTags = content.ExtractHashtags();
+                var newTags = string.IsNullOrEmpty(content) ? new string[0] : content.ExtractHashtags();
                 if (fields.HasFlag(ListingUpdateFields.Hashtags)) listing.Hashtags = hashtags.Union(newTags).ToList();
                 else listing.Hashtags = newTags;
             }
