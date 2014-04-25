@@ -727,6 +727,7 @@ namespace classy.Manager
                 if (profile.Translations != null)
                 {
                     profile.Translations.Remove(culture);
+                    profile.Languages[culture] = 0;
                     ProfileRepository.Save(profile);
                 }
             }
