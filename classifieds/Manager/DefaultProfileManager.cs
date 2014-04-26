@@ -100,7 +100,7 @@ namespace classy.Manager
             IList<object> results = new List<object>();
             foreach (var profile in profileList)
             {
-                results.Add(profile.ToProfileView().ToAPIModel().Include(x => x.ProfessionalInfo, x => x.ContactInfo, x => x.Id, x => x.IsProfessional, x => x.IsProxy, x => x.IsVendor, x => x.IsVerifiedProfessional, x => x.ListingCount, x => x.Listings, x => x.Metadata, x => x.Avatar, x => x.CoverPhotos));
+                results.Add(profile.ToProfileView().ToAPIModel().Include(x => x.ProfessionalInfo, x => x.ContactInfo, x => x.Id, x => x.IsProfessional, x => x.IsProxy, x => x.IsVendor, x => x.IsVerifiedProfessional, x => x.ListingCount, x => x.Listings, x => x.Metadata, x => x.Avatar, x => x.CoverPhotos, x => x.ReviewCount));
             }
             return new SearchResultsView<object> { Results = results, Count = count };
         }
