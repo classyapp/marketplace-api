@@ -11,6 +11,8 @@ namespace Classy.Repository
     {
         IList<string> GetResourceKeysForApp(string appId);
 
+        IEnumerable<LocalizationResource> GetResourcesForApp(string appId);
+
         LocalizationResource GetResourceByKey(string appId, string key);
         string SetResource(LocalizationResource resource);
 

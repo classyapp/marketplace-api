@@ -1,0 +1,19 @@
+﻿{
+	/* NOTICE: COMMENTS ARE NOT VALID IN JSON AND ARE HERE ONLY FOR YOUR BENEFIT */
+
+	// specify a resource by using its name as the property
+	"windows": {
+		"description": "the things that enable you to see through walls",
+		"appId": "v1.0"
+	}
+
+	// simply add an array named "items" to turn the resource into a resource list:
+	"wood_types": {
+		"appId": "v1.0",
+		"items": [
+			"oak",
+			"mahogany",
+			"pine"
+		]
+	}
+}
