@@ -9,7 +9,7 @@ namespace Classy.Repository
 {
     public interface ILocalizationRepository
     {
-        IList<string> GetResourceKeysForApp(string appId);
+        IList<LocalizationResource> GetResourcesForApp(string appId);
 
         LocalizationResource GetResourceByKey(string appId, string key);
         string SetResource(LocalizationResource resource);

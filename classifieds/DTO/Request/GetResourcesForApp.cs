@@ -6,7 +6,7 @@ using System.Web;
 
 namespace Classy.Models.Request
 {
-    public class GetResourceKeysForApp : BaseRequestDto
+    public class GetResourcesForApp : BaseRequestDto
     {
     }
 }

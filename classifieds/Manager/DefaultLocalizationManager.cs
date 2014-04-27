@@ -106,9 +106,9 @@ namespace classy.Manager
             return listResource.ToLocalizationListResourceView();
         }
 
-        public IList<string> GetResourceKeysForApp(string appId)
+        public IList<LocalizationResourceView> GetResourcesForApp(string appId)
         {
-            return LocalizationRepository.GetResourceKeysForApp(appId);
+            return LocalizationRepository.GetResourcesForApp(appId).ToLocalizationResourceViewList();
         }
 
         public IList<string> GetCitiesByCountry(string appId, string countryCode)
