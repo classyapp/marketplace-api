@@ -1302,11 +1302,13 @@ namespace classy.Services
         }
 
         //
-        // GET: /resource/keys
-        // get all available resource keys for an app
-        public object Get(GetResourceKeysForApp request)
+        // GET: /resource/all
+        // get all available resources for an app
+        [CustomAuthenticate]
+        [CustomRequiredPermission("cms")]
+        public object Get(GetResourcesForApp request)
         {
-            var resourceKeys = LocalizationManager.GetResourceKeysForApp(request.Environment.AppId);
+            var resourceKeys = LocalizationManager.GetResourcesForApp(request.Environment.AppId);
             return new HttpResult(resourceKeys, HttpStatusCode.OK);
         }
 

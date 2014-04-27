@@ -115,12 +115,12 @@
     <Compile Include="DTO\Request\ClaimProxyProfile.cs" />
     <Compile Include="DTO\Request\AddListingToCollection.cs" />
     <Compile Include="DTO\Request\ForgotPasswordRequest.cs" />
+    <Compile Include="DTO\Request\GetCitiesByCountry.cs" />
     <Compile Include="DTO\Request\GetCollectionTranslation.cs" />
     <Compile Include="DTO\Request\GetIncludedListingTranslation.cs" />
     <Compile Include="DTO\Request\GetListingTranslation.cs" />
     <Compile Include="DTO\Request\DeleteTranslation.cs" />
     <Compile Include="DTO\Request\GetProfileTranslation.cs" />
-    <Compile Include="DTO\Request\GetCitiesByCountry.cs" />
     <Compile Include="DTO\Request\PasswordResetRequest.cs" />
     <Compile Include="DTO\Request\PostComment.cs" />
     <Compile Include="DTO\Request\PostCommentForCollection.cs" />
@@ -131,7 +131,7 @@
     <Compile Include="DTO\Request\GetFacebookAlbums.cs" />
     <Compile Include="DTO\Request\GetGoogleContacts.cs" />
     <Compile Include="DTO\Request\GetListResourceByKey.cs" />
-    <Compile Include="DTO\Request\GetResourceKeysForApp.cs" />
+    <Compile Include="DTO\Request\GetResourcesForApp.cs" />
     <Compile Include="DTO\Request\GetThumbnail.cs" />
     <Compile Include="DTO\Request\UpdateListing.cs" />
     <Compile Include="DTO\Request\RemoveListingFromCollection.cs" />
