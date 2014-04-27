@@ -182,6 +182,7 @@
     <Compile Include="Extentions\ContactInfoViewExtensions.cs" />
     <Compile Include="Extentions\CollectionViewExtensions.cs" />
     <Compile Include="Extentions\FuncExtensions.cs" />
+    <Compile Include="Extentions\LocalizationResourceViewExtensions.cs" />
     <Compile Include="Extentions\ModelExtensions.cs" />
     <Compile Include="Extentions\PricingInfoViewExtensions.cs" />
     <Compile Include="Extentions\MediaFileViewExtensions.cs" />
