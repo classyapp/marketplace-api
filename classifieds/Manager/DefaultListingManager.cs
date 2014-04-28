@@ -810,8 +810,15 @@ namespace classy.Manager
         public CollectionView SubmitCollectionForEditorialApproval(string appId, string collectionId)
         {
             var collection = GetVerifiedCollection(appId, collectionId, null);
-            collection.SumittedForEditorialApproval = true;
-            CollectionRepository.SubmitForEditorialApproval(appId, collectionId);
+
+            if (collection.EditorialFlow == null) collection.EditorialFlow = new List<EditorialFlowItem>();
+            collection.EditorialFlow.Add(new EditorialFlowItem
+            {
+                Created = DateTime.UtcNow,
+                Status = Classy.Models.EditorialApprovalStatus.Submitted
+            });
+                
+            CollectionRepository.Update(collection);
             return collection.ToCollectionView();
         }
 

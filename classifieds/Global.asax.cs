@@ -158,12 +158,10 @@ namespace classy
                     .Add<SubmitCollectionForEditorialApproval>("/collection/{CollectionId}/submit", "POST")
                     .Add<GetApprovedCollections>("/collection/list/approved", "GET")
                     .Add<SetCollectionCoverPhotos>("/collection/{CollectionId}/cover", "POST") //set collection cover photos
-                    //.Add<RemoveListingsFromCollection>("/collection/{CollectionId}/listing", "DELETE") // remove listings to collection
                     //.Add<AddCollaboratorsToCollection>("/collection/{CollectionId}/collaborator", "POST") // add collaborators to collection
                     //.Add<RemoveCollaboratorsFromCollection>("/collection/{CollectionId}/collaborator", "DELETE") // remove collaborators to collection
                     //.Add<AddPermittedViewersToCollection>("/collection/{CollectionId}/viewer", "POST") // add view premissions to profiles
                     //.Add<RemovePermittedViewersFromCollection>("/collection/{CollectionId}/viewer", "DELETE") // remove view permissions
-                    //.Add<UpdateCollection>("/collection/{CollectionId}", "PUT") // update collection details
                     .Add<GetCollectionById>("/collection/{CollectionId}", "GET") // get a collection by id
                     .Add<GetCollectionByProfileId>("/profile/{ProfileId}/collection/list/{CollectionType}", "GET") // get a collection by id
                     .Add<GetCollectionTranslation>("/collection/{CollectionID}/translation/{CultureCode}", "GET")

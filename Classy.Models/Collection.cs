@@ -13,6 +13,20 @@ namespace Classy.Models
         public static readonly string WebPhotos = "WebPhotos";
     }
 
+    public enum EditorialApprovalStatus
+    {
+        Submitted = 1,
+        Rejected = 2,
+        Approved = 3
+    }
+
+    public class EditorialFlowItem
+    {
+        public DateTime Created { get; set; }
+        public EditorialApprovalStatus Status { get; set; }
+        public string Message { get; set; }
+    }
+
     /// <summary>
     /// represents a collection of listings curated by a user, with the ability to collaborate with other users
     /// </summary>
@@ -21,6 +35,7 @@ namespace Classy.Models
         public Collection()
         {
             Hashtags = new List<string>();
+            EditorialFlow = new List<EditorialFlowItem>();
         }
         /// <summary>
         /// the profile id of the collection owner
@@ -47,17 +62,9 @@ namespace Classy.Models
         /// </summary>
         public bool IsPublic { get; set; }
         /// <summary>
-        /// a flag indicating if the collection was submitted for editorial approval by the creator
+        /// a list of items representing the editorial process history of this collection
         /// </summary>
-        public bool SumittedForEditorialApproval { get; set; }
-        /// <summary>
-        /// ProfileId of the editor that approved this collection (if any)
-        /// </summary>
-        public string EditorialApprovalBy { get; set; }
-        /// <summary>
-        /// timestamp of when editorial approval occured
-        /// </summary>
-        public DateTime? EditorialApprovalDate { get; set; }
+        public IList<EditorialFlowItem> EditorialFlow { get; set; }
         /// <summary>
         /// the ids of the listings included in this collection
         /// </summary>

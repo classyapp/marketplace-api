@@ -64,19 +64,6 @@ namespace Classy.Repository
         /// <param name="listingId"></param>
         void RemoveListingById(string appId, string listingId);
         /// <summary>
-        /// submit the collection for editorial approval
-        /// </summary>
-        /// <param name="appId"></param>
-        /// <param name="collectionId"></param>
-        void SubmitForEditorialApproval(string appId, string collectionId);
-        /// <summary>
-        /// approve the collection. only editorial approved collections are returned from GetApprovedCollections.
-        /// </summary>
-        /// <param name="appId"></param>
-        /// <param name="editorProfileId"></param>
-        /// <param name="category"></param>
-        void EditorialApproveCollection(string appId, string collectionId, string editorProfileId, string category);
-        /// <summary>
         /// 
         /// </summary>
         /// <param name="appId"></param>

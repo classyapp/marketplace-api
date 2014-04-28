@@ -3,8 +3,23 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+
 namespace Classy.Models.Response
 {
+    public enum EditorialApprovalStatus
+    {
+        Submitted = 1,
+        Rejected = 2,
+        Approved = 3
+    }
+
+    public class EditorialFlowItemView 
+    {
+        public DateTime Created { get; set; }
+        public EditorialApprovalStatus Status { get; set; }
+        public string Message { get; set; }
+    }
+
     public class CollectionView
     {
         public string Id { get; set; }
@@ -23,6 +38,7 @@ namespace Classy.Models.Response
         public int FavoriteCount { get; set; }
         public IList<MediaThumbnailView> Thumbnails { get; set; }
         public IList<string> CoverPhotos { get; set; }
+        public IList<EditorialFlowItemView> EditorialFlow { get; set; }
         //
         public IList<CommentView> Comments { get; set; }
         public string DefaultCulture { get; set; }

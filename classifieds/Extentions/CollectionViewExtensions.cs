@@ -18,6 +18,14 @@ namespace classy
             {
                 to.CoverPhotos = null;
             }
+            if (from.EditorialFlow != null)
+            {
+                to.EditorialFlow = new List<EditorialFlowItemView>();
+                foreach(var item in from.EditorialFlow)
+                {
+                    to.EditorialFlow.Add(item.TranslateTo<EditorialFlowItemView>());
+                }
+            }
             return to;
         }
 
