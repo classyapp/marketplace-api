@@ -1211,8 +1211,7 @@ namespace classy.Services
         }
 
         //
-        // POST: /collection/{CollectionId}/submit
-        // add listings to a collection
+        // POST: /collection/{CollectionId}/editorial/submit
         [CustomAuthenticate]
         public object Post(SubmitCollectionForEditorialApproval request)
         {
@@ -1222,6 +1221,36 @@ namespace classy.Services
                     request.Environment.AppId,
                     request.CollectionId);
                 return new HttpResult(collection, HttpStatusCode.OK);
+            }
+            catch (KeyNotFoundException kex)
+            {
+                return new HttpError(HttpStatusCode.NotFound, kex.Message);
+            }
+        }
+
+        //
+        // POST: /collection/{CollectionId}/editorial/approve
+        [CustomAuthenticate]
+        public object Post(EditorialApproveCollection request)
+        {
+            try
+            {
+                return new HttpResult(new { }, HttpStatusCode.OK);
+            }
+            catch (KeyNotFoundException kex)
+            {
+                return new HttpError(HttpStatusCode.NotFound, kex.Message);
+            }
+        }        
+        
+        //
+        // POST: /collection/{CollectionId}/editorial/reject
+        [CustomAuthenticate]
+        public object Post(EditorialRejectCollection request)
+        {
+            try
+            {
+                return new HttpResult(new { }, HttpStatusCode.OK);
             }
             catch (KeyNotFoundException kex)
             {

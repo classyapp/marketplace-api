@@ -155,7 +155,9 @@ namespace classy
                     .Add<RemoveListingFromCollection>("/collection/{CollectionId}/remove", "POST")
                     .Add<UpdateCollection>("/collection/{CollectionId}", "PUT") //update listings comments, and collection title and content
                     .Add<DeleteCollection>("/collection/{CollectionId}", "DELETE") //delete collection
-                    .Add<SubmitCollectionForEditorialApproval>("/collection/{CollectionId}/submit", "POST")
+                    .Add<SubmitCollectionForEditorialApproval>("/collection/{CollectionId}/editor/submit", "POST")
+                    .Add<EditorialApproveCollection>("/collection/{CollectionId}/editor/approve", "POST")
+                    .Add<EditorialRejectCollection>("/collection/{CollectionId}/editor/reject", "POST")
                     .Add<GetApprovedCollections>("/collection/list/approved", "GET")
                     .Add<SetCollectionCoverPhotos>("/collection/{CollectionId}/cover", "POST") //set collection cover photos
                     //.Add<AddCollaboratorsToCollection>("/collection/{CollectionId}/collaborator", "POST") // add collaborators to collection
