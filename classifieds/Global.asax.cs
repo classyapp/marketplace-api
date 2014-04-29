@@ -238,6 +238,8 @@ namespace classy
 
         protected void Application_Start(object sender, EventArgs e)
         {
+            CopyResourcesOperation.CopyResources();
+
             var host = new ListingServiceHost();
             host.Init();
         }
