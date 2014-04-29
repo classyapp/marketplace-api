@@ -12,6 +12,7 @@ using System.Text;
 using System.Threading.Tasks;
 using ServiceStack.Common;
 using classy.Extentions;
+using MongoDB.Driver;
 
 namespace Classy.Tests
 {
@@ -59,8 +60,7 @@ namespace Classy.Tests
             Plugins.Add(new Classy.Auth.AuthFeature(
                 () => new CustomUserSession(), // Use your own typed Custom UserSession type
                     new Classy.Auth.IAuthProvider[] {
-                        new Classy.Auth.CredentialsAuthProvider(),      //HTML Form post of UserName/Password credentials
-                        new Classy.Auth.BasicAuthProvider()
+                        new CredentialsAuthProvider()
                 }));
 
 
@@ -68,7 +68,9 @@ namespace Classy.Tests
             Plugins.Add(new Classy.Auth.RegistrationFeature());
 
             //Store User Data into the referenced MongoDB database
-            //container.Register<Classy.Auth.IUserAuthRepository>(c => new Classy.Auth.MongoDBAuthRepository(c.Resolve<MongoDatabase>(), true));
+            //Store User Data into the referenced MongoDB database
+            container.Register<Classy.Auth.IUserAuthRepository>(c => new Classy.Auth.MongoDBAuthRepository(c.Resolve<MongoDatabase>(), true)); 
+
         }
     }
 }

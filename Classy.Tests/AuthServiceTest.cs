@@ -12,7 +12,7 @@ using System.Threading.Tasks;
 namespace Classy.Tests
 {
     [TestClass]
-    public class AuthServiceTest
+    public class AuthServiceUnitTest
     {
         private AppHostHttpListenerBase appHost;
         private JsonServiceClient client;
@@ -34,8 +34,8 @@ namespace Classy.Tests
             {
                 client.Headers.Add("X-Classy-Env", new { AppId = "v1.0", CultureCode = "he", CountryCode = "IL", CurrencyCode = "ILS" }.ToJson());
                 var response = client.Post<AuthResponse>("/auth",
-                    new Auth.Auth { UserName = "juvaly1", Password = "333444" });
-                Assert.AreEqual(response.UserName, "test1");
+                    new Auth.Auth { UserName = "vasko", Password = "123456" });
+                Assert.AreEqual(response.UserName, "vasko");
             }
             catch (WebServiceException ex)
             {

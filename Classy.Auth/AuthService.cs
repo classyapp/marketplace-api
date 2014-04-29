@@ -88,7 +88,10 @@ namespace Classy.Auth
         public static string DefaultOAuthProvider { get; private set; }
         public static string DefaultOAuthRealm { get; private set; }
         public static string HtmlRedirect { get; internal set; }
-        public static IAuthProvider[] AuthProviders { get; private set; }
+
+        // allowing to set providers externally for unit tests
+        // Michael Shvartsman 
+        public static IAuthProvider[] AuthProviders { get; set; }
 
 
         static AuthService()
