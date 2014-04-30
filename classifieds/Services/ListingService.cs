@@ -1333,6 +1333,17 @@ namespace classy.Services
         }
 
         //
+        // POST: /resource
+        // create new resource
+        [CustomAuthenticate]
+        [CustomRequiredPermission("cms")]
+        public object Post(CreateNewResource request)
+        {
+            var resource = LocalizationManager.CreateResource(request.Environment.AppId, request.Key, request.Values, request.Description);
+            return new HttpResult(resource, HttpStatusCode.OK);
+        }
+
+        //
         // POST: /resource/list/{Key}
         // set resource values
         [CustomAuthenticate]

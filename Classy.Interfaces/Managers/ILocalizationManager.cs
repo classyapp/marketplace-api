@@ -13,6 +13,7 @@ namespace classy.Manager
         IList<LocalizationResourceView> GetResourcesForApp(string appId);
         LocalizationResourceView GetResourceByKey(string appId, string key, bool processMarkdown);
         LocalizationResourceView SetResourceValues(string appId, string key, IDictionary<string, string> values);
+        LocalizationResourceView CreateResource(string appId, string key, IDictionary<string, string> values, string description);
         LocalizationListResourceView GetListResourceByKey(string appId, string key);
         LocalizationListResourceView SetListResourceValues(string appId, string key, IList<ListItem> listItems);
         IList<string> GetCitiesByCountry(string appId, string countryCode);

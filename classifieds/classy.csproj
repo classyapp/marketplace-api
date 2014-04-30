@@ -133,6 +133,7 @@
     <Compile Include="DTO\Request\GetListResourceByKey.cs" />
     <Compile Include="DTO\Request\GetResourcesForApp.cs" />
     <Compile Include="DTO\Request\GetThumbnail.cs" />
+    <Compile Include="DTO\Request\CreateNewResource.cs" />
     <Compile Include="DTO\Request\UpdateListing.cs" />
     <Compile Include="DTO\Request\RemoveListingFromCollection.cs" />
     <Compile Include="DTO\Request\SendEmailRequest.cs" />
@@ -209,6 +210,7 @@
     <Compile Include="Manager\IProfileManager.cs" />
     <Compile Include="Manager\IReviewManager.cs" />
     <Compile Include="Manager\IThumbnailManager.cs" />
+    <Compile Include="Manager\ITranslationProvider.cs" />
     <Compile Include="Manager\MandrillEmailManager.cs" />
     <Compile Include="Manager\DefaultLocalizationManager.cs" />
     <Compile Include="Manager\DefaultThumbnailManager.cs" />

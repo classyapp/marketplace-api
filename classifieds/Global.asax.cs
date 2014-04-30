@@ -226,6 +226,7 @@ namespace classy
                     .Add<GetListResourceByKey>("/resource/list/{Key}", "GET")
                     .Add<GetResourceByKey>("/resource/{Key}", "GET")
                     .Add<GetResourcesForApp>("/resource/all", "GET")
+                    .Add<CreateNewResource>("/resource", "POST")
                     .Add<SetResourceValues>("/resource/{Key}", "POST")
                     .Add<SetResourceListValues>("/resource/list/{Key}", "POST")
                     .Add<GetCitiesByCountry>("/resource/list/cities/{countryCode}", "GET")
