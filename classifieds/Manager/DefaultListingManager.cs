@@ -14,6 +14,7 @@ using ServiceStack.Messaging;
 using classy.Operations;
 using ServiceStack.CacheAccess;
 using Classy.Models.Request;
+using classy.Extentions;
 
 namespace classy.Manager
 {
@@ -184,8 +185,10 @@ namespace classy.Manager
                         using (var reader = new BinaryReader(file.InputStream))
                         {
                             var key = Guid.NewGuid().ToString();
-                            var content = reader.ReadBytes((int)file.ContentLength);
-                            StorageRepository.SaveFile(key, content, file.ContentType, true, ListingRepository);
+                            byte[] content = reader.ReadBytes((int)file.ContentLength);
+                            byte[] reducedContent = content.Rescale(640);
+                            StorageRepository.SaveFile(key, content, file.ContentType, false, ListingRepository);
+                            StorageRepository.SaveFile(key + "_reduced", reducedContent, file.ContentType, true, ListingRepository);
                             var mediaFile = new MediaFile
                             {
                                 Type = MediaFileType.Image,

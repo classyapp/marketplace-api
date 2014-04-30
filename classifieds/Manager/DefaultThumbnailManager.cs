@@ -13,10 +13,13 @@ namespace classy.Manager
     public class DefaultThumbnailManager : IThumbnailManager
     {
         private IStorageRepository StorageRepository;
+        private IAppManager AppManager;
 
         public DefaultThumbnailManager(
+            IAppManager appManager,
             IStorageRepository storageRepository)
         {
+            AppManager = appManager;
             StorageRepository = storageRepository;
         }
 
@@ -27,11 +30,12 @@ namespace classy.Manager
                 if (height == 0) height = width;
                 Stream memoryStream;
 
-                Stream originalImage = StorageRepository.GetFile(originKey);
-
+                Stream originalImage = StorageRepository.GetFile(originKey + "_reduced");
                 lock (originalImage)
                 {
                     memoryStream = GenerateThumbnail(originalImage, width, height);
+                    originalImage.Close();
+                    originalImage.Dispose();
                 }
                 return memoryStream;
             }
