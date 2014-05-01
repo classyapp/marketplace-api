@@ -1570,5 +1570,10 @@ namespace classy.Services
         {
             return LocalizationManager.GetCitiesByCountry(request.Environment.AppId, request.CountryCode);
         }
+
+        public object Get(GetListingMoreInfo request)
+        {
+            return ListingManager.GetListingMoreInfo(request.Environment.AppId, request.ListingId, request.Environment.CultureCode);
+        }
     }
 }

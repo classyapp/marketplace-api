@@ -13,13 +13,10 @@ namespace classy.Manager
     public class DefaultThumbnailManager : IThumbnailManager
     {
         private IStorageRepository StorageRepository;
-        private IAppManager AppManager;
-
+        
         public DefaultThumbnailManager(
-            IAppManager appManager,
             IStorageRepository storageRepository)
         {
-            AppManager = appManager;
             StorageRepository = storageRepository;
         }
 
@@ -27,10 +24,10 @@ namespace classy.Manager
         {
             try
             {
-                if (height == 0) height = width;
                 Stream memoryStream;
 
-                Stream originalImage = StorageRepository.GetFile(originKey + "_reduced");
+                originKey = originKey.StartsWith("profile_img") ? originKey : originKey + "_reduced";
+                Stream originalImage = StorageRepository.GetFile(originKey);
                 lock (originalImage)
                 {
                     memoryStream = GenerateThumbnail(originalImage, width, height);
@@ -54,17 +51,25 @@ namespace classy.Manager
                 int newWidth = 0;
                 int newHeight = 0;
 
-                if ((float)height / (float)source.Height > (float)width / (float)source.Width)
+                if (height == 0)
                 {
-                    newHeight = height;
-                    newWidth = (int)(width * (((float)height / (float)source.Height) / ((float)width / (float)source.Width)));
+                    // rescale 
+                    newWidth = width;
+                    newHeight = height = (int)((float)width * ((float)source.Height / (float)source.Width));
                 }
                 else
                 {
-                    newHeight = (int)(height * (((float)width / (float)source.Width) / ((float)height / (float)source.Height)));
-                    newWidth = width;
+                    if ((float)height / (float)source.Height > (float)width / (float)source.Width)
+                    {
+                        newHeight = height;
+                        newWidth = (int)(width * (((float)height / (float)source.Height) / ((float)width / (float)source.Width)));
+                    }
+                    else
+                    {
+                        newHeight = (int)(height * (((float)width / (float)source.Width) / ((float)height / (float)source.Height)));
+                        newWidth = width;
+                    }
                 }
-
                 using (Bitmap bitmap = new Bitmap(newWidth, newHeight))
                 {
                     Graphics g = Graphics.FromImage((Image)bitmap);
