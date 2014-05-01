@@ -354,13 +354,18 @@ namespace Classy.Repository
             }
         }
 
-        public IList<Listing> GetByOriginHost(string appId, string host, string culture)
+        public IList<Listing> GetByMetadata(string appId, Dictionary<string, string> metadata, string culture)
         {
-            return ListingsCollection.Find(
-                Query.And(
-                    Query.EQ("Metadata.IsWebPhoto", "True"), 
-                    Query.Matches("Metadata.CopyrightMessage", new BsonRegularExpression(new Regex(host, RegexOptions.IgnoreCase))))
-                )
+            List<IMongoQuery> queries = new List<IMongoQuery>();
+            if (metadata == null)
+                return null;
+
+            foreach (var key in metadata.Keys)
+            {
+                queries.Add(Query.EQ("Metadata." + key, metadata[key]));
+            }
+
+            return ListingsCollection.Find(Query.And(queries))
                 .Select(listing => listing.Translate(culture)).ToList();
         }
     }

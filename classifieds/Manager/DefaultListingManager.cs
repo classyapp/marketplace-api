@@ -986,7 +986,7 @@ namespace classy.Manager
         }
 
 
-        public ListingMoreInfoView GetListingMoreInfo(string appId, string listingId, string culture)
+        public ListingMoreInfoView GetListingMoreInfo(string appId, string listingId, Dictionary<string, string> metadata, string culture)
         {
             ListingMoreInfoView data = new ListingMoreInfoView();
 
@@ -999,13 +999,12 @@ namespace classy.Manager
                 data.CollectionLisitngs = ListingRepository.GetById(originalCollection.IncludedListings.Select(l => l.Id).ToArray(), appId, false, culture).ToListingViewList(culture);
             }
 
-            // Check if web photo and get from the same origin
-            if (listing.Metadata.ContainsKey("IsWebPhoto") && listing.Metadata["IsWebPhoto"] == "True")
+            // Search by metadata provided
+            if (metadata != null)
             {
-                Uri uri = null;
-                if (Uri.TryCreate(listing.Metadata["CopyrightMessage"], UriKind.RelativeOrAbsolute, out uri))
+                data.WebListings = ListingRepository.GetByMetadata(appId, metadata, culture).ToListingViewList(culture);
+                if (data.WebListings != null)
                 {
-                    data.WebListings = ListingRepository.GetByOriginHost(appId, uri.DnsSafeHost, culture).ToListingViewList(culture);
                     data.WebListings.Remove(data.WebListings.First(wl => wl.Id == listingId));
                 }
             }
