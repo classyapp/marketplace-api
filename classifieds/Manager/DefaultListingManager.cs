@@ -1015,6 +1015,7 @@ namespace classy.Manager
             IList<CollectionView> collections = GetCollectionsByProfileId(appId, listing.ProfileId, profile.IsProfessional ? Classy.Models.CollectionType.Project : Classy.Models.CollectionType.PhotoBook, culture);
             collections.Remove(collections.First(c => c.Id == originalCollection.Id));
 
+            data.Profile = profile.ToProfileView();
             data.Collections = collections;
 
             return data;

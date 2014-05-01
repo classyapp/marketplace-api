@@ -12,5 +12,6 @@ namespace Classy.Models.Response
         public IList<ListingView> CollectionLisitngs { get; set; }
         public IList<CollectionView> Collections { get; set; }
         public IList<ListingView> WebListings { get; set; }
+        public ProfileView Profile { get; set; }
     }
 }
