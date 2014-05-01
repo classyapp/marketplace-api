@@ -353,5 +353,15 @@ namespace Classy.Repository
                 ListingsCollection.Save(listing);
             }
         }
+
+        public IList<Listing> GetByOriginHost(string appId, string host, string culture)
+        {
+            return ListingsCollection.Find(
+                Query.And(
+                    Query.EQ("Metadata.IsWebPhoto", "True"), 
+                    Query.Matches("Metadata.CopyrightMessage", new BsonRegularExpression(new Regex(host, RegexOptions.IgnoreCase))))
+                )
+                .Select(listing => listing.Translate(culture)).ToList();
+        }
     }
 }

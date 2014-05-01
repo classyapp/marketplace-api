@@ -994,9 +994,21 @@ namespace classy.Manager
 
             // Get original collection
             Collection originalCollection = CollectionRepository.GetOriginalCollection(listing);
-            data.CollectionLisitngs = ListingRepository.GetById(originalCollection.IncludedListings.Select(l => l.Id).ToArray(), appId, false, culture).ToListingViewList(culture);
+            if (originalCollection != null)
+            {
+                data.CollectionLisitngs = ListingRepository.GetById(originalCollection.IncludedListings.Select(l => l.Id).ToArray(), appId, false, culture).ToListingViewList(culture);
+            }
 
             // Check if web photo and get from the same origin
+            if (listing.Metadata.ContainsKey("IsWebPhoto") && listing.Metadata["IsWebPhoto"] == "True")
+            {
+                Uri uri = null;
+                if (Uri.TryCreate(listing.Metadata["CopyrightMessage"], UriKind.RelativeOrAbsolute, out uri))
+                {
+                    data.WebListings = ListingRepository.GetByOriginHost(appId, uri.DnsSafeHost, culture).ToListingViewList(culture);
+                    data.WebListings.Remove(data.WebListings.First(wl => wl.Id == listingId));
+                }
+            }
             
             // Get more collections from same owner
             Profile profile  = GetVerifiedProfile(appId, listing.ProfileId, culture);

@@ -42,5 +42,6 @@ namespace Classy.Repository
         string Insert(Listing listing);
         void Update(Listing listing);
         void SetListingErrorForMediaFile(string key, string error);
+        IList<Listing> GetByOriginHost(string appId, string host, string culture);
     }
 }
