@@ -70,6 +70,15 @@ namespace classy.Manager
                         newWidth = width;
                     }
                 }
+
+                // Check that we are not upscaling
+                if (newWidth > source.Width /*|| newHeight > source.Height*/)
+                {
+                    memoryStream = new MemoryStream((int)originalImage.Length);
+                    originalImage.CopyTo(memoryStream);
+                    return memoryStream;
+                }
+
                 using (Bitmap bitmap = new Bitmap(newWidth, newHeight))
                 {
                     Graphics g = Graphics.FromImage((Image)bitmap);

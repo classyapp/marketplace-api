@@ -1002,10 +1002,10 @@ namespace classy.Manager
             // Search by metadata provided
             if (metadata != null)
             {
-                data.WebListings = ListingRepository.GetByMetadata(appId, metadata, culture).ToListingViewList(culture);
-                if (data.WebListings != null)
+                data.SearchResults = ListingRepository.GetByMetadata(appId, metadata, culture).ToListingViewList(culture);
+                if (data.SearchResults != null)
                 {
-                    data.WebListings.Remove(data.WebListings.First(wl => wl.Id == listingId));
+                    data.SearchResults.Remove(data.SearchResults.First(wl => wl.Id == listingId));
                 }
             }
             
