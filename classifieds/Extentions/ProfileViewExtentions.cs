@@ -25,6 +25,12 @@ namespace classy
             }
             to.IsFacebookConnected = !from.FacebookUserId.IsNullOrEmpty();
             to.IsGoogleConnected = !from.GoogleUserName.IsNullOrEmpty();
+            if (from.Permissions != null && from.Permissions.Count() > 0)
+            {
+                to.IsAdmin = from.Permissions.Contains("admin");
+                to.IsCmsUser = from.Permissions.Contains("cms");
+                to.IsEditor = from.Permissions.Contains("editor");
+            }
 
             // avatar
             if (from.Avatar != null) to.Avatar = from.Avatar.ToMediaFileView();

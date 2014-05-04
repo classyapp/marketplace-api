@@ -59,13 +59,6 @@ namespace Classy.Repository
                     }
                     throw t.Exception;
                 }
-                else if (t.IsCompleted)
-                {
-                    if (cacheStream)
-                    {
-                        memoryCache.Remove(keys[t.Id]);
-                    }
-                }
             });
         }
 
@@ -73,7 +66,9 @@ namespace Classy.Repository
         {
             if (memoryCache.ContainsKey(key))
             {
-                return memoryCache[key];
+                Stream stream = memoryCache[key];
+                memoryCache.Remove(key);
+                return stream;
             }
 
             var request = new GetObjectRequest()
@@ -82,7 +77,7 @@ namespace Classy.Repository
                 BucketName = bucketName
             };
             var obj = s3Client.GetObject(request);
-            byte[] buffer = new byte[obj.ContentLength];
+            //byte[] buffer = new byte[obj.ContentLength];
             return obj.ResponseStream;
         }
 

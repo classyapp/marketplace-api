@@ -140,7 +140,7 @@ namespace classy
                     .Add<AddExternalMedia>("/listing/{ListingId}/media", "POST") // add media files and associate with listing
                     .Add<DeleteExternalMedia>("/listing/{ListingId}/media", "DELETE")
                     .Add<PublishListing>("/listing/{ListingId}/publish", "POST") // publish a post to the public
-                    .Add<PostListing>("/listing/{ListingId}", "PUT") // update listing
+                    .Add<UpdateListing>("/listing/{ListingId}", "PUT") // update listing
                     .Add<SearchListings>("/listing/search", ApplyTo.Get | ApplyTo.Post) // search listings by tag and/or metadata
                     .Add<SearchListings>("/tags/{tag}", "GET") // search with a nicer url for tag
                     .Add<GetListingsByProfileId>("/profile/{ProfileId}/listing/list", "GET") // get list of listing for profile
@@ -225,7 +225,8 @@ namespace classy
                     // Localization
                     .Add<GetListResourceByKey>("/resource/list/{Key}", "GET")
                     .Add<GetResourceByKey>("/resource/{Key}", "GET")
-                    .Add<GetResourceKeysForApp>("/resource/keys", "GET")
+                    .Add<GetResourcesForApp>("/resource/all", "GET")
+                    .Add<CreateNewResource>("/resource", "POST")
                     .Add<SetResourceValues>("/resource/{Key}", "POST")
                     .Add<SetResourceListValues>("/resource/list/{Key}", "POST")
                     .Add<GetCitiesByCountry>("/resource/list/cities/{countryCode}", "GET")

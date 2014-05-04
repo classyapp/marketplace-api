@@ -100,7 +100,7 @@ namespace classy.Manager
             IList<object> results = new List<object>();
             foreach (var profile in profileList)
             {
-                results.Add(profile.ToProfileView().ToAPIModel().Include(x => x.ProfessionalInfo, x => x.ContactInfo, x => x.Id, x => x.IsProfessional, x => x.IsProxy, x => x.IsVendor, x => x.IsVerifiedProfessional, x => x.ListingCount, x => x.Listings, x => x.Metadata, x => x.Avatar, x => x.CoverPhotos));
+                results.Add(profile.ToProfileView().ToAPIModel().Include(x => x.ProfessionalInfo, x => x.ContactInfo, x => x.Id, x => x.IsProfessional, x => x.IsProxy, x => x.IsVendor, x => x.IsVerifiedProfessional, x => x.ListingCount, x => x.Listings, x => x.Metadata, x => x.Avatar, x => x.CoverPhotos, x => x.ReviewCount, x => x.ReviewAverageScore));
             }
             return new SearchResultsView<object> { Results = results, Count = count };
         }
@@ -678,17 +678,27 @@ namespace classy.Manager
             {
                 Profile profile = GetVerifiedProfile(appId, profileId);
                 if (profile.DefaultCulture == profileTranslation.Culture)
-                    throw new InvalidOperationException("Cannot translate default culture values");
-                if (profile.Translations == null)
                 {
-                    profile.Translations = new Dictionary<string, ProfileTranslation>();
+                    // default cultures translations should be updated inline
+                    profile.ProfessionalInfo.CompanyName = profileTranslation.CompanyName;
+                    foreach (var key in profileTranslation.Metadata.Keys)
+                    {
+                        profile.Metadata[key] = profileTranslation.Metadata[key];
+                    }
                 }
-                profile.Translations[profileTranslation.Culture] = profileTranslation;
-                // update languages ranks
-                if (profile.Languages == null)
+                else
                 {
-                    InitializeLanguageRanks(appId, profile);
-                    profile.Languages[profile.DefaultCulture] = 2;
+                    if (profile.Translations == null)
+                    {
+                        profile.Translations = new Dictionary<string, ProfileTranslation>();
+                    }
+                    profile.Translations[profileTranslation.Culture] = profileTranslation;
+                    // update languages ranks
+                    if (profile.Languages == null)
+                    {
+                        InitializeLanguageRanks(appId, profile);
+                        profile.Languages[profile.DefaultCulture] = 2;
+                    }
                 }
                 profile.Languages[profileTranslation.Culture] = 1;
 
@@ -727,6 +737,7 @@ namespace classy.Manager
                 if (profile.Translations != null)
                 {
                     profile.Translations.Remove(culture);
+                    profile.Languages[culture] = 0;
                     ProfileRepository.Save(profile);
                 }
             }

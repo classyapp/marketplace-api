@@ -115,12 +115,12 @@
     <Compile Include="DTO\Request\ClaimProxyProfile.cs" />
     <Compile Include="DTO\Request\AddListingToCollection.cs" />
     <Compile Include="DTO\Request\ForgotPasswordRequest.cs" />
+    <Compile Include="DTO\Request\GetCitiesByCountry.cs" />
     <Compile Include="DTO\Request\GetCollectionTranslation.cs" />
     <Compile Include="DTO\Request\GetIncludedListingTranslation.cs" />
     <Compile Include="DTO\Request\GetListingTranslation.cs" />
     <Compile Include="DTO\Request\DeleteTranslation.cs" />
     <Compile Include="DTO\Request\GetProfileTranslation.cs" />
-    <Compile Include="DTO\Request\GetCitiesByCountry.cs" />
     <Compile Include="DTO\Request\PasswordResetRequest.cs" />
     <Compile Include="DTO\Request\PostComment.cs" />
     <Compile Include="DTO\Request\PostCommentForCollection.cs" />
@@ -131,8 +131,10 @@
     <Compile Include="DTO\Request\GetFacebookAlbums.cs" />
     <Compile Include="DTO\Request\GetGoogleContacts.cs" />
     <Compile Include="DTO\Request\GetListResourceByKey.cs" />
-    <Compile Include="DTO\Request\GetResourceKeysForApp.cs" />
+    <Compile Include="DTO\Request\GetResourcesForApp.cs" />
     <Compile Include="DTO\Request\GetThumbnail.cs" />
+    <Compile Include="DTO\Request\CreateNewResource.cs" />
+    <Compile Include="DTO\Request\UpdateListing.cs" />
     <Compile Include="DTO\Request\RemoveListingFromCollection.cs" />
     <Compile Include="DTO\Request\SendEmailRequest.cs" />
     <Compile Include="DTO\Request\SetCollectionCoverPhotos.cs" />
@@ -144,7 +146,7 @@
     <Compile Include="DTO\Request\CreateCollection.cs" />
     <Compile Include="DTO\Request\GetSessionProfile.cs" />
     <Compile Include="DTO\Request\LogActivity.cs" />
-    <Compile Include="DTO\Request\SubmitCollectionForEditorialApproval - Copy.cs" />
+    <Compile Include="DTO\Request\SubmitCollectionForEditorialApproval.cs" />
     <Compile Include="DTO\Request\GetApprovedCollections.cs" />
     <Compile Include="DTO\Request\UpdateCollection.cs" />
     <Compile Include="DTO\Request\UpdateProfile.cs" />
@@ -176,11 +178,13 @@
     <Compile Include="DTO\Request\UpdateBooking.cs" />
     <Compile Include="DTO\Request\UpdateSingleItemOrder.cs" />
     <Compile Include="DTO\Request\VerifyPasswordResetRequest.cs" />
+    <Compile Include="Extentions\ImageExtensions.cs" />
     <Compile Include="Extentions\LocalizationListResourceViewExtenstions.cs" />
     <Compile Include="Extentions\CommentViewExtensions.cs" />
     <Compile Include="Extentions\ContactInfoViewExtensions.cs" />
     <Compile Include="Extentions\CollectionViewExtensions.cs" />
     <Compile Include="Extentions\FuncExtensions.cs" />
+    <Compile Include="Extentions\LocalizationResourceViewExtensions.cs" />
     <Compile Include="Extentions\ModelExtensions.cs" />
     <Compile Include="Extentions\PricingInfoViewExtensions.cs" />
     <Compile Include="Extentions\MediaFileViewExtensions.cs" />
@@ -206,6 +210,7 @@
     <Compile Include="Manager\IProfileManager.cs" />
     <Compile Include="Manager\IReviewManager.cs" />
     <Compile Include="Manager\IThumbnailManager.cs" />
+    <Compile Include="Manager\ITranslationProvider.cs" />
     <Compile Include="Manager\MandrillEmailManager.cs" />
     <Compile Include="Manager\DefaultLocalizationManager.cs" />
     <Compile Include="Manager\DefaultThumbnailManager.cs" />

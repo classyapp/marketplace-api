@@ -41,24 +41,14 @@ namespace classy.Manager
         {
             // get the respource and set new values
             var resource = LocalizationRepository.GetResourceByKey(appId, key);
-            if (resource == null)
+            if (resource == null) throw new KeyNotFoundException("invalid resource key");
+
+            if (resource.Values == null) resource.Values = new Dictionary<string, string>();
+            foreach (var k in values.Keys)
             {
-                resource = new LocalizationResource
-                {
-                    AppId = appId,
-                    Key = key,
-                    Values = values
-                };
-            }
-            else
-            {
-                if (resource.Values == null) resource.Values = new Dictionary<string, string>();
-                foreach (var k in values.Keys)
-                {
-                    var val = HtmlUtilities.RemoveTags(values[k]);
-                    if (resource.Values.ContainsKey(k)) resource.Values[k] = val;
-                    else resource.Values.Add(k, val);
-                }
+                var val = HtmlUtilities.RemoveTags(values[k]);
+                if (resource.Values.ContainsKey(k)) resource.Values[k] = val;
+                else resource.Values.Add(k, val);
             }
             // save 
             LocalizationRepository.SetResource(resource);
@@ -66,6 +56,18 @@ namespace classy.Manager
             return resource.TranslateTo<LocalizationResourceView>();
         }
 
+        public LocalizationResourceView CreateResource(string appId, string key, IDictionary<string, string> values, string description)
+        {
+            var resource = new LocalizationResource
+            {
+                AppId = appId,
+                Key = key,
+                Values = values,
+                Description = description
+            };
+            LocalizationRepository.SetResource(resource);
+            return resource.TranslateTo<LocalizationResourceView>();
+        }
 
         public LocalizationListResourceView GetListResourceByKey(string appId, string key)
         {
@@ -108,9 +110,9 @@ namespace classy.Manager
             return listResource.ToLocalizationListResourceView();
         }
 
-        public IList<string> GetResourceKeysForApp(string appId)
+        public IList<LocalizationResourceView> GetResourcesForApp(string appId)
         {
-            return LocalizationRepository.GetResourceKeysForApp(appId);
+            return LocalizationRepository.GetResourcesForApp(appId).ToLocalizationResourceViewList();
         }
 
         public IList<string> GetCitiesByCountry(string appId, string countryCode)

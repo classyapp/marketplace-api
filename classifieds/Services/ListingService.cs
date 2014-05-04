@@ -223,23 +223,24 @@ namespace classy.Services
 
         // update listing
         [CustomAuthenticate]
-        public object Put(PostListing request)
+        public object Put(UpdateListing request)
         {
             try
             {
                 var session = SessionAs<CustomUserSession>();
                 ListingManager.SecurityContext = session.ToSecurityContext();
 
-                var listing = ListingManager.SaveListing(
+                var listing = ListingManager.UpdateListing(
                     request.Environment.AppId,
                     request.ListingId,
                     request.Title,
                     request.Content,
-                    null,
                     request.Pricing,
-                    request.ContactInfo ?? session.GetDefaultContactInfo(AppManager.GetAppById(request.Environment.AppId).DefaultCountry),
+                    request.ContactInfo,
                     request.SchedulingTemplate,
-                    request.Metadata);
+                    request.Metadata,
+                    request.Hashtags,
+                    request.Fields);
 
                 return new HttpResult(listing, HttpStatusCode.OK);
             }
@@ -1301,11 +1302,13 @@ namespace classy.Services
         }
 
         //
-        // GET: /resource/keys
-        // get all available resource keys for an app
-        public object Get(GetResourceKeysForApp request)
+        // GET: /resource/all
+        // get all available resources for an app
+        [CustomAuthenticate]
+        [CustomRequiredPermission("cms")]
+        public object Get(GetResourcesForApp request)
         {
-            var resourceKeys = LocalizationManager.GetResourceKeysForApp(request.Environment.AppId);
+            var resourceKeys = LocalizationManager.GetResourcesForApp(request.Environment.AppId);
             return new HttpResult(resourceKeys, HttpStatusCode.OK);
         }
 
@@ -1326,6 +1329,17 @@ namespace classy.Services
         public object Post(SetResourceValues request)
         {
             var resource = LocalizationManager.SetResourceValues(request.Environment.AppId, request.Key, request.Values);
+            return new HttpResult(resource, HttpStatusCode.OK);
+        }
+
+        //
+        // POST: /resource
+        // create new resource
+        [CustomAuthenticate]
+        [CustomRequiredPermission("cms")]
+        public object Post(CreateNewResource request)
+        {
+            var resource = LocalizationManager.CreateResource(request.Environment.AppId, request.Key, request.Values, request.Description);
             return new HttpResult(resource, HttpStatusCode.OK);
         }
 

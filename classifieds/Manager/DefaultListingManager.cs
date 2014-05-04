@@ -13,6 +13,8 @@ using System.IO;
 using ServiceStack.Messaging;
 using classy.Operations;
 using ServiceStack.CacheAccess;
+using Classy.Models.Request;
+using classy.Extentions;
 
 namespace classy.Manager
 {
@@ -183,8 +185,10 @@ namespace classy.Manager
                         using (var reader = new BinaryReader(file.InputStream))
                         {
                             var key = Guid.NewGuid().ToString();
-                            var content = reader.ReadBytes((int)file.ContentLength);
-                            StorageRepository.SaveFile(key, content, file.ContentType, true, ListingRepository);
+                            byte[] content = reader.ReadBytes((int)file.ContentLength);
+                            byte[] reducedContent = content.Rescale(640);
+                            StorageRepository.SaveFile(key, content, file.ContentType, false, ListingRepository);
+                            StorageRepository.SaveFile(key + "_reduced", reducedContent, file.ContentType, true, ListingRepository);
                             var mediaFile = new MediaFile
                             {
                                 Type = MediaFileType.Image,
@@ -268,11 +272,13 @@ namespace classy.Manager
             // include basic listing info
             if (!title.IsNullOrEmpty()) listing.Title = title;
             if (!listingType.IsNullOrEmpty()) listing.ListingType = listingType;
+
             if (!content.IsNullOrEmpty())
             {
                 listing.Content = content;
                 listing.Hashtags = content.ExtractHashtags();
             }
+
             if (pricingInfo != null) listing.PricingInfo = pricingInfo;
             if (contactInfo != null) listing.ContactInfo = contactInfo;
             if (timeslotSchedule != null) listing.SchedulingTemplate = timeslotSchedule;
@@ -297,6 +303,51 @@ namespace classy.Manager
             {
                 ListingRepository.Update(listing);
             }
+
+            // return
+            return listing.ToListingView();
+        }
+
+        public ListingView UpdateListing(
+            string appId,
+            string listingId,
+            string title,
+            string content,
+            PricingInfo pricingInfo,
+            ContactInfo contactInfo,
+            TimeslotSchedule timeslotSchedule,
+            IDictionary<string, string> metadata,
+            IList<string> hashtags,
+            ListingUpdateFields fields)
+        {
+            var listing = GetVerifiedListing(appId, listingId, true, true);
+
+            // include basic listing info
+            if (fields.HasFlag(ListingUpdateFields.Title)) listing.Title = title;
+            if (fields.HasFlag(ListingUpdateFields.Hashtags)) listing.Hashtags = hashtags;
+            if (fields.HasFlag(ListingUpdateFields.Content))
+            {
+                listing.Content = content;
+                var newTags = string.IsNullOrEmpty(content) ? new string[0] : content.ExtractHashtags();
+                if (fields.HasFlag(ListingUpdateFields.Hashtags)) listing.Hashtags = hashtags.Union(newTags).ToList();
+                else listing.Hashtags = newTags;
+            }
+            if (fields.HasFlag(ListingUpdateFields.Pricing)) listing.PricingInfo = pricingInfo;
+            if (fields.HasFlag(ListingUpdateFields.ContactInfo)) listing.ContactInfo = contactInfo;
+            if (fields.HasFlag(ListingUpdateFields.SchedulingTemplate)) listing.SchedulingTemplate = timeslotSchedule;
+            if (fields.HasFlag(ListingUpdateFields.Metadata))
+            {
+                foreach (var c in metadata)
+                {
+                    if (listing.Metadata.ContainsKey(c.Key))
+                    {
+                        listing.Metadata.Remove(listing.Metadata.SingleOrDefault(x => x.Key == c.Key));
+                    }
+                    listing.Metadata.Add(c);
+                }
+            }
+
+            ListingRepository.Update(listing);
 
             // return
             return listing.ToListingView();

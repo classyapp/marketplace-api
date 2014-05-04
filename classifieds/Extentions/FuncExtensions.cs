@@ -145,6 +145,7 @@ namespace classy.Extentions
                     c.TryResolve<IProfileRepository>()));
             container.Register<IThumbnailManager>(c =>
                 new DefaultThumbnailManager(
+                    c.TryResolve<IAppManager>(),
                     c.TryResolve<IStorageRepository>()));
         }
     }
