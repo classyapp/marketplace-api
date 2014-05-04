@@ -94,6 +94,7 @@ namespace Classy.Repository
                 if (listing.SchedulingTemplate != null) update.Set(x => x.SchedulingTemplate, listing.SchedulingTemplate);
                 if (listing.Metadata != null) update.Set(x => x.Metadata, listing.Metadata);
                 if (listing.Hashtags != null && listing.Hashtags.Count > 0) update.Set(x => x.Hashtags, listing.Hashtags);
+                if (listing.EditorKeywords != null && listing.EditorKeywords.Count > 0) update.Set(x => x.EditorKeywords, listing.EditorKeywords);
 
                 ListingsCollection.FindAndModify(query, null, update);
             }

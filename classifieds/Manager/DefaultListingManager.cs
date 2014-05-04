@@ -318,6 +318,7 @@ namespace classy.Manager
             TimeslotSchedule timeslotSchedule,
             IDictionary<string, string> metadata,
             IList<string> hashtags,
+            IDictionary<string, IList<string>> editorKeywords,
             ListingUpdateFields fields)
         {
             var listing = GetVerifiedListing(appId, listingId, true, true);
@@ -346,6 +347,7 @@ namespace classy.Manager
                     listing.Metadata.Add(c);
                 }
             }
+            if (fields.HasFlag(ListingUpdateFields.EditorKeywords)) listing.EditorKeywords = editorKeywords;
 
             ListingRepository.Update(listing);
 

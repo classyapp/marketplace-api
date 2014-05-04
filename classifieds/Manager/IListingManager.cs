@@ -127,6 +127,7 @@ namespace classy.Manager
             TimeslotSchedule timeslotSchedule,
             IDictionary<string, string> metadata,
             IList<string> Hashtags,
+            IDictionary<string, IList<string>> EditorKeywords,
             ListingUpdateFields fields);
 
         /// <summary>

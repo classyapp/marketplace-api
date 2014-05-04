@@ -240,6 +240,7 @@ namespace classy.Services
                     request.SchedulingTemplate,
                     request.Metadata,
                     request.Hashtags,
+                    request.EditorKeywords,
                     request.Fields);
 
                 return new HttpResult(listing, HttpStatusCode.OK);

@@ -15,7 +15,7 @@ using Classy.Interfaces.Managers;
 
 namespace classy.Extentions
 {
-    public static class FunqExtensions
+    public static class FunqExtensiosn
     {
         private static string GetConnectionString(string key) {
             // try app settings
@@ -147,8 +147,6 @@ namespace classy.Extentions
                 new DefaultThumbnailManager(
                     c.TryResolve<IAppManager>(),
                     c.TryResolve<IStorageRepository>()));
-            container.Register<ITranslationProvider>(c => 
-                new GoogleTranslationProvider(ConfigurationManager.AppSettings["google.translateapi.key"]));
         }
     }
 }
