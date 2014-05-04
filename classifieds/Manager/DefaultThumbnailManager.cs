@@ -31,7 +31,7 @@ namespace classy.Manager
                 Stream memoryStream;
 
                 originKey = originKey.StartsWith("profile_img") ? originKey : originKey + "_reduced";
-                Stream originalImage = StorageRepository.GetFile(originKey + "_reduced");
+                Stream originalImage = StorageRepository.GetFile(originKey);
                 lock (originalImage)
                 {
                     memoryStream = GenerateThumbnail(originalImage, width, height);
