@@ -30,6 +30,7 @@ namespace classy.Manager
                 if (height == 0) height = width;
                 Stream memoryStream;
 
+                originKey = originKey.StartsWith("profile_img") ? originKey : originKey + "_reduced";
                 Stream originalImage = StorageRepository.GetFile(originKey + "_reduced");
                 lock (originalImage)
                 {
