@@ -11,8 +11,6 @@ namespace Classy.Models
         Image = 1 << 0
     }
 
-    // Added for the image size reduction utility
-    [MongoDB.Bson.Serialization.Attributes.BsonIgnoreExtraElements]
     public class MediaFile
     {
         public MediaFileType Type { get; set; }
