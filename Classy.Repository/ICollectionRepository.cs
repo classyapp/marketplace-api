@@ -89,5 +89,7 @@ namespace Classy.Repository
         void AddHashtags(string collectionId, string appId, string[] hashtags);
 
         Collection GetOriginalCollection(Listing listing);
+
+        IList<Collection> GetByListingId(string appId, string listingId, string culture);
     }
 }

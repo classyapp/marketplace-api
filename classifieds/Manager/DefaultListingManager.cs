@@ -1012,15 +1012,35 @@ namespace classy.Manager
                 }
             }
             
-            // Get more collections from same owner
-            Profile profile  = GetVerifiedProfile(appId, listing.ProfileId, culture);
-            IList<CollectionView> collections = GetCollectionsByProfileId(appId, listing.ProfileId, profile.IsProfessional ? Classy.Models.CollectionType.Project : Classy.Models.CollectionType.PhotoBook, culture);
+            // Get more collections including this listing
+            IList<CollectionView> collections = GetCollectionsByListingId(appId, listing.Id, culture);
             collections.Remove(collections.First(c => c.Id == originalCollection.Id));
 
-            data.Profile = profile.ToProfileView();
             data.Collections = collections;
 
             return data;
+        }
+
+        private IList<CollectionView> GetCollectionsByListingId(string appId, string listingId, string culture)
+        {
+            try
+            {
+                var collections = CollectionRepository.GetByListingId(appId, listingId, culture);
+
+                foreach (var collection in collections)
+                {
+                    if (collection.CoverPhotos == null || collection.CoverPhotos.Count == 0)
+                    {
+                        collection.CoverPhotos = ListingRepository.GetById(collection.IncludedListings.Select(l => l.Id).Skip(Math.Max(0, collection.IncludedListings.Count - 4)).ToArray(), appId, false, null).Select(l => l.ExternalMedia[0].Key).ToArray();
+                    }
+                }
+
+                return collections.ToCollectionViewList(culture);
+            }
+            catch (Exception)
+            {
+                throw;
+            }
         }
     }
 }
