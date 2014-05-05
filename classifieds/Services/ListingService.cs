@@ -1573,7 +1573,7 @@ namespace classy.Services
 
         public object Post(GetListingMoreInfo request)
         {
-            return ListingManager.GetListingMoreInfo(request.Environment.AppId, request.ListingId, request.Metadata, request.Environment.CultureCode);
+            return ListingManager.GetListingMoreInfo(request.Environment.AppId, request.ListingId, request.Metadata, null, request.Environment.CultureCode);
         }
     }
 }

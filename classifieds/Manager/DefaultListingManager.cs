@@ -986,7 +986,7 @@ namespace classy.Manager
         }
 
 
-        public ListingMoreInfoView GetListingMoreInfo(string appId, string listingId, Dictionary<string, string> metadata, string culture)
+        public ListingMoreInfoView GetListingMoreInfo(string appId, string listingId, Dictionary<string, string> metadata, Location location, string culture)
         {
             ListingMoreInfoView data = new ListingMoreInfoView();
 
@@ -1002,7 +1002,10 @@ namespace classy.Manager
             // Search by metadata provided
             if (metadata != null)
             {
-                data.SearchResults = ListingRepository.GetByMetadata(appId, metadata, culture).ToListingViewList(culture);
+                long count = 0;
+                data.SearchResults = ListingRepository.Search(null, new string[] { "Photo" }, 
+                    metadata.ToDictionary(x => x.Key, x => new string[] {x.Value }), 
+                    null, null, location, appId, false, false, 0, 0, ref count, culture).ToListingViewList(culture);
                 if (data.SearchResults != null)
                 {
                     data.SearchResults.Remove(data.SearchResults.First(wl => wl.Id == listingId));

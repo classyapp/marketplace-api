@@ -242,6 +242,6 @@ namespace classy.Manager
         /// <param name="cultureCode"></param>
         void DeleteTranslation(string appId, string listingId, string cultureCode);
 
-        ListingMoreInfoView GetListingMoreInfo(string appId, string listingId, Dictionary<string, string> metadata, string culture);
+        ListingMoreInfoView GetListingMoreInfo(string appId, string listingId, Dictionary<string, string> metadata, Location location, string culture);
     }
 }
