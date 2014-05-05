@@ -184,19 +184,27 @@ namespace classy.Manager
                     {
                         using (var reader = new BinaryReader(file.InputStream))
                         {
-                            var key = Guid.NewGuid().ToString();
-                            byte[] content = reader.ReadBytes((int)file.ContentLength);
-                            byte[] reducedContent = content.Rescale(640);
-                            StorageRepository.SaveFile(key, content, file.ContentType, false, ListingRepository);
-                            StorageRepository.SaveFile(key + "_reduced", reducedContent, file.ContentType, true, ListingRepository);
-                            var mediaFile = new MediaFile
+                            try
                             {
-                                Type = MediaFileType.Image,
-                                ContentType = file.ContentType,
-                                Url = StorageRepository.KeyToUrl(key),
-                                Key = key
-                            };
-                            mediaFiles.Add(mediaFile);
+                                var key = Guid.NewGuid().ToString();
+                                byte[] content = reader.ReadBytes((int)file.ContentLength);
+                                byte[] reducedContent = content.Rescale(640);
+                                StorageRepository.SaveFile(key, content, file.ContentType, false, ListingRepository);
+                                StorageRepository.SaveFile(key + "_reduced", reducedContent, file.ContentType, true, ListingRepository);
+                                var mediaFile = new MediaFile
+                                {
+                                    Type = MediaFileType.Image,
+                                    ContentType = file.ContentType,
+                                    Url = StorageRepository.KeyToUrl(key),
+                                    Key = key
+                                };
+                                mediaFiles.Add(mediaFile);
+                            }
+                            catch (Exception ex)
+                            {
+                                System.Diagnostics.Trace.WriteLine("Error saving external media " + ex.ToString());
+                                throw ex;
+                            }
                         }
                     }
                 }
