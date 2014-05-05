@@ -212,5 +212,10 @@ namespace Classy.Repository
                 throw;
             }
         }
+
+        public Collection GetOriginalCollection(Listing listing)
+        {
+            return CollectionsCollection.Find(Query.And(Query<Collection>.EQ(c => c.ProfileId, listing.ProfileId), Query.ElemMatch("IncludedListings", Query.EQ("_id", listing.Id)))).FirstOrDefault();
+        }
     }
 }

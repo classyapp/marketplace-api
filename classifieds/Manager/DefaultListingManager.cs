@@ -27,8 +27,10 @@ namespace classy.Manager
         private ICollectionRepository CollectionRepository;
         private ITripleStore TripleStore;
         private IStorageRepository StorageRepository;
+        private IAppManager AppManager;
 
         public DefaultListingManager(
+            IAppManager appManager,
             IMessageQueueClient messageQueueClient,
             IListingRepository listingRepository,
             ICommentRepository commentRepository,
@@ -38,6 +40,7 @@ namespace classy.Manager
             IStorageRepository storageRepository)
         {
             _messageQueueClient = messageQueueClient;
+            AppManager = appManager;
             ListingRepository = listingRepository;
             CommentRepository = commentRepository;
             ProfileRepository = profileRepository;
@@ -186,7 +189,7 @@ namespace classy.Manager
                         {
                             var key = Guid.NewGuid().ToString();
                             byte[] content = reader.ReadBytes((int)file.ContentLength);
-                            byte[] reducedContent = content.Rescale(640);
+                            byte[] reducedContent = content.Rescale(AppManager.GetAppById(appId).ImageReducedSize);
                             StorageRepository.SaveFile(key, content, file.ContentType, false, ListingRepository);
                             StorageRepository.SaveFile(key + "_reduced", reducedContent, file.ContentType, true, ListingRepository);
                             var mediaFile = new MediaFile
@@ -980,6 +983,41 @@ namespace classy.Manager
         private Listing GetVerifiedListing(string appId, string listingId)
         {
             return GetVerifiedListing(appId, listingId, false);
+        }
+
+
+        public ListingMoreInfoView GetListingMoreInfo(string appId, string listingId, Dictionary<string, string> metadata, string culture)
+        {
+            ListingMoreInfoView data = new ListingMoreInfoView();
+
+            Listing listing = GetVerifiedListing(appId, listingId);
+
+            // Get original collection
+            Collection originalCollection = CollectionRepository.GetOriginalCollection(listing);
+            if (originalCollection != null)
+            {
+                data.CollectionLisitngs = ListingRepository.GetById(originalCollection.IncludedListings.Select(l => l.Id).ToArray(), appId, false, culture).ToListingViewList(culture);
+            }
+
+            // Search by metadata provided
+            if (metadata != null)
+            {
+                data.SearchResults = ListingRepository.GetByMetadata(appId, metadata, culture).ToListingViewList(culture);
+                if (data.SearchResults != null)
+                {
+                    data.SearchResults.Remove(data.SearchResults.First(wl => wl.Id == listingId));
+                }
+            }
+            
+            // Get more collections from same owner
+            Profile profile  = GetVerifiedProfile(appId, listing.ProfileId, culture);
+            IList<CollectionView> collections = GetCollectionsByProfileId(appId, listing.ProfileId, profile.IsProfessional ? Classy.Models.CollectionType.Project : Classy.Models.CollectionType.PhotoBook, culture);
+            collections.Remove(collections.First(c => c.Id == originalCollection.Id));
+
+            data.Profile = profile.ToProfileView();
+            data.Collections = collections;
+
+            return data;
         }
     }
 }

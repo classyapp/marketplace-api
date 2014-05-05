@@ -148,6 +148,7 @@ namespace classy
                     .Add<SetListingTranslation>("/listing/{ListingId}/translation/{CultureCode}", "POST")
                     .Add<GetListingTranslation>("/listing/{ListingId}/translation/{CultureCode}", "GET")
                     .Add<DeleteListingTranslation>("/listing/{ListingId}/translation/{CultureCode}", "DELETE")
+                    .Add<GetListingMoreInfo>("/listing/{ListingId}/more", "POST")
 
                     // Collections
                     .Add<CreateCollection>("/collection/new", "POST") // create a new collection

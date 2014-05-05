@@ -118,6 +118,7 @@
     <Compile Include="DTO\Request\GetCitiesByCountry.cs" />
     <Compile Include="DTO\Request\GetCollectionTranslation.cs" />
     <Compile Include="DTO\Request\GetIncludedListingTranslation.cs" />
+    <Compile Include="DTO\Request\GetListingMoreInfo.cs" />
     <Compile Include="DTO\Request\GetListingTranslation.cs" />
     <Compile Include="DTO\Request\DeleteTranslation.cs" />
     <Compile Include="DTO\Request\GetProfileTranslation.cs" />

@@ -18,6 +18,11 @@ namespace classy.Extentions
             Stream memoryStream = new MemoryStream(original);
             using (Image image = Image.FromStream(memoryStream))
             {
+                if (maxSize > image.Width) {
+                    memoryStream.Close();
+                    memoryStream.Dispose();
+                    return original;
+                }
                 double scale = (double)image.Width / (double)image.Height;
                 int newWidth = scale > 1 ? maxSize : (int)(maxSize * scale);
                 int newHeight = scale > 1 ? (int)(maxSize / scale) : maxSize;

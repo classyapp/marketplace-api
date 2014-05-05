@@ -14,6 +14,7 @@ namespace Classy.Models
     /// <summary>
     /// a <see cref="Listing"/> is the basic unit of the marketplace
     /// </summary>
+    [MongoDB.Bson.Serialization.Attributes.BsonIgnoreExtraElements]
     public class Listing : BaseObject, ITranslatable<Listing>
     {
         public Listing()
