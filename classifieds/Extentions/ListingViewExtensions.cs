@@ -29,6 +29,9 @@ namespace classy
             {   
                 to.SchedulingTemplate = from.SchedulingTemplate.TranslateTo<TimeslotScheduleView>();
             }
+
+            to.EditorKeywords = from.EditorKeywords;
+
             return to;
         }
 
