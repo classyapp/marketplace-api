@@ -26,10 +26,10 @@ namespace Classy.Auth
         //http://stackoverflow.com/questions/3588623/c-sharp-regex-for-a-username-with-a-few-restrictions
         public Regex ValidUserNameRegEx = new Regex(@"^(?=.{3,45}$)([A-Za-z0-9][._-]?)*$", RegexOptions.Compiled);
 
-        private readonly MongoDatabase mongoDatabase;
+        protected readonly MongoDatabase mongoDatabase;
 
         // UserAuth collection name
-        private static string UserAuth_Col
+        protected static string UserAuth_Col
         {
             get
             {
@@ -474,6 +474,12 @@ namespace Classy.Auth
                 userAuth.PrimaryEmail = email;
                 collection.Save(userAuth);
             }
+        }
+
+
+        public virtual UserAuth RemoveUser(string appId, string userNameOrEmail)
+        {
+            throw new NotImplementedException();
         }
     }
 }
