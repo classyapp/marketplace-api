@@ -799,5 +799,21 @@ namespace classy.Manager
                 professionalInfo.CompanyContactInfo.Location.Coords.Latitude = 0;
             }
         }
+
+        public VerifyEmailResponse VerifyEmailByHash(string appId, string hash)
+        {
+            Profile profile = ProfileRepository.GetByEmailHash(appId, hash);
+            if (profile != null)
+            {
+                profile.EmailVerified = true;
+                profile.Metadata.Remove(Profile.EmailHashMetadata);
+                ProfileRepository.Save(profile);
+                return new VerifyEmailResponse { Verified = true };
+            }
+            else
+            {
+                return new VerifyEmailResponse { Verified = false, ErrorMessage = "Invalid Hash" };
+            }
+        }
     }
 }

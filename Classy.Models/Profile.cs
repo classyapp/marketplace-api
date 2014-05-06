@@ -14,6 +14,8 @@ namespace Classy.Models
     /// </summary>   
     public class Profile : BaseObject, ITranslatable<Profile>
     {
+        public static readonly string EmailHashMetadata = "EmailHash";
+
         public Profile()
         {
             ContactInfo = new ContactInfo();
@@ -45,6 +47,7 @@ namespace Classy.Models
         public IList<string> Permissions { get; set; }
         public string DefaultCulture { get; set; }
         public Dictionary<string, int> Languages { get; set; }
+        public bool EmailVerified { get; set; }
 
         /// <summary>
         /// A collection of media files' keys to be used in creating the collage
