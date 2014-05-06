@@ -69,7 +69,7 @@ namespace Classy.Tests
 
             //Store User Data into the referenced MongoDB database
             //Store User Data into the referenced MongoDB database
-            container.Register<Classy.Auth.IUserAuthRepository>(c => new Classy.Auth.MongoDBAuthRepository(c.Resolve<MongoDatabase>(), true)); 
+            container.Register<IUserAuthRepository>(c => new MongoDBAuthRepositoryTests(c.Resolve<MongoDatabase>(), true)); 
 
         }
     }

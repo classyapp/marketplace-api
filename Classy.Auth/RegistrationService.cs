@@ -110,6 +110,21 @@ namespace Classy.Auth
                 throw new ConfigurationException("No IUserAuthRepository has been registered in your AppHost.");
         }
 
+        public object Delete(Registration request)
+        {
+            UserAuth userAuth = UserAuthRepo.RemoveUser(request.Environment.AppId, request.UserName);
+
+            RegistrationResponse response = null;
+
+            response = new RegistrationResponse
+            {
+                UserName = userAuth!=null ? userAuth.UserName : null,
+                UserId = userAuth!=null ? userAuth.Id.ToString() : null
+            };
+            
+            return response;
+        }
+
         /// <summary>
         /// Create new Registration
         /// </summary>

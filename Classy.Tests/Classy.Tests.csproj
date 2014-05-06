@@ -99,7 +99,7 @@
     <Compile Include="AuthServiceUnitTestWithHost.cs" />
     <Compile Include="MockCridentialsAuthProvider.cs" />
     <Compile Include="JsonExtensions.cs" />
-    <Compile Include="MongoDBAuthTestRepository.cs" />
+    <Compile Include="MongoDBAuthRepositoryTests.cs" />
     <Compile Include="TestAppHost.cs" />
     <Compile Include="AuthServiceTest.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
