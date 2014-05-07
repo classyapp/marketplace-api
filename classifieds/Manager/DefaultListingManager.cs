@@ -998,6 +998,7 @@ namespace classy.Manager
             Collection originalCollection = CollectionRepository.GetOriginalCollection(listing);
             if (originalCollection != null)
             {
+                data.CollectionType = originalCollection.Type.ToLowerInvariant();
                 data.CollectionLisitngs = ListingRepository.GetById(originalCollection.IncludedListings.Select(l => l.Id).ToArray(), appId, false, culture).ToListingViewList(culture);
             }
 
