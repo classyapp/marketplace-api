@@ -100,6 +100,7 @@ namespace classy.Extentions
                     c.TryResolve<IShippingCalculator>()));
             container.Register<IListingManager>(c =>
                 new DefaultListingManager(
+                    c.TryResolve<IAppManager>(),
                     c.TryResolve<IMessageQueueClient>(),
                     c.TryResolve<IListingRepository>(),
                     c.TryResolve<ICommentRepository>(),
@@ -129,6 +130,7 @@ namespace classy.Extentions
                     c.TryResolve<IStorageRepository>()));
             container.Register<ICollectionManager>(c =>
                 new DefaultListingManager(
+                    c.TryResolve<IAppManager>(),
                     c.TryResolve<IMessageQueueClient>(),
                     c.TryResolve<IListingRepository>(),
                     c.TryResolve<ICommentRepository>(),
@@ -145,7 +147,6 @@ namespace classy.Extentions
                     c.TryResolve<IProfileRepository>()));
             container.Register<IThumbnailManager>(c =>
                 new DefaultThumbnailManager(
-                    c.TryResolve<IAppManager>(),
                     c.TryResolve<IStorageRepository>()));
         }
     }

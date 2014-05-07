@@ -353,5 +353,5 @@ namespace Classy.Repository
                 ListingsCollection.Save(listing);
             }
         }
-    }
+   }
 }

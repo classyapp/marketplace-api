@@ -212,5 +212,20 @@ namespace Classy.Repository
                 throw;
             }
         }
+
+        public Collection GetOriginalCollection(Listing listing)
+        {
+            return CollectionsCollection.Find(Query.And(Query<Collection>.EQ(c => c.ProfileId, listing.ProfileId), Query.ElemMatch("IncludedListings", Query.EQ("_id", listing.Id)))).FirstOrDefault();
+        }
+
+        public IList<Collection> GetByListingId(string appId, string listingId, string culture)
+        {
+            var collections = CollectionsCollection.Find(Query.And(Query.EQ("AppId", appId), Query.ElemMatch("IncludedListings", Query.EQ("_id", listingId))));
+            foreach (var collection in collections)
+            {
+                collection.Translate(culture);
+            }
+            return collections.ToList();
+        }
     }
 }
