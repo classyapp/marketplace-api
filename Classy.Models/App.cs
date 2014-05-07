@@ -25,5 +25,6 @@ namespace Classy.Models
         public string CultureCookieName { get; set; }
         public string Hostname { get; set; }
         public string MandrilAPIKey { get; set; }
+        public string DefaultFromEmailAddress { get; set; }
     }
 }
