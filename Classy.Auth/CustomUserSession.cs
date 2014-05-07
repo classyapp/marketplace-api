@@ -48,7 +48,7 @@ namespace Classy.Auth
                 profile.ContactInfo.LastName = session.LastName;
                 profile.ContactInfo.Email = session.Email;
                 profile.DefaultCulture = Environment.CultureCode;
-                profile.EmailVerified = false;
+                profile.IsEmailVerified = false;
                 profile.Metadata = new Dictionary<string, string>();
                 profile.Metadata.Add(Profile.EmailHashMetadata, Encoding.UTF8.GetString(MD5.Create().ComputeHash(Encoding.UTF8.GetBytes(profile.ContactInfo.Email))));
             }

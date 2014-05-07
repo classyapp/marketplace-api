@@ -805,7 +805,7 @@ namespace classy.Manager
             Profile profile = ProfileRepository.GetByEmailHash(appId, hash);
             if (profile != null)
             {
-                profile.EmailVerified = true;
+                profile.IsEmailVerified = true;
                 profile.Metadata.Remove(Profile.EmailHashMetadata);
                 ProfileRepository.Save(profile);
                 return new VerifyEmailResponse { Verified = true };

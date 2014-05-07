@@ -47,7 +47,7 @@ namespace Classy.Models
         public IList<string> Permissions { get; set; }
         public string DefaultCulture { get; set; }
         public Dictionary<string, int> Languages { get; set; }
-        public bool EmailVerified { get; set; }
+        public bool IsEmailVerified { get; set; }
 
         /// <summary>
         /// A collection of media files' keys to be used in creating the collage
