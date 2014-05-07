@@ -49,6 +49,7 @@ namespace Classy.Models
         public IList<string> Hashtags { get; set; }
 
         public IDictionary<string, IList<string>> EditorKeywords { get; set; }
+        public IList<string> SearchableKeywords { get; set; }
         /// <summary>
         /// external media files relating to the listing (images, video, etc)
         /// </summary>
