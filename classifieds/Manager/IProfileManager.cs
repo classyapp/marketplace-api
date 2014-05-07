@@ -206,5 +206,7 @@ namespace classy.Manager
         /// <param name="profileId"></param>
         /// <param name="culture"></param>
         void DeleteTranslation(string appId, string profileId, string culture);
+
+        VerifyEmailResponse VerifyEmailByHash(string appId, string hash);
     }
 }

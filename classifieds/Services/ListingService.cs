@@ -1581,5 +1581,20 @@ namespace classy.Services
         {
             return LocalizationManager.GetCitiesByCountry(request.Environment.AppId, request.CountryCode);
         }
+
+        public object Get(VerifyEmailRequest request)
+        {
+            VerifyEmailResponse response = null;
+            try
+            {
+                response = ProfileManager.VerifyEmailByHash(request.Environment.AppId, request.Hash);
+            }
+            catch (Exception ex)
+            {
+                response = new VerifyEmailResponse { Verified = false, ErrorMessage = ex.Message };
+            }
+
+            return new HttpResult(response, HttpStatusCode.OK);
+        }
     }
 }
