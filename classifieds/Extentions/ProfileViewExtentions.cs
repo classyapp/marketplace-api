@@ -28,8 +28,8 @@ namespace classy
             if (from.Permissions != null && from.Permissions.Count() > 0)
             {
                 to.IsAdmin = from.Permissions.Contains("admin");
-                to.IsCmsUser = from.Permissions.Contains("cms");
-                to.IsEditor = from.Permissions.Contains("editor");
+                to.IsCmsUser = from.Permissions.Contains("cms") || to.IsAdmin;
+                to.IsEditor = from.Permissions.Contains("editor") || to.IsAdmin;
             }
 
             // avatar
