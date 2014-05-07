@@ -211,7 +211,6 @@
     <Compile Include="Manager\IProfileManager.cs" />
     <Compile Include="Manager\IReviewManager.cs" />
     <Compile Include="Manager\IThumbnailManager.cs" />
-    <Compile Include="Manager\ITranslationProvider.cs" />
     <Compile Include="Manager\MandrillEmailManager.cs" />
     <Compile Include="Manager\DefaultLocalizationManager.cs" />
     <Compile Include="Manager\DefaultThumbnailManager.cs" />

@@ -13,7 +13,7 @@ using System.Web;
 using Classy.Auth;
 using Classy.Interfaces.Managers;
 
-namespace classy.Extentions
+namespace classy.Extensions
 {
     public static class FunqExtensions
     {

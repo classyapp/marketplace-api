@@ -85,7 +85,7 @@ namespace classy.Services
         }
 
         public object Get(GetListingsByProfileId request)
-        {
+       { 
             try
             {
                 var listingViews = ListingManager.GetListingsByProfileId(
@@ -240,6 +240,7 @@ namespace classy.Services
                     request.SchedulingTemplate,
                     request.Metadata,
                     request.Hashtags,
+                    request.EditorKeywords,
                     request.Fields);
 
                 return new HttpResult(listing, HttpStatusCode.OK);

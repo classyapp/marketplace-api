@@ -23,7 +23,7 @@ using System.Web.SessionState;
 using ServiceStack.Text;
 using MongoDB.Driver;
 using System.Configuration;
-using classy.Extentions;
+using classy.Extensions;
 using classy.Operations;
 
 namespace classy

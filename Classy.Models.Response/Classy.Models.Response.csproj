@@ -65,7 +65,6 @@
     <Compile Include="SocialPhotoAlbumView.cs" />
     <Compile Include="EmailContact.cs" />
     <Compile Include="IncludedListingView.cs" />
-    <Compile Include="Listing.cs" />
     <Compile Include="ListingView.cs" />
     <Compile Include="LocalizationListResourceView.cs" />
     <Compile Include="LocalizationResourceView.cs" />
