@@ -300,7 +300,7 @@ namespace classy.Services
                 {
                     EmailManager.SendHtmlMessage(
                         app.MandrilAPIKey,
-                        "team@homelab.com",
+                        app.DefaultFromEmailAddress,
                         new string[] { comment.Profile.ContactInfo.Email },
                         string.Format(LocalizationManager.GetResourceByKey(request.Environment.AppId, "ListingComment_Notification_Subject", false).Values[request.Environment.CultureCode], listing.ListingType.ToLowerInvariant()),
                         string.Format(LocalizationManager.GetResourceByKey(request.Environment.AppId, "ListingComment_Notification_Body", true).Values[request.Environment.CultureCode],
