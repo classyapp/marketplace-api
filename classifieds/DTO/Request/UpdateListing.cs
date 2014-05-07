@@ -61,7 +61,7 @@ namespace Classy.Models.Request
             {
                 RuleFor(x => x.Hashtags).NotNull();
             });
-            When(x => x.Fields.HasFlag(ListingUpdateFields.Hashtags), () =>
+            When(x => x.Fields.HasFlag(ListingUpdateFields.EditorKeywords), () =>
             {
                 RuleFor(X => X.EditorKeywords).NotNull();
             });
