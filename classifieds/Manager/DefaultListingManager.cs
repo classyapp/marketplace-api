@@ -175,9 +175,9 @@ namespace classy.Manager
         {
             var listing = GetVerifiedListing(appId, listingId, true, true);
             var mediaFiles = new List<MediaFile>();
-
             if (files != null && files.Count() > 0)
             {
+                System.Diagnostics.Trace.TraceInformation(string.Format("adding {0} external media files to listing {1}", files.Count(), listingId));
                 foreach (IFile file in files)
                 {
                     if (file.ContentType.Contains("image")) // only images for now
