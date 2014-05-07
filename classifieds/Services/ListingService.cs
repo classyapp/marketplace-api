@@ -292,27 +292,6 @@ namespace classy.Services
                     comment.Profile = ProfileManager.GetProfileById(request.Environment.AppId, comment.ProfileId, null, false, false, false, false, false, false, false, request.Environment.CultureCode);
                 }
 
-                ListingView listing = ListingManager.GetListingById(request.Environment.AppId, request.ListingId, false, false, false, false, false, false, false, request.Environment.CultureCode);
-                App app = AppManager.GetAppById(request.Environment.AppId);
-
-                // send email notification
-                try
-                {
-                    EmailManager.SendHtmlMessage(
-                        app.MandrilAPIKey,
-                        app.DefaultFromEmailAddress,
-                        new string[] { comment.Profile.ContactInfo.Email },
-                        string.Format(LocalizationManager.GetResourceByKey(request.Environment.AppId, "ListingComment_Notification_Subject", false).Values[request.Environment.CultureCode], listing.ListingType.ToLowerInvariant()),
-                        string.Format(LocalizationManager.GetResourceByKey(request.Environment.AppId, "ListingComment_Notification_Body", true).Values[request.Environment.CultureCode],
-                                comment.Profile.ContactInfo.Name, listing.ListingType.ToLowerInvariant(),
-                                string.Format("https://{0}/{1}/{2}--{3}", app.Hostname, listing.ListingType, listing.Id, listing.Title)),
-                        null, null);
-                }
-                catch (Exception ex)
-                {
-                    System.Diagnostics.Trace.WriteLine("Error occured while trying to send notification\r\n" + ex.ToString());
-                }
-
                 return new HttpResult(comment, HttpStatusCode.OK);
             }
             catch (KeyNotFoundException kex)
