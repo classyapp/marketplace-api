@@ -113,18 +113,20 @@ namespace Classy.Auth
                 if (!string.IsNullOrEmpty(profile.ContactInfo.FirstName))
                 {
                     body = string.Format(localizationManager.GetResourceByKey(Environment.AppId, "WelcomeEmail_BodyWithName", true).Values[Environment.CultureCode], 
-                        string.Format("{0} {1}", profile.ContactInfo.FirstName, profile.ContactInfo.LastName));
+                        string.Format("{0} {1}", profile.ContactInfo.FirstName, profile.ContactInfo.LastName,
+                        string.Format("https://{0}/profile/verify/{1}", appManager.GetAppById(Environment.AppId).Hostname, profile.Metadata[Profile.EmailHashMetadata])));
                 }
                 else
                 {
-                    body = localizationManager.GetResourceByKey(Environment.AppId, "WelcomeEmail_BodyNoName", true).Values[Environment.CultureCode];
+                    body = string.Format(localizationManager.GetResourceByKey(Environment.AppId, "WelcomeEmail_BodyNoName", true).Values[Environment.CultureCode], 
+                        string.Format("https://{0}/profile/verify/{1}", appManager.GetAppById(Environment.AppId).Hostname, profile.Metadata[Profile.EmailHashMetadata]));
                 }
-                //emailManager.SendHtmlMessage(
-                //    appManager.GetAppById(Environment.AppId).MandrilAPIKey,
-                //    null, new string[] { profile.ContactInfo.Email },
-                //    localizationManager.GetResourceByKey(Environment.AppId, "WelcomeEmail_Subject", true).Values[Environment.CultureCode],
-                //    body, "welcome_email", null
-                //    );
+                emailManager.SendHtmlMessage(
+                    appManager.GetAppById(Environment.AppId).MandrilAPIKey,
+                    null, new string[] { profile.ContactInfo.Email },
+                    localizationManager.GetResourceByKey(Environment.AppId, "WelcomeEmail_Subject", true).Values[Environment.CultureCode],
+                    body, "welcome_email", null
+                    );
             }
         }
 
