@@ -1014,7 +1014,9 @@ namespace classy.Manager
             
             // Get more collections including this listing
             IList<CollectionView> collections = GetCollectionsByListingId(appId, listing.Id, culture);
-            collections.Remove(collections.First(c => c.Id == originalCollection.Id));
+            CollectionView currenctCollection = collections.FirstOrDefault(c => c.Id == originalCollection.Id);
+            if (currenctCollection != null)
+                collections.Remove(currenctCollection);
 
             data.Collections = collections;
 
