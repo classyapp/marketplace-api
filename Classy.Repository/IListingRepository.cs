@@ -42,6 +42,5 @@ namespace Classy.Repository
         string Insert(Listing listing);
         void Update(Listing listing);
         void SetListingErrorForMediaFile(string key, string error);
-        IList<Listing> GetByMetadata(string appId, Dictionary<string, string> metadata, string culture);
     }
 }

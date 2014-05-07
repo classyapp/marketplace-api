@@ -353,20 +353,5 @@ namespace Classy.Repository
                 ListingsCollection.Save(listing);
             }
         }
-
-        public IList<Listing> GetByMetadata(string appId, Dictionary<string, string> metadata, string culture)
-        {
-            List<IMongoQuery> queries = new List<IMongoQuery>();
-            if (metadata == null)
-                return null;
-
-            foreach (var key in metadata.Keys)
-            {
-                queries.Add(Query.EQ("Metadata." + key, metadata[key]));
-            }
-
-            return ListingsCollection.Find(Query.And(queries))
-                .Select(listing => listing.Translate(culture)).ToList();
-        }
-    }
+   }
 }
