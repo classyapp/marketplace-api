@@ -108,7 +108,9 @@ namespace Classy.Repository
 
             #region Build queries for match
             var queries = new List<IMongoQuery>() {
-                Query<Profile>.EQ(x => x.AppId, appId)
+                Query<Profile>.EQ(x => x.AppId, appId),
+                // exclude admin accoutns
+                Query<Profile>.NE(x => x.Permissions, "admin")
             };
 
             if (professionalsOnly)
