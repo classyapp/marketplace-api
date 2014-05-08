@@ -287,10 +287,7 @@ namespace classy.Services
                     request.Content,
                     request.FormatAsHtml);
 
-                if (comment.Profile == null)
-                {
-                    comment.Profile = ProfileManager.GetProfileById(request.Environment.AppId, comment.ProfileId, null, false, false, false, false, false, false, false, request.Environment.CultureCode);
-                }
+                comment.Profile = ProfileManager.GetProfileById(request.Environment.AppId, comment.ProfileId, null, false, false, false, false, false, false, false, request.Environment.CultureCode);
 
                 return new HttpResult(comment, HttpStatusCode.OK);
             }
