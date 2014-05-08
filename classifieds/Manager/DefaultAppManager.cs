@@ -29,7 +29,7 @@ namespace classy.Manager
                 CultureCookieName = "classy.env.culture",
                 Hostname = "www.homelab.com",
                 MandrilAPIKey = "ndg42WcyRHVLtLbvGqBjUA",
-                ImageReducedSize = 1600
+                ImageReducedSize = 1600,
                 DefaultFromEmailAddress = "team@homelab.com"
             };
         }
