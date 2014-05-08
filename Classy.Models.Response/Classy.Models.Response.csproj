@@ -85,6 +85,7 @@
     <Compile Include="SubTransactionView.cs" />
     <Compile Include="TimeslotScheduleView.cs" />
     <Compile Include="TripleView.cs" />
+    <Compile Include="VerifyEmailResponse.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />

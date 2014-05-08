@@ -259,5 +259,10 @@ namespace Classy.Repository
                         !string.IsNullOrEmpty(x.ProfessionalInfo.CompanyContactInfo.Location.Address.City)
                     )).ToList();
         }
+
+        public Profile GetByEmailHash(string appId, string hash)
+        {
+            return ProfilesCollection.FindOne(Query.And(Query.EQ("AppId", appId), Query.EQ("Metadata." + Profile.EmailHashMetadata, hash)));
+        }
     }
 }

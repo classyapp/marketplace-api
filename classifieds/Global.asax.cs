@@ -212,6 +212,7 @@ namespace classy
                     .Add<SetProfileTranslation>("/profile/{ProfileID}/translation/{CultureCode}", "POST")
                     .Add<GetProfileTranslation>("/profile/{ProfileID}/translation/{CultureCode}", "GET")
                     .Add<DeleteProfileTranslation>("/profile/{ProfileID}/translation/{CultureCode}", "DELETE")
+                    .Add<VerifyEmailRequest>("/profile/verify/{hash}", "GET")
 
                     // Reviews
                     .Add<PostReviewForListing>("/listing/{ListingId}/reviews/new", "POST")
