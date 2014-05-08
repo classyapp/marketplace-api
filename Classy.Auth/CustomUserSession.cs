@@ -50,7 +50,7 @@ namespace Classy.Auth
                 profile.DefaultCulture = Environment.CultureCode;
                 profile.IsEmailVerified = false;
                 profile.Metadata = new Dictionary<string, string>();
-                profile.Metadata.Add(Profile.EmailHashMetadata, Encoding.UTF8.GetString(MD5.Create().ComputeHash(Encoding.UTF8.GetBytes(profile.ContactInfo.Email))));
+                profile.Metadata.Add(Profile.EmailHashMetadata, ComputeHash(profile.ContactInfo.Email).SafeSubstring(16)); 
             }
 
             foreach (var authToken in session.ProviderOAuthAccess)
@@ -102,6 +102,26 @@ namespace Classy.Auth
             //
             profile.Permissions = session.Permissions;
             repo.Save(profile);
+        }
+
+        private string ComputeHash(string input)
+        {
+            byte[] data = Encoding.UTF8.GetBytes(input);
+            byte[] result;
+            SHA512 shaM = new SHA512Managed();
+            result = shaM.ComputeHash(data);
+
+            StringBuilder sBuilder = new StringBuilder();
+
+            // Loop through each byte of the hashed data  
+            // and format each one as a hexadecimal string. 
+            for (int i = 0; i < result.Length; i++)
+            {
+                sBuilder.Append(result[i].ToString("x2"));
+            }
+
+            // Return the hexadecimal string. 
+            return sBuilder.ToString();
         }
 
         public string SaveFileFromUrl(IStorageRepository storage, string key, string url)
