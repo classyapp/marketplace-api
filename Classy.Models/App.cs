@@ -26,5 +26,6 @@ namespace Classy.Models
         public string Hostname { get; set; }
         public string MandrilAPIKey { get; set; }
         public int ImageReducedSize { get; set; }
+        public string DefaultFromEmailAddress { get; set; }
     }
 }

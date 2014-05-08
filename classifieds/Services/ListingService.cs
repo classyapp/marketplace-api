@@ -288,6 +288,8 @@ namespace classy.Services
                     request.Content,
                     request.FormatAsHtml);
 
+                comment.Profile = ProfileManager.GetProfileById(request.Environment.AppId, comment.ProfileId, null, false, false, false, false, false, false, false, request.Environment.CultureCode);
+
                 return new HttpResult(comment, HttpStatusCode.OK);
             }
             catch (KeyNotFoundException kex)
@@ -578,7 +580,7 @@ namespace classy.Services
                     request.CoverPhotos);
 
                 // update email on user auth if needed
-                if (!session.Permissions.Contains("admin") && 
+                if (!session.Permissions.Contains("admin") &&
                     ((profile.IsProfessional && (session.Email != profile.ProfessionalInfo.CompanyContactInfo.Email)) ||
                     (!profile.IsProfessional && (session.Email != profile.ContactInfo.Email))))
                 {
@@ -1496,7 +1498,7 @@ namespace classy.Services
                 EmailResult result = EmailManager.SendHtmlMessage(
                     AppManager.GetAppById(request.Environment.AppId).MandrilAPIKey,
                     request.ReplyTo, request.To, request.Subject, request.Body, request.Template, request.Variables);
-                
+
                 if (result.Status == EmailResultStatus.Failed)
                 {
                     return new HttpError(HttpStatusCode.NotFound, result.Reason);
