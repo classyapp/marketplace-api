@@ -31,8 +31,8 @@ namespace classy
             }
 
             if (from.EditorKeywords != null && from.EditorKeywords.Count > 0)
-                to.EditorKeywords = from.EditorKeywords.SelectMany(x => x.Value).ToList();
-
+                to.EditorKeywords = from.EditorKeywords;
+            
             return to;
         }
 

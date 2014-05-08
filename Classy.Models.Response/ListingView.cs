@@ -44,7 +44,7 @@ namespace Classy.Models.Response
         public int? Quantity { get; set; }
         //
         public IList<string> Hashtags { get; set; }
-        public IList<string> EditorKeywords { get; set; }
+        public IDictionary<string, IList<string>> EditorKeywords { get; set; }
         //
         public ProfileView Profile { get; set; }
         public IList<ProfileView> FavoritedBy { get; set; }
