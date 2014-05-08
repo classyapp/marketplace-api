@@ -102,32 +102,6 @@ namespace Classy.Auth
             //
             profile.Permissions = session.Permissions;
             repo.Save(profile);
-
-            if (isNew) 
-            {
-                //send welcome email
-                IEmailManager emailManager = authService.TryResolve<IEmailManager>();
-                IAppManager appManager = authService.TryResolve<IAppManager>();
-                ILocalizationManager localizationManager = authService.TryResolve<ILocalizationManager>();
-                string body = null;
-                if (!string.IsNullOrEmpty(profile.ContactInfo.FirstName))
-                {
-                    body = string.Format(localizationManager.GetResourceByKey(Environment.AppId, "WelcomeEmail_BodyWithName", true).Values[Environment.CultureCode], 
-                        string.Format("{0} {1}", profile.ContactInfo.FirstName, profile.ContactInfo.LastName,
-                        string.Format("https://{0}/profile/verify/{1}", appManager.GetAppById(Environment.AppId).Hostname, profile.Metadata[Profile.EmailHashMetadata])));
-                }
-                else
-                {
-                    body = string.Format(localizationManager.GetResourceByKey(Environment.AppId, "WelcomeEmail_BodyNoName", true).Values[Environment.CultureCode], 
-                        string.Format("https://{0}/profile/verify/{1}", appManager.GetAppById(Environment.AppId).Hostname, profile.Metadata[Profile.EmailHashMetadata]));
-                }
-                emailManager.SendHtmlMessage(
-                    appManager.GetAppById(Environment.AppId).MandrilAPIKey,
-                    null, new string[] { profile.ContactInfo.Email },
-                    localizationManager.GetResourceByKey(Environment.AppId, "WelcomeEmail_Subject", true).Values[Environment.CultureCode],
-                    body, "welcome_email", null
-                    );
-            }
         }
 
         public string SaveFileFromUrl(IStorageRepository storage, string key, string url)
