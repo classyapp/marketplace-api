@@ -74,8 +74,8 @@ namespace classy.Manager
                 // Check that we are not upscaling
                 if (newWidth > source.Width)
                 {
-                    memoryStream = new MemoryStream((int)originalImage.Length);
-                    originalImage.CopyTo(memoryStream);
+                    memoryStream = new MemoryStream();
+                    source.Save(memoryStream, ImageFormat.Jpeg);
                     return memoryStream;
                 }
 
