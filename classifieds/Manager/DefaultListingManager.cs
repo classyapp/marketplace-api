@@ -108,6 +108,7 @@ namespace classy.Manager
                 int count = 1;
                 TripleStore.LogActivity(appId, SecurityContext.IsAuthenticated ? SecurityContext.AuthenticatedProfileId : "guest", ActivityPredicate.VIEW_LISTING, listing.Id, ref count);
             }
+
             return listingView;
         }
 
@@ -350,7 +351,7 @@ namespace classy.Manager
                     listing.Metadata.Add(c);
                 }
             }
-            if (fields.HasFlag(ListingUpdateFields.EditorKeywords)) listing.EditorKeywords = editorKeywords;
+            if (fields.HasFlag(ListingUpdateFields.EditorKeywords)) listing.TranslatedKeywords = editorKeywords;
 
             ListingRepository.Update(listing);
 
