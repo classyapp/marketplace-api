@@ -179,28 +179,36 @@ namespace classy.Manager
         {
             var listing = GetVerifiedListing(appId, listingId, true, true);
             var mediaFiles = new List<MediaFile>();
-
             if (files != null && files.Count() > 0)
             {
+                System.Diagnostics.Trace.TraceInformation(string.Format("adding {0} external media files to listing {1}", files.Count(), listingId));
                 foreach (IFile file in files)
                 {
                     if (file.ContentType.Contains("image")) // only images for now
                     {
                         using (var reader = new BinaryReader(file.InputStream))
                         {
-                            var key = Guid.NewGuid().ToString();
-                            byte[] content = reader.ReadBytes((int)file.ContentLength);
-                            byte[] reducedContent = content.Rescale(AppManager.GetAppById(appId).ImageReducedSize);
-                            StorageRepository.SaveFile(key, content, file.ContentType, false, ListingRepository);
-                            StorageRepository.SaveFile(key + "_reduced", reducedContent, file.ContentType, true, ListingRepository);
-                            var mediaFile = new MediaFile
+                            try
                             {
-                                Type = MediaFileType.Image,
-                                ContentType = file.ContentType,
-                                Url = StorageRepository.KeyToUrl(key),
-                                Key = key
-                            };
-                            mediaFiles.Add(mediaFile);
+                                var key = Guid.NewGuid().ToString();
+                                byte[] content = reader.ReadBytes((int)file.ContentLength);
+                                byte[] reducedContent = content.Rescale(AppManager.GetAppById(appId).ImageReducedSize);
+                                StorageRepository.SaveFile(key, content, file.ContentType, false, ListingRepository);
+                                StorageRepository.SaveFile(key + "_reduced", reducedContent, file.ContentType, true, ListingRepository);
+                                var mediaFile = new MediaFile
+                                {
+                                    Type = MediaFileType.Image,
+                                    ContentType = file.ContentType,
+                                    Url = StorageRepository.KeyToUrl(key),
+                                    Key = key
+                                };
+                                mediaFiles.Add(mediaFile);
+                            }
+                            catch (Exception ex)
+                            {
+                                System.Diagnostics.Trace.WriteLine("Error saving external media " + ex.ToString());
+                                throw ex;
+                            }
                         }
                     }
                 }
