@@ -118,6 +118,7 @@
     <Compile Include="DTO\Request\GetCitiesByCountry.cs" />
     <Compile Include="DTO\Request\GetCollectionTranslation.cs" />
     <Compile Include="DTO\Request\GetIncludedListingTranslation.cs" />
+    <Compile Include="DTO\Request\GetListingMoreInfo.cs" />
     <Compile Include="DTO\Request\GetListingTranslation.cs" />
     <Compile Include="DTO\Request\DeleteTranslation.cs" />
     <Compile Include="DTO\Request\GetProfileTranslation.cs" />
@@ -177,6 +178,7 @@
     <Compile Include="DTO\Request\SearchProfiles.cs" />
     <Compile Include="DTO\Request\UpdateBooking.cs" />
     <Compile Include="DTO\Request\UpdateSingleItemOrder.cs" />
+    <Compile Include="DTO\Request\VerifyEmailRequest.cs" />
     <Compile Include="DTO\Request\VerifyPasswordResetRequest.cs" />
     <Compile Include="Extentions\ImageExtensions.cs" />
     <Compile Include="Extentions\LocalizationListResourceViewExtenstions.cs" />
@@ -210,7 +212,6 @@
     <Compile Include="Manager\IProfileManager.cs" />
     <Compile Include="Manager\IReviewManager.cs" />
     <Compile Include="Manager\IThumbnailManager.cs" />
-    <Compile Include="Manager\ITranslationProvider.cs" />
     <Compile Include="Manager\MandrillEmailManager.cs" />
     <Compile Include="Manager\DefaultLocalizationManager.cs" />
     <Compile Include="Manager\DefaultThumbnailManager.cs" />

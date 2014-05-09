@@ -59,12 +59,12 @@
     <Compile Include="ContactInfoView.cs" />
     <Compile Include="CoordsView.cs" />
     <Compile Include="IncludedListingTranslationView.cs" />
+    <Compile Include="ListingMoreInfoView.cs" />
     <Compile Include="ListingTranslationView.cs" />
     <Compile Include="ProfileTranslationView.cs" />
     <Compile Include="SocialPhotoAlbumView.cs" />
     <Compile Include="EmailContact.cs" />
     <Compile Include="IncludedListingView.cs" />
-    <Compile Include="Listing.cs" />
     <Compile Include="ListingView.cs" />
     <Compile Include="LocalizationListResourceView.cs" />
     <Compile Include="LocalizationResourceView.cs" />
@@ -85,6 +85,7 @@
     <Compile Include="SubTransactionView.cs" />
     <Compile Include="TimeslotScheduleView.cs" />
     <Compile Include="TripleView.cs" />
+    <Compile Include="VerifyEmailResponse.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />

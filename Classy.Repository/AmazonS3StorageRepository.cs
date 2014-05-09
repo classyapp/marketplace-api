@@ -7,6 +7,7 @@ using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
 using System.Web;
+using System.Collections.Concurrent;
 
 namespace Classy.Repository
 {
@@ -14,12 +15,12 @@ namespace Classy.Repository
     {
         private readonly Amazon.S3.IAmazonS3 s3Client;
         private readonly string bucketName;
-        private static Dictionary<string, Stream> memoryCache;
+        private static ConcurrentDictionary<string, Stream> memoryCache;
         private static Dictionary<int, string> keys;
 
         static AmazonS3StorageRepository()
         {
-            memoryCache = new Dictionary<string, Stream>();
+            memoryCache = new ConcurrentDictionary<string, Stream>();
             keys = new Dictionary<int, string>();
         }
 
@@ -44,7 +45,7 @@ namespace Classy.Repository
             request.CannedACL = Amazon.S3.S3CannedACL.PublicReadWrite;
             if (cacheStream)
             {
-                memoryCache.Add(key, new MemoryStream(content));
+                memoryCache.AddOrUpdate(key, new MemoryStream(content), (_key, _value) => { return _value; });
             }
 
             Task<PutObjectResponse> response = s3Client.PutObjectAsync(request);
@@ -66,8 +67,8 @@ namespace Classy.Repository
         {
             if (memoryCache.ContainsKey(key))
             {
-                Stream stream = memoryCache[key];
-                memoryCache.Remove(key);
+                Stream stream = null;
+                memoryCache.TryRemove(key, out stream);
                 return stream;
             }
 
@@ -108,10 +109,16 @@ namespace Classy.Repository
 
             if (memoryCache.ContainsKey(originKey))
             {
-                memoryCache[originKey].Dispose();
-                memoryCache.Remove(originKey);
+                Stream existingStream = null;
+                memoryCache.TryRemove(originKey, out existingStream);
+                if (existingStream != null)
+                {
+                    existingStream.Close();
+                    existingStream.Dispose();
+                    existingStream = null;
+                }
             }
-            memoryCache.Add(originKey, stream);
+            memoryCache.AddOrUpdate(originKey, stream, (keys, value) => { return value; });
         }
     }
 }

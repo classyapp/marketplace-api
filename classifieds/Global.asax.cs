@@ -23,7 +23,7 @@ using System.Web.SessionState;
 using ServiceStack.Text;
 using MongoDB.Driver;
 using System.Configuration;
-using classy.Extentions;
+using classy.Extensions;
 using classy.Operations;
 
 namespace classy
@@ -148,6 +148,7 @@ namespace classy
                     .Add<SetListingTranslation>("/listing/{ListingId}/translation/{CultureCode}", "POST")
                     .Add<GetListingTranslation>("/listing/{ListingId}/translation/{CultureCode}", "GET")
                     .Add<DeleteListingTranslation>("/listing/{ListingId}/translation/{CultureCode}", "DELETE")
+                    .Add<GetListingMoreInfo>("/listing/{ListingId}/more", "POST")
 
                     // Collections
                     .Add<CreateCollection>("/collection/new", "POST") // create a new collection
@@ -211,6 +212,7 @@ namespace classy
                     .Add<SetProfileTranslation>("/profile/{ProfileID}/translation/{CultureCode}", "POST")
                     .Add<GetProfileTranslation>("/profile/{ProfileID}/translation/{CultureCode}", "GET")
                     .Add<DeleteProfileTranslation>("/profile/{ProfileID}/translation/{CultureCode}", "DELETE")
+                    .Add<VerifyEmailRequest>("/profile/verify/{hash}", "GET")
 
                     // Reviews
                     .Add<PostReviewForListing>("/listing/{ListingId}/reviews/new", "POST")

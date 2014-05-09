@@ -108,7 +108,9 @@ namespace Classy.Repository
 
             #region Build queries for match
             var queries = new List<IMongoQuery>() {
-                Query<Profile>.EQ(x => x.AppId, appId)
+                Query<Profile>.EQ(x => x.AppId, appId),
+                // exclude admin accoutns
+                Query<Profile>.NE(x => x.Permissions, "admin")
             };
 
             if (professionalsOnly)
@@ -256,6 +258,11 @@ namespace Classy.Repository
                         x.ProfessionalInfo.CompanyContactInfo.Location.Address.Country == countryCode &&
                         !string.IsNullOrEmpty(x.ProfessionalInfo.CompanyContactInfo.Location.Address.City)
                     )).ToList();
+        }
+
+        public Profile GetByEmailHash(string appId, string hash)
+        {
+            return ProfilesCollection.FindOne(Query.And(Query.EQ("AppId", appId), Query.EQ("Metadata." + Profile.EmailHashMetadata, hash)));
         }
     }
 }

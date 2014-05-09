@@ -27,8 +27,10 @@ namespace classy.Manager
         private ICollectionRepository CollectionRepository;
         private ITripleStore TripleStore;
         private IStorageRepository StorageRepository;
+        private IAppManager AppManager;
 
         public DefaultListingManager(
+            IAppManager appManager,
             IMessageQueueClient messageQueueClient,
             IListingRepository listingRepository,
             ICommentRepository commentRepository,
@@ -38,6 +40,7 @@ namespace classy.Manager
             IStorageRepository storageRepository)
         {
             _messageQueueClient = messageQueueClient;
+            AppManager = appManager;
             ListingRepository = listingRepository;
             CommentRepository = commentRepository;
             ProfileRepository = profileRepository;
@@ -105,6 +108,7 @@ namespace classy.Manager
                 int count = 1;
                 TripleStore.LogActivity(appId, SecurityContext.IsAuthenticated ? SecurityContext.AuthenticatedProfileId : "guest", ActivityPredicate.VIEW_LISTING, listing.Id, ref count);
             }
+
             return listingView;
         }
 
@@ -186,7 +190,7 @@ namespace classy.Manager
                         {
                             var key = Guid.NewGuid().ToString();
                             byte[] content = reader.ReadBytes((int)file.ContentLength);
-                            byte[] reducedContent = content.Rescale(640);
+                            byte[] reducedContent = content.Rescale(AppManager.GetAppById(appId).ImageReducedSize);
                             StorageRepository.SaveFile(key, content, file.ContentType, false, ListingRepository);
                             StorageRepository.SaveFile(key + "_reduced", reducedContent, file.ContentType, true, ListingRepository);
                             var mediaFile = new MediaFile
@@ -318,6 +322,7 @@ namespace classy.Manager
             TimeslotSchedule timeslotSchedule,
             IDictionary<string, string> metadata,
             IList<string> hashtags,
+            IDictionary<string, IList<string>> editorKeywords,
             ListingUpdateFields fields)
         {
             var listing = GetVerifiedListing(appId, listingId, true, true);
@@ -346,6 +351,7 @@ namespace classy.Manager
                     listing.Metadata.Add(c);
                 }
             }
+            if (fields.HasFlag(ListingUpdateFields.EditorKeywords)) listing.TranslatedKeywords = editorKeywords;
 
             ListingRepository.Update(listing);
 
@@ -980,6 +986,67 @@ namespace classy.Manager
         private Listing GetVerifiedListing(string appId, string listingId)
         {
             return GetVerifiedListing(appId, listingId, false);
+        }
+
+
+        public ListingMoreInfoView GetListingMoreInfo(string appId, string listingId, Dictionary<string, string[]> metadata, Location location, string culture)
+        {
+            ListingMoreInfoView data = new ListingMoreInfoView();
+
+            Listing listing = GetVerifiedListing(appId, listingId);
+
+            // Get original collection
+            Collection originalCollection = CollectionRepository.GetOriginalCollection(listing);
+            if (originalCollection != null)
+            {
+                data.CollectionType = originalCollection.Type.ToLowerInvariant();
+                data.CollectionLisitngs = ListingRepository.GetById(originalCollection.IncludedListings.Select(l => l.Id).ToArray(), appId, false, culture).ToListingViewList(culture);
+            }
+
+            // Search by metadata provided
+            if (metadata != null)
+            {
+                long count = 0;
+                data.SearchResults = ListingRepository.Search(null, new string[] { listing.ListingType }, 
+                    metadata, 
+                    null, null, location, appId, false, false, 0, 0, ref count, culture).ToListingViewList(culture);
+                if (data.SearchResults != null)
+                {
+                    data.SearchResults.Remove(data.SearchResults.First(wl => wl.Id == listingId));
+                }
+            }
+            
+            // Get more collections including this listing
+            IList<CollectionView> collections = GetCollectionsByListingId(appId, listing.Id, culture);
+            CollectionView currenctCollection = collections.FirstOrDefault(c => c.Id == originalCollection.Id);
+            if (currenctCollection != null)
+                collections.Remove(currenctCollection);
+
+            data.Collections = collections;
+
+            return data;
+        }
+
+        private IList<CollectionView> GetCollectionsByListingId(string appId, string listingId, string culture)
+        {
+            try
+            {
+                var collections = CollectionRepository.GetByListingId(appId, listingId, culture);
+
+                foreach (var collection in collections)
+                {
+                    if (collection.CoverPhotos == null || collection.CoverPhotos.Count == 0)
+                    {
+                        collection.CoverPhotos = ListingRepository.GetById(collection.IncludedListings.Select(l => l.Id).Skip(Math.Max(0, collection.IncludedListings.Count - 4)).ToArray(), appId, false, null).Select(l => l.ExternalMedia[0].Key).ToArray();
+                    }
+                }
+
+                return collections.ToCollectionViewList(culture);
+            }
+            catch (Exception)
+            {
+                throw;
+            }
         }
     }
 }

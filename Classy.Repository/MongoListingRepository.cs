@@ -94,6 +94,11 @@ namespace Classy.Repository
                 if (listing.SchedulingTemplate != null) update.Set(x => x.SchedulingTemplate, listing.SchedulingTemplate);
                 if (listing.Metadata != null) update.Set(x => x.Metadata, listing.Metadata);
                 if (listing.Hashtags != null && listing.Hashtags.Count > 0) update.Set(x => x.Hashtags, listing.Hashtags);
+                if (listing.TranslatedKeywords != null && listing.TranslatedKeywords.Count > 0)
+                {
+                    update.Set(x => x.TranslatedKeywords, listing.TranslatedKeywords);
+                    update.Set(x => x.SearchableKeywords, listing.TranslatedKeywords.SelectMany(s => s.Value));
+                }
 
                 ListingsCollection.FindAndModify(query, null, update);
             }
@@ -246,6 +251,7 @@ namespace Classy.Repository
         public IList<Listing> Search(string[] tags, string[] listingTypes, IDictionary<string, string[]> metadata, 
             double? priceMin, double? priceMax, Location location, string appId,
             bool includeDrafts, bool increaseViewCounter, int page, int pageSize, ref long count, string culture)
+        
         {
             // set sort order
             var sortOrder = SortBy<Listing>.Descending(x => x.DisplayOrder).Descending(x => x.FavoriteCount);
@@ -269,7 +275,10 @@ namespace Classy.Repository
             // tags
             if (tags != null && tags.Count() > 0)
             {
-                queries.Add(Query.In("Hashtags", tags.Select(x => new BsonRegularExpression(new Regex(x, RegexOptions.IgnoreCase)))));
+                var tagQueries = new List<IMongoQuery>();
+                tagQueries.Add(Query.In("Hashtags", tags.Select(x => new BsonRegularExpression(new Regex(x, RegexOptions.IgnoreCase | RegexOptions.Compiled)))));
+                tagQueries.Add(Query.In("SearchableKeywords", tags.Select(x => new BsonRegularExpression(new Regex(x, RegexOptions.IgnoreCase | RegexOptions.CultureInvariant | RegexOptions.Compiled)))));
+                queries.Add(Query.Or(tagQueries));
             }
 
             // metadata
@@ -353,5 +362,5 @@ namespace Classy.Repository
                 ListingsCollection.Save(listing);
             }
         }
-    }
+   }
 }

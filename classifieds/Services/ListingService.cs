@@ -85,7 +85,7 @@ namespace classy.Services
         }
 
         public object Get(GetListingsByProfileId request)
-        {
+       { 
             try
             {
                 var listingViews = ListingManager.GetListingsByProfileId(
@@ -240,6 +240,7 @@ namespace classy.Services
                     request.SchedulingTemplate,
                     request.Metadata,
                     request.Hashtags,
+                    request.EditorKeywords,
                     request.Fields);
 
                 return new HttpResult(listing, HttpStatusCode.OK);
@@ -286,6 +287,8 @@ namespace classy.Services
                     request.ListingId,
                     request.Content,
                     request.FormatAsHtml);
+
+                comment.Profile = ProfileManager.GetProfileById(request.Environment.AppId, comment.ProfileId, null, false, false, false, false, false, false, false, request.Environment.CultureCode);
 
                 return new HttpResult(comment, HttpStatusCode.OK);
             }
@@ -577,7 +580,7 @@ namespace classy.Services
                     request.CoverPhotos);
 
                 // update email on user auth if needed
-                if (!session.Permissions.Contains("admin") && 
+                if (!session.Permissions.Contains("admin") &&
                     ((profile.IsProfessional && (session.Email != profile.ProfessionalInfo.CompanyContactInfo.Email)) ||
                     (!profile.IsProfessional && (session.Email != profile.ContactInfo.Email))))
                 {
@@ -1495,7 +1498,7 @@ namespace classy.Services
                 EmailResult result = EmailManager.SendHtmlMessage(
                     AppManager.GetAppById(request.Environment.AppId).MandrilAPIKey,
                     request.ReplyTo, request.To, request.Subject, request.Body, request.Template, request.Variables);
-                
+
                 if (result.Status == EmailResultStatus.Failed)
                 {
                     return new HttpError(HttpStatusCode.NotFound, result.Reason);
@@ -1580,6 +1583,26 @@ namespace classy.Services
         public object Get(GetCitiesByCountry request)
         {
             return LocalizationManager.GetCitiesByCountry(request.Environment.AppId, request.CountryCode);
+        }
+
+        public object Post(GetListingMoreInfo request)
+        {
+            return ListingManager.GetListingMoreInfo(request.Environment.AppId, request.ListingId, request.Metadata, null, request.Environment.CultureCode);
+        }
+
+        public object Get(VerifyEmailRequest request)
+        {
+            VerifyEmailResponse response = null;
+            try
+            {
+                response = ProfileManager.VerifyEmailByHash(request.Environment.AppId, request.Hash);
+            }
+            catch (Exception ex)
+            {
+                response = new VerifyEmailResponse { Verified = false, ErrorMessage = ex.Message };
+            }
+
+            return new HttpResult(response, HttpStatusCode.OK);
         }
     }
 }

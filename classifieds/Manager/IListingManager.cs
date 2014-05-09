@@ -127,6 +127,7 @@ namespace classy.Manager
             TimeslotSchedule timeslotSchedule,
             IDictionary<string, string> metadata,
             IList<string> Hashtags,
+            IDictionary<string, IList<string>> EditorKeywords,
             ListingUpdateFields fields);
 
         /// <summary>
@@ -241,5 +242,7 @@ namespace classy.Manager
         /// <param name="listingId"></param>
         /// <param name="cultureCode"></param>
         void DeleteTranslation(string appId, string listingId, string cultureCode);
+
+        ListingMoreInfoView GetListingMoreInfo(string appId, string listingId, Dictionary<string, string[]> metadata, Location location, string culture);
     }
 }
