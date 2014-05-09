@@ -6,6 +6,7 @@ using System.Drawing.Imaging;
 using System.IO;
 using System.Linq;
 using System.Web;
+using Amazon.S3;
 using Classy.Repository;
 
 namespace classy.Manager
@@ -26,8 +27,17 @@ namespace classy.Manager
             {
                 Stream memoryStream;
 
-                originKey = originKey.StartsWith("profile_img") ? originKey : originKey + "_reduced";
-                Stream originalImage = StorageRepository.GetFile(originKey);
+                var imageKey = originKey.StartsWith("profile_img") ? originKey : originKey + "_reduced";
+                Stream originalImage = null;
+                try
+                {
+                    originalImage = StorageRepository.GetFile(imageKey);
+                }
+                catch (AmazonS3Exception ex)
+                {
+                    originalImage = StorageRepository.GetFile(originKey);
+                }
+
                 lock (originalImage)
                 {
                     memoryStream = GenerateThumbnail(originalImage, width, height);
@@ -72,12 +82,12 @@ namespace classy.Manager
                 }
 
                 // Check that we are not upscaling
-                if (newWidth > source.Width)
-                {
-                    memoryStream = new MemoryStream();
-                    source.Save(memoryStream, ImageFormat.Jpeg);
-                    return memoryStream;
-                }
+                //if (newWidth < source.Width && newHeight < source.Height)
+                //{
+                //    memoryStream = new MemoryStream();
+                //    source.Save(memoryStream, ImageFormat.Jpeg);
+                //    return memoryStream;
+                //}
 
                 using (Bitmap bitmap = new Bitmap(newWidth, newHeight))
                 {
