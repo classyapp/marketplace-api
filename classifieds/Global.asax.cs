@@ -3,6 +3,7 @@ using classy.Manager;
 using Classy.Models;
 using Classy.Models.Request;
 using Classy.Repository;
+using classy.Services;
 using ServiceStack.Common;
 using ServiceStack.Common.Web;
 using ServiceStack.Configuration;
@@ -122,6 +123,9 @@ namespace classy
             private void ConfigureServiceRoutes()
             {
                 Routes
+                    // Search
+                    .Add<SearchListingsRequest>("/listings/search", "POST")
+
                     // App settings
                     .Add<GetAppSettings>("/app/settings", "GET")
 

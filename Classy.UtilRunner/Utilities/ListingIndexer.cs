@@ -40,6 +40,7 @@ namespace Classy.UtilRunner.Utilities
             {
                 toIndex.Add(new ListingIndexDto
                 {
+                    Id = listing.Id,
                     AddToCollectionCount = listing.AddToCollectionCount,
                     BookingCount = listing.BookingCount,
                     ClickCount = listing.ClickCount,

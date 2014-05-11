@@ -6,6 +6,8 @@ namespace Classy.Models.Search
     [ElasticType(Name = "listing")]
     public class ListingIndexDto
     {
+        public string Id { get; set; }
+
         [ElasticProperty(Index = FieldIndexOption.analyzed)]
         public string Title { get; set; }
         [ElasticProperty(Index = FieldIndexOption.analyzed)]

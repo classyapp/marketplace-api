@@ -1,5 +1,6 @@
 ﻿using Classy.Interfaces.Search;
 using classy.Manager;
+using classy.Manager.Search;
 using Classy.Repository;
 using MongoDB.Driver;
 using ServiceStack.CacheAccess;
