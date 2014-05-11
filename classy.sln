@@ -1,6 +1,8 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 2012
+# Visual Studio 2013
+VisualStudioVersion = 12.0.21005.1
+MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "classy", "classifieds\classy.csproj", "{F03039CF-DC12-4A37-A2B6-9E9B78E59FB1}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Classy.Models", "Classy.Models\Classy.Models.csproj", "{AC13DF42-51BB-4798-A0AB-9B2776B4844F}"
@@ -14,6 +16,8 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Classy.Interfaces", "Classy.Interfaces\Classy.Interfaces.csproj", "{9C0DED9F-8160-4BDF-A599-6B33A983353A}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Classy.Tests", "Classy.Tests\Classy.Tests.csproj", "{FBF99D6F-7815-49C7-99B6-BFA9B8FDBEDE}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Classy.UtilRunner", "Classy.UtilRunner\Classy.UtilRunner.csproj", "{0B3E9ACC-1579-4C04-825F-3485E30E2E0D}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -64,6 +68,12 @@ Global
 		{FBF99D6F-7815-49C7-99B6-BFA9B8FDBEDE}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{FBF99D6F-7815-49C7-99B6-BFA9B8FDBEDE}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{FBF99D6F-7815-49C7-99B6-BFA9B8FDBEDE}.Release|Any CPU.Build.0 = Release|Any CPU
+		{0B3E9ACC-1579-4C04-825F-3485E30E2E0D}.AppHarbor|Any CPU.ActiveCfg = Release|Any CPU
+		{0B3E9ACC-1579-4C04-825F-3485E30E2E0D}.AppHarbor|Any CPU.Build.0 = Release|Any CPU
+		{0B3E9ACC-1579-4C04-825F-3485E30E2E0D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{0B3E9ACC-1579-4C04-825F-3485E30E2E0D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{0B3E9ACC-1579-4C04-825F-3485E30E2E0D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{0B3E9ACC-1579-4C04-825F-3485E30E2E0D}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
