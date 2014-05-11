@@ -81,6 +81,7 @@
   <ItemGroup>
     <Compile Include="ModelDictionaryTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Search\ListingSearchProviderTests.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\classifieds\classy.csproj">
