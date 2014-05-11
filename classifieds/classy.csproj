@@ -56,6 +56,10 @@
     <Reference Include="MongoDB.Driver">
       <HintPath>..\lib\MongoDB.Driver.dll</HintPath>
     </Reference>
+    <Reference Include="Nest, Version=0.12.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\packages\NEST.0.12.0.0\lib\NET4\Nest.dll</HintPath>
+    </Reference>
     <Reference Include="Newtonsoft.Json, Version=6.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\packages\Newtonsoft.Json.6.0.1\lib\net45\Newtonsoft.Json.dll</HintPath>
@@ -221,9 +225,11 @@
     <Compile Include="Manager\DefaultListingManager.cs" />
     <Compile Include="Manager\DefaultOrderManager.cs" />
     <Compile Include="Manager\DefaultProfileManager.cs" />
+    <Compile Include="Manager\Search\ListingSearchProvider.cs" />
     <Compile Include="Operations\IOperator.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Services\ListingService.cs" />
+    <Compile Include="Services\SearchService.cs" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="packages.config" />
