@@ -52,7 +52,7 @@
     <Compile Include="Managers\IEmailManager.cs" />
     <Compile Include="Managers\ILocalizationManager.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Search\ISearchClientFactory.cs" />
+    <Compile Include="Search\ListingSearchProvider.cs" />
     <Compile Include="Search\SearchClientFactory.cs" />
   </ItemGroup>
   <ItemGroup>
