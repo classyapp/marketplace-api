@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using Classy.Interfaces.Search;
 using Classy.Models;
@@ -11,6 +12,7 @@ namespace Classy.UtilRunner.Utilities
 {
     public class ListingIndexer : IUtility
     {
+        private const int BatchSize = 100;
         private readonly MongoCollection<Listing> _listings;
         private readonly ISearchClientFactory _searchClientFactory;
 
@@ -30,9 +32,10 @@ namespace Classy.UtilRunner.Utilities
 
             client = _searchClientFactory.GetClient("listings");
 
-            var toIndex = new List<ListingIndexDto>();
+            var toIndex = new List<ListingIndexDto>(BatchSize);
 
-            var cursor = _listings.FindAll().SetLimit(100);
+            var i = 0;
+            var cursor = _listings.FindAll().SetBatchSize(BatchSize);
             foreach (var listing in cursor)
             {
                 toIndex.Add(new ListingIndexDto
@@ -51,9 +54,16 @@ namespace Classy.UtilRunner.Utilities
                     Title = listing.Title,
                     ViewCount = listing.ViewCount
                 });
-            }
 
-            client.IndexMany(toIndex.ToArray());
+                if (toIndex.Count == BatchSize)
+                {
+                    client.IndexMany(toIndex);
+                    toIndex = new List<ListingIndexDto>(BatchSize);
+
+                    Console.WriteLine("Indexed {0} documents", ++i * BatchSize);
+                }
+            }
+            client.IndexMany(toIndex);
 
             return StatusCode.Success;
         }
