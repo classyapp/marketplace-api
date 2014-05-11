@@ -46,6 +46,9 @@
     <Reference Include="MongoDB.Driver">
       <HintPath>..\lib\MongoDB.Driver.dll</HintPath>
     </Reference>
+    <Reference Include="Nest">
+      <HintPath>..\packages\NEST.0.12.0.0\lib\NET4\Nest.dll</HintPath>
+    </Reference>
     <Reference Include="Newtonsoft.Json">
       <HintPath>..\packages\Newtonsoft.Json.6.0.1\lib\net45\Newtonsoft.Json.dll</HintPath>
     </Reference>
@@ -77,6 +80,7 @@
     <Compile Include="LocalizationListResource.cs" />
     <Compile Include="LocalizationResource.cs" />
     <Compile Include="Profile.cs" />
+    <Compile Include="Search\ListingIndexDto.cs" />
     <Compile Include="Translation.cs" />
     <Compile Include="ProxyClaim.cs" />
     <Compile Include="ProfessionalInfo.cs" />
@@ -104,6 +108,7 @@
   <ItemGroup>
     <None Include="packages.config" />
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
