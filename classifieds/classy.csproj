@@ -184,6 +184,7 @@
     <Compile Include="DTO\Request\UpdateSingleItemOrder.cs" />
     <Compile Include="DTO\Request\VerifyEmailRequest.cs" />
     <Compile Include="DTO\Request\VerifyPasswordResetRequest.cs" />
+    <Compile Include="Extentions\EnumerableExtensions.cs" />
     <Compile Include="Extentions\ImageExtensions.cs" />
     <Compile Include="Extentions\LocalizationListResourceViewExtenstions.cs" />
     <Compile Include="Extentions\CommentViewExtensions.cs" />
