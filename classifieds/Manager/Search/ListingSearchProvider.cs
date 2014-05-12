@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.Linq;
+﻿using System.Linq;
 using Classy.Interfaces.Search;
 using Classy.Models.Search;
 using Nest;
@@ -24,15 +21,22 @@ namespace classy.Manager.Search
 
         public SearchResults<ListingIndexDto> Search(string query)
         {
-            var queryDescriptor = new QueryDescriptor<ListingIndexDto>();
-            queryDescriptor.QueryString(
-                q => q.OnFields(f => f.Title, f => f.Content).Query(query));
-            queryDescriptor.Filtered(q => q.Filter(f => f.Term(t => t.FlagCount, 0)));
+            //var searchDescriptor = new SearchDescriptor<ListingIndexDto>()
+            //    .Query(q => q.Bool(b =>
+            //        b.Should(s => s.QueryString(x => x.OnFields(f => f.Title, f => f.Content, f => f.Keywords).Query(query)),
+            //        s => s.Nested(n => 
+            //            n.Path(p => p.Metadata)
+            //            .Query(nq => nq.Term(t => t.Metadata, query))))));
 
-            var searchDescriptor = new SearchDescriptor<ListingIndexDto>();
-            searchDescriptor.Query(queryDescriptor);
-            
+            var searchDescriptor = new SearchDescriptor<ListingIndexDto>()
+                .Query(q => q.QueryString(x =>
+                    x.OnFields(f => f.Metadata, f => f.Title, f => f.Content, f => f.Keywords).Query(query)));
+
+            var request = _client.Serializer.Serialize(searchDescriptor);
+
             var response = _client.Search(searchDescriptor);
+
+            //queryDescriptor.Filtered(q => q.Filter(f => f.Range(t => t.Greater(0))));
 
             return new SearchResults<ListingIndexDto> {
                 Results = response.Documents.ToList(),
