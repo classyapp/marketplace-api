@@ -12,10 +12,12 @@ namespace Classy.Models.Search
         public string Title { get; set; }
         [ElasticProperty(Index = FieldIndexOption.analyzed)]
         public string Content { get; set; }
+        [ElasticProperty(Index = FieldIndexOption.not_analyzed)]
         public string ListingType { get; set; }
+        [ElasticProperty(Index = FieldIndexOption.analyzed)]
         public string[] Keywords { get; set; } // comes from SearchableKeywords
 
-        // Scoring
+        // These fields are here for scoring/relevance
         public int CommentCount { get; set; }
         public int FavoriteCount { get; set; }
         public int FlagCount { get; set; }
@@ -31,7 +33,7 @@ namespace Classy.Models.Search
         //public PricingInfo PricingInfo { get; set; }
         //public TimeslotSchedule SchedulingTemplate { get; set; }
 
-        [ElasticProperty(Type = FieldType.@object)]
-        public Dictionary<string, string> Metadata { get; set; }
+        [ElasticProperty(Index = FieldIndexOption.analyzed)] // should we analyze this data ?...
+        public string[] Metadata { get; set; }
     }
 }
