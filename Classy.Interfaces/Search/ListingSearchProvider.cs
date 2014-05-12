@@ -6,6 +6,6 @@ namespace Classy.Interfaces.Search
     {
         void Index(ListingIndexDto[] listingDtos);
 
-        SearchResults<ListingIndexDto> Search(string query);
+        SearchResults<ListingIndexDto> Search(string query, int amount = 25, int page = 1);
     }
 }

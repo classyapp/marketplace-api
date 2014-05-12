@@ -31,6 +31,7 @@ namespace classy.Manager
                 MandrilAPIKey = "ndg42WcyRHVLtLbvGqBjUA",
                 ImageReducedSize = 1600,
                 DefaultFromEmailAddress = "team@homelab.com"
+                // metadata indexing properties
             };
         }
     }

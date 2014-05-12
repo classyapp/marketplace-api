@@ -1,4 +1,6 @@
-﻿using ServiceStack.Common;
+﻿using System.Diagnostics;
+using Classy.Interfaces.Search;
+using ServiceStack.Common;
 using ServiceStack.ServiceInterface;
 using System;
 using System.Collections.Generic;
@@ -17,7 +19,7 @@ using Classy.Interfaces.Managers;
 
 namespace classy.Services
 {
-    public class ListingService : ServiceStack.ServiceInterface.Service
+    public class ListingService : Service
     {
         public IBookingManager BookingManager { get; set; }
         public IOrderManager OrderManager { get; set; }
