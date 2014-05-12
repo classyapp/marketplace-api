@@ -44,9 +44,13 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\packages\Newtonsoft.Json.6.0.3\lib\net45\Newtonsoft.Json.dll</HintPath>
     </Reference>
+    <Reference Include="nunit.framework">
+      <HintPath>..\packages\NUnit.2.6.3\lib\nunit.framework.dll</HintPath>
+    </Reference>
     <Reference Include="ServiceStack, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\packages\mongocsharpdriver.1.8.3\lib\net35\MongoDB.Bson.dll</HintPath>
+      <HintPath>..\lib\ServiceStack.dll</HintPath>
     </Reference>
     <Reference Include="MongoDB.Driver, Version=1.8.3.9, Culture=neutral, PublicKeyToken=f686731cfb9cc103, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
@@ -96,11 +100,7 @@
         <Reference Include="Microsoft.VisualStudio.QualityTools.UnitTestFramework, Version=10.1.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL" />
       </ItemGroup>
     </When>
-    <Otherwise>
-      <ItemGroup>
-        <Reference Include="Microsoft.VisualStudio.QualityTools.UnitTestFramework" />
-      </ItemGroup>
-    </Otherwise>
+    <Otherwise />
   </Choose>
   <ItemGroup>
     <Compile Include="AuthServiceUnitTest.cs" />
@@ -110,6 +110,8 @@
     <Compile Include="MongoDBAuthRepositoryTests.cs" />
     <Compile Include="TestAppHost.cs" />
     <Compile Include="AuthServiceTest.cs" />
+    <Compile Include="Framework\TestBase.cs" />
+    <Compile Include="ModelDictionaryTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="TestCustomAuthenticationAttribute.cs" />
     <Compile Include="Search\ListingSearchProviderTests.cs" />
@@ -122,6 +124,9 @@
     <ProjectReference Include="..\Classy.Auth\Classy.Auth.csproj">
       <Project>{c40e22db-95cd-4e86-bf84-718aeadf064c}</Project>
       <Name>Classy.Auth</Name>
+    <ProjectReference Include="..\Classy.Interfaces\Classy.Interfaces.csproj">
+      <Project>{9C0DED9F-8160-4BDF-A599-6B33A983353A}</Project>
+      <Name>Classy.Interfaces</Name>
     </ProjectReference>
     <ProjectReference Include="..\Classy.Models\Classy.Models.csproj">
       <Project>{ac13df42-51bb-4798-a0ab-9b2776b4844f}</Project>
@@ -133,8 +138,10 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="App.config" />
     <None Include="packages.config" />
   </ItemGroup>
+  <ItemGroup />
   <Choose>
     <When Condition="'$(VisualStudioVersion)' == '10.0' And '$(IsCodedUITest)' == 'True'">
       <ItemGroup>

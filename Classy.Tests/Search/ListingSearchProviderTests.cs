@@ -1,15 +1,19 @@
-﻿using classy.Manager.Search;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+﻿using Classy.Tests.Framework;
+using NUnit.Framework;
 
 namespace Classy.Tests.Search
 {
-    [TestClass]
-    public class ListingSearchProviderTests
+    [TestFixture]
+    public class ListingSearchProviderTests : SearchProviderTestBase
     {
-        [TestMethod]
+        [Test]
         public void Search_WordInTitle_ReturnRelevantDocuments()
         {
-            
+            var results = ListingSearchProvider.Search("classic");
+
+            Assert.NotNull(results);
+            Assert.That(results.TotalResults, Is.Not.EqualTo(0));
+            Assert.IsNotEmpty(results.Results);
         }
     }
 }
