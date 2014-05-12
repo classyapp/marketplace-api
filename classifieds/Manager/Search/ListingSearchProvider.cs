@@ -19,7 +19,7 @@ namespace classy.Manager.Search
             _client.IndexMany(listingDtos);
         }
 
-        public SearchResults<ListingIndexDto> Search(string query)
+        public SearchResults<ListingIndexDto> Search(string query, int amount = 25, int page = 1)
         {
             //var searchDescriptor = new SearchDescriptor<ListingIndexDto>()
             //    .Query(q => q.Bool(b =>
@@ -30,7 +30,9 @@ namespace classy.Manager.Search
 
             var searchDescriptor = new SearchDescriptor<ListingIndexDto>()
                 .Query(q => q.QueryString(x =>
-                    x.OnFields(f => f.Metadata, f => f.Title, f => f.Content, f => f.Keywords).Query(query)));
+                    x.OnFields(f => f.Metadata, f => f.Title, f => f.Content, f => f.Keywords).Query(query)))
+                .Size(amount)
+                .From(amount*(page - 1));
 
             var request = _client.Serializer.Serialize(searchDescriptor);
 
