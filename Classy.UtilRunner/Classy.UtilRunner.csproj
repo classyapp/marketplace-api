@@ -32,6 +32,10 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="MongoDB.Bson, Version=1.8.3.9, Culture=neutral, PublicKeyToken=f686731cfb9cc103, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\lib\MongoDB.Bson.dll</HintPath>
+    </Reference>
     <Reference Include="MongoDB.Driver, Version=1.8.3.9, Culture=neutral, PublicKeyToken=f686731cfb9cc103, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\lib\MongoDB.Driver.dll</HintPath>
@@ -71,6 +75,8 @@
     <Compile Include="IUtility.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Utilities\HashtagCleaning\CleanCommentsHashtags.cs" />
+    <Compile Include="Utilities\HashtagCleaning\CleanDescriptionHashtags.cs" />
     <Compile Include="Utilities\ListingIndexer.cs" />
   </ItemGroup>
   <ItemGroup>

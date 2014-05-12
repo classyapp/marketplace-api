@@ -9,5 +9,10 @@ namespace classy.Extentions
         {
             return collection ?? Enumerable.Empty<T>();
         }
+
+        public static bool IsNullOrEmpty<T>(this IEnumerable<T> collection)
+        {
+            return collection == null || !collection.Any();
+        }
     }
 }
