@@ -30,7 +30,7 @@ namespace Classy.UtilRunner
                 return;
             }
 
-            Console.WriteLine("This will run the utility '{0}' - Are you sure ?");
+            Console.WriteLine("This will run the utility '{0}' - Are you sure ?", utilityName);
             var input = Console.ReadLine();
 
             if (!input.IsNullOrEmpty() && !input.ToLower().StartsWith("y"))
