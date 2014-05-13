@@ -59,6 +59,7 @@
     <Compile Include="ContactInfoView.cs" />
     <Compile Include="CoordsView.cs" />
     <Compile Include="IncludedListingTranslationView.cs" />
+    <Compile Include="JobView.cs" />
     <Compile Include="ListingMoreInfoView.cs" />
     <Compile Include="ListingTranslationView.cs" />
     <Compile Include="ProfileTranslationView.cs" />

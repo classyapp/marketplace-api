@@ -36,6 +36,7 @@ namespace classy.Services
         public IEmailManager EmailManager { get; set; }
         public IAppManager AppManager { get; set; }
         public IUserAuthRepository UserAuthRepository { get; set; }
+        public IJobManager JobManager { get; set; }
 
         [CustomAuthenticate]
         public object Post(CreateProfileProxy request)
@@ -1603,6 +1604,14 @@ namespace classy.Services
             }
 
             return new HttpResult(response, HttpStatusCode.OK);
+        }
+
+        public object Post(ImportPorductCatalogRequest request)
+        {
+            IFile file = Request.Files[0];
+            byte[] content = new byte[file.ContentLength];
+            file.InputStream.Read(content, 0, content.Length);
+            return JobManager.ScheduleCatalogImport(request.Environment.AppId, request.ProfileId, request.OverwriteListings, request.UpdateImages, content, file.ContentType, request.CatalogTemplateType);
         }
     }
 }
