@@ -2,6 +2,7 @@
 using classy.Manager;
 using Classy.Models.Request;
 using Classy.Models.Response;
+using ServiceStack.Common;
 using ServiceStack.Common.Web;
 using ServiceStack.ServiceInterface;
 

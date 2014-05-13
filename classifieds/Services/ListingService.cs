@@ -1,5 +1,4 @@
-﻿using ServiceStack.Common;
-using ServiceStack.ServiceInterface;
+﻿using ServiceStack.ServiceInterface;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -10,8 +9,6 @@ using Classy.Models.Response;
 using Classy.Models.Request;
 using Classy.Auth;
 using classy.Manager;
-using System.Security.Cryptography;
-using System.Text;
 using Classy.Interfaces.Managers;
 
 namespace classy.Services
@@ -22,7 +19,6 @@ namespace classy.Services
         public IOrderManager OrderManager { get; set; }
         public IListingManager ListingManager { get; set; }
         public IProfileManager ProfileManager { get; set; }
-        public IReviewManager ReviewManager { get; set; }
         public IAnalyticsManager AnalyticsManager { get; set; }
         public ILocalizationManager LocalizationManager { get; set; }
         public IThumbnailManager ThumbnailManager { get; set; }
@@ -543,142 +539,6 @@ namespace classy.Services
             }
         }
 
-        // post a review for listing
-        [CustomAuthenticate]
-        public object Post(PostReviewForListing request)
-        {
-            try
-            {
-                var session = SessionAs<CustomUserSession>();
-                var review = ReviewManager.PostReviewForListing(
-                    request.Environment.AppId,
-                    session.UserAuthId,
-                    request.ListingId,
-                    request.Content,
-                    request.Score,
-                    request.SubCriteria);
-                return new HttpResult(review, HttpStatusCode.OK);
-            }
-            catch (KeyNotFoundException kex)
-            {
-                return new HttpError(HttpStatusCode.NotFound, kex.Message);
-            }
-        }
-
-        // post a review for profile
-        [CustomAuthenticate]
-        public object Post(PostReviewForProfile request)
-        {
-            try
-            {
-                var session = SessionAs<CustomUserSession>();
-                var review = ReviewManager.PostReviewForProfile(
-                    request.Environment.AppId,
-                    session.UserAuthId,
-                    request.RevieweeProfileId,
-                    request.Content,
-                    request.Score,
-                    request.SubCriteria,
-                    request.Metadata,
-                    request.NewProfessionalContactInfo,
-                    request.NewProfessionalMetadata);
-                var response = new PostReviewResponse
-                {
-                    Review = review.TranslateTo<ReviewView>()
-                };
-                if (request.ReturnRevieweeProfile)
-                    response.RevieweeProfile = ProfileManager.GetProfileById(
-                        request.Environment.AppId,
-                        request.RevieweeProfileId,
-                        null,
-                        false,
-                        false,
-                        false,
-                        false,
-                        false,
-                        false,
-                        false,
-                        request.Environment.CultureCode);
-                if (request.ReturnReviewerProfile)
-                    response.ReviewerProfile = ProfileManager.GetProfileById(
-                        request.Environment.AppId,
-                        session.UserAuthId,
-                        null,
-                        false,
-                        false,
-                        false,
-                        false,
-                        false,
-                        false,
-                        false,
-                        request.Environment.CultureCode);
-                return new HttpResult(response, HttpStatusCode.OK);
-            }
-            catch (KeyNotFoundException kex)
-            {
-                return new HttpError(HttpStatusCode.NotFound, kex.Message);
-            }
-        }
-
-        // get a list of reviews for profile
-        [CustomAuthenticate]
-        public object Get(GetReviewsByProfileId request)
-        {
-            try
-            {
-                var reviews = ReviewManager.GetReviews(
-                    request.Environment.AppId,
-                    request.ProfileId,
-                    request.IncludeDrafts,
-                    request.IncludeOnlyDrafts);
-
-                return new HttpResult(reviews, HttpStatusCode.OK);
-            }
-            catch (KeyNotFoundException kex)
-            {
-                return new HttpError(HttpStatusCode.NotFound, kex.Message);
-            }
-        }
-
-        // publish a review
-        [CustomAuthenticate]
-        public object Post(PublishOrDeleteReview request)
-        {
-            try
-            {
-                var session = SessionAs<CustomUserSession>();
-                var review = ReviewManager.PublishReview(
-                    request.Environment.AppId,
-                    request.ReviewId,
-                    session.UserAuthId);
-
-                return new HttpResult(review, HttpStatusCode.OK);
-            }
-            catch (KeyNotFoundException kex)
-            {
-                return new HttpError(HttpStatusCode.NotFound, kex.Message);
-            }
-        }
-
-        // delete a review
-        public object Delete(PublishOrDeleteReview request)
-        {
-            try
-            {
-                var session = SessionAs<CustomUserSession>();
-                var review = ReviewManager.DeleteReview(
-                    request.Environment.AppId,
-                    request.ReviewId,
-                    session.UserAuthId);
-
-                return new HttpResult(review, HttpStatusCode.OK);
-            }
-            catch (KeyNotFoundException kex)
-            {
-                return new HttpError(HttpStatusCode.NotFound, kex.Message);
-            }
-        }
-
         // 
         // POST: /stats/push
         // log an activity 
@@ -690,69 +550,7 @@ namespace classy.Services
             return new HttpResult(tripleView, HttpStatusCode.OK);
         }
 
-        //
-        // GET: /resource/{Key}
-        // get resource by key
-        public object Get(GetResourceByKey request)
-        {
-            var resource = LocalizationManager.GetResourceByKey(request.Environment.AppId, request.Key, request.ProcessMarkdown);
-            return new HttpResult(resource, HttpStatusCode.OK);
-        }
-
-        //
-        // GET: /resource/all
-        // get all available resources for an app
-        [CustomAuthenticate]
-        [CustomRequiredPermission("cms")]
-        public object Get(GetResourcesForApp request)
-        {
-            var resourceKeys = LocalizationManager.GetResourcesForApp(request.Environment.AppId);
-            return new HttpResult(resourceKeys, HttpStatusCode.OK);
-        }
-
-        //
-        // GET: /resource/list/{Key}
-        // get resource by key
-        public object Get(GetListResourceByKey request)
-        {
-            var resource = LocalizationManager.GetListResourceByKey(request.Environment.AppId, request.Key);
-            return new HttpResult(resource, HttpStatusCode.OK);
-        }
-
-        //
-        // POST: /resource/{Key}
-        // set resource values
-        [CustomAuthenticate]
-        [CustomRequiredPermission("cms")]
-        public object Post(SetResourceValues request)
-        {
-            var resource = LocalizationManager.SetResourceValues(request.Environment.AppId, request.Key, request.Values);
-            return new HttpResult(resource, HttpStatusCode.OK);
-        }
-
-        //
-        // POST: /resource
-        // create new resource
-        [CustomAuthenticate]
-        [CustomRequiredPermission("cms")]
-        public object Post(CreateNewResource request)
-        {
-            var resource = LocalizationManager.CreateResource(request.Environment.AppId, request.Key, request.Values, request.Description);
-            return new HttpResult(resource, HttpStatusCode.OK);
-        }
-
-        //
-        // POST: /resource/list/{Key}
-        // set resource values
-        [CustomAuthenticate]
-        [CustomRequiredPermission("cms")]
-        public object Post(SetResourceListValues request)
-        {
-            var listResource = LocalizationManager.SetListResourceValues(request.Environment.AppId, request.Key, request.ListItems);
-            return new HttpResult(listResource, HttpStatusCode.OK);
-        }
-
-        //
+                //
         //GET: /profile/facebook/friends
         // get a list of the user's facebook friends
         [CustomAuthenticate]
@@ -853,76 +651,7 @@ namespace classy.Services
                 return new HttpError(HttpStatusCode.NotFound, kex.Message);
             }
         }
-
-        public object Post(ForgotPasswordRequest request)
-        {
-            IUserAuthRepository authRepo = ResolveService<IUserAuthRepository>();
-            UserAuth userAuth = authRepo.GetUserAuthByUserName(request.Environment.AppId, request.Email);
-
-            if (userAuth != null)
-            {
-                // create hash
-                if (userAuth.Meta == null)
-                {
-                    userAuth.Meta = new Dictionary<string, string>();
-                }
-
-                MD5 md5 = System.Security.Cryptography.MD5.Create();
-                byte[] inputBytes = System.Text.Encoding.ASCII.GetBytes(Guid.NewGuid().ToString());
-                byte[] hash = md5.ComputeHash(inputBytes);
-                StringBuilder sb = new StringBuilder();
-                for (int i = 0; i < hash.Length; i++)
-                {
-                    sb.Append(hash[i].ToString("X2"));
-                }
-                userAuth.Meta["ResetPasswordHash"] = sb.ToString();
-                authRepo.SaveUserAuth(userAuth);
-
-                // Send Email
-                string subject = "ForgotPassword_ResetEmailSubject";
-                string body = "ForgotPassword_ResetEmailBody";
-                var subjectRes = LocalizationManager.GetResourceByKey(request.Environment.AppId, "ForgotPassword_ResetEmailSubject", true);
-                var bodyRes = LocalizationManager.GetResourceByKey(request.Environment.AppId, "ForgotPassword_ResetEmailBody", true);
-                EmailManager.SendHtmlMessage(
-                    AppManager.GetAppById(request.Environment.AppId).MandrilAPIKey,
-                    null, new string[] { userAuth.Email },
-                    subjectRes == null ? subject : subjectRes.Values[request.Environment.CultureCode],
-                    bodyRes == null ? body : string.Format(bodyRes.Values[request.Environment.CultureCode], string.Format("http://{0}/reset/{1}", AppManager.GetAppById(request.Environment.AppId).Hostname, sb.ToString())),
-                    "reset_password_template",
-                    null
-                    );
-                return new HttpResult(new { }, HttpStatusCode.OK);
-
-            }
-            return new HttpError("Email not found");
-        }
-
-        public object Get(VerifyPasswordResetRequest request)
-        {
-            IUserAuthRepository authRepo = ResolveService<IUserAuthRepository>();
-            UserAuth userAuth = authRepo.GetUserAuthByResetHash(request.Environment.AppId, request.Hash);
-
-            if (userAuth != null)
-            {
-                return new HttpResult(new { }, HttpStatusCode.OK);
-            }
-            return new HttpError("Invalid hash");
-        }
-
-        public object Post(PasswordResetRequest request)
-        {
-            IUserAuthRepository authRepo = ResolveService<IUserAuthRepository>();
-            UserAuth userAuth = authRepo.GetUserAuthByResetHash(request.Environment.AppId, request.Hash);
-
-            if (userAuth != null)
-            {
-                authRepo.ResetUserPassword(userAuth, request.Password);
-
-                return new HttpResult(new { }, HttpStatusCode.OK);
-            }
-            return new HttpError("Invalid hash");
-        }
-
+        
         public object Get(GetCitiesByCountry request)
         {
             return LocalizationManager.GetCitiesByCountry(request.Environment.AppId, request.CountryCode);

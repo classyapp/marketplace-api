@@ -1,4 +1,5 @@
 ﻿using Classy.Auth;
+using classy.DTO.Request.Search;
 using Classy.Models.Request;
 using classy.Services;
 using ServiceStack.Common;
