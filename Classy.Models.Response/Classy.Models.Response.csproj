@@ -59,104 +59,11 @@
     <Compile Include="ContactInfoView.cs" />
     <Compile Include="CoordsView.cs" />
     <Compile Include="IncludedListingTranslationView.cs" />
-    <Compile Include="ListingMoreInfoView.cs" />
-    <Compile Include="ListingTranslationView.cs" />
-    <Compile Include="ProfileTranslationView.cs" />
-    <Compile Include="Search\SearchResultsResponse.cs" />
-    <Compile Include="SocialPhotoAlbumView.cs" />
-    <Compile Include="EmailContact.cs" />
-    <Compile Include="IncludedListingView.cs" />
-    <Compile Include="ListingView.cs" />
-    <Compile Include="LocalizationListResourceView.cs" />
-    <Compile Include="LocalizationResourceView.cs" />
-    <Compile Include="LocationView.cs" />
-    <Compile Include="MediaFileView.cs" />
-    <Compile Include="MediaThumbnailView.cs" />
-    <Compile Include="PhysicalAddressView.cs" />
-    <Compile Include="PostReviewResponse.cs" />
-    <Compile Include="PricingInfoView.cs" />
-    <Compile Include="ProfileView.cs" />
-    <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="ProxyClaimView.cs" />
-    <Compile Include="PurchaseOptionView.cs" />
-    <Compile Include="ReviewView.cs" />
-    <Compile Include="ProfessionalInfoView.cs" />
-    <Compile Include="SearchResultsView.cs" />
-    <Compile Include="SocialPhotoView.cs" />
-    <Compile Include="SubTransactionView.cs" />
-    <Compile Include="TimeslotScheduleView.cs" />
-    <Compile Include="TripleView.cs" />
-    <Compile Include="VerifyEmailResponse.cs" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="packages.config" />
-  </ItemGroup>
-  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
-﻿<?xml version="1.0" encoding="utf-8"?>
-<Project ToolsVersion="12.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
-  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
-  <PropertyGroup>
-    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
-    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{7DBA45E3-CB30-4F3C-9577-27E955DD3F49}</ProjectGuid>
-    <OutputType>Library</OutputType>
-    <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>Classy.Models.Response</RootNamespace>
-    <AssemblyName>Classy.Models.Response</AssemblyName>
-    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
-    <FileAlignment>512</FileAlignment>
-    <SolutionDir Condition="$(SolutionDir) == '' Or $(SolutionDir) == '*Undefined*'">..\</SolutionDir>
-  </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
-    <DebugSymbols>true</DebugSymbols>
-    <DebugType>full</DebugType>
-    <Optimize>false</Optimize>
-    <OutputPath>bin\Debug\</OutputPath>
-    <DefineConstants>DEBUG;TRACE</DefineConstants>
-    <ErrorReport>prompt</ErrorReport>
-    <WarningLevel>4</WarningLevel>
-  </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
-    <DebugType>pdbonly</DebugType>
-    <Optimize>true</Optimize>
-    <OutputPath>bin\Release\</OutputPath>
-    <DefineConstants>TRACE</DefineConstants>
-    <ErrorReport>prompt</ErrorReport>
-    <WarningLevel>4</WarningLevel>
-  </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'AppHarbor|AnyCPU'">
-    <OutputPath>bin\AppHarbor\</OutputPath>
-    <DefineConstants>TRACE</DefineConstants>
-    <Optimize>true</Optimize>
-    <DebugType>pdbonly</DebugType>
-    <PlatformTarget>AnyCPU</PlatformTarget>
-    <ErrorReport>prompt</ErrorReport>
-    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
-  </PropertyGroup>
-  <ItemGroup>
-    <Reference Include="System" />
-    <Reference Include="System.Core" />
-    <Reference Include="System.Xml.Linq" />
-    <Reference Include="System.Data.DataSetExtensions" />
-    <Reference Include="Microsoft.CSharp" />
-    <Reference Include="System.Data" />
-    <Reference Include="System.Xml" />
-  </ItemGroup>
-  <ItemGroup>
-    <Compile Include="AppView.cs" />
-    <Compile Include="BaseDeleteResponse.cs" />
-    <Compile Include="CancelBookingResponse.cs" />
-    <Compile Include="CancelOrderResponse.cs" />
-    <Compile Include="CollectionTranslationView.cs" />
-    <Compile Include="CollectionView.cs" />
-    <Compile Include="CommentView.cs" />
-    <Compile Include="ContactInfoView.cs" />
-    <Compile Include="CoordsView.cs" />
-    <Compile Include="IncludedListingTranslationView.cs" />
     <Compile Include="JobView.cs" />
     <Compile Include="ListingMoreInfoView.cs" />
     <Compile Include="ListingTranslationView.cs" />
     <Compile Include="ProfileTranslationView.cs" />
+    <Compile Include="Search\SearchResultsResponse.cs" />
     <Compile Include="SocialPhotoAlbumView.cs" />
     <Compile Include="EmailContact.cs" />
     <Compile Include="IncludedListingView.cs" />

@@ -3,7 +3,6 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using classy.Extentions;
-using classy.Manager.Search;
 using Classy.Models;
 using Funq;
 using MongoDB.Driver;

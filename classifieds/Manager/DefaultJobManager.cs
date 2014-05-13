@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Web;
+using classy.Operations;
 using Classy.Models;
 using Classy.Models.Request;
 using Classy.Models.Response;
@@ -46,8 +47,8 @@ namespace classy.Manager
             };
 
             _jobsRepository.Save(job);
-            var queueRequest = new ImportProductCatalogRequest(job.Id);
-            _messageQueueClient.Publish<ImportProductCatalogRequest>(queueRequest);
+            var queueRequest = new ImportProductCatalogJob(job.Id);
+            _messageQueueClient.Publish<ImportProductCatalogJob>(queueRequest);
 
             return new JobView { JobId = job.Id, Status = job.Status };
         }

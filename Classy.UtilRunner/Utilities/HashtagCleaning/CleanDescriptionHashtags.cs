@@ -6,6 +6,7 @@ using classy.Extentions;
 using Classy.Models;
 using Funq;
 using MongoDB.Driver;
+using ServiceStack.Common;
 
 namespace Classy.UtilRunner.Utilities.HashtagCleaning
 {
