@@ -1,5 +1,5 @@
-﻿using classy.DTO.Request;
-using classy.Manager;
+﻿using classy.Manager;
+using Classy.Models.Request;
 using Classy.Repository;
 using System;
 using System.Collections.Generic;
@@ -10,8 +10,8 @@ namespace classy.Operations
 {
     public class ProductCatalogImportOperator : IOperator<ImportProductCatalogRequest>
     {
-        private readonly IStorageRepository _storageRepository;
-        private readonly IListingRepository _listingRepository;
+        private readonly IStorageRepository _storageRepository; // AWS
+        private readonly IListingRepository _listingRepository; //MONGO
         private readonly IAppManager _appManager;
 
         public ProductCatalogImportOperator(IStorageRepository storageRepo, IListingRepository listingRepo, IAppManager appManager)
@@ -23,6 +23,11 @@ namespace classy.Operations
 
         public void PerformOperation(ImportProductCatalogRequest request)
         {
+            //var app = _appManager.GetAppById(request.Environment.AppId);
+            //var listing = _listingRepository.GetById(request.ProfileId, request.Environment.AppId, true, null);
+            //var listingMediaFile = listing.ExternalMedia.Single(x => x.Key == request.AWSFileKey);
+
+
             throw new NotImplementedException();
         }
     }
