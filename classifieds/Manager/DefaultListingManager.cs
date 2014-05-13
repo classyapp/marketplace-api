@@ -1,18 +1,13 @@
 ﻿using System;
-using System.Text;
 using System.Collections.Generic;
 using System.Linq;
-using System.Web;
 using Classy.Models;
 using Classy.Models.Response;
 using Classy.Repository;
-using Classy.Auth;
 using ServiceStack.Common;
 using ServiceStack.ServiceHost;
 using System.IO;
 using ServiceStack.Messaging;
-using classy.Operations;
-using ServiceStack.CacheAccess;
 using Classy.Models.Request;
 using classy.Extentions;
 
@@ -50,6 +45,15 @@ namespace classy.Manager
         }
 
         public ManagerSecurityContext SecurityContext { get; set; }
+
+        public IList<ListingView> GetListingsByIds(string[] listingIds, string appId, bool includeDrafts, string culture)
+        {
+            var listings = ListingRepository.GetById(listingIds, appId, includeDrafts, null);
+            foreach (var listing in listings)
+                listing.Translate(culture);
+
+            return listings.Select(x => x.ToListingView()).ToList();
+        }
 
         public ListingView GetListingById(
             string appId,
@@ -103,6 +107,9 @@ namespace classy.Manager
                     listingView.FavoritedBy.Add(p.ToProfileView());
                 }
             }
+
+            // i don't think we should be logging impressions here... 
+            // it should be in the UI level since only there we really know what the user saw
             if (logImpression)
             {
                 int count = 1;
