@@ -34,7 +34,10 @@ namespace classy.Manager.Search
                 .Size(amount)
                 .From(amount*(page - 1));
 
+#if DEGBUG
+            // find a better way (than precompiler flags) to log if we have problems...
             var request = _client.Serializer.Serialize(searchDescriptor);
+#endif
 
             var response = _client.Search(searchDescriptor);
 

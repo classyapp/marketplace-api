@@ -1,4 +1,4 @@
-﻿using System.Collections.Generic;
+﻿using System.Security.Policy;
 using Nest;
 
 namespace Classy.Models.Search
@@ -26,6 +26,10 @@ namespace Classy.Models.Search
         public int PurchaseCount { get; set; }
         public int BookingCount { get; set; }
         public int AddToCollectionCount { get; set; }
+
+        // Just added this so we won't have to go to the
+        // db just for displaying direct search results
+        public string ImageUrl { get; set; }
 
         // not sure if we need these...
         //public int DisplayOrder { get; set; }

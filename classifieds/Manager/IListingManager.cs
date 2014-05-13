@@ -2,16 +2,14 @@
 using Classy.Models.Request;
 using Classy.Models.Response;
 using ServiceStack.ServiceHost;
-using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace classy.Manager
 {
     public interface IListingManager : IManager
     {
+        IList<ListingView> GetListingsByIds(string[] listingIds, string appId, bool includeDrafts, string culture);
+
         /// <summary>
         /// 
         /// </summary>
