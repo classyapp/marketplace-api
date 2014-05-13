@@ -42,7 +42,8 @@ namespace Classy.Tests
             // Validation
             Plugins.Add(new ValidationFeature());
 
-            container.WireUp();
+            classy.Extensions.FunqExtensions.WireUp(container);
+            //container.WireUp();
 
             // configure service routes
             ConfigureServiceRoutes();

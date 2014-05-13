@@ -54,11 +54,6 @@ namespace Classy.Models
         /// </summary>
         public IList<string> CoverPhotos { get; set; }
 
-        /// <summary>
-        /// A collection of media files' keys to be used in creating the collage
-        /// </summary>
-        public IList<string> CoverPhotos { get; set; }
-
         //
         public bool IsProfessional {
             get {
