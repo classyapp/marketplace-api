@@ -137,7 +137,7 @@ namespace classy.Services
                 request.IncludeComments,
                 request.FormatCommentsAsHtml,
                 request.Page,
-                AppManager.GetAppById(request.Environment.AppId).PageSize,
+                request.PageSize ?? AppManager.GetAppById(request.Environment.AppId).PageSize,
                 request.Environment.CultureCode);
 
             return new HttpResult(listingViews, HttpStatusCode.OK);
