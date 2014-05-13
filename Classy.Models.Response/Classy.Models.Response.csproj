@@ -59,6 +59,7 @@
     <Compile Include="ContactInfoView.cs" />
     <Compile Include="CoordsView.cs" />
     <Compile Include="IncludedListingTranslationView.cs" />
+    <Compile Include="JobView.cs" />
     <Compile Include="ListingMoreInfoView.cs" />
     <Compile Include="ListingTranslationView.cs" />
     <Compile Include="ProfileTranslationView.cs" />
@@ -92,6 +93,12 @@
     <None Include="packages.config" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
   <Target Name="BeforeBuild">

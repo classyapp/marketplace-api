@@ -17,6 +17,7 @@ using classy.Manager;
 using System.Security.Cryptography;
 using System.Text;
 using Classy.Interfaces.Managers;
+using ServiceStack.ServiceHost;
 
 namespace classy.Services
 {

@@ -8,7 +8,7 @@ using System.Web;
 
 namespace classy.Operations
 {
-    public class ProductCatalogImportOperator : IOperator<ImportProductCatalogRequest>
+    public class ProductCatalogImportOperator : IOperator<ImportProductCatalogJob>
     {
         private readonly IStorageRepository _storageRepository; // AWS
         private readonly IListingRepository _listingRepository; //MONGO
@@ -21,7 +21,7 @@ namespace classy.Operations
             _appManager = appManager;
         }
 
-        public void PerformOperation(ImportProductCatalogRequest request)
+        public void PerformOperation(ImportProductCatalogJob request)
         {
             //var app = _appManager.GetAppById(request.Environment.AppId);
             //var listing = _listingRepository.GetById(request.ProfileId, request.Environment.AppId, true, null);

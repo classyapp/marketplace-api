@@ -128,6 +128,7 @@
     <Compile Include="DTO\Request\DeleteTranslation.cs" />
     <Compile Include="DTO\Request\GetProfileTranslation.cs" />
     <Compile Include="DTO\Request\ImportProductCatalogRequest.cs" />
+    <Compile Include="DTO\Request\ImportPorductCatalogRequest.cs" />
     <Compile Include="DTO\Request\PasswordResetRequest.cs" />
     <Compile Include="DTO\Request\PostComment.cs" />
     <Compile Include="DTO\Request\PostCommentForCollection.cs" />
@@ -230,6 +231,7 @@
     <Compile Include="Manager\DefaultProfileManager.cs" />
     <Compile Include="Manager\Search\ListingSearchProvider.cs" />
     <Compile Include="Manager\Search\SearchClientFactory.cs" />
+    <Compile Include="Operations\ImportProductCatalogJob.cs" />
     <Compile Include="Operations\IOperator.cs" />
     <Compile Include="Operations\ProductCatalogImportOperator.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
