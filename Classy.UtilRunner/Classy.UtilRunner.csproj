@@ -78,6 +78,7 @@
     <Compile Include="Utilities\HashtagCleaning\CleanHashtagsField.cs" />
     <Compile Include="Utilities\HashtagCleaning\CleanCommentsHashtags.cs" />
     <Compile Include="Utilities\HashtagCleaning\CleanDescriptionHashtags.cs" />
+    <Compile Include="Utilities\HashtagCleaning\TempHashtagRestore.cs" />
     <Compile Include="Utilities\Indexing\ListingIndexer.cs" />
   </ItemGroup>
   <ItemGroup>
