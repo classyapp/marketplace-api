@@ -1,38 +1,26 @@
 ﻿using Classy.Auth;
-using classy.Manager;
-using Classy.Models;
 using Classy.Models.Request;
-using Classy.Repository;
+using classy.Services;
 using ServiceStack.Common;
 using ServiceStack.Common.Web;
 using ServiceStack.Configuration;
 using ServiceStack.ServiceHost;
 using ServiceStack.ServiceInterface;
 using ServiceStack.ServiceInterface.Admin;
-using ServiceStack.ServiceInterface.Auth;
-using ServiceStack.ServiceInterface.Cors;
 using ServiceStack.ServiceInterface.Validation;
 using ServiceStack.WebHost.Endpoints;
 using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
 using System.Web;
-using System.Web.Security;
-using System.Web.SessionState;
-using ServiceStack.Text;
 using MongoDB.Driver;
-using System.Configuration;
 using classy.Extensions;
-using classy.Operations;
 
 namespace classy
 {
-    public class Global : System.Web.HttpApplication
+    public class Global : HttpApplication
     {
         public class ListingServiceHost : AppHostBase
         {
-            public ListingServiceHost() : base("Listing Service Endpoint, Hello", typeof(Services.ListingService).Assembly) 
+            public ListingServiceHost() : base("Listing Service Endpoint, Hello", typeof(SearchService).Assembly) 
             {
                 // request filter to verify api key
                 RequestFilters.Add(CustomAuthenticateAttribute.SetEnvironment);
@@ -122,6 +110,9 @@ namespace classy
             private void ConfigureServiceRoutes()
             {
                 Routes
+                    // Search
+                    .Add<SearchListingsRequest>("/free_search", "POST")
+
                     // App settings
                     .Add<GetAppSettings>("/app/settings", "GET")
 
@@ -242,6 +233,7 @@ namespace classy
         protected void Application_Start(object sender, EventArgs e)
         {
             var host = new ListingServiceHost();
+            host.RegisterService(typeof(SearchService));
             host.Init();
         }
     }

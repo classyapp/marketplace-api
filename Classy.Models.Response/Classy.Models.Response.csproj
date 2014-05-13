@@ -62,6 +62,7 @@
     <Compile Include="ListingMoreInfoView.cs" />
     <Compile Include="ListingTranslationView.cs" />
     <Compile Include="ProfileTranslationView.cs" />
+    <Compile Include="Search\SearchResultsResponse.cs" />
     <Compile Include="SocialPhotoAlbumView.cs" />
     <Compile Include="EmailContact.cs" />
     <Compile Include="IncludedListingView.cs" />
