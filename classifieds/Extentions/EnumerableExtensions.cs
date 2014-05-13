@@ -11,6 +11,11 @@ namespace classy.Extentions
             return collection == null || !collection.Any();
         }
 
+		public static IEnumerable<T> EmptyIfNull<T>(this IEnumerable<T> collection)
+        {
+            return collection ?? Enumerable.Empty<T>();
+        }
+
         public static IEnumerable<IList<T>> Bulks<T>(this IEnumerable<T> source, int bulkSize)
         {
             return Bulks(source, bulkSize, size => size);

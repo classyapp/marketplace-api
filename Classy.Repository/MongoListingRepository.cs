@@ -92,13 +92,13 @@ namespace Classy.Repository
                 if (listing.ContactInfo != null) update.Set(x => x.ContactInfo, listing.ContactInfo);
                 if (listing.PricingInfo != null) update.Set(x => x.PricingInfo, listing.PricingInfo);
                 if (listing.SchedulingTemplate != null) update.Set(x => x.SchedulingTemplate, listing.SchedulingTemplate);
-                if (listing.Metadata != null) update.Set(x => x.Metadata, listing.Metadata);
-                if (listing.Hashtags != null && listing.Hashtags.Count > 0) update.Set(x => x.Hashtags, listing.Hashtags);
-                if (listing.TranslatedKeywords != null && listing.TranslatedKeywords.Count > 0)
-                {
-                    update.Set(x => x.TranslatedKeywords, listing.TranslatedKeywords);
+                update.Set(x => x.Metadata, listing.Metadata);
+                update.Set(x => x.Hashtags, listing.Hashtags);
+                update.Set(x => x.TranslatedKeywords, listing.TranslatedKeywords);
+                if (listing.TranslatedKeywords != null)
                     update.Set(x => x.SearchableKeywords, listing.TranslatedKeywords.SelectMany(s => s.Value));
-                }
+                else
+                    update.Set(x => x.SearchableKeywords, null);
 
                 ListingsCollection.FindAndModify(query, null, update);
             }
