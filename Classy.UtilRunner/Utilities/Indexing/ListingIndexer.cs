@@ -8,7 +8,6 @@ using Classy.Models.Search;
 using Funq;
 using MongoDB.Driver;
 using Nest;
-using ServiceStack.Common;
 
 namespace Classy.UtilRunner.Utilities.Indexing
 {
@@ -60,6 +59,8 @@ namespace Classy.UtilRunner.Utilities.Indexing
                         FlagCount = listing.FlagCount,
                         Keywords =
                             listing.SearchableKeywords != null ? listing.SearchableKeywords.ToArray() : new string[0],
+                        ImageUrl = 
+                            !listing.ExternalMedia.IsNullOrEmpty() ? listing.ExternalMedia[0].Url : null,
                         ListingType = listing.ListingType,
                         Metadata = metadata,
                         PurchaseCount = listing.PurchaseCount,

@@ -1,5 +1,6 @@
 ﻿using System.Diagnostics;
 using Classy.Interfaces.Search;
+using Classy.Models.Response.Search;
 using ServiceStack.Common;
 using ServiceStack.ServiceInterface;
 using System;
@@ -33,6 +34,23 @@ namespace classy.Services
         public IEmailManager EmailManager { get; set; }
         public IAppManager AppManager { get; set; }
         public IUserAuthRepository UserAuthRepository { get; set; }
+        public IListingSearchProvider ListingSearchProvider { get; set; }
+
+        public object Post(SearchListingsRequest searchRequest)
+        {
+            var searchResults = ListingSearchProvider.Search(
+                searchRequest.Q, searchRequest.Amount, searchRequest.Page);
+
+            var listingsFromDb = ListingManager.GetListingsByIds(
+                searchResults.Results.Select(x => x.Id).ToArray(),
+                searchRequest.Environment.AppId,
+                false,
+                searchRequest.Environment.CultureCode);
+
+            var response = new SearchResultsResponse<ListingView>(listingsFromDb, searchResults.TotalResults);
+
+            return new HttpResult(response, HttpStatusCode.OK);
+        }
 
         [CustomAuthenticate]
         public object Post(CreateProfileProxy request)
