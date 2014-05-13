@@ -54,6 +54,7 @@ namespace Classy.Models
         /// </summary>
         public IList<string> CoverPhotos { get; set; }
 
+
         //
         public bool IsProfessional {
             get {

@@ -16,6 +16,7 @@ using ServiceStack.CacheAccess;
 using Classy.Models.Request;
 using classy.Extentions;
 
+
 namespace classy.Manager
 {
     public class DefaultListingManager : IListingManager, ICollectionManager
@@ -351,7 +352,6 @@ namespace classy.Manager
                 }
             }
             listing.TranslatedKeywords = editorKeywords;
-
             ListingRepository.Update(listing);
 
             // return

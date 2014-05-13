@@ -6,6 +6,7 @@ You'll need:
 * MongoDB - [instructions here](http://docs.mongodb.org/manual/tutorial/install-mongodb-on-windows/)
 * Redis - redis is not available for Windows but [there's a port that's good enough for development](https://github.com/MSOpenTech/redis) - you'll need to build the executables using the instructions in the readme there and then just run `redis-server.exe` 
  
+<<<<<<< HEAD
 
 ### Getting Started
 
@@ -28,5 +29,7 @@ You'll need:
       ```
 * you should now be able to open `MyHome.sln`. **warning:** IISExpress doesn't like serving SSL content on anything except `localhost` so you might have to run VS as an Administrator (though this shouldn't pose too much of an issue for the most part since ssl is not required for local requests)
 
+=======
+>>>>>>> 658baed920aa3cc1de89685c7afdefcdb6f65725
  
  
