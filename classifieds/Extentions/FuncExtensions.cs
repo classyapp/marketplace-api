@@ -1,6 +1,7 @@
 ﻿using Classy.Interfaces.Search;
 using classy.Manager;
 using classy.Manager.Search;
+using Classy.Models;
 using Classy.Repository;
 using MongoDB.Driver;
 using ServiceStack.CacheAccess;
@@ -31,9 +32,17 @@ namespace classy.Extensions
         }
         public static void WireUp(this Funq.Container container)
         {
+            container.Register<IAppManager>(c =>
+                new DefaultAppManager());
+
             container.Register<ISearchClientFactory>(_ => new SearchClientFactory());
             container.Register<IListingSearchProvider>(
                 c => new ListingSearchProvider(c.TryResolve<ISearchClientFactory>()));
+
+            container.Register<IIndexer<Listing>>(x =>
+                new ListingIndexer(x.TryResolve<ISearchClientFactory>(), x.TryResolve<IAppManager>()));
+            container.Register<IIndexer<Profile>>(x =>
+                new ProfileIndexer(x.TryResolve<ISearchClientFactory>(), x.TryResolve<IAppManager>()));
 
             container.Register<IRedisClientsManager>(c =>
             {
@@ -81,8 +90,7 @@ namespace classy.Extensions
             container.Register<IOrderRepository>(c => new MongoOrderRepository(c.Resolve<MongoDatabase>()));
             container.Register<ICollectionRepository>(c => new MongoCollectionRepository(c.Resolve<MongoDatabase>()));
             container.Register<ILocalizationRepository>(c => new MongoLocalizationProvider(c.Resolve<MongoDatabase>()));
-            container.Register<IAppManager>(c =>
-                new DefaultAppManager());
+            
             container.Register<IEmailManager>(c =>
                 new MandrillEmailManager(c.TryResolve<IAppManager>()));
             container.Register<IPaymentGateway>(c =>
@@ -107,13 +115,13 @@ namespace classy.Extensions
             container.Register<IListingManager>(c =>
                 new DefaultListingManager(
                     c.TryResolve<IAppManager>(),
-                    c.TryResolve<IMessageQueueClient>(),
                     c.TryResolve<IListingRepository>(),
                     c.TryResolve<ICommentRepository>(),
                     c.TryResolve<IProfileRepository>(),
                     c.TryResolve<ICollectionRepository>(),
                     c.TryResolve<ITripleStore>(),
-                    c.TryResolve<IStorageRepository>()));
+                    c.TryResolve<IStorageRepository>(),
+                    c.TryResolve<IIndexer<Listing>>()));
             container.Register<IProfileManager>(c =>
                 new DefaultProfileManager(
                     c.TryResolve<IAppManager>(),
@@ -137,13 +145,13 @@ namespace classy.Extensions
             container.Register<ICollectionManager>(c =>
                 new DefaultListingManager(
                     c.TryResolve<IAppManager>(),
-                    c.TryResolve<IMessageQueueClient>(),
                     c.TryResolve<IListingRepository>(),
                     c.TryResolve<ICommentRepository>(),
                     c.TryResolve<IProfileRepository>(),
                     c.TryResolve<ICollectionRepository>(),
                     c.TryResolve<ITripleStore>(),
-                    c.TryResolve<IStorageRepository>()));
+                    c.TryResolve<IStorageRepository>(),
+                    c.TryResolve<IIndexer<Listing>>()));
             container.Register<IAnalyticsManager>(c =>
                 new DefaultAnalyticsManager(
                     c.TryResolve<ITripleStore>()));

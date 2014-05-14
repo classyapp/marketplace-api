@@ -189,6 +189,7 @@
     <Compile Include="Extentions\BulkedEnumerator.cs" />
     <Compile Include="Extentions\EnumerableExtensions.cs" />
     <Compile Include="Extentions\ImageExtensions.cs" />
+    <Compile Include="Extentions\IndexerExtensions.cs" />
     <Compile Include="Extentions\LocalizationListResourceViewExtenstions.cs" />
     <Compile Include="Extentions\CommentViewExtensions.cs" />
     <Compile Include="Extentions\ContactInfoViewExtensions.cs" />
@@ -228,6 +229,8 @@
     <Compile Include="Manager\DefaultListingManager.cs" />
     <Compile Include="Manager\DefaultOrderManager.cs" />
     <Compile Include="Manager\DefaultProfileManager.cs" />
+    <Compile Include="Manager\Search\ProfileIndexer.cs" />
+    <Compile Include="Manager\Search\ListingIndexer.cs" />
     <Compile Include="Manager\Search\ListingSearchProvider.cs" />
     <Compile Include="Manager\Search\ProfileSearchProvider.cs" />
     <Compile Include="Manager\Search\SearchClientFactory.cs" />
