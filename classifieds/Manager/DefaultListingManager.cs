@@ -578,9 +578,9 @@ namespace classy.Manager
         {
             try
             {
+                var collection = GetVerifiedCollection(appId, collectionId, culture);
                 string[] listingIds = collection.IncludedListings.Select(l => l.Id).ToArray();
 
-                var collection = GetVerifiedCollection(appId, collectionId, culture);
                 var collectionView = collection.Translate(culture).ToCollectionView();
                 if (includeProfile)
                 {
