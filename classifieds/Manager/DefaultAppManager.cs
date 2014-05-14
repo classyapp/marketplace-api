@@ -26,15 +26,16 @@ namespace classy.Manager
                 Hostname = "www.homelab.com",
                 MandrilAPIKey = "ndg42WcyRHVLtLbvGqBjUA",
                 ImageReducedSize = 1600,
-                DefaultFromEmailAddress = "team@homelab.com",
+                DefaultFromEmailAddress = "team@homelab.com"
+            };
+        }
 
-                IndexingInfo = new IndexingInfo
-                {
-                    ListingTypes = new[] {"Photo"},
-                    MetadataPerListing = new Dictionary<string, string[]>
-                    {
-                        {"Photo", new[] {"Room", "Style"}}
-                    }
+        public IndexingInfo GetIndexingInfo()
+        {
+            return new IndexingInfo {
+                ListingTypes = new[] {"Photo"},
+                MetadataPerListing = new Dictionary<string, string[]> {
+                    {"Photo", new[] {"Room", "Style"}}
                 }
             };
         }

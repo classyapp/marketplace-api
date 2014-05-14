@@ -1,5 +1,7 @@
 ﻿using System.Linq;
+using Amazon.OpsWorks.Model;
 using Classy.Interfaces.Search;
+using Classy.Models;
 using Classy.Models.Search;
 using Nest;
 
