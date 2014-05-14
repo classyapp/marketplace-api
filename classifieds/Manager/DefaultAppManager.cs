@@ -1,9 +1,5 @@
 ﻿using Classy.Models;
-using System;
 using System.Collections.Generic;
-using System.Drawing;
-using System.Linq;
-using System.Web;
 
 namespace classy.Manager
 {
@@ -30,8 +26,14 @@ namespace classy.Manager
                 Hostname = "www.homelab.com",
                 MandrilAPIKey = "ndg42WcyRHVLtLbvGqBjUA",
                 ImageReducedSize = 1600,
-                DefaultFromEmailAddress = "team@homelab.com"
-                // metadata indexing properties
+                DefaultFromEmailAddress = "team@homelab.com",
+                
+                IndexingInfo = new IndexingInfo {
+                    ListingTypes = new[] { "Photo" },
+                    MetadataPerListing = new Dictionary<string, string[]> {
+                        { "Photo", new [] { "Room", "Style" } }
+                    }
+                }
             };
         }
     }
