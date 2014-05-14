@@ -229,6 +229,7 @@
     <Compile Include="Manager\DefaultOrderManager.cs" />
     <Compile Include="Manager\DefaultProfileManager.cs" />
     <Compile Include="Manager\Search\ListingSearchProvider.cs" />
+    <Compile Include="Manager\Search\ProfileSearchProvider.cs" />
     <Compile Include="Manager\Search\SearchClientFactory.cs" />
     <Compile Include="Operations\IOperator.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

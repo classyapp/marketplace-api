@@ -48,8 +48,9 @@
     <Compile Include="Managers\IEmailManager.cs" />
     <Compile Include="Managers\ILocalizationManager.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Search\ListingSearchProvider.cs" />
-    <Compile Include="Search\SearchClientFactory.cs" />
+    <Compile Include="Search\IListingSearchProvider.cs" />
+    <Compile Include="Search\IProfileSearchProvider.cs" />
+    <Compile Include="Search\ISearchClientFactory.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Classy.Models.Response\Classy.Models.Response.csproj">
