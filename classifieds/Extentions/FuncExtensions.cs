@@ -117,7 +117,8 @@ namespace classy.Extensions
                     c.TryResolve<ICollectionRepository>(),
                     c.TryResolve<ITripleStore>(),
                     c.TryResolve<IStorageRepository>(),
-                    c.TryResolve<IIndexer<Listing>>()));
+                    c.TryResolve<IIndexer<Listing>>(),
+                    c.TryResolve<IIndexer<Profile>>()));
             container.Register<IProfileManager>(c =>
                 new DefaultProfileManager(
                     c.TryResolve<IAppManager>(),
@@ -147,7 +148,8 @@ namespace classy.Extensions
                     c.TryResolve<ICollectionRepository>(),
                     c.TryResolve<ITripleStore>(),
                     c.TryResolve<IStorageRepository>(),
-                    c.TryResolve<IIndexer<Listing>>()));
+                    c.TryResolve<IIndexer<Listing>>(),
+                    c.TryResolve<IIndexer<Profile>>()));
             container.Register<IAnalyticsManager>(c =>
                 new DefaultAnalyticsManager(
                     c.TryResolve<ITripleStore>()));
