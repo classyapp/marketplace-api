@@ -5,6 +5,8 @@ namespace Classy.Models.Search
     [ElasticType(Name = "profile")]
     public class ProfileIndexDto
     {
+        public string Id { get; set; }
+
         [ElasticProperty(Type = FieldType.geo_point)]
         public GPSLocation Location { get; set; } // from ContatInfo
 

@@ -48,6 +48,7 @@
     <Compile Include="Managers\IEmailManager.cs" />
     <Compile Include="Managers\ILocalizationManager.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Search\IIndexer.cs" />
     <Compile Include="Search\IListingSearchProvider.cs" />
     <Compile Include="Search\IProfileSearchProvider.cs" />
     <Compile Include="Search\ISearchClientFactory.cs" />

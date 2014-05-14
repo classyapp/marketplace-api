@@ -1,5 +1,7 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
+using System.Linq.Expressions;
 using classy.Extentions;
 using Classy.Interfaces.Search;
 using Classy.Models;
@@ -17,6 +19,13 @@ namespace classy.Manager.Search
         {
             _indexingInfo = appManager.GetIndexingInfo();
             _client = searchClientFactory.GetClient("listings");
+        }
+
+        public void RemoveFromIndex(Listing entity)
+        {
+            _client.Delete(new ListingIndexDto {
+                Id = entity.Id
+            });
         }
 
         public void Index(Listing[] entities)
@@ -48,6 +57,23 @@ namespace classy.Manager.Search
                 });
             }
             _client.IndexMany(listingsToIndex);
+        }
+
+        public void Increment<T>(string id, Expression<Func<Listing, T>> property, int amount = 1)
+        {
+            var propertyName = ((MemberExpression) property.Body).Member.Name;
+            var elasticPropertyName = Char.ToLowerInvariant(propertyName[0]) + propertyName.Substring(1);
+
+            var script = string.Format("ctx._source.{0} += {1}", elasticPropertyName, amount);
+
+            _client.Update<ListingIndexDto>(d => d
+                .Id(id)
+                .Script(script));
+        }
+
+        public void Increment<T>(string[] ids, Expression<Func<Listing, T>> property, int amount = 1)
+        {
+            ids.ForEach(x => Increment(x, property, amount));
         }
     }
 }
