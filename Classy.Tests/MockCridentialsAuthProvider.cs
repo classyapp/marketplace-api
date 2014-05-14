@@ -1,24 +1,24 @@
-﻿using Classy.Auth;
-using ServiceStack.Common.Web;
+﻿using ServiceStack.Common.Web;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using ServiceStack.ServiceInterface.Auth;
 
 namespace Classy.Tests
 {
-    class MockCridentialsAuthProvider : AuthProvider
+    class MockCridentialsAuthProvider : Classy.Auth.AuthProvider
     {
         public override bool IsAuthorized(ServiceStack.ServiceInterface.Auth.IAuthSession session, 
-            ServiceStack.ServiceInterface.Auth.IOAuthTokens tokens, Auth.Auth request = null)
+            ServiceStack.ServiceInterface.Auth.IOAuthTokens tokens, Classy.Auth.Auth request)
         {
             return false;
 
         }
 
         public override object Authenticate(ServiceStack.ServiceInterface.IServiceBase authService, 
-            ServiceStack.ServiceInterface.Auth.IAuthSession session, Auth.Auth request)
+            ServiceStack.ServiceInterface.Auth.IAuthSession session, Classy.Auth.Auth request)
         {
             if (request.Environment.AppId != "Test")
                 throw new InvalidOperationException("Invalid AppID!");

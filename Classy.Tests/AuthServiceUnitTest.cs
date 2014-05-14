@@ -1,28 +1,21 @@
-﻿using Classy.Auth;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
-using Moq;
+﻿using Moq;
+using NUnit.Framework;
 using ServiceStack.ServiceClient.Web;
 using ServiceStack.ServiceHost;
-using ServiceStack.ServiceInterface.Testing;
-using ServiceStack.WebHost.Endpoints;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using ServiceStack.ServiceInterface.Auth;
 
 namespace Classy.Tests
 {
-    //[TestClass]
+    //[TestFixture]
     public class CridentialsProviderUnitTests
     {
       
-        [TestInitialize]
+        [SetUp]
         public void TestStart()
         {
         }
 
-        [TestMethod]
+        [Test]
         public void TestLogin()
         {
             try
@@ -31,20 +24,13 @@ namespace Classy.Tests
                 mockCtx.SetupGet(f => f.AbsoluteUri).Returns("localhost:1337/auth");
 
 
-                AuthService service = new AuthService() { RequestContext = mockCtx.Object};
-                AuthService.AuthProviders = new IAuthProvider[] { new MockCridentialsAuthProvider() };
-                service.Post(new Auth.Auth { UserName = "papai", Password = "mamai" });
+                //AuthService service = new AuthService() { RequestContext = mockCtx.Object};
+                //AuthService.AuthProviders = new IAuthProvider[] { new MockCridentialsAuthProvider() };
+                //service.Post(new Auth.Auth { UserName = "papai", Password = "mamai" });
             }
             catch (WebServiceException ex)
             {
             }
         }
-
-        [TestCleanup]
-        public void TestEnd()
-        {
-        }
-
-
     }
 }

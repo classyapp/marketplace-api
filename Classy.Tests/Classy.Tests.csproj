@@ -47,7 +47,7 @@
     <Reference Include="ServiceStack, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\lib\ServiceStack.dll</HintPath>
-
+	</Reference>
     <Reference Include="MongoDB.Bson, Version=1.8.3.9, Culture=neutral, PublicKeyToken=f686731cfb9cc103, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\packages\mongocsharpdriver.1.8.3\lib\net35\MongoDB.Bson.dll</HintPath>
@@ -107,7 +107,6 @@
 
     <Compile Include="Framework\TestBase.cs" />
     <Compile Include="ModelDictionaryTests.cs" />
-    <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Search\ListingSearchProviderTests.cs" />
 
     <Compile Include="AuthServiceUnitTest.cs" />
@@ -130,7 +129,7 @@
     <ProjectReference Include="..\Classy.Interfaces\Classy.Interfaces.csproj">
       <Project>{9C0DED9F-8160-4BDF-A599-6B33A983353A}</Project>
       <Name>Classy.Interfaces</Name>
-
+	</ProjectReference>
     <ProjectReference Include="..\Classy.Auth\Classy.Auth.csproj">
       <Project>{c40e22db-95cd-4e86-bf84-718aeadf064c}</Project>
       <Name>Classy.Auth</Name>
