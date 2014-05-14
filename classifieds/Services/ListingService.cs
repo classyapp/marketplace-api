@@ -72,30 +72,6 @@ namespace classy.Services
             }
         }
 
-        public object Get(SearchListings request)
-        {
-            return Post(request);
-        }
-
-        public object Post(SearchListings request)
-        {
-            var listingViews = ListingManager.SearchListings(
-                request.Environment.AppId,
-                request.Tags,
-                request.ListingTypes,
-                request.Metadata,
-                request.PriceMin,
-                request.PriceMax,
-                request.Location ?? request.Environment.GetDefaultLocation(AppManager.GetAppById(request.Environment.AppId).DefaultCountry),
-                request.IncludeComments,
-                request.FormatCommentsAsHtml,
-                request.Page,
-                request.PageSize ?? AppManager.GetAppById(request.Environment.AppId).PageSize,
-                request.Environment.CultureCode);
-
-            return new HttpResult(listingViews, HttpStatusCode.OK);
-        }
-
         // create new listing
         [CustomAuthenticate]
         public object Post(PostListing request)
