@@ -32,7 +32,7 @@ namespace classy.Manager
             IProfileRepository profileRepository,
             ICollectionRepository collectionRepository,
             ITripleStore tripleStore,
-            IStorageRepository storageRepository, IIndexer<Listing> listingIndexer)
+            IStorageRepository storageRepository, IIndexer<Listing> listingIndexer, IIndexer<Profile> profileIndexer)
         {
             AppManager = appManager;
             ListingRepository = listingRepository;
@@ -42,6 +42,7 @@ namespace classy.Manager
             TripleStore = tripleStore;
             StorageRepository = storageRepository;
             _listingIndexer = listingIndexer;
+            _profileIndexer = profileIndexer;
         }
 
         public ManagerSecurityContext SecurityContext { get; set; }
