@@ -20,7 +20,7 @@ namespace Classy.Repository
 
         public Job GetById(string appId, string jobId)
         {
-            return JobsCollection.FindOne(Query.And(Query.EQ("AppId", appId), Query.EQ("JobId", jobId)));
+            return JobsCollection.FindOne(Query.And(Query.EQ("AppId", appId), Query.EQ("_id", jobId)));
         }
 
         public void Save(Models.Job job)
