@@ -27,11 +27,13 @@ namespace classy.Manager
                 MandrilAPIKey = "ndg42WcyRHVLtLbvGqBjUA",
                 ImageReducedSize = 1600,
                 DefaultFromEmailAddress = "team@homelab.com",
-                
-                IndexingInfo = new IndexingInfo {
-                    ListingTypes = new[] { "Photo" },
-                    MetadataPerListing = new Dictionary<string, string[]> {
-                        { "Photo", new [] { "Room", "Style" } }
+
+                IndexingInfo = new IndexingInfo
+                {
+                    ListingTypes = new[] {"Photo"},
+                    MetadataPerListing = new Dictionary<string, string[]>
+                    {
+                        {"Photo", new[] {"Room", "Style"}}
                     }
                 }
             };

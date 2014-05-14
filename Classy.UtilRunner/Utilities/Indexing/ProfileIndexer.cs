@@ -78,7 +78,10 @@ namespace Classy.UtilRunner.Utilities.Indexing
             if (!coords.Longitude.HasValue || !coords.Latitude.HasValue)
                 return null;
 
-            return new GPSLocation(coords.Longitude.Value, coords.Latitude.Value);
+            return new GPSLocation {
+                Longitude = coords.Longitude.Value,
+                Latitude = coords.Latitude.Value
+            };
         }
     }
 }
