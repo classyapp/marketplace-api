@@ -3,6 +3,7 @@ using System.Linq;
 using System.Reflection;
 using classy.Extensions;
 using Funq;
+using ServiceStack.Common;
 
 namespace Classy.UtilRunner
 {
@@ -28,6 +29,12 @@ namespace Classy.UtilRunner
                 Console.WriteLine("Couldn't find/resolve utility : " + utilityName);
                 return;
             }
+
+            Console.WriteLine("This will run the utility '{0}' - Are you sure ?", utilityName);
+            var input = Console.ReadLine();
+
+            if (!input.IsNullOrEmpty() && !input.ToLower().StartsWith("y"))
+                return;
 
             Console.WriteLine("Starting to run utility '{0}' :: {1}", utilityName, DateTime.Now.TimeOfDay);
             var status = StatusCode.Failure;

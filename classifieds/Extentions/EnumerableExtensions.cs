@@ -6,14 +6,14 @@ namespace classy.Extentions
 {
     public static class EnumerableExtensions
     {
+        public static IEnumerable<T> EmptyIfNull<T>(this IEnumerable<T> collection)
+        {
+            return collection ?? Enumerable.Empty<T>();
+        }
+
         public static bool IsNullOrEmpty<T>(this IEnumerable<T> collection)
         {
             return collection == null || !collection.Any();
-        }
-
-		public static IEnumerable<T> EmptyIfNull<T>(this IEnumerable<T> collection)
-        {
-            return collection ?? Enumerable.Empty<T>();
         }
 
         public static IEnumerable<IList<T>> Bulks<T>(this IEnumerable<T> source, int bulkSize)
