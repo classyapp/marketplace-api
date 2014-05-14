@@ -21,13 +21,12 @@ namespace Classy.Models
         public string MandrilAPIKey { get; set; }
         public int ImageReducedSize { get; set; }
         public string DefaultFromEmailAddress { get; set; }
-
-        public IndexingInfo IndexingInfo { get; set; }
     }
 
     public class IndexingInfo
     {
         public string[] ListingTypes { get; set; }
+        // I think we can depend only on the dictionary
         public Dictionary<string, string[]> MetadataPerListing { get; set; }
     }
 }
