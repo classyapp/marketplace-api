@@ -4,16 +4,11 @@ using classy.Manager.Search;
 using Classy.Models;
 using Classy.Repository;
 using MongoDB.Driver;
-using ServiceStack.CacheAccess;
 using ServiceStack.Messaging;
 using ServiceStack.Redis;
 using ServiceStack.Redis.Messaging;
 using System;
-using System.Collections.Generic;
 using System.Configuration;
-using System.Linq;
-using System.Web;
-using Classy.Auth;
 using Classy.Interfaces.Managers;
 
 namespace classy.Extensions
