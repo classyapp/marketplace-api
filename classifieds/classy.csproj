@@ -215,12 +215,14 @@
     <Compile Include="Manager\IAnalyticsManager.cs" />
     <Compile Include="Manager\IBookingManager.cs" />
     <Compile Include="Manager\ICollectionManager.cs" />
+    <Compile Include="Manager\IJobManager.cs" />
     <Compile Include="Manager\IListingManager.cs" />
     <Compile Include="Manager\IManager.cs" />
     <Compile Include="Manager\IOrderManager.cs" />
     <Compile Include="Manager\IProfileManager.cs" />
     <Compile Include="Manager\IReviewManager.cs" />
     <Compile Include="Manager\IThumbnailManager.cs" />
+    <Compile Include="Manager\DefaultJobManager.cs" />
     <Compile Include="Manager\MandrillEmailManager.cs" />
     <Compile Include="Manager\DefaultLocalizationManager.cs" />
     <Compile Include="Manager\DefaultThumbnailManager.cs" />
@@ -236,6 +238,7 @@
     <Compile Include="Operations\ProductCatalogImportOperator.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Services\ListingService.cs" />
+    <Compile Include="Services\ProductService.cs" />
     <Compile Include="Services\SearchService.cs" />
   </ItemGroup>
   <ItemGroup>

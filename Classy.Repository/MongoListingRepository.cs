@@ -99,6 +99,7 @@ namespace Classy.Repository
                     update.Set(x => x.SearchableKeywords, listing.TranslatedKeywords.SelectMany(s => s.Value));
                 else
                     update.Set(x => x.SearchableKeywords, null);
+              
 
                 ListingsCollection.FindAndModify(query, null, update);
             }

@@ -1,4 +1,4 @@
-﻿using classy.Manager;
+using classy.Manager;
 using Classy.Models.Request;
 using Classy.Repository;
 using System;

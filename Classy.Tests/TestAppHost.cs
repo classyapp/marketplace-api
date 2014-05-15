@@ -42,6 +42,7 @@ namespace Classy.Tests
             // Validation
             Plugins.Add(new ValidationFeature());
 
+
             classy.Extensions.FunqExtensions.WireUp(container);
             //container.WireUp();
 

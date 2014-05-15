@@ -1,0 +1,79 @@
+﻿using classy.Operations;
+using Classy.Auth;
+using Classy.Repository;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
+using MongoDB.Driver;
+using ServiceStack.ServiceClient.Web;
+using ServiceStack.ServiceInterface.Testing;
+using ServiceStack.WebHost.Endpoints;
+using System;
+using System.Collections.Generic;
+using System.Configuration;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+
+namespace Classy.Tests
+{
+    [TestClass]
+    public class CatalogImportTests
+    {
+       
+       
+      [TestMethod]
+        public void TestImport()
+        {
+            try
+            {
+                var config = new Amazon.S3.AmazonS3Config()
+                {
+                    ServiceURL = "s3.amazonaws.com",
+                    RegionEndpoint = Amazon.RegionEndpoint.USEast1,
+                    Timeout = new TimeSpan(0, 5, 0)
+                };
+                var s3Client = Amazon.AWSClientFactory.CreateAmazonS3Client(config);
+
+                var mongoDB = getDB();
+                
+
+
+                ProductCatalogImportOperator catalogImport =
+                    new ProductCatalogImportOperator(new AmazonS3StorageRepository(s3Client, ConfigurationManager.AppSettings["S3BucketName"]),
+                    new MongoListingRepository(mongoDB),
+                    new MongoJobRepository(mongoDB));
+
+                catalogImport.PerformOperation(new ImportProductCatalogJob("537254b58e65962eb099643e", "v1.0"));
+                
+            }
+            catch (WebServiceException ex)
+            {
+                Assert.Fail(ex.Message);
+            }
+        }
+
+      private MongoDB.Driver.MongoDatabase getDB()
+      {
+          var connectionString = GetConnectionString("MONGO");
+          var client = new MongoClient(connectionString);
+          var databaseName = MongoUrl.Create(connectionString).DatabaseName;
+          var server = client.GetServer();
+          var db = server.GetDatabase(databaseName);
+
+          return db;
+      }
+
+
+      private string GetConnectionString(string key)
+      {
+          // try app settings
+          string connectionString = ConfigurationManager.AppSettings.Get(key + "_URI");
+          if (string.IsNullOrEmpty(connectionString))
+          {
+              // fall back on connection strings
+              connectionString = ConfigurationManager.ConnectionStrings[key].ConnectionString;
+          }
+          return connectionString;
+      }
+
+    }
+}
