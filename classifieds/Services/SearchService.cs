@@ -1,8 +1,10 @@
-﻿using System.Linq;
+﻿using System.Collections.Generic;
+using System.Linq;
 using System.Net;
 using classy.DTO.Request.Search;
 using Classy.Interfaces.Search;
 using classy.Manager;
+using Classy.Models;
 using Classy.Models.Request;
 using Classy.Models.Response;
 using Classy.Models.Response.Search;
@@ -30,7 +32,11 @@ namespace classy.Services
                 false,
                 searchRequest.Environment.CultureCode);
 
-            var response = new SearchResultsResponse<ListingView>(listingsFromDb, searchResults.TotalResults);
+            var orderedListings = new List<ListingView>();
+            foreach (var dbResult in searchResults.Results)
+                orderedListings.Add(listingsFromDb.First(x => x.Id == dbResult.Id));
+
+            var response = new SearchResultsResponse<ListingView>(orderedListings, searchResults.TotalResults);
 
             return new HttpResult(response, HttpStatusCode.OK);
         }
