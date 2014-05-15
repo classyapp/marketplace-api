@@ -43,7 +43,7 @@ namespace classy.Manager.Search
                             .Boost(0.5f),
                         f => f.Filter(
                             ff => ff.Exists(e => e.FavoriteCount))
-                            .Script("1 + (doc['favoriteCount'].value / 500)")
+                            .Script("1.0 + (doc['favoriteCount'].value * 2)")
                     ).ScoreMode(ScoreMode.multiply)
                 )
             );
