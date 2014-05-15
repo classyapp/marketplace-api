@@ -5,18 +5,12 @@ using Classy.Repository;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Web;
-using MongoDB.Driver.Linq;
 using ServiceStack.Common;
-using Classy.Auth;
 using Classy.Models.Request;
 using ServiceStack.Text;
-using ServiceStack.ServiceClient.Web;
-using System.IO;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using classy.Extentions;
-using System.Collections.ObjectModel;
 
 namespace classy.Manager
 {
