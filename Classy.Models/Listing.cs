@@ -114,6 +114,9 @@ namespace Classy.Models
         // Translations
         public string DefaultCulture { get; set; }
 
+        // Categories
+        public IList<string> Categories { get; set; }
+
         // Errors
         [BsonIgnoreIfNull]
         public string Errors { get; set; }
