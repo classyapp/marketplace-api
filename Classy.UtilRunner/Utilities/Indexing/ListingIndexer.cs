@@ -26,9 +26,12 @@ namespace Classy.UtilRunner.Utilities.Indexing
         
         public StatusCode Run(string[] args)
         {
+            var indexName = ListingIndexDto.IndexName + "_v1.0";
+
             var client = _searchClientFactory.GetClient(ListingIndexDto.IndexName, "v1.0");
             client.DeleteIndex<ListingIndexDto>();
-            client.CreateIndex(ListingIndexDto.IndexName, new IndexSettings());
+            client.CreateIndex(ListingIndexDto.IndexName + "_v1.0", new IndexSettings());
+            client = _searchClientFactory.GetClient(ListingIndexDto.IndexName, "v1.0");
             client.MapFromAttributes<ListingIndexDto>();
 
             client = _searchClientFactory.GetClient(ListingIndexDto.IndexName, "v1.0");
