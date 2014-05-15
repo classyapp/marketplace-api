@@ -150,27 +150,6 @@ namespace classy.Manager
             ProfileRepository.Save(follower);
         }
 
-        public void UnfollowProfile(
-            string appId,
-            string profileId,
-            string followeeProfileId)
-        {
-            var follower = ProfileRepository.GetById(appId, profileId, false, null);
-            var followee = ProfileRepository.GetById(appId, followeeProfileId, false, null);
-            if (followee == null) throw new KeyNotFoundException("invalid username");
-
-            // reset triple
-            TripleStore.ResetActivity(appId, profileId, ActivityPredicate.FOLLOW_PROFILE, followeeProfileId);
-
-            // decrease follower count
-            ProfileRepository.IncreaseCounter(appId, followee.Id, ProfileCounters.Followers | ProfileCounters.Rank, -1);
-
-            // add followee and save follower profile
-            follower.FolloweeProfileIds.Remove(followeeProfileId);
-            if (follower.FollowingCount > 0) follower.FollowingCount--;
-            ProfileRepository.Save(follower);
-        }
-
         public ProfileView GetProfileById(
             string appId,
             string profileId,
