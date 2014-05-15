@@ -21,7 +21,7 @@ namespace Classy.Tests
             client = new JsonServiceClient("http://localhost:8080/api");
         }
 
-        [Test]
+        //[Test]
         public void TestLoginWrongUserPassword()
         {
             try
@@ -75,7 +75,7 @@ namespace Classy.Tests
             }
         }
 
-        [Test]
+        //[Test]
         public void TestCorrectLogin()
         {
             try
