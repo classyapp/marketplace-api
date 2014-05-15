@@ -1,16 +1,11 @@
 ﻿using Nest;
+using Newtonsoft.Json;
 
 namespace Classy.Models.Search
 {
     [ElasticType(Name = "profile")]
     public class ProfileIndexDto
     {
-        [ElasticProperty(Index = FieldIndexOption.no)]
-        public static string IndexName
-        {
-            get { return "profiles"; }
-        }
-
         public string Id { get; set; }
 
         [ElasticProperty(Type = FieldType.geo_point)]

@@ -26,12 +26,15 @@ namespace Classy.UtilRunner.Utilities.Indexing
         
         public StatusCode Run(string[] args)
         {
-            var client = _searchClientFactory.GetClient(ProfileIndexDto.IndexName, "v1.0");
+            var indexName = "profiles" + "_v1.0";
+
+            var client = _searchClientFactory.GetClient("profiles", "v1.0");
             client.DeleteIndex<ProfileIndexDto>();
-            client.CreateIndex(ProfileIndexDto.IndexName, new IndexSettings());
+            client.CreateIndex("profiles_v1.0", new IndexSettings());
+            client = _searchClientFactory.GetClient("profiles", "v1.0");
             client.MapFromAttributes<ProfileIndexDto>();
 
-            client = _searchClientFactory.GetClient(ProfileIndexDto.IndexName, "v1.0");
+            client = _searchClientFactory.GetClient("profiles", "v1.0");
 
             var i = 0;
             var cursor = _profiles.Find(MongoDB.Driver.Builders.Query<Profile>.NE(x => x.ProfessionalInfo, null)).SetBatchSize(BatchSize);
@@ -42,6 +45,7 @@ namespace Classy.UtilRunner.Utilities.Indexing
                 foreach (var professional in professionalsBulks)
                 {
                     toIndex.Add(new ProfileIndexDto {
+                        Id = professional.Id,
                         CommentCount = professional.CommentCount,
                         ComnpanyName = professional.ProfessionalInfo.CompanyName,
                         FollowerCount= professional.FollowerCount,

@@ -22,7 +22,7 @@ namespace classy.Manager.Search
 
         public void Index(Profile[] entities, string appId)
         {
-            var client = _searchClientFactory.GetClient(ProfileIndexDto.IndexName, appId);
+            var client = _searchClientFactory.GetClient("profiles", appId);
             var indexingInfo = _appManager.GetAppById(appId).IndexingInfo;
 
             var profilesToIndex = new List<ProfileIndexDto>();
@@ -53,7 +53,7 @@ namespace classy.Manager.Search
 
         public void RemoveFromIndex(Profile entity, string appId)
         {
-            var client = _searchClientFactory.GetClient(ProfileIndexDto.IndexName, appId);
+            var client = _searchClientFactory.GetClient("profiles", appId);
             client.Delete(new ProfileIndexDto {
                 Id = entity.Id
             });
@@ -66,7 +66,7 @@ namespace classy.Manager.Search
 
             var script = string.Format("ctx._source.{0} += {1}", elasticPropertyName, amount);
 
-            var client = _searchClientFactory.GetClient(ProfileIndexDto.IndexName, appId);
+            var client = _searchClientFactory.GetClient("profiles", appId);
             client.Update<ProfileIndexDto>(d => d
                 .Id(id)
                 .Script(script));
