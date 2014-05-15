@@ -4,8 +4,8 @@ namespace Classy.Interfaces.Search
 {
     public interface IListingSearchProvider
     {
-        void Index(ListingIndexDto[] listingDtos);
+        void Index(ListingIndexDto[] listingDtos, string appId);
 
-        SearchResults<ListingIndexDto> Search(string query, int amount = 25, int page = 1);
+        SearchResults<ListingIndexDto> Search(string query, string appId, int amount = 25, int page = 1);
     }
 }

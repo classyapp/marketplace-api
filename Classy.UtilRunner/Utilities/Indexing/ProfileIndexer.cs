@@ -26,12 +26,12 @@ namespace Classy.UtilRunner.Utilities.Indexing
         
         public StatusCode Run(string[] args)
         {
-            var client = _searchClientFactory.GetClient("profiles");
+            var client = _searchClientFactory.GetClient(ProfileIndexDto.IndexName, "v1.0");
             client.DeleteIndex<ProfileIndexDto>();
-            client.CreateIndex("profiles", new IndexSettings());
+            client.CreateIndex(ProfileIndexDto.IndexName, new IndexSettings());
             client.MapFromAttributes<ProfileIndexDto>();
 
-            client = _searchClientFactory.GetClient("profiles");
+            client = _searchClientFactory.GetClient(ProfileIndexDto.IndexName, "v1.0");
 
             var i = 0;
             var cursor = _profiles.Find(MongoDB.Driver.Builders.Query<Profile>.NE(x => x.ProfessionalInfo, null)).SetBatchSize(BatchSize);

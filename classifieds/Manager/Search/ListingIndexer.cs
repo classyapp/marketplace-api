@@ -6,34 +6,37 @@ using classy.Extentions;
 using Classy.Interfaces.Search;
 using Classy.Models;
 using Classy.Models.Search;
-using Nest;
 
 namespace classy.Manager.Search
 {
     public class ListingIndexer : IIndexer<Listing>
     {
-        private readonly ElasticClient _client;
-        private readonly IndexingInfo _indexingInfo;
+        private readonly ISearchClientFactory _searchClientFactory;
+        private readonly IAppManager _appManager;
 
         public ListingIndexer(ISearchClientFactory searchClientFactory, IAppManager appManager)
         {
-            _indexingInfo = appManager.GetIndexingInfo();
-            _client = searchClientFactory.GetClient("listings");
+            _searchClientFactory = searchClientFactory;
+            _appManager = appManager;
         }
 
-        public void RemoveFromIndex(Listing entity)
+        public void RemoveFromIndex(Listing entity, string appId)
         {
-            _client.Delete(new ListingIndexDto {
+            var client = _searchClientFactory.GetClient(ListingIndexDto.IndexName, appId);
+            client.Delete(new ListingIndexDto {
                 Id = entity.Id
             });
         }
 
-        public void Index(Listing[] entities)
+        public void Index(Listing[] entities, string appId)
         {
+            var client = _searchClientFactory.GetClient(ListingIndexDto.IndexName, appId);
+            var indexingInfo = _appManager.GetAppById(appId).IndexingInfo;
+
             var listingsToIndex = new List<ListingIndexDto>();
             foreach (var entity in entities)
             {
-                if (!_indexingInfo.ListingTypes.Contains(entity.ListingType))
+                if (!indexingInfo.ListingTypes.Contains(entity.ListingType))
                     continue;
 
                 listingsToIndex.Add(new ListingIndexDto {
@@ -52,28 +55,29 @@ namespace classy.Manager.Search
                     Title = entity.Title,
                     ViewCount = entity.ViewCount,
                     Metadata = entity.Metadata
-                        .Where(x => _indexingInfo.MetadataPerListing[entity.ListingType].Contains(x.Key))
+                        .Where(x => indexingInfo.MetadataPerListing[entity.ListingType].Contains(x.Key))
                         .Select(x => x.Value).ToArray()
                 });
             }
-            _client.IndexMany(listingsToIndex);
+            client.IndexMany(listingsToIndex);
         }
 
-        public void Increment<T>(string id, Expression<Func<Listing, T>> property, int amount = 1)
+        public void Increment<T>(string id, string appId, Expression<Func<Listing, T>> property, int amount = 1)
         {
             var propertyName = ((MemberExpression) property.Body).Member.Name;
             var elasticPropertyName = Char.ToLowerInvariant(propertyName[0]) + propertyName.Substring(1);
 
             var script = string.Format("ctx._source.{0} += {1}", elasticPropertyName, amount);
 
-            _client.Update<ListingIndexDto>(d => d
+            var client = _searchClientFactory.GetClient(ListingIndexDto.IndexName, appId);
+            client.Update<ListingIndexDto>(d => d
                 .Id(id)
                 .Script(script));
         }
 
-        public void Increment<T>(string[] ids, Expression<Func<Listing, T>> property, int amount = 1)
+        public void Increment<T>(string[] ids, string appId, Expression<Func<Listing, T>> property, int amount = 1)
         {
-            ids.ForEach(x => Increment(x, property, amount));
+            ids.ForEach(x => Increment(x, appId, property, amount));
         }
     }
 }

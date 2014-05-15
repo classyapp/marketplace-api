@@ -1,4 +1,5 @@
-﻿using System.Security.Policy;
+﻿using System.Security.Cryptography.X509Certificates;
+using System.Security.Policy;
 using Nest;
 
 namespace Classy.Models.Search
@@ -6,6 +7,12 @@ namespace Classy.Models.Search
     [ElasticType(Name = "listing")]
     public class ListingIndexDto
     {
+        [ElasticProperty(Index = FieldIndexOption.no)]
+        public static string IndexName
+        {
+            get { return "listings"; }
+        }
+
         public string Id { get; set; }
 
         [ElasticProperty(Index = FieldIndexOption.analyzed)]

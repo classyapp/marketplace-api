@@ -1,21 +1,22 @@
 ﻿using System;
 using Classy.Interfaces.Search;
 using Classy.Models.Search;
-using Nest;
 
 namespace classy.Manager.Search
 {
     public class ProfileSearchProvider : IProfileSearchProvider
     {
-        private readonly IElasticClient _client;
+        private const string IndexName = "profiles";
+        private readonly ISearchClientFactory _searchClientFactory;
 
         public ProfileSearchProvider(ISearchClientFactory searchClientFactory)
         {
-            _client = searchClientFactory.GetClient("profiles");
+            _searchClientFactory = searchClientFactory;
         }
 
-        public SearchResults<ProfileIndexDto> Search(string query, int amount = 25, int page = 1)
+        public SearchResults<ProfileIndexDto> Search(string query, string appId, int amount = 25, int page = 1)
         {
+            var client = _searchClientFactory.GetClient(IndexName, appId);
             throw new NotImplementedException();
         }
     }
