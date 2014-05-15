@@ -1,28 +1,27 @@
-﻿using ServiceStack.Common;
+﻿using System.Diagnostics;
+using Classy.Interfaces.Search;
+using Classy.Models.Response.Search;
+using ServiceStack.Common;
 using ServiceStack.ServiceInterface;
-using ServiceStack.ServiceHost;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Web;
 using ServiceStack.Common.Web;
 using System.Net;
-using ServiceStack.ServiceInterface.Validation;
-using ServiceStack.FluentValidation;
 using Classy.Models;
 using Classy.Models.Response;
 using Classy.Models.Request;
 using Classy.Auth;
 using System.IO;
 using classy.Manager;
-using Classy.Repository;
 using System.Security.Cryptography;
 using System.Text;
 using Classy.Interfaces.Managers;
+using ServiceStack.ServiceHost;
 
 namespace classy.Services
 {
-    public class ListingService : ServiceStack.ServiceInterface.Service
+    public class ListingService : Service
     {
         public IBookingManager BookingManager { get; set; }
         public IOrderManager OrderManager { get; set; }
@@ -36,7 +35,23 @@ namespace classy.Services
         public IEmailManager EmailManager { get; set; }
         public IAppManager AppManager { get; set; }
         public IUserAuthRepository UserAuthRepository { get; set; }
-        public IJobManager JobManager { get; set; }
+        public IListingSearchProvider ListingSearchProvider { get; set; }
+
+        public object Post(SearchListingsRequest searchRequest)
+        {
+            var searchResults = ListingSearchProvider.Search(
+                searchRequest.Q, searchRequest.Amount, searchRequest.Page);
+
+            var listingsFromDb = ListingManager.GetListingsByIds(
+                searchResults.Results.Select(x => x.Id).ToArray(),
+                searchRequest.Environment.AppId,
+                false,
+                searchRequest.Environment.CultureCode);
+
+            var response = new SearchResultsResponse<ListingView>(listingsFromDb, searchResults.TotalResults);
+
+            return new HttpResult(response, HttpStatusCode.OK);
+        }
 
         [CustomAuthenticate]
         public object Post(CreateProfileProxy request)
@@ -86,7 +101,7 @@ namespace classy.Services
         }
 
         public object Get(GetListingsByProfileId request)
-       { 
+        { 
             try
             {
                 var listingViews = ListingManager.GetListingsByProfileId(
@@ -123,7 +138,7 @@ namespace classy.Services
                 request.IncludeComments,
                 request.FormatCommentsAsHtml,
                 request.Page,
-                AppManager.GetAppById(request.Environment.AppId).PageSize,
+                request.PageSize ?? AppManager.GetAppById(request.Environment.AppId).PageSize,
                 request.Environment.CultureCode);
 
             return new HttpResult(listingViews, HttpStatusCode.OK);
@@ -1604,14 +1619,6 @@ namespace classy.Services
             }
 
             return new HttpResult(response, HttpStatusCode.OK);
-        }
-
-        public object Post(ImportPorductCatalogRequest request)
-        {
-            IFile file = Request.Files[0];
-            byte[] content = new byte[file.ContentLength];
-            file.InputStream.Read(content, 0, content.Length);
-            return JobManager.ScheduleCatalogImport(request.Environment.AppId, request.ProfileId, request.OverwriteListings, request.UpdateImages, content, file.ContentType, request.CatalogTemplateType);
         }
     }
 }

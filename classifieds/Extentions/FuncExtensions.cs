@@ -1,4 +1,6 @@
-﻿using classy.Manager;
+﻿using Classy.Interfaces.Search;
+using classy.Manager;
+using classy.Manager.Search;
 using Classy.Repository;
 using MongoDB.Driver;
 using ServiceStack.CacheAccess;
@@ -29,6 +31,10 @@ namespace classy.Extensions
         }
         public static void WireUp(this Funq.Container container)
         {
+            container.Register<ISearchClientFactory>(_ => new SearchClientFactory());
+            container.Register<IListingSearchProvider>(
+                c => new ListingSearchProvider(c.TryResolve<ISearchClientFactory>()));
+
             container.Register<IRedisClientsManager>(c =>
             {
                 var connectionString = GetConnectionString("REDIS");

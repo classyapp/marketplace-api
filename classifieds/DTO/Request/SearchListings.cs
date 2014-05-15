@@ -18,5 +18,6 @@ namespace Classy.Models.Request
         public bool IncludeComments { get; set; }
         public bool FormatCommentsAsHtml { get; set; }
         public int Page { get; set; }
+        public int? PageSize { get; set; }
     }
 }

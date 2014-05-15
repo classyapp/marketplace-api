@@ -99,6 +99,7 @@ namespace Classy.Repository
                     update.Set(x => x.SearchableKeywords, listing.TranslatedKeywords.SelectMany(s => s.Value));
                 else
                     update.Set(x => x.SearchableKeywords, null);
+              
 
                 ListingsCollection.FindAndModify(query, null, update);
             }
@@ -305,11 +306,11 @@ namespace Classy.Repository
             // price range
             if (priceMin.HasValue)
             {
-                queries.Add(Query<Listing>.GTE(x => x.PricingInfo.Price, priceMin));
+                queries.Add(Query.ElemMatch("PricingInfo", Query.GTE("Price", priceMin)));
             }
             if (priceMax.HasValue)
             {
-                queries.Add(Query<Listing>.LTE(x => x.PricingInfo.Price, priceMax));
+                queries.Add(Query.ElemMatch("PricingInfo", Query.LTE("Price", priceMax)));
             }
 
             // geo
