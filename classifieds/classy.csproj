@@ -127,6 +127,7 @@
     <Compile Include="DTO\Request\GetListingTranslation.cs" />
     <Compile Include="DTO\Request\DeleteTranslation.cs" />
     <Compile Include="DTO\Request\GetProfileTranslation.cs" />
+    <Compile Include="DTO\Request\ImportPorductCatalogRequest.cs" />
     <Compile Include="DTO\Request\PasswordResetRequest.cs" />
     <Compile Include="DTO\Request\PostComment.cs" />
     <Compile Include="DTO\Request\PostCommentForCollection.cs" />
@@ -211,9 +212,11 @@
     </Compile>
     <Compile Include="HtmlUtilities.cs" />
     <Compile Include="Manager\DefaultAnalyticsManager.cs" />
+    <Compile Include="Manager\DefaultJobManager.cs" />
     <Compile Include="Manager\IAnalyticsManager.cs" />
     <Compile Include="Manager\IBookingManager.cs" />
     <Compile Include="Manager\ICollectionManager.cs" />
+    <Compile Include="Manager\IJobManager.cs" />
     <Compile Include="Manager\IListingManager.cs" />
     <Compile Include="Manager\IManager.cs" />
     <Compile Include="Manager\IOrderManager.cs" />
@@ -230,13 +233,16 @@
     <Compile Include="Manager\DefaultProfileManager.cs" />
     <Compile Include="Manager\Search\ListingSearchProvider.cs" />
     <Compile Include="Manager\Search\SearchClientFactory.cs" />
+    <Compile Include="Operations\ImportProductCatalogJob.cs" />
     <Compile Include="Operations\IOperator.cs" />
+    <Compile Include="Operations\ProductCatalogImportOperator.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Services\AppService.cs" />
     <Compile Include="Services\CollectionService.cs" />
     <Compile Include="Services\CommentsService.cs" />
     <Compile Include="Services\ListingService.cs" />
     <Compile Include="Services\PasswordService.cs" />
+    <Compile Include="Services\ProductService.cs" />
     <Compile Include="Services\ProfileService.cs" />
     <Compile Include="Services\ResourcesService.cs" />
     <Compile Include="Services\ReviewsService.cs" />
