@@ -1,7 +1,11 @@
-﻿using Classy.Auth;
+﻿using System;
+using System.Web;
 using classy.DTO.Request.Search;
-using Classy.Models.Request;
+using classy.Extensions;
 using classy.Services;
+using Classy.Auth;
+using Classy.Models.Request;
+using MongoDB.Driver;
 using ServiceStack.Common;
 using ServiceStack.Common.Web;
 using ServiceStack.Configuration;
@@ -10,10 +14,6 @@ using ServiceStack.ServiceInterface;
 using ServiceStack.ServiceInterface.Admin;
 using ServiceStack.ServiceInterface.Validation;
 using ServiceStack.WebHost.Endpoints;
-using System;
-using System.Web;
-using MongoDB.Driver;
-using classy.Extensions;
 
 namespace classy
 {
@@ -211,6 +211,9 @@ namespace classy
                 .Add<GetProfileTranslation>("/profile/{ProfileID}/translation/{CultureCode}", "GET")
                 .Add<DeleteProfileTranslation>("/profile/{ProfileID}/translation/{CultureCode}", "DELETE")
                 .Add<VerifyEmailRequest>("/profile/verify/{hash}", "GET")
+
+                // Products
+                .Add<ImportPorductCatalogRequest>("/product/uploadcatalog", "POST")
 
                 // Reviews
                 .Add<PostReviewForListing>("/listing/{ListingId}/reviews/new", "POST")
