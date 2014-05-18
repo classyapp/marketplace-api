@@ -3,6 +3,7 @@ using classy.Cache;
 using Classy.Interfaces.Search;
 using classy.Manager;
 using classy.Manager.Search;
+using Classy.Models;
 using Classy.Repository;
 using MongoDB.Driver;
 using ServiceStack.Messaging;
@@ -32,6 +33,11 @@ namespace classy.Extensions
             container.Register<ISearchClientFactory>(_ => new SearchClientFactory());
             container.Register<IListingSearchProvider>(
                 c => new ListingSearchProvider(c.TryResolve<ISearchClientFactory>()));
+
+            container.Register<IIndexer<Listing>>(x =>
+                new ListingIndexer(x.TryResolve<ISearchClientFactory>(), x.TryResolve<IAppManager>()));
+            container.Register<IIndexer<Profile>>(x =>
+                new ProfileIndexer(x.TryResolve<ISearchClientFactory>(), x.TryResolve<IAppManager>()));
 
             container.Register<IRedisClientsManager>(c =>
             {
@@ -105,13 +111,13 @@ namespace classy.Extensions
             container.Register<IListingManager>(c =>
                 new DefaultListingManager(
                     c.TryResolve<IAppManager>(),
-                    c.TryResolve<IMessageQueueClient>(),
                     c.TryResolve<IListingRepository>(),
                     c.TryResolve<ICommentRepository>(),
                     c.TryResolve<IProfileRepository>(),
                     c.TryResolve<ICollectionRepository>(),
                     c.TryResolve<ITripleStore>(),
-                    c.TryResolve<IStorageRepository>()));
+                    c.TryResolve<IStorageRepository>(),
+                    c.TryResolve<IIndexer<Listing>>()));
             container.Register<IProfileManager>(c =>
                 new DefaultProfileManager(
                     c.TryResolve<IAppManager>(),
@@ -135,13 +141,13 @@ namespace classy.Extensions
             container.Register<ICollectionManager>(c =>
                 new DefaultListingManager(
                     c.TryResolve<IAppManager>(),
-                    c.TryResolve<IMessageQueueClient>(),
                     c.TryResolve<IListingRepository>(),
                     c.TryResolve<ICommentRepository>(),
                     c.TryResolve<IProfileRepository>(),
                     c.TryResolve<ICollectionRepository>(),
                     c.TryResolve<ITripleStore>(),
-                    c.TryResolve<IStorageRepository>()));
+                    c.TryResolve<IStorageRepository>(),
+                    c.TryResolve<IIndexer<Listing>>()));
             container.Register<IAnalyticsManager>(c =>
                 new DefaultAnalyticsManager(
                     c.TryResolve<ITripleStore>()));

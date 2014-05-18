@@ -1,9 +1,12 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
+using System.Linq.Expressions;
 using Classy.Interfaces.Search;
 using Classy.Models;
 using Classy.Models.Search;
 using Nest;
+using ServiceStack.Common.Extensions;
 
 namespace classy.Manager.Search
 {
@@ -44,6 +47,30 @@ namespace classy.Manager.Search
                 });
             }
             _client.IndexMany(profilesToIndex);
+        }
+
+        public void RemoveFromIndex(Profile entity)
+        {
+            _client.Delete(new ProfileIndexDto {
+                Id = entity.Id
+            });
+        }
+
+        public void Increment<T>(string id, Expression<Func<Profile, T>> property, int amount = 1)
+        {
+            var propertyName = ((MemberExpression)property.Body).Member.Name;
+            var elasticPropertyName = Char.ToLowerInvariant(propertyName[0]) + propertyName.Substring(1);
+
+            var script = string.Format("ctx._source.{0} += {1}", elasticPropertyName, amount);
+
+            _client.Update<ProfileIndexDto>(d => d
+                .Id(id)
+                .Script(script));
+        }
+
+        public void Increment<T>(string[] ids, Expression<Func<Profile, T>> property, int amount = 1)
+        {
+            ids.ForEach(x => Increment(x, property, amount));
         }
 
         private static GPSLocation GetGpsLocation(Profile professional)
