@@ -5,10 +5,10 @@ using NUnit.Framework;
 
 namespace Classy.Tests.Search
 {
-    [TestFixture]
+    //[TestFixture]
     public class FoolingAround
     {
-        [Test]
+        //[Test]
         public void Test()
         {
             var a = ReturnPropertyName(x => x.ContactInfo);

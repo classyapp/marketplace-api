@@ -206,6 +206,7 @@
     <Compile Include="Extentions\ListingViewExtensions.cs" />
     <Compile Include="Extentions\ProfileViewExtentions.cs" />
     <Compile Include="DTO\Request\GetCollectionByProfileId.cs" />
+    <Compile Include="Extentions\StringExtensions.cs" />
     <Compile Include="Extentions\UserSessionExtensions.cs" />
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>

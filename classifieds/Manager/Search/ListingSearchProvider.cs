@@ -1,7 +1,5 @@
 ﻿using System.Linq;
-using Amazon.OpsWorks.Model;
 using Classy.Interfaces.Search;
-using Classy.Models;
 using Classy.Models.Search;
 using Nest;
 
@@ -9,19 +7,21 @@ namespace classy.Manager.Search
 {
     public class ListingSearchProvider : IListingSearchProvider
     {
-        private readonly IElasticClient _client;
+        private const string IndexName = "listings";
+        private readonly ISearchClientFactory _searchClientFactory;
 
         public ListingSearchProvider(ISearchClientFactory searchClientFactory)
         {
-            _client = searchClientFactory.GetClient("listings");
+            _searchClientFactory = searchClientFactory;
         }
 
-        public void Index(ListingIndexDto[] listingDtos)
+        public void Index(ListingIndexDto[] listingDtos, string appId)
         {
-            _client.IndexMany(listingDtos);
+            var client = _searchClientFactory.GetClient(IndexName, appId);
+            client.IndexMany(listingDtos);
         }
 
-        public SearchResults<ListingIndexDto> Search(string query, int amount = 25, int page = 1)
+        public SearchResults<ListingIndexDto> Search(string query, string appId, int amount = 25, int page = 1)
         {
             //var searchDescriptor = new SearchDescriptor<ListingIndexDto>()
             //    .Query(q => q.Bool(b =>
@@ -30,6 +30,7 @@ namespace classy.Manager.Search
             //            n.Path(p => p.Metadata)
             //            .Query(nq => nq.Term(t => t.Metadata, query))))));
 
+            var client = _searchClientFactory.GetClient(IndexName, appId);
             var searchDescriptor = new SearchDescriptor<ListingIndexDto>()
                 .Query(q => q.QueryString(x =>
                     x.OnFields(f => f.Metadata, f => f.Title, f => f.Content, f => f.Keywords).Query(query)))
@@ -38,10 +39,10 @@ namespace classy.Manager.Search
 
 #if DEGBUG
             // find a better way (than precompiler flags) to log if we have problems...
-            var request = _client.Serializer.Serialize(searchDescriptor);
+            var request = client.Serializer.Serialize(searchDescriptor);
 #endif
 
-            var response = _client.Search(searchDescriptor);
+            var response = client.Search(searchDescriptor);
 
             //queryDescriptor.Filtered(q => q.Filter(f => f.Range(t => t.Greater(0))));
 

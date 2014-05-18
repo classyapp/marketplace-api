@@ -21,7 +21,8 @@ namespace classy.Services
         public object Post(SearchListingsRequest searchRequest)
         {
             var searchResults = ListingSearchProvider.Search(
-                searchRequest.Q, searchRequest.Amount, searchRequest.Page);
+                searchRequest.Q, searchRequest.Environment.AppId,
+                searchRequest.Amount, searchRequest.Page);
 
             var listingsFromDb = ListingManager.GetListingsByIds(
                 searchResults.Results.Select(x => x.Id).ToArray(),
