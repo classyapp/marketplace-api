@@ -1,12 +1,4 @@
-﻿using MongoDB.Bson.Serialization.Attributes;
-using MongoDB.Bson.Serialization.IdGenerators;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Web;
-using System.Drawing;
-
-namespace Classy.Models
+﻿namespace Classy.Models
 {
     public class App : BaseObject
     {
