@@ -1,18 +1,15 @@
-﻿using Classy.Interfaces.Search;
+﻿using Amazon.OpsWorks.Model;
+using classy.Cache;
+using Classy.Interfaces.Search;
 using classy.Manager;
 using classy.Manager.Search;
 using Classy.Repository;
 using MongoDB.Driver;
-using ServiceStack.CacheAccess;
 using ServiceStack.Messaging;
 using ServiceStack.Redis;
 using ServiceStack.Redis.Messaging;
 using System;
-using System.Collections.Generic;
 using System.Configuration;
-using System.Linq;
-using System.Web;
-using Classy.Auth;
 using Classy.Interfaces.Managers;
 
 namespace classy.Extensions
@@ -31,6 +28,7 @@ namespace classy.Extensions
         }
         public static void WireUp(this Funq.Container container)
         {
+            container.Register<ICache<Classy.Models.App>>(r => new DefaultCache<Classy.Models.App>());
             container.Register<ISearchClientFactory>(_ => new SearchClientFactory());
             container.Register<IListingSearchProvider>(
                 c => new ListingSearchProvider(c.TryResolve<ISearchClientFactory>()));
@@ -82,7 +80,7 @@ namespace classy.Extensions
             container.Register<ICollectionRepository>(c => new MongoCollectionRepository(c.Resolve<MongoDatabase>()));
             container.Register<ILocalizationRepository>(c => new MongoLocalizationProvider(c.Resolve<MongoDatabase>()));
             container.Register<IAppManager>(c =>
-                new DefaultAppManager(c.TryResolve<MongoDatabase>()));
+                new DefaultAppManager(c.TryResolve<MongoDatabase>(), c.TryResolve<ICache<Classy.Models.App>>()));
             container.Register<IEmailManager>(c =>
                 new MandrillEmailManager(c.TryResolve<IAppManager>()));
             container.Register<IPaymentGateway>(c =>

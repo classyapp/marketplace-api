@@ -112,6 +112,7 @@
     </Content>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Cache\ICacheProvider.cs" />
     <Compile Include="DTO\Request\AddExternalMedia.cs" />
     <Compile Include="DTO\Request\ApproveProxyClaim.cs" />
     <Compile Include="DTO\Request\BookListing.cs" />

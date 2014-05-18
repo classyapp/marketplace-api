@@ -93,6 +93,10 @@
     <Compile Include="TranzilaPaymentGateway.cs" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\Classy.Interfaces\Classy.Interfaces.csproj">
+      <Project>{9C0DED9F-8160-4BDF-A599-6B33A983353A}</Project>
+      <Name>Classy.Interfaces</Name>
+    </ProjectReference>
     <ProjectReference Include="..\Classy.Models\Classy.Models.csproj">
       <Project>{ac13df42-51bb-4798-a0ab-9b2776b4844f}</Project>
       <Name>Classy.Models</Name>
