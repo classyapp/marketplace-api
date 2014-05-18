@@ -1,6 +1,5 @@
 using System;
 using System.Linq.Expressions;
-using Classy.Models;
 
 namespace Classy.Interfaces.Search
 {

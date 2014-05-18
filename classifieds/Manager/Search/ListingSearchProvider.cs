@@ -1,7 +1,6 @@
 using System.Linq;
 using System.Linq;
 using Classy.Interfaces.Search;
-using Classy.Models;
 using Classy.Models.Search;
 using Nest;
 
