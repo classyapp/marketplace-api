@@ -5,6 +5,7 @@ using Classy.Repository;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using MongoDB.Driver.Linq;
 using ServiceStack.Common;
 using Classy.Models.Request;
 using ServiceStack.Text;
