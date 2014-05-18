@@ -1,3 +1,4 @@
+﻿using System;
 using System.Linq;
 using Amazon.DynamoDBv2;
 using Classy.Interfaces.Search;
