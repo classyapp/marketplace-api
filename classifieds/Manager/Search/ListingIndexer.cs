@@ -23,9 +23,7 @@ namespace classy.Manager.Search
         public void RemoveFromIndex(Listing entity, string appId)
         {
             var client = _searchClientFactory.GetClient(ListingIndexDto.IndexName, appId);
-            client.Delete(new ListingIndexDto {
-                Id = entity.Id
-            });
+            client.Delete<ListingIndexDto>(x => x.Id(entity.Id));
         }
 
         public void Index(Listing[] entities, string appId)

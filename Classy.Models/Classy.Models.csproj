@@ -40,14 +40,18 @@
     <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="Elasticsearch.Net">
+      <HintPath>..\packages\Elasticsearch.Net.1.0.0-beta1\lib\Elasticsearch.Net.dll</HintPath>
+    </Reference>
     <Reference Include="MongoDB.Bson">
       <HintPath>..\lib\MongoDB.Bson.dll</HintPath>
     </Reference>
     <Reference Include="MongoDB.Driver">
       <HintPath>..\lib\MongoDB.Driver.dll</HintPath>
     </Reference>
-    <Reference Include="Nest">
-      <HintPath>..\packages\NEST.0.12.0.0\lib\NET4\Nest.dll</HintPath>
+    <Reference Include="Nest, Version=1.0.0.0, Culture=neutral, PublicKeyToken=96c599bbe3e70f5d, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\packages\NEST.1.0.0-beta1\lib\Nest.dll</HintPath>
     </Reference>
     <Reference Include="Newtonsoft.Json">
       <HintPath>..\packages\Newtonsoft.Json.6.0.1\lib\net45\Newtonsoft.Json.dll</HintPath>

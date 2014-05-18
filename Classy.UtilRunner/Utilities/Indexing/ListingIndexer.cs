@@ -29,11 +29,11 @@ namespace Classy.UtilRunner.Utilities.Indexing
             var indexName = ListingIndexDto.IndexName + "_v1.0";
 
             var client = _searchClientFactory.GetClient(ListingIndexDto.IndexName, "v1.0");
-            client.DeleteIndex<ListingIndexDto>();
-            client.CreateIndex(ListingIndexDto.IndexName + "_v1.0", new IndexSettings());
-            client = _searchClientFactory.GetClient(ListingIndexDto.IndexName, "v1.0");
-            client.MapFromAttributes<ListingIndexDto>();
-
+            client.DeleteIndex(x => x.Index<ListingIndexDto>());
+            client.CreateIndex(ListingIndexDto.IndexName + "_v1.0", 
+                x => x.Settings(s => new IndexSettings())
+                    .AddMapping<ListingIndexDto>(m => m.MapFromAttributes()));
+            
             client = _searchClientFactory.GetClient(ListingIndexDto.IndexName, "v1.0");
 
             var i = 0;

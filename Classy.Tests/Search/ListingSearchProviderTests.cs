@@ -11,11 +11,11 @@ namespace Classy.Tests.Search
         //[Test]
         public void Search_WordInTitle_ReturnRelevantDocuments()
         {
-            var results = ListingSearchProvider.Search("classic");
+            //var results = ListingSearchProvider.Search("classic");
 
-            Assert.NotNull(results);
-            Assert.That(results.TotalResults, Is.Not.EqualTo(0));
-            Assert.IsNotEmpty(results.Results);
+            //Assert.NotNull(results);
+            //Assert.That(results.TotalResults, Is.Not.EqualTo(0));
+            //Assert.IsNotEmpty(results.Results);
         }
     }
 }
