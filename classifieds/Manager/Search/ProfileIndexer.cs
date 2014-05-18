@@ -54,9 +54,7 @@ namespace classy.Manager.Search
         public void RemoveFromIndex(Profile entity, string appId)
         {
             var client = _searchClientFactory.GetClient("profiles", appId);
-            client.Delete(new ProfileIndexDto {
-                Id = entity.Id
-            });
+            client.Delete<ProfileIndexDto>(x => x.Id(entity.Id));
         }
 
         public void Increment<T>(string id, string appId, Expression<Func<Profile, T>> property, int amount = 1)

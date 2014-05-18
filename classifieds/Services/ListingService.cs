@@ -1,5 +1,4 @@
-﻿using classy.Infrastructure.Events;
-using ServiceStack.ServiceInterface;
+﻿using ServiceStack.ServiceInterface;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -25,7 +24,6 @@ namespace classy.Services
         public IThumbnailManager ThumbnailManager { get; set; }
         public IEmailManager EmailManager { get; set; }
         public IAppManager AppManager { get; set; }
-        public EventsAggregator EventsAggregator { get; set; } 
 
         public object Get(GetListingById request)
         {
@@ -91,9 +89,7 @@ namespace classy.Services
                 request.ContactInfo ?? session.GetDefaultContactInfo(AppManager.GetAppById(request.Environment.AppId).DefaultCountry),
                 request.SchedulingTemplate,
                 request.Metadata);
-
-            EventsAggregator.Publish<NewEventCreated>();
-
+            
             return new HttpResult
             {
                 StatusCode = HttpStatusCode.Created,

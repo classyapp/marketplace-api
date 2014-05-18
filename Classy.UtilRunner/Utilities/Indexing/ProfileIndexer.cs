@@ -29,10 +29,10 @@ namespace Classy.UtilRunner.Utilities.Indexing
             var indexName = "profiles" + "_v1.0";
 
             var client = _searchClientFactory.GetClient("profiles", "v1.0");
-            client.DeleteIndex<ProfileIndexDto>();
-            client.CreateIndex("profiles_v1.0", new IndexSettings());
-            client = _searchClientFactory.GetClient("profiles", "v1.0");
-            client.MapFromAttributes<ProfileIndexDto>();
+            client.DeleteIndex(d => d.Index<ProfileIndexDto>());
+            client.CreateIndex("profiles_v1.0",
+                s => s.Settings(_ => new IndexSettings())
+                    .AddMapping<ProfileIndexDto>(m => m.MapFromAttributes()));
 
             client = _searchClientFactory.GetClient("profiles", "v1.0");
 
