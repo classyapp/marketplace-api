@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System;
+using System.Linq;
 using Classy.Interfaces.Search;
 using Classy.Models.Search;
 using Nest;
@@ -31,16 +32,28 @@ namespace classy.Manager.Search
             //            .Query(nq => nq.Term(t => t.Metadata, query))))));
 
             var client = _searchClientFactory.GetClient(IndexName, appId);
+
             var searchDescriptor = new SearchDescriptor<ListingIndexDto>()
-                .Query(q => q.QueryString(x =>
-                    x.OnFields(f => f.Metadata, f => f.Title, f => f.Content, f => f.Keywords).Query(query)))
+                .Query(q => q.CustomFiltersScore(
+                    c => c.Query(cq => cq.QueryString(
+                        qs => qs.OnFields(f => f.Metadata, f => f.Title, f => f.Content, f => f.Keywords).Query(query))
+                    ).Filters(
+                        f => f.Filter(
+                            ff => ff.NumericRange(fn => fn.GreaterOrEquals(1).OnField(aa => aa.FlagCount)))
+                            .Boost(0.5f),
+                        f => f.Filter(
+                            ff => ff.Exists(e => e.FavoriteCount))
+                            .Script("1 + (doc['favoriteCount'].value / 500)")
+                    ).ScoreMode(ScoreMode.multiply)
+                )
+            );
+
+            searchDescriptor
                 .Size(amount)
                 .From(amount*(page - 1));
-
-#if DEGBUG
+            
             // find a better way (than precompiler flags) to log if we have problems...
             var request = client.Serializer.Serialize(searchDescriptor);
-#endif
 
             var response = client.Search(searchDescriptor);
 
