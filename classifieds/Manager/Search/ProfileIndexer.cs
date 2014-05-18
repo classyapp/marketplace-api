@@ -5,24 +5,26 @@ using System.Linq.Expressions;
 using Classy.Interfaces.Search;
 using Classy.Models;
 using Classy.Models.Search;
-using Nest;
 using ServiceStack.Common.Extensions;
 
 namespace classy.Manager.Search
 {
     public class ProfileIndexer : IIndexer<Profile>
     {
-        private readonly ElasticClient _client;
-        private readonly IndexingInfo _indexingInfo;
+        private readonly ISearchClientFactory _searchClientFactory;
+        private readonly IAppManager _appManager;
 
         public ProfileIndexer(ISearchClientFactory searchClientFactory, IAppManager appManager)
         {
-            _indexingInfo = appManager.GetIndexingInfo();
-            _client = searchClientFactory.GetClient("profiles");
+            _searchClientFactory = searchClientFactory;
+            _appManager = appManager;
         }
 
-        public void Index(Profile[] entities)
+        public void Index(Profile[] entities, string appId)
         {
+            var client = _searchClientFactory.GetClient(ProfileIndexDto.IndexName, appId);
+            var indexingInfo = _appManager.GetAppById(appId).IndexingInfo;
+
             var profilesToIndex = new List<ProfileIndexDto>();
             foreach (var entity in entities)
             {
@@ -38,7 +40,7 @@ namespace classy.Manager.Search
                     ListingCount = entity.ListingCount,
                     Location = GetGpsLocation(entity),
                     Metadata = entity.Metadata
-                        .Where(x => _indexingInfo.MetadataPerListing["Profile"].Contains(x.Key))
+                        .Where(x => indexingInfo.MetadataPerListing["Profile"].Contains(x.Key))
                         .Select(x => x.Value).ToArray(),
                     Rank = entity.Rank,
                     ReviewAverageScore = entity.ReviewAverageScore,
@@ -46,31 +48,33 @@ namespace classy.Manager.Search
                     ViewCount = entity.ViewCount
                 });
             }
-            _client.IndexMany(profilesToIndex);
+            client.IndexMany(profilesToIndex);
         }
 
-        public void RemoveFromIndex(Profile entity)
+        public void RemoveFromIndex(Profile entity, string appId)
         {
-            _client.Delete(new ProfileIndexDto {
+            var client = _searchClientFactory.GetClient(ProfileIndexDto.IndexName, appId);
+            client.Delete(new ProfileIndexDto {
                 Id = entity.Id
             });
         }
 
-        public void Increment<T>(string id, Expression<Func<Profile, T>> property, int amount = 1)
+        public void Increment<T>(string id, string appId, Expression<Func<Profile, T>> property, int amount = 1)
         {
             var propertyName = ((MemberExpression)property.Body).Member.Name;
             var elasticPropertyName = Char.ToLowerInvariant(propertyName[0]) + propertyName.Substring(1);
 
             var script = string.Format("ctx._source.{0} += {1}", elasticPropertyName, amount);
 
-            _client.Update<ProfileIndexDto>(d => d
+            var client = _searchClientFactory.GetClient(ProfileIndexDto.IndexName, appId);
+            client.Update<ProfileIndexDto>(d => d
                 .Id(id)
                 .Script(script));
         }
 
-        public void Increment<T>(string[] ids, Expression<Func<Profile, T>> property, int amount = 1)
+        public void Increment<T>(string[] ids, string appId, Expression<Func<Profile, T>> property, int amount = 1)
         {
-            ids.ForEach(x => Increment(x, property, amount));
+            ids.ForEach(x => Increment(x, appId, property, amount));
         }
 
         private static GPSLocation GetGpsLocation(Profile professional)
