@@ -31,7 +31,7 @@ namespace Classy.Models.Response
         public IList<CommentView> Comments { get; set; }
         //
         public bool HasPricingInfo { get; set; }
-        public PricingInfoView PricingInfo { get; set; }
+        public IList<PurchaseOptionView> PurchaseOptions { get; set; }
         //
         public bool HasContactInfo { get; set; }
         public ContactInfoView ContactInfo { get; set; }

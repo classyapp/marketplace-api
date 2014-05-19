@@ -54,14 +54,14 @@ namespace classy.Operations
 
 
                         Listing currListing = null;
-                        PricingInfo PriceInfo = null;
-                        PurchaseOption PO = new PurchaseOption();
+                        IList<PurchaseOption> purchaseOptions = null;
+                        PurchaseOption purchaseOption = new PurchaseOption();
 
                         // create new Listing object only if parent, otherwise get the parent to add a new PO to it.
                         if (dataLine[2].ToLower().Equals("parent"))
                         {
                             currListing = new Listing();
-                            PriceInfo = new PricingInfo();
+                            purchaseOptions = new List<PurchaseOption>();
                         }
                         else
                         {
@@ -70,12 +70,12 @@ namespace classy.Operations
                             if (currListing == null)
                                 throw new Exception("No parent for child"); // TODO : handle better.
 
-                            PriceInfo = currListing.PricingInfo;
+                            purchaseOptions = currListing.PurchaseOptions;
                         }
 
                         currListing.ProfileId = job.ProfileId;
 
-                        PO.SKU = dataLine[0];
+                        purchaseOption.SKU = dataLine[0];
 
                         string[] variants = dataLine[4].Split(',');
 
@@ -84,13 +84,13 @@ namespace classy.Operations
                             switch (variation.ToLower())
                             {
                                 case "color":
-                                    PO.VariantProperties.Add("Color", dataLine[18]);
+                                    purchaseOption.VariantProperties.Add("Color", dataLine[18]);
                                     break;
                                 case "size":
-                                    PO.VariantProperties.Add("Size", dataLine[19]);
+                                    purchaseOption.VariantProperties.Add("Size", dataLine[19]);
                                     break;
                                 case "design":
-                                    PO.VariantProperties.Add("Design", dataLine[20]);
+                                    purchaseOption.VariantProperties.Add("Design", dataLine[20]);
                                     break;
                                 default:
                                     break;
@@ -127,11 +127,11 @@ namespace classy.Operations
                         else
                         {
                             //child title.
-                            PO.Title = dataLine[6];
+                            purchaseOption.Title = dataLine[6];
                         }
 
-                        PO.Quantity = int.Parse(dataLine[11]);
-                        PO.Price = double.Parse(dataLine[12]);
+                        purchaseOption.Quantity = int.Parse(dataLine[11]);
+                        purchaseOption.Price = double.Parse(dataLine[12]);
 
                         List<MediaFile> tmpList = new List<MediaFile>();
 
@@ -149,11 +149,11 @@ namespace classy.Operations
                                 tmpList.Add(mf);
                             }
                         }
-                        PO.MediaFiles = tmpList.ToArray();
+                        purchaseOption.MediaFiles = tmpList.ToArray();
 
 
-                        PriceInfo.PurchaseOptions.Add(PO);
-                        currListing.PricingInfo = PriceInfo;
+                        purchaseOptions.Add(purchaseOption);
+                        currListing.PurchaseOptions = purchaseOptions;
                     }
 
                     lineNum++;

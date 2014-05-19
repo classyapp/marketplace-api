@@ -247,7 +247,7 @@ namespace classy.Manager
             var profile = ProfileRepository.GetById(appId, listing.ProfileId, false, null);
 
             // can't publish a purchasable listing if 
-            if ((listing.PricingInfo != null || listing.SchedulingTemplate != null) && !profile.IsVendor)
+            if ((listing.PurchaseOptions != null || listing.SchedulingTemplate != null) && !profile.IsVendor)
                 throw new ApplicationException("a listing with pricing or scheduling information can only be published by a merchant profile");
 
             // publish
@@ -265,7 +265,7 @@ namespace classy.Manager
             string title,
             string content,
             string listingType,
-            PricingInfo pricingInfo,
+            IList<PurchaseOption> purchaseOptions,
             ContactInfo contactInfo,
             TimeslotSchedule timeslotSchedule,
             IDictionary<string, string> customAttributes)
@@ -295,7 +295,7 @@ namespace classy.Manager
                 listing.Hashtags = content.ExtractHashtags();
             }
 
-            if (pricingInfo != null) listing.PricingInfo = pricingInfo;
+            if (purchaseOptions != null) listing.PurchaseOptions = purchaseOptions;
             if (contactInfo != null) listing.ContactInfo = contactInfo;
             if (timeslotSchedule != null) listing.SchedulingTemplate = timeslotSchedule;
             if (customAttributes != null)
@@ -331,7 +331,7 @@ namespace classy.Manager
             string listingId,
             string title,
             string content,
-            PricingInfo pricingInfo,
+            IList<PurchaseOption> purchaseOptions,
             ContactInfo contactInfo,
             TimeslotSchedule timeslotSchedule,
             IDictionary<string, string> metadata,
@@ -350,7 +350,7 @@ namespace classy.Manager
                 var newTags = string.IsNullOrEmpty(content) ? new string[0] : content.ExtractHashtags();
                 listing.Hashtags = hashtags.EmptyIfNull().Union(newTags).ToList();
             }
-            if (fields.HasFlag(ListingUpdateFields.Pricing)) listing.PricingInfo = pricingInfo;
+            if (fields.HasFlag(ListingUpdateFields.Pricing)) listing.PurchaseOptions = purchaseOptions;
             if (fields.HasFlag(ListingUpdateFields.ContactInfo)) listing.ContactInfo = contactInfo;
             if (fields.HasFlag(ListingUpdateFields.SchedulingTemplate)) listing.SchedulingTemplate = timeslotSchedule;
             if (fields.HasFlag(ListingUpdateFields.Metadata))
@@ -1083,5 +1083,37 @@ namespace classy.Manager
                 throw;
             }
         }
+
+#if DEBUG
+        private void CreateProduct()
+        {
+            var options = new List<PurchaseOption>();
+            options.Add(new PurchaseOption() { Title = "Product #1", SKU = "123456", Quantity = 1, Price = 12, CompareAtPrice = 14,
+                                               MediaFiles = new MediaFile[] { new MediaFile { Type = MediaFileType.Image, Key = "2c6a6734-6580-4fa9-9bb8-ab24973dde3e", ContentType = "image/jpeg", Url = "http://d107oye3n9eb07.cloudfront.net/2c6a6734-6580-4fa9-9bb8-ab24973dde3e" } } 
+            });
+            Listing listing = new Listing()
+            {
+                Title = "Product #1",
+                Content = "Product Description",
+                Categories = new string[] { "kitchen", "aprons" },
+                ClickCount = 0,
+                AddToCollectionCount = 0,
+                AppId = "v1.0",
+                CommentCount = 0,
+                Created = DateTime.UtcNow,
+                DefaultCulture = "en",
+                ExternalMedia = null,
+                FavoriteCount = 0,
+                IsPublished = true,
+                ListingType = "Product",
+                ProfileId = "172",
+                PurchaseCount = 0,
+                PurchaseOptions = options,
+                ViewCount = 0
+            };
+
+            ListingRepository.Update(listing);
+        }
+#endif
     }
 }

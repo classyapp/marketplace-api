@@ -90,7 +90,7 @@ namespace Classy.Repository
                     .Set(x => x.Content, listing.Content)
                     .Set(x => x.Translations, listing.Translations);
                 if (listing.ContactInfo != null) update.Set(x => x.ContactInfo, listing.ContactInfo);
-                if (listing.PricingInfo != null) update.Set(x => x.PricingInfo, listing.PricingInfo);
+                if (listing.PurchaseOptions != null) update.Set(x => x.PurchaseOptions, listing.PurchaseOptions);
                 if (listing.SchedulingTemplate != null) update.Set(x => x.SchedulingTemplate, listing.SchedulingTemplate);
                 update.Set(x => x.Metadata, listing.Metadata);
                 update.Set(x => x.Hashtags, listing.Hashtags);

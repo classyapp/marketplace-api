@@ -85,7 +85,7 @@ namespace classy.Services
                 request.Title,
                 request.Content,
                 request.ListingType,
-                request.Pricing,
+                request.PurchaseOptions,
                 request.ContactInfo ?? session.GetDefaultContactInfo(AppManager.GetAppById(request.Environment.AppId).DefaultCountry),
                 request.SchedulingTemplate,
                 request.Metadata);
@@ -179,7 +179,7 @@ namespace classy.Services
                     request.ListingId,
                     request.Title,
                     request.Content,
-                    request.Pricing,
+                    request.PurchaseOptions,
                     request.ContactInfo,
                     request.SchedulingTemplate,
                     request.Metadata,

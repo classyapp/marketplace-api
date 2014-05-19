@@ -14,7 +14,7 @@ namespace Classy.Models.Request
         public string Content { get; set; }
         public string ListingType { get; set; }
         public Location Location { get; set; }
-        public PricingInfo Pricing { get; set; }
+        public IList<PurchaseOption> PurchaseOptions { get; set; }
         public ContactInfo ContactInfo { get; set; }
         public TimeslotSchedule SchedulingTemplate { get; set; }
         public IDictionary<string, string> Metadata { get; set; }
@@ -33,10 +33,9 @@ namespace Classy.Models.Request
                     RuleFor(x => x.ContactInfo.Location).SetValidator(new LocationValidator())
                         .WithErrorCode("Invalid Location");
                 });
-                When(x => x.Pricing != null, () =>
+                When(x => x.PurchaseOptions != null, () =>
                 {
-                    RuleFor(x => x.Pricing).SetValidator(new PricingInfoValidator())
-                        .WithErrorCode("Invalid Pricing Information");
+                    RuleFor(x => x.PurchaseOptions.Count).GreaterThan(0);
                 });
             });
         }

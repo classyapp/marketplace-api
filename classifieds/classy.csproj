@@ -203,9 +203,9 @@
     <Compile Include="Extentions\FuncExtensions.cs" />
     <Compile Include="Extentions\LocalizationResourceViewExtensions.cs" />
     <Compile Include="Extentions\ModelExtensions.cs" />
-    <Compile Include="Extentions\PricingInfoViewExtensions.cs" />
     <Compile Include="Extentions\MediaFileViewExtensions.cs" />
     <Compile Include="Extentions\LocationViewExtensions.cs" />
+    <Compile Include="Extentions\PurchaseOptionViewExtentions.cs" />
     <Compile Include="Extentions\ReviewViewExtensions.cs" />
     <Compile Include="Extentions\SellerViewExtentions.cs" />
     <Compile Include="Extentions\ProxyClaimViewExtentions.cs" />

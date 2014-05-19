@@ -14,10 +14,10 @@ namespace classy
         {
             var to = from.TranslateTo<ListingView>();
             if (from.ExternalMedia != null) to.ExternalMedia = from.ExternalMedia.ToMediaFileList();
-            to.HasPricingInfo = from.PricingInfo != null;
+            to.HasPricingInfo = from.PurchaseOptions != null;
             if (to.HasPricingInfo)
             {
-                to.PricingInfo = from.PricingInfo.ToPricingInfoView();
+                to.PurchaseOptions = from.PurchaseOptions.ToPurchaseOptionViewList(null);
             }
             to.HasContactInfo = from.ContactInfo != null;
             if (to.HasContactInfo)

@@ -5,7 +5,7 @@ using System.Text;
 
 namespace Classy.Models
 {
-    public class PurchaseOption
+    public class PurchaseOption : ITranslatable<PurchaseOption>
     {
         public string Title{ get; set; }
         public Dictionary<string, string> VariantProperties { get; set; } // Key: Size, Color, Model, etc. Value: Smal, Medium, Large, etc.
@@ -15,5 +15,10 @@ namespace Classy.Models
         public double? CompareAtPrice { get; set; }
         public MediaFile[] MediaFiles { get; set; }
         public string DefaultImage { get; set; }
+
+        public PurchaseOption Translate(string culture)
+        {
+            return this;
+        }
     }
 }

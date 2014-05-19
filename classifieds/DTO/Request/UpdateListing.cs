@@ -27,7 +27,7 @@ namespace Classy.Models.Request
         public string Title { get; set; }
         public string Content { get; set; }
         public Location Location { get; set; }
-        public PricingInfo Pricing { get; set; }
+        public IList<PurchaseOption> PurchaseOptions { get; set; }
         public ContactInfo ContactInfo { get; set; }
         public TimeslotSchedule SchedulingTemplate { get; set; }
         public IDictionary<string, string> Metadata { get; set; }
@@ -51,7 +51,7 @@ namespace Classy.Models.Request
                 });
             When(x => x.Fields.HasFlag(ListingUpdateFields.Pricing), () =>
                 {
-                    RuleFor(x => x.Pricing).SetValidator(new PricingInfoValidator());
+                    RuleFor(x => x.PurchaseOptions.Count).GreaterThan(0);
                 });
             When(x => x.Fields.HasFlag(ListingUpdateFields.Metadata), () =>
             {

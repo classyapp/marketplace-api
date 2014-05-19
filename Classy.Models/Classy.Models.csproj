@@ -105,7 +105,6 @@
     <Compile Include="PaymentGatewayResponse.cs" />
     <Compile Include="PaymentMethod.cs" />
     <Compile Include="PhysicalAddress.cs" />
-    <Compile Include="PricingInfo.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="PurchaseOption.cs" />
     <Compile Include="Review.cs" />

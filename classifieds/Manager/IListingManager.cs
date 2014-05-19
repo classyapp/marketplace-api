@@ -97,7 +97,7 @@ namespace classy.Manager
             string title,
             string content,
             string listingType,
-            PricingInfo pricingInfo,
+            IList<PurchaseOption> purchaseOptions,
             ContactInfo contactInfo,
             TimeslotSchedule timeslotSchedule,
             IDictionary<string, string> customAttributes);
@@ -120,7 +120,7 @@ namespace classy.Manager
             string listingId,
             string title,
             string content,
-            PricingInfo pricingInfo,
+            IList<PurchaseOption> purchaseOptions,
             ContactInfo contactInfo,
             TimeslotSchedule timeslotSchedule,
             IDictionary<string, string> metadata,

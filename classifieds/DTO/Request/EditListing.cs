@@ -24,10 +24,9 @@ namespace Classy.Models.Request
                     RuleFor(x => x.ContactInfo.Location).SetValidator(new LocationValidator())
                         .WithErrorCode("Invalid Location");
                 });
-                When(x => x.Pricing != null, () =>
+                When(x => x.PurchaseOptions != null, () =>
                 {
-                    RuleFor(x => x.Pricing).SetValidator(new PricingInfoValidator())
-                        .WithErrorCode("Invalid Pricing Information");
+                    RuleFor(x => x.PurchaseOptions.Count).GreaterThan(0);
                 });
             });
         }
