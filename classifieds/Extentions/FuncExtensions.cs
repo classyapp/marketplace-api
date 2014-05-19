@@ -162,6 +162,8 @@ namespace classy.Extensions
             container.Register<IThumbnailManager>(c =>
                 new DefaultThumbnailManager(
                     c.TryResolve<IStorageRepository>()));
+            container.Register<ISearchSuggestionsProvider>(c => 
+                new SearchSuggestionsProvider(c.TryResolve<ISearchClientFactory>()));
         }
     }
 }

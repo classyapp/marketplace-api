@@ -120,6 +120,7 @@ namespace classy
         {
             Routes
                 .Add<SearchListingsRequest>("/free_search", "POST")
+                .Add<SearchSuggestionsRequest>("/search/suggest", "GET")
                 // App settings
                 .Add<GetAppSettings>("/app/settings", "GET")
 

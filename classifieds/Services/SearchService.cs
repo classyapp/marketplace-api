@@ -4,7 +4,7 @@ using System.Net;
 using classy.DTO.Request.Search;
 using Classy.Interfaces.Search;
 using classy.Manager;
-using Classy.Models;
+using classy.Manager.Search;
 using Classy.Models.Request;
 using Classy.Models.Response;
 using Classy.Models.Response.Search;
@@ -19,6 +19,7 @@ namespace classy.Services
         public IProfileManager ProfileManager { get; set; }
         public IListingSearchProvider ListingSearchProvider { get; set; }
         public IListingManager ListingManager { get; set; }
+        public ISearchSuggestionsProvider SearchSuggestionsProvider { get; set; }
 
         public object Post(SearchListingsRequest searchRequest)
         {
@@ -86,6 +87,12 @@ namespace classy.Services
                 request.Environment.CultureCode);
 
             return new HttpResult(profiles, HttpStatusCode.OK);
+        }
+
+        public object Get(SearchSuggestionsRequest request)
+        {
+            var suggestions = SearchSuggestionsProvider.GetSearchSuggestions(request.q, request.Environment.AppId);
+            return new HttpResult(suggestions, HttpStatusCode.OK);
         }
     }
 }
