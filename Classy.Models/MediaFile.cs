@@ -8,7 +8,8 @@ namespace Classy.Models
     [Flags]
     public enum MediaFileType
     {
-        Image = 1 << 0
+        Image = 1 << 0,
+        File = 2
     }
 
     public class MediaFile
