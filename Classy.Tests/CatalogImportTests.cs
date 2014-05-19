@@ -15,12 +15,16 @@ using System.Threading.Tasks;
 
 namespace Classy.Tests
 {
-    //[TestClass]
+    [TestFixture]
     public class CatalogImportTests
     {
+
+        public CatalogImportTests()
+        {
+
+        }
        
-       
-      //[TestMethod]
+        [Test]
         public void TestImport()
         {
             try

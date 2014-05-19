@@ -38,12 +38,13 @@ namespace classy.Operations
                 StreamReader reader = new StreamReader(file);
 
                 int lineNum = 0;
+                Dictionary<string, Listing> listingList = new Dictionary<string, Listing>();
+
+
                 while (!reader.EndOfStream)
                 {
 
                     string currLine = reader.ReadLine();
-
-                    Dictionary<string, Listing> listingList = new Dictionary<string, Listing>();
 
                     if (lineNum != 0)
                     {
@@ -57,58 +58,57 @@ namespace classy.Operations
                         IList<PurchaseOption> purchaseOptions = null;
                         PurchaseOption purchaseOption = new PurchaseOption();
 
-                        // create new Listing object only if parent, otherwise get the parent to add a new PO to it.
+                        string[] variants = null;
+
                         if (dataLine[2].ToLower().Equals("parent"))
                         {
                             currListing = new Listing();
                             purchaseOptions = new List<PurchaseOption>();
-                        }
-                        else
-                        {
-                            currListing = listingList[dataLine[0]];
 
-                            if (currListing == null)
-                                throw new Exception("No parent for child"); // TODO : handle better.
 
-                            purchaseOptions = currListing.PurchaseOptions;
-                        }
+                            currListing.ProfileId = job.ProfileId;
+                            currListing.AppId = job.AppId;
+                            currListing.ListingType = "Product";
 
-                        currListing.ProfileId = job.ProfileId;
+                            variants = dataLine[4].Split(',');
 
-                        purchaseOption.SKU = dataLine[0];
-
-                        string[] variants = dataLine[4].Split(',');
-
-                        foreach (string variation in variants)
-                        {
-                            switch (variation.ToLower())
+                            purchaseOption.VariantProperties = new Dictionary<string, string>();
+                            foreach (string variation in variants)
                             {
-                                case "color":
-                                    purchaseOption.VariantProperties.Add("Color", dataLine[18]);
-                                    break;
-                                case "size":
-                                    purchaseOption.VariantProperties.Add("Size", dataLine[19]);
-                                    break;
-                                case "design":
-                                    purchaseOption.VariantProperties.Add("Design", dataLine[20]);
-                                    break;
-                                default:
-                                    break;
+                                switch (variation.ToLower())
+                                {
+                                    case "color":
+                                        purchaseOption.VariantProperties.Add("Color", dataLine[18]);
+                                        break;
+                                    case "size":
+                                        purchaseOption.VariantProperties.Add("Size", dataLine[19]);
+                                        break;
+                                    case "design":
+                                        purchaseOption.VariantProperties.Add("Design", dataLine[20]);
+                                        break;
+                                    default:
+                                        break;
+                                }
                             }
-                        }
 
 
-                        if (dataLine[2].ToLower().Equals("parent"))
-                        {
                             // only fill out the listing parent once.
                             currListing.Title = dataLine[6];
                             currListing.Content = dataLine[8];
 
                             string[] categories = dataLine[9].Split(',');
 
+
+                            if (currListing.Categories == null)
+                                currListing.Categories = new List<string>();
+		  
                             foreach (string cat in categories)
                                 currListing.Categories.Add(cat);
 
+
+                            if (currListing.Metadata == null)
+                                currListing.Metadata = new Dictionary<string,string>();
+                            
                             currListing.Metadata.Add("Style", dataLine[10]);
                             currListing.Metadata.Add("Width", dataLine[21]);
                             currListing.Metadata.Add("Depth", dataLine[22]);
@@ -118,17 +118,30 @@ namespace classy.Operations
                             currListing.Metadata.Add("Designer", dataLine[26]);
 
                             string[] keywords = dataLine[36].Split(',');
+
+                            if (currListing.SearchableKeywords == null)
+                                currListing.SearchableKeywords = new List<string>();
+
                             foreach (string keyword in keywords)
                             {
-                                currListing.SearchableKeywords.Add(keyword);
+                                if (keyword.Length > 0)
+                                    currListing.SearchableKeywords.Add(keyword);
                             }
 
                         }
                         else
                         {
+                            currListing = listingList[dataLine[1]];
+                            purchaseOptions = currListing.PurchaseOptions;
+
+                            purchaseOption.VariantProperties = listingList[dataLine[1]].PurchaseOptions.First().VariantProperties;
+
                             //child title.
                             purchaseOption.Title = dataLine[6];
                         }
+
+                        
+                        purchaseOption.SKU = dataLine[0];
 
                         purchaseOption.Quantity = int.Parse(dataLine[11]);
                         purchaseOption.Price = double.Parse(dataLine[12]);
@@ -143,8 +156,8 @@ namespace classy.Operations
                                 // add media file
                                 MediaFile mf = new MediaFile();
                                 mf.Type = MediaFileType.File;
-                                mf.ContentType = ""; // TODO ???
-                                mf.Key = ""; // TODO
+                                mf.ContentType = "image/jpeg";
+                                mf.Key = Guid.NewGuid().ToString();
                                 mf.Url = dataLine[i];
                                 tmpList.Add(mf);
                             }
@@ -154,9 +167,23 @@ namespace classy.Operations
 
                         purchaseOptions.Add(purchaseOption);
                         currListing.PurchaseOptions = purchaseOptions;
+
+                        if (dataLine[2].ToLower().Equals("parent"))
+                        {
+                            listingList.Add(dataLine[0], currListing);
+                        }
+                        
                     }
 
                     lineNum++;
+                }
+
+                // write data to storage.
+                foreach (Listing currListing in listingList.Values)
+                {
+                    currListing.IsPublished = true;
+
+                    _listingRepository.Insert(currListing);
                 }
             }
         }
