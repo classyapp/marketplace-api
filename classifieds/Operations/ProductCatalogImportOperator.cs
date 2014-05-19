@@ -14,14 +14,14 @@ namespace classy.Operations
         private readonly IStorageRepository _storageRepository; // AWS
         private readonly IListingRepository _listingRepository; //MONGO
         private readonly IJobRepository _jobRepository; // JOBS
-        private readonly IAppManager _appManager;
+       // private readonly IAppManager _appManager;
 
-        public ProductCatalogImportOperator(IStorageRepository storageRepo, IListingRepository listingRepo, IJobRepository jobRepo, IAppManager appManager)
+        public ProductCatalogImportOperator(IStorageRepository storageRepo, IListingRepository listingRepo, IJobRepository jobRepo)
         {
             _storageRepository = storageRepo;
             _listingRepository = listingRepo;
             _jobRepository = jobRepo;
-            _appManager = appManager;
+            //_appManager = appManager;
         }
 
         public void PerformOperation(ImportProductCatalogJob request)

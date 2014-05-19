@@ -35,6 +35,10 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="AWSSDK, Version=2.0.4.1, Culture=neutral, PublicKeyToken=9f476d3089b52be3, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\packages\AWSSDK.2.0.4.1\lib\net45\AWSSDK.dll</HintPath>
+    </Reference>
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="Newtonsoft.Json, Version=6.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
@@ -92,6 +96,7 @@
       <HintPath>..\lib\ServiceStack.Text.dll</HintPath>
     </Reference>
     <Reference Include="System" />
+    <Reference Include="System.Configuration" />
   </ItemGroup>
   <Choose>
     <When Condition="('$(VisualStudioVersion)' == '10.0' or '$(VisualStudioVersion)' == '') and '$(TargetFrameworkVersion)' == 'v3.5'">
@@ -102,6 +107,7 @@
     <Otherwise />
   </Choose>
   <ItemGroup>
+    <Compile Include="CatalogImportTests.cs" />
     <Compile Include="Framework\TestBase.cs" />
     <Compile Include="ModelDictionaryTests.cs" />
     <Compile Include="Search\FoolingAround.cs" />
@@ -133,13 +139,13 @@
       <Project>{ac13df42-51bb-4798-a0ab-9b2776b4844f}</Project>
       <Name>Classy.Models</Name>
     </ProjectReference>
+    <ProjectReference Include="..\Classy.Repository\Classy.Repository.csproj">
+      <Project>{8bb8c610-ffdb-49de-af0c-0e4cb37e4b1e}</Project>
+      <Name>Classy.Repository</Name>
+    </ProjectReference>
   </ItemGroup>
   <ItemGroup>
     <None Include="app.config" />
-    <None Include="packages.config" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="App.config" />
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup />
