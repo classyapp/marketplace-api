@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using Classy.Interfaces.Search;
 using Classy.Models.Search;
@@ -22,6 +23,20 @@ namespace classy.Manager.Search
             client.IndexMany(listingDtos);
         }
 
+        private List<ListingIndexDto> GetBoostedResults(string category, string appId)
+        {
+            var client = _searchClientFactory.GetClient(IndexName, appId);
+
+            var descriptor = new SearchDescriptor<ListingIndexDto>()
+                .Query(q => q.Term(t => t.BoostedCategories, category));
+
+            var request = client.Serializer.Serialize(descriptor);
+
+            var response = client.Search<ListingIndexDto>(_ => descriptor);
+
+            return response.Documents.ToList();
+        }
+
         public SearchResults<ListingIndexDto> Search(string query, string appId, int amount = 25, int page = 1)
         {
             // This elasticsearch query currently uses 'script_score' in the 'function_score' method
@@ -29,6 +44,8 @@ namespace classy.Manager.Search
             // to use that, since it should be much faster in performance.
             // http://www.elasticsearch.org/guide/en/elasticsearch/reference/current/mapping-boost-field.html
             // https://github.com/elasticsearch/elasticsearch/pull/5519
+
+            var boosted = GetBoostedResults(query, appId);
 
             var client = _searchClientFactory.GetClient(IndexName, appId);
 
@@ -49,7 +66,7 @@ namespace classy.Manager.Search
                                 )
                         )
                     ));
-
+            
             descriptor
                 .Size(amount)
                 .From(amount * (page - 1));

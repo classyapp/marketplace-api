@@ -15,6 +15,7 @@ namespace Classy.Models.Response
         public string Title { get; set; }
         public string Content { get; set; }
         public IList<string> Categories { get; set; }
+        public IList<string> FeaturedCategories { get; set; } 
         public string ListingType { get; set; }
         public IList<MediaFileView> ExternalMedia { get; set; }
         public LocationView Location { get; set; }
