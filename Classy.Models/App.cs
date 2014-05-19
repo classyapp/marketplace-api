@@ -1,4 +1,12 @@
-﻿namespace Classy.Models
+using MongoDB.Bson.Serialization.Attributes;
+using MongoDB.Bson.Serialization.IdGenerators;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Web;
+using System.Drawing;
+
+namespace Classy.Models
 {
     public class App : BaseObject
     {
@@ -19,5 +27,14 @@
         public string MandrilAPIKey { get; set; }
         public int ImageReducedSize { get; set; }
         public string DefaultFromEmailAddress { get; set; }
+
+        public IndexingInfo IndexingInfo { get; set; }
+    }
+
+    public class IndexingInfo
+    {
+        public string[] ListingTypes { get; set; }
+        // I think we can depend only on the dictionary
+        public Dictionary<string, string[]> MetadataPerListing { get; set; }
     }
 }

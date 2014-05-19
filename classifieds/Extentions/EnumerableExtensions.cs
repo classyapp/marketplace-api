@@ -37,5 +37,11 @@ namespace classy.Extentions
                 bulkSize = bulkSizeModifier(bulkSize);
             }
         }
+
+        public static void ForEach<T>(this IEnumerable<T> collection, Action<T> action)
+        {
+            foreach (var t in collection)
+                action(t);
+        }
     }
 }

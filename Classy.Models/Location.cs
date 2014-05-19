@@ -15,6 +15,9 @@ namespace Classy.Models
 
     public class Location
     {
+        public double? Longitude { get; set; }
+        public double? Latitude { get; set; }
+
         public Coords Coords { get; set; }
         public PhysicalAddress Address { get; set; }
     }
