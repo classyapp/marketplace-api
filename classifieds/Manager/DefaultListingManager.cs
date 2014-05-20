@@ -50,8 +50,6 @@ namespace classy.Manager
         public IList<ListingView> GetListingsByIds(string[] listingIds, string appId, bool includeDrafts, string culture)
         {
             var listings = ListingRepository.GetById(listingIds, appId, includeDrafts, null);
-            foreach (var listing in listings)
-                listing.Translate(culture);
 
             return listings.Select(x => x.ToListingView()).ToList();
         }

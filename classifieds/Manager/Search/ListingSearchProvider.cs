@@ -17,12 +17,6 @@ namespace classy.Manager.Search
             _searchClientFactory = searchClientFactory;
         }
 
-        public void Index(ListingIndexDto[] listingDtos, string appId)
-        {
-            var client = _searchClientFactory.GetClient(IndexName, appId);
-            client.IndexMany(listingDtos);
-        }
-
         private List<ListingIndexDto> GetBoostedResults(string category, string appId)
         {
             var client = _searchClientFactory.GetClient(IndexName, appId);

@@ -33,6 +33,8 @@ namespace classy.Extensions
             container.Register<ISearchClientFactory>(_ => new SearchClientFactory());
             container.Register<IListingSearchProvider>(
                 c => new ListingSearchProvider(c.TryResolve<ISearchClientFactory>()));
+            container.Register<IProfileSearchProvider>(
+                c => new ProfileSearchProvider(c.TryResolve<ISearchClientFactory>()));
 
             container.Register<IIndexer<Listing>>(x =>
                 new ListingIndexer(x.TryResolve<ISearchClientFactory>(), x.TryResolve<IAppManager>()));

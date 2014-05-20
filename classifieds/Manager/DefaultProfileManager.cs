@@ -148,6 +148,12 @@ namespace classy.Manager
             ProfileRepository.Save(follower);
         }
 
+        public List<ProfileView> GetProfilesByIds(string[] profileIds, string appId, string culture)
+        {
+            var profiles = ProfileRepository.GetByIds(appId, profileIds, culture);
+            return profiles.Select(x => x.ToProfileView()).ToList();
+        }
+
         public ProfileView GetProfileById(
             string appId,
             string profileId,

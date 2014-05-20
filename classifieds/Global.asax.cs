@@ -119,7 +119,7 @@ namespace classy
         private void ConfigureServiceRoutes()
         {
             Routes
-                .Add<SearchListingsRequest>("/free_search", "POST")
+                .Add<FreeSearchRequest>("/free_search", "POST")
                 .Add<SearchSuggestionsRequest>("/search/{EntityType}/suggest", "GET")
 
                 // App settings

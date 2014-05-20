@@ -146,7 +146,7 @@
     <Compile Include="DTO\Request\GetResourcesForApp.cs" />
     <Compile Include="DTO\Request\GetThumbnail.cs" />
     <Compile Include="DTO\Request\CreateNewResource.cs" />
-    <Compile Include="DTO\Request\Search\SearchListingsRequest.cs" />
+    <Compile Include="DTO\Request\Search\FreeSearchRequest.cs" />
     <Compile Include="DTO\Request\UpdateListing.cs" />
     <Compile Include="DTO\Request\RemoveListingFromCollection.cs" />
     <Compile Include="DTO\Request\SendEmailRequest.cs" />
@@ -258,6 +258,7 @@
     <Compile Include="Services\ProfileService.cs" />
     <Compile Include="Services\ResourcesService.cs" />
     <Compile Include="Services\ReviewsService.cs" />
+    <Compile Include="DTO\Request\Search\SearchProfilesRequest.cs" />
     <Compile Include="Services\SearchService.cs" />
     <Compile Include="DTO\Request\Search\SearchSuggestionsRequest.cs" />
   </ItemGroup>

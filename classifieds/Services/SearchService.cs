@@ -19,28 +19,49 @@ namespace classy.Services
         public IAppManager AppManager { get; set; }
         public IProfileManager ProfileManager { get; set; }
         public IListingSearchProvider ListingSearchProvider { get; set; }
+        public IProfileSearchProvider ProfileSearchProvider { get; set; }
         public IListingManager ListingManager { get; set; }
         public ISearchSuggestionsProvider SearchSuggestionsProvider { get; set; }
 
-        public object Post(SearchListingsRequest searchRequest)
+        public object Post(FreeSearchRequest freeSearchRequest)
         {
-            var searchResults = ListingSearchProvider.Search(
-                searchRequest.Q, searchRequest.Environment.AppId,
-                searchRequest.Amount, searchRequest.Page);
+            // get and organize listings
+            var searchListingsResults = ListingSearchProvider.Search(
+                freeSearchRequest.Q, freeSearchRequest.Environment.AppId,
+                freeSearchRequest.Amount, freeSearchRequest.Page);
 
             var listingsFromDb = ListingManager.GetListingsByIds(
-                searchResults.Results.Select(x => x.Id).ToArray(),
-                searchRequest.Environment.AppId,
+                searchListingsResults.Results.Select(x => x.Id).ToArray(),
+                freeSearchRequest.Environment.AppId,
                 false,
-                searchRequest.Environment.CultureCode);
+                freeSearchRequest.Environment.CultureCode);
 
             var orderedListings = new List<ListingView>();
-            foreach (var dbResult in searchResults.Results)
+            foreach (var dbResult in searchListingsResults.Results)
                 orderedListings.Add(listingsFromDb.First(x => x.Id == dbResult.Id));
 
-            var response = new SearchResultsResponse<ListingView>(orderedListings, searchResults.TotalResults);
+            // get and organize profiles
+            var searchProfilesResults = ProfileSearchProvider.Search(
+                freeSearchRequest.Q, freeSearchRequest.Environment.AppId,
+                freeSearchRequest.Amount, freeSearchRequest.Page);
 
-            return new HttpResult(response, HttpStatusCode.OK);
+            var profilesFromDb = ProfileManager.GetProfilesByIds(
+                searchProfilesResults.Results.Select(x => x.Id).ToArray(),
+                freeSearchRequest.Environment.AppId,
+                freeSearchRequest.Environment.CultureCode);
+
+            var orderedProfiles = new List<ProfileView>();
+            foreach (var dbResult in searchProfilesResults.Results)
+                orderedProfiles.Add(profilesFromDb.First(x => x.Id == dbResult.Id));
+
+            // build model from results
+            var listingsResponse = new SearchResultsResponse<ListingView>(orderedListings, searchListingsResults.TotalResults);
+            var profilesResponse = new SearchResultsResponse<ProfileView>(orderedProfiles, searchProfilesResults.TotalResults);
+
+            return new HttpResult(new FreeSearchResultsResponse() {
+                ListingsResults = listingsResponse,
+                ProfilesResults = profilesResponse
+            }, HttpStatusCode.OK);
         }
 
         public object Get(SearchListings request)
