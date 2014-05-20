@@ -9,6 +9,7 @@
     {
         Success,
         Failure,
+        MissingArguments,
         Warning
     }
 }
