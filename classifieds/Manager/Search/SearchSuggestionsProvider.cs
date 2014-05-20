@@ -1,8 +1,6 @@
 ﻿using System.Collections.Generic;
-using System.Linq;
-using System.Security.Cryptography.X509Certificates;
-using Amazon.OpsWorks.Model;
 using classy.DTO.Response;
+using classy.Extentions;
 using Classy.Interfaces.Search;
 using Classy.Models.Search;
 using Nest;
@@ -35,25 +33,26 @@ namespace classy.Manager.Search
 
             var client = _searchClientFactory.GetClient(ListingsIndexName, appId);
 
-            return null;
+            var searchDescriptor = new SearchDescriptor<ListingIndexDto>()
+                .Query(
+                    qq => qq.QueryString(
+                        qs => qs.OnField(f => f.AnalyzedTitle).Query(q)));
 
+            var response = client.Search<ListingIndexDto>(_ => searchDescriptor);
 
-            //var descriptor = new SuggestDescriptor<ListingIndexDto>()
-            //    .Completion("listing-suggest", c => c.OnField(f => f.Keywords).Text(q));
+            var suggestions = new List<SearchSuggestion>();
+            if (response.Documents.IsNullOrEmpty())
+                return suggestions;
 
-            //var response = client.Suggest<ListingIndexDto>(
-            //    d => d.Completion("listing-suggest", c => c.OnField(f => f.Title).Text(q)));
+            foreach (var suggestion in response.Documents)
+            {
+                suggestions.Add(new SearchSuggestion {
+                    Key = suggestion.Title,
+                    Value = suggestion.Title
+                });
+            }
 
-            //var parsed = new List<SearchSuggestion>();
-            //foreach (var suggestion in response.Suggestions)
-            //{
-            //    parsed.Add(new SearchSuggestion {
-            //        Key = suggestion.Key,
-            //        Value = suggestion.Key
-            //    });
-            //}
-
-            //return parsed;
+            return suggestions;
         }
     }
 }
