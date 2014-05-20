@@ -1,5 +1,4 @@
 ﻿using Nest;
-using Newtonsoft.Json;
 
 namespace Classy.Models.Search
 {
@@ -25,6 +24,8 @@ namespace Classy.Models.Search
         
         // ProfessionalInfo
         public string CompanyName { get; set; }
+        [ElasticProperty(Index = FieldIndexOption.analyzed, OmitNorms = true, SearchAnalyzer = "standard", IndexAnalyzer = "suggest_analyzer")]
+        public string AnalyzedCompanyName { get; set; }
         public bool IsVendor { get; set; }
     }
 }

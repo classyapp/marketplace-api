@@ -2,6 +2,7 @@
 using System.Linq;
 using System.Net;
 using classy.DTO.Request.Search;
+using classy.DTO.Response;
 using Classy.Interfaces.Search;
 using classy.Manager;
 using classy.Manager.Search;
@@ -91,7 +92,12 @@ namespace classy.Services
 
         public object Get(SearchSuggestionsRequest request)
         {
-            var suggestions = SearchSuggestionsProvider.GetSearchSuggestions(request.q, request.Environment.AppId);
+            var suggestions = new List<SearchSuggestion>();
+            if (request.EntityType == "listing")
+                suggestions = SearchSuggestionsProvider.GetListingsSuggestions(request.q, request.Environment.AppId);
+            else if (request.EntityType == "profile")
+                suggestions = SearchSuggestionsProvider.GetProfilesSuggestions(request.q, request.Environment.AppId);
+
             return new HttpResult(suggestions, HttpStatusCode.OK);
         }
     }

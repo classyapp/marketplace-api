@@ -9,7 +9,8 @@ namespace classy.Manager.Search
 {
     public interface ISearchSuggestionsProvider
     {
-        List<SearchSuggestion> GetSearchSuggestions(string q, string appId);
+        List<SearchSuggestion> GetListingsSuggestions(string q, string appId);
+        List<SearchSuggestion> GetProfilesSuggestions(string q, string appId);
     }
 
     public class SearchSuggestionsProvider : ISearchSuggestionsProvider
@@ -22,7 +23,7 @@ namespace classy.Manager.Search
             _searchClientFactory = searchClientFactory;
         }
 
-        public List<SearchSuggestion> GetSearchSuggestions(string q, string appId)
+        public List<SearchSuggestion> GetListingsSuggestions(string q, string appId)
         {
             // We're using a regular search here with an ngram tokenizer
             // since using the elasticsearch 'suggest' endpoint will always
@@ -49,6 +50,33 @@ namespace classy.Manager.Search
                 suggestions.Add(new SearchSuggestion {
                     Key = suggestion.Title,
                     Value = suggestion.Title
+                });
+            }
+
+            return suggestions;
+        }
+
+        public List<SearchSuggestion> GetProfilesSuggestions(string q, string appId)
+        {
+            var client = _searchClientFactory.GetClient(ListingsIndexName, appId);
+
+            var searchDescriptor = new SearchDescriptor<ProfileIndexDto>()
+                .Query(
+                    qq => qq.QueryString(
+                        qs => qs.OnField(f => f.AnalyzedCompanyName).Query(q)));
+
+            var response = client.Search<ProfileIndexDto>(_ => searchDescriptor);
+
+            var suggestions = new List<SearchSuggestion>();
+            if (response.Documents.IsNullOrEmpty())
+                return suggestions;
+
+            foreach (var suggestion in response.Documents)
+            {
+                suggestions.Add(new SearchSuggestion
+                {
+                    Key = suggestion.CompanyName,
+                    Value = suggestion.CompanyName
                 });
             }
 
