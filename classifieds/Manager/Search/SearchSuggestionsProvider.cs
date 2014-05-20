@@ -17,6 +17,7 @@ namespace classy.Manager.Search
     {
         private readonly ISearchClientFactory _searchClientFactory;
         private const string ListingsIndexName = "listings";
+        private const string ProfilesIndexName = "profiles";
 
         public SearchSuggestionsProvider(ISearchClientFactory searchClientFactory)
         {
@@ -58,7 +59,7 @@ namespace classy.Manager.Search
 
         public List<SearchSuggestion> GetProfilesSuggestions(string q, string appId)
         {
-            var client = _searchClientFactory.GetClient(ListingsIndexName, appId);
+            var client = _searchClientFactory.GetClient(ProfilesIndexName, appId);
 
             var searchDescriptor = new SearchDescriptor<ProfileIndexDto>()
                 .Query(
