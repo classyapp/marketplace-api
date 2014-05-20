@@ -78,6 +78,7 @@
     <Compile Include="IUtility.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Utilities\ExportProfiles\ExportProfiles.cs" />
     <Compile Include="Utilities\HashtagCleaning\CleanHashtagsField.cs" />
     <Compile Include="Utilities\HashtagCleaning\CleanCommentsHashtags.cs" />
     <Compile Include="Utilities\HashtagCleaning\CleanDescriptionHashtags.cs" />
