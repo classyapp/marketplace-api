@@ -17,6 +17,7 @@ namespace Classy.Models.Response
         public string DefaultProfileImage { get; set; }
         public string DefaultCountry { get; set; }
         public string DefaultCulture { get; set; }
+        public IList<string> SupportedCultures { get; set; }
         public string GPSLocationCookieName { get; set; }
         public string GPSOriginCookieName { get; set; }
         public string CountryCookieName { get; set; }

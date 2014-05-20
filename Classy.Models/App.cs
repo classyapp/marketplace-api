@@ -1,4 +1,5 @@
-﻿namespace Classy.Models
+﻿using System.Collections.Generic;
+namespace Classy.Models
 {
     public class App : BaseObject
     {
@@ -19,5 +20,6 @@
         public string MandrilAPIKey { get; set; }
         public int ImageReducedSize { get; set; }
         public string DefaultFromEmailAddress { get; set; }
+        public IList<string> SupportedCultures { get; set; }
     }
 }
