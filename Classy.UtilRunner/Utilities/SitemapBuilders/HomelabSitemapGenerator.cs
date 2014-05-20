@@ -3,26 +3,39 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Web;
-using System.Web.Mvc;
-using Classy.DotNet.Mvc.Localization;
 using Classy.DotNet.Mvc.SitemapGenerator;
 using Classy.DotNet.Mvc;
 using Classy.DotNet;
+using Classy.Models;
+using Classy.UtilRunner;
+using MongoDB.Driver;
+using Funq;
 
 namespace MyHome.Sitemap
 {
-    public class HomelabSitemapGenerator : Classy.DotNet.Mvc.SitemapGenerator.ClassySitemapGenerator
+    public class HomelabSitemapGenerator : Classy.DotNet.Mvc.SitemapGenerator.ClassySitemapGenerator, IUtility
     {
-        private static IEnumerable<LocalizedListItem> _supportedCultures = Localizer.GetList("supported-cultures");
+        private readonly MongoCollection<App> _apps;
+        private readonly MongoCollection<Listing> _listings;
 
-        public HomelabSitemapGenerator(UrlHelper urlHelper) : base(urlHelper) { }
+        private readonly App App { get; set; }
+
+        public HomelabSitemapGenerator(Container container)
+        {
+            var mongoDatabase = container.Resolve<MongoDatabase>();
+
+            _apps = mongoDatabase.GetCollection<App>("apps");
+            App = _apps.FindOneById("5378a5cf488c7623b5a648ab");
+
+            _listings = mongoDatabase.GetCollection<Listing>("classifieds");
+        }
 
         public override void GenerateStaticNodes()
         {
-            foreach(var culture in _supportedCultures)
+            foreach(var culture in App.SupportedCultures)
             {
-                WriteUrlLocation(Url.RouteUrlForLocale("Home", culture.Value), UpdateFrequency.Daily, DateTime.UtcNow);
-                WriteUrlLocation(Url.RouteUrlForLocale("Careers", culture.Value), UpdateFrequency.Weekly, DateTime.UtcNow);
+                WriteUrlLocation(Url.RouteUrlForLocale("Home", culture.ToLower()), UpdateFrequency.Daily, DateTime.UtcNow);
+                WriteUrlLocation(Url.RouteUrlForLocale("Careers", culture.ToLower()), UpdateFrequency.Weekly, DateTime.UtcNow);
                 WriteUrlLocation(Url.RouteUrlForLocale("Terms", culture.Value), UpdateFrequency.Monthly, DateTime.UtcNow);
                 WriteUrlLocation(Url.RouteUrlForLocale("Privacy", culture.Value), UpdateFrequency.Monthly, DateTime.UtcNow);
             }
@@ -174,6 +187,12 @@ namespace MyHome.Sitemap
                     }
                 }
             }
+        }
+
+        public StatusCode Run(string[] args)
+        {
+            var app = 
+            var sitemapGenerator = new HomelabSitemapGenerator(app);
         }
     }
 }
