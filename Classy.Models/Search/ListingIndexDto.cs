@@ -13,8 +13,12 @@ namespace Classy.Models.Search
 
         public string Id { get; set; }
 
-        [ElasticProperty(Index = FieldIndexOption.analyzed, Type = FieldType.completion, SearchAnalyzer = "simple", IndexAnalyzer = "simple")]
+        [ElasticProperty(Index = FieldIndexOption.analyzed)]
         public string Title { get; set; }
+
+        [ElasticProperty(Index = FieldIndexOption.analyzed, OmitNorms = true, SearchAnalyzer = "standard", IndexAnalyzer = "suggest_analyzer")]
+        public string AnalyzedTitle { get; set; }
+
         [ElasticProperty(Index = FieldIndexOption.analyzed)]
         public string Content { get; set; }
         [ElasticProperty(Index = FieldIndexOption.not_analyzed)]
@@ -45,7 +49,7 @@ namespace Classy.Models.Search
         //public PricingInfo PricingInfo { get; set; }
         //public TimeslotSchedule SchedulingTemplate { get; set; }
 
-        [ElasticProperty(Index = FieldIndexOption.analyzed, Type = FieldType.completion, SearchAnalyzer = "simple", IndexAnalyzer = "simple")] // should we analyze this data ?...
+        [ElasticProperty(Index = FieldIndexOption.analyzed)] // should we analyze this data ?...
         public string[] Metadata { get; set; }
     }
 }

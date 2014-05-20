@@ -24,7 +24,7 @@ namespace Classy.Models.Search
         public string[] Metadata { get; set; }
         
         // ProfessionalInfo
-        public string ComnpanyName { get; set; }
+        public string CompanyName { get; set; }
         public bool IsVendor { get; set; }
     }
 }

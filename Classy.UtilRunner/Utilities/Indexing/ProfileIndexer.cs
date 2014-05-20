@@ -30,9 +30,12 @@ namespace Classy.UtilRunner.Utilities.Indexing
 
             var client = _searchClientFactory.GetClient("profiles", "v1.0");
             client.DeleteIndex(d => d.Index<ProfileIndexDto>());
-            client.CreateIndex("profiles_v1.0",
-                s => s.Settings(_ => new IndexSettings())
-                    .AddMapping<ProfileIndexDto>(m => m.MapFromAttributes()));
+            client.CreateIndex("profiles_v1.0", s => s.Settings(_ => new IndexSettings()));
+            client.Map<ProfileIndexDto>(
+                m => m.MapFromAttributes().Properties(
+                    p => p.Completion(
+                        c => c.Name(n => n.CompanyName).IndexAnalyzer("simple").SearchAnalyzer("simple")
+                            .Payloads(true).MaxInputLength(20))));
 
             client = _searchClientFactory.GetClient("profiles", "v1.0");
 
@@ -47,7 +50,7 @@ namespace Classy.UtilRunner.Utilities.Indexing
                     toIndex.Add(new ProfileIndexDto {
                         Id = professional.Id,
                         CommentCount = professional.CommentCount,
-                        ComnpanyName = professional.ProfessionalInfo.CompanyName,
+                        CompanyName = professional.ProfessionalInfo.CompanyName,
                         FollowerCount= professional.FollowerCount,
                         FollowingCount= professional.FollowingCount,
                         IsVendor= professional.IsVendor,
