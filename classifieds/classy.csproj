@@ -46,6 +46,10 @@
     <Reference Include="DotNetOpenAuth">
       <HintPath>..\packages\DotNetOpenAuth.Ultimate.4.3.4.13329\lib\net45-full\DotNetOpenAuth.dll</HintPath>
     </Reference>
+    <Reference Include="Elasticsearch.Net, Version=1.0.0.0, Culture=neutral, PublicKeyToken=96c599bbe3e70f5d, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\packages\Elasticsearch.Net.1.0.0-beta1\lib\Elasticsearch.Net.dll</HintPath>
+    </Reference>
     <Reference Include="Mandrill">
       <HintPath>..\packages\Mandrill.1.0.75\lib\net40\Mandrill.dll</HintPath>
     </Reference>
@@ -57,9 +61,9 @@
     <Reference Include="MongoDB.Driver">
       <HintPath>..\lib\MongoDB.Driver.dll</HintPath>
     </Reference>
-    <Reference Include="Nest, Version=0.12.0.0, Culture=neutral, processorArchitecture=MSIL">
+    <Reference Include="Nest, Version=1.0.0.0, Culture=neutral, PublicKeyToken=96c599bbe3e70f5d, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\packages\NEST.0.12.0.0\lib\NET4\Nest.dll</HintPath>
+      <HintPath>..\packages\NEST.1.0.0-beta1\lib\Nest.dll</HintPath>
     </Reference>
     <Reference Include="Newtonsoft.Json, Version=6.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
@@ -191,6 +195,7 @@
     <Compile Include="Extentions\BulkedEnumerator.cs" />
     <Compile Include="Extentions\EnumerableExtensions.cs" />
     <Compile Include="Extentions\ImageExtensions.cs" />
+    <Compile Include="Extentions\IndexerExtensions.cs" />
     <Compile Include="Extentions\LocalizationListResourceViewExtenstions.cs" />
     <Compile Include="Extentions\CommentViewExtensions.cs" />
     <Compile Include="Extentions\ContactInfoViewExtensions.cs" />
@@ -207,6 +212,7 @@
     <Compile Include="Extentions\ListingViewExtensions.cs" />
     <Compile Include="Extentions\ProfileViewExtentions.cs" />
     <Compile Include="DTO\Request\GetCollectionByProfileId.cs" />
+    <Compile Include="Extentions\StringExtensions.cs" />
     <Compile Include="Extentions\UserSessionExtensions.cs" />
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
@@ -232,7 +238,10 @@
     <Compile Include="Manager\DefaultListingManager.cs" />
     <Compile Include="Manager\DefaultOrderManager.cs" />
     <Compile Include="Manager\DefaultProfileManager.cs" />
+    <Compile Include="Manager\Search\ProfileIndexer.cs" />
+    <Compile Include="Manager\Search\ListingIndexer.cs" />
     <Compile Include="Manager\Search\ListingSearchProvider.cs" />
+    <Compile Include="Manager\Search\ProfileSearchProvider.cs" />
     <Compile Include="Manager\Search\SearchClientFactory.cs" />
     <Compile Include="Operations\ImportProductCatalogJob.cs" />
     <Compile Include="Operations\IOperator.cs" />

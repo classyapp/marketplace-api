@@ -89,7 +89,7 @@ namespace classy.Services
                 request.ContactInfo ?? session.GetDefaultContactInfo(AppManager.GetAppById(request.Environment.AppId).DefaultCountry),
                 request.SchedulingTemplate,
                 request.Metadata);
-
+            
             return new HttpResult
             {
                 StatusCode = HttpStatusCode.Created,

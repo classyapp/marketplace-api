@@ -26,12 +26,15 @@ namespace Classy.UtilRunner.Utilities.Indexing
         
         public StatusCode Run(string[] args)
         {
-            var client = _searchClientFactory.GetClient("listings");
-            client.DeleteIndex<ListingIndexDto>();
-            client.CreateIndex("listings", new IndexSettings());
-            client.MapFromAttributes<ListingIndexDto>();
+            var indexName = "listings" + "_v1.0";
 
-            client = _searchClientFactory.GetClient("listings");
+            var client = _searchClientFactory.GetClient(null, null);
+            client.DeleteIndex(x => x.Index<ListingIndexDto>().Index(indexName));
+            client.CreateIndex("listings" + "_v1.0",
+                x => x.Settings(s => new IndexSettings()));
+
+            client = _searchClientFactory.GetClient("listings", "v1.0");
+            client.Map<ListingIndexDto>(m => m.MapFromAttributes());
 
             var i = 0;
             var cursor = _listings.FindAll().SetBatchSize(BatchSize);
