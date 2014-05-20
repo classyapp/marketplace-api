@@ -13,6 +13,11 @@ namespace Classy.Models
         public IDictionary<string, string> Text { get; set; }
     }
 
+    public class CurrencyListItemView : ListItemView
+    {
+        public string Sign { get; set; }
+    }
+
     public class LocalizationListResourceView
     {
         /// <summary>
