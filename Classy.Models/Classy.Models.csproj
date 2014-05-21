@@ -78,6 +78,7 @@
     <Compile Include="App.cs" />
     <Compile Include="Collection.cs" />
     <Compile Include="ContactInfo.cs" />
+    <Compile Include="CurrencyListItem.cs" />
     <Compile Include="Env.cs" />
     <Compile Include="GPSLocation.cs" />
     <Compile Include="IncludedListing.cs" />

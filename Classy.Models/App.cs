@@ -8,7 +8,7 @@ using System.Drawing;
 
 namespace Classy.Models
 {
-    public class App : BaseObject
+    public class App : BaseObject, ITranslatable<App>
     {
         public int PageSize { get; set; }
         public int PagesCount { get; set; }
@@ -19,16 +19,28 @@ namespace Classy.Models
         public string DefaultProfileImage { get; set; }
         public string DefaultCountry { get; set; }
         public string DefaultCulture { get; set; }
+        public string DefaultCurrency { get; set; }
         public string GPSLocationCookieName { get; set; }
         public string GPSOriginCookieName { get; set; }
         public string CountryCookieName { get; set; }
         public string CultureCookieName { get; set; }
+        public string CurrencyCookieName { get; set; }
         public string Hostname { get; set; }
         public string MandrilAPIKey { get; set; }
         public int ImageReducedSize { get; set; }
         public string DefaultFromEmailAddress { get; set; }
 
         public IndexingInfo IndexingInfo { get; set; }
+
+        // Static lists of values
+        public IList<CurrencyListItem> SupportedCurrencies { get; set; }
+        public IList<ListItem> SupportedCultures { get; set; }
+        public IList<ListItem> SupportedCountries { get; set; }
+
+        public App Translate(string culture)
+        {
+            return this;
+        }
     }
 
     public class IndexingInfo
