@@ -58,6 +58,7 @@ namespace Classy.UtilRunner.Utilities.Indexing
                         IsVendor= professional.IsVendor,
                         ListingCount= professional.ListingCount,
                         Location= GetGpsLocation(professional),
+                        Country = GetCountry(professional),
                         Metadata = professional.Metadata.Select(x => x.Value).ToArray(),
                         Rank= professional.Rank,
                         ReviewAverageScore= professional.ReviewAverageScore,
@@ -72,6 +73,19 @@ namespace Classy.UtilRunner.Utilities.Indexing
             }
 
             return StatusCode.Success;
+        }
+
+        private string GetCountry(Profile professional)
+        {
+            if (professional.ProfessionalInfo == null)
+                return null;
+            if (professional.ProfessionalInfo.CompanyContactInfo == null)
+                return null;
+            if (professional.ProfessionalInfo.CompanyContactInfo.Location == null)
+                return null;
+            if (professional.ProfessionalInfo.CompanyContactInfo.Location.Address == null)
+                return null;
+            return professional.ProfessionalInfo.CompanyContactInfo.Location.Address.Country;
         }
 
         private static GPSLocation GetGpsLocation(Profile professional)

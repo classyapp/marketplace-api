@@ -38,12 +38,17 @@ namespace classy.Services
 
             var orderedListings = new List<ListingView>();
             foreach (var dbResult in searchListingsResults.Results)
-                orderedListings.Add(listingsFromDb.First(x => x.Id == dbResult.Id));
+            {
+                var listingFromDb = listingsFromDb.FirstOrDefault(x => x.Id == dbResult.Id);
+                if (listingFromDb != null)
+                    orderedListings.Add(listingFromDb);
+                // TODO: else - LOG about this, since it shouldn't happen!
+            }
 
             // get and organize profiles
             var searchProfilesResults = ProfileSearchProvider.Search(
-                freeSearchRequest.Q, freeSearchRequest.Environment.AppId,
-                freeSearchRequest.Amount, freeSearchRequest.Page);
+                freeSearchRequest.Q, freeSearchRequest.Environment.CountryCode,
+                freeSearchRequest.Environment.AppId, freeSearchRequest.Amount, freeSearchRequest.Page);
 
             var profilesFromDb = ProfileManager.GetProfilesByIds(
                 searchProfilesResults.Results.Select(x => x.Id).ToArray(),

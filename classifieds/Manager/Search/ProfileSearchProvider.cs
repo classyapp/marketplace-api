@@ -16,7 +16,7 @@ namespace classy.Manager.Search
             _searchClientFactory = searchClientFactory;
         }
 
-        public SearchResults<ProfileIndexDto> Search(string query, string appId, int amount = 25, int page = 1)
+        public SearchResults<ProfileIndexDto> Search(string query, string country, string appId, int amount = 25, int page = 1)
         {
             // This elasticsearch query currently uses 'script_score' in the 'function_score' method
             // When NEST starts supporting 'field_value_factor', then we should convert this query
@@ -36,15 +36,20 @@ namespace classy.Manager.Search
             var descriptor = new SearchDescriptor<ProfileIndexDto>()
                 .Query(q => q.FunctionScore(
                     fs => fs.Query(
-                        qq => q.QueryString(
-                            qs => qs.OnFields(f => f.AnalyzedCompanyName, f => f.Metadata)
-                                .Query(query)))
-                        .Functions(
-                            ff => ff.ScriptScore(
-                                ss => ss.Script(script)
+                        qq => qq.Bool(
+                            b => b.Should(m => m.Term(t => t.Country, country))
+                                .Must(mq => mq.QueryString(
+                                    qs => qs.OnFields(f => f.AnalyzedCompanyName, f => f.Metadata)
+                                        .Query(query))
                                 )
                         )
-                    ));
+                    )
+                    .Functions(
+                        ff => ff.ScriptScore(
+                            ss => ss.Script(script)
+                            )
+                    )
+                ));
 
             descriptor
                 .Size(amount)
