@@ -1,4 +1,5 @@
-﻿using classy.Operations;
+﻿using classy.Manager;
+using classy.Operations;
 using Classy.Auth;
 using Classy.Repository;
 using MongoDB.Driver;
@@ -44,7 +45,8 @@ namespace Classy.Tests
                 ProductCatalogImportOperator catalogImport =
                     new ProductCatalogImportOperator(new AmazonS3StorageRepository(s3Client, ConfigurationManager.AppSettings["S3BucketName"]),
                     new MongoListingRepository(mongoDB),
-                    new MongoJobRepository(mongoDB));
+                    new MongoJobRepository(mongoDB),
+                    new CurrencyManager(new StubCurrencyRepository()));
 
                 catalogImport.PerformOperation(new ImportProductCatalogJob("5373ab038e65962b7cd8eac9", "v1.0"));
                 

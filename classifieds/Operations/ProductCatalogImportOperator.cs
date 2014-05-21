@@ -6,6 +6,8 @@ using System.Linq;
 using classy.Manager;
 using Classy.Models;
 using Classy.Repository;
+using Classy.Interfaces.Managers;
+using System.Net;
 
 namespace classy.Operations
 {
@@ -14,22 +16,41 @@ namespace classy.Operations
         private readonly IStorageRepository _storageRepository; // AWS
         private readonly IListingRepository _listingRepository; //MONGO
         private readonly IJobRepository _jobRepository; // JOBS
+        private readonly ICurrencyManager _currencyManager; // 
        // private readonly IAppManager _appManager;
 
-        public ProductCatalogImportOperator(IStorageRepository storageRepo, IListingRepository listingRepo, IJobRepository jobRepo)
+        public ProductCatalogImportOperator(IStorageRepository storageRepo, IListingRepository listingRepo, IJobRepository jobRepo, ICurrencyManager currencyManager)
         {
             _storageRepository = storageRepo;
             _listingRepository = listingRepo;
             _jobRepository = jobRepo;
+            _currencyManager = currencyManager;
             //_appManager = appManager;
+        }
+
+        private void ReportError(Exception ex)
+        {
         }
 
         public void PerformOperation(ImportProductCatalogJob request)
         {
+          
             var job = _jobRepository.GetById(request.AppId, request.JobId);
-            bool overwriteListings = (bool)job.Properties["OverwriteListings"];
-            bool updateImages = (bool)job.Properties["UpdateImages"];
-            int catalogFormat = (int)job.Properties["CatalogFormat"];
+            bool overwriteListings;
+            int catalogFormat;
+            bool updateImages;
+            string currencyCode=null;
+
+            try
+            {
+                overwriteListings = (bool)job.Properties["OverwriteListings"];
+                updateImages = (bool)job.Properties["UpdateImages"];
+                catalogFormat = (int)job.Properties["CatalogFormat"];
+                currencyCode = (string)job.Properties["CurrencyCode"];
+            }catch(Exception ex)
+            {
+                ReportError(new Exception("One of the required properties for the job is missing: " + ex.Message));
+            }
 
             if (job.Attachments.Count() > 0)
             {
@@ -40,146 +61,182 @@ namespace classy.Operations
                 int lineNum = 0;
                 Dictionary<string, Listing> listingList = new Dictionary<string, Listing>();
 
-
+                bool skipToNextParent = false;
                 while (!reader.EndOfStream)
                 {
-
-                    string currLine = reader.ReadLine();
-
-                    if (lineNum != 0)
+                    try
                     {
-                        // validations, update job, update database
-                        Trace.WriteLine(currLine);
+                        string currLine = reader.ReadLine();
 
-                        string[] dataLine = currLine.Split(';');
-
-
-                        Listing currListing = null;
-                        IList<PurchaseOption> purchaseOptions = null;
-                        PurchaseOption purchaseOption = new PurchaseOption();
-
-                        string[] variants = null;
-
-                        if (dataLine[2].ToLower().Equals("parent"))
+                        if (lineNum != 0)
                         {
-                            currListing = new Listing();
-                            currListing.PricingInfo = new PricingInfo();
-                            currListing.PricingInfo.PurchaseOptions = new List<PurchaseOption>();
-                            purchaseOptions = currListing.PricingInfo.PurchaseOptions;
+                            // validations, update job, update database
+                            Trace.WriteLine(currLine);
 
-                            
-                            currListing.ProfileId = job.ProfileId;
-                            currListing.AppId = job.AppId;
-                            currListing.ListingType = "Product";
+                            string[] dataLine = currLine.Split(';');
 
-                            variants = dataLine[4].Split(',');
 
-                            purchaseOption.VariantProperties = new Dictionary<string, string>();
-                            foreach (string variation in variants)
+                            Listing currListing = null;
+                            IList<PurchaseOption> purchaseOptions = null;
+                            PurchaseOption purchaseOption = new PurchaseOption();
+
+                            string[] variants = null;
+
+                            if (dataLine[2].ToLower().Equals("parent"))
                             {
-                                switch (variation.ToLower())
+                                skipToNextParent = false;
+                                
+                                currListing = new Listing();
+                                currListing.PricingInfo = new PricingInfo();
+                                currListing.PricingInfo.PurchaseOptions = new List<PurchaseOption>();
+                                purchaseOptions = currListing.PricingInfo.PurchaseOptions;
+
+
+                                currListing.ProfileId = job.ProfileId;
+                                currListing.AppId = job.AppId;
+                                currListing.ListingType = "Product";
+
+                                variants = dataLine[4].Split(',');
+
+                                purchaseOption.VariantProperties = new Dictionary<string, string>();
+                                foreach (string variation in variants)
                                 {
-                                    case "color":
-                                        purchaseOption.VariantProperties.Add("Color", dataLine[18]);
-                                        break;
-                                    case "size":
-                                        purchaseOption.VariantProperties.Add("Size", dataLine[19]);
-                                        break;
-                                    case "design":
-                                        purchaseOption.VariantProperties.Add("Design", dataLine[20]);
-                                        break;
-                                    default:
-                                        break;
+                                    switch (variation.ToLower())
+                                    {
+                                        case "color":
+                                            purchaseOption.VariantProperties.Add("Color", dataLine[18]);
+                                            break;
+                                        case "size":
+                                            purchaseOption.VariantProperties.Add("Size", dataLine[19]);
+                                            break;
+                                        case "design":
+                                            purchaseOption.VariantProperties.Add("Design", dataLine[20]);
+                                            break;
+                                        default:
+                                            break;
+                                    }
+                                }
+
+
+                                // only fill out the listing parent once.
+                                currListing.Title = dataLine[6];
+                                currListing.Content = dataLine[8];
+
+                                string[] categories = dataLine[9].Split(',');
+
+
+                                if (currListing.Categories == null)
+                                    currListing.Categories = new List<string>();
+
+                                foreach (string cat in categories)
+                                    currListing.Categories.Add(cat);
+
+
+                                if (currListing.Metadata == null)
+                                    currListing.Metadata = new Dictionary<string, string>();
+
+                                currListing.Metadata.Add("Style", dataLine[10]);
+                                currListing.Metadata.Add("Width", dataLine[21]);
+                                currListing.Metadata.Add("Depth", dataLine[22]);
+                                currListing.Metadata.Add("Height", dataLine[23]);
+                                currListing.Metadata.Add("Materials", dataLine[24]);
+                                currListing.Metadata.Add("Manufacturer", dataLine[25]);
+                                currListing.Metadata.Add("Designer", dataLine[26]);
+
+                                string[] keywords = dataLine[36].Split(',');
+
+                                if (currListing.SearchableKeywords == null)
+                                    currListing.SearchableKeywords = new List<string>();
+
+                                foreach (string keyword in keywords)
+                                {
+                                    if (keyword.Length > 0)
+                                        currListing.SearchableKeywords.Add(keyword);
+                                }
+
+                            }
+                            else
+                            {
+                                if (skipToNextParent)
+                                {
+                                    continue;
+                                }
+                                currListing = listingList[dataLine[1]];
+                                purchaseOptions = currListing.PricingInfo.PurchaseOptions;
+
+                                purchaseOption.VariantProperties = listingList[dataLine[1]].PricingInfo.PurchaseOptions.First().VariantProperties;
+
+                                //child title.
+                                purchaseOption.Title = dataLine[6];
+                            }
+
+
+                            purchaseOption.SKU = dataLine[0];
+
+                            purchaseOption.Quantity = int.Parse(dataLine[11]);
+                            purchaseOption.Price = double.Parse(dataLine[12]);
+                            purchaseOption.NeutralPrice = purchaseOption.Price * _currencyManager.GetRate(currencyCode, "USD", 0);
+
+
+                            List<MediaFile> tmpList = new List<MediaFile>();
+
+                            // Media files
+                            for (int i = 28; i < 32; i++)
+                            {
+                                if (dataLine[i].Length > 0)
+                                {
+                                    // add media file
+                                    MediaFile mf = new MediaFile();
+                                    mf.Type = MediaFileType.File;
+                                    mf.ContentType = "image/jpeg";
+                                    mf.Key = Guid.NewGuid().ToString();
+                                    mf.Url = dataLine[i];
+                                    tmpList.Add(mf);
+
+                                    var client = new WebClient();
+                                    byte[] img = null;
+
+                                    try
+                                    {
+                                        img = client.DownloadData(mf.Url);
+                                    }
+                                    catch (Exception ex)
+                                    {
+                                        throw new Exception("Error downloading image: " + mf.Url + ", line #:" + lineNum + ":" + currLine);
+                                    }
+                                    client.Dispose();
+
+                                    try
+                                    {
+                                        _storageRepository.SaveFileSync(mf.Key, img, mf.ContentType);
+                                    }
+                                    catch (Exception ex)
+                                    {
+                                        throw new Exception("Error saving image: " + mf.Url + ", line#:" + lineNum + ":" + currLine);
+                                    }
                                 }
                             }
+                            purchaseOption.MediaFiles = tmpList.ToArray();
 
 
-                            // only fill out the listing parent once.
-                            currListing.Title = dataLine[6];
-                            currListing.Content = dataLine[8];
+                            purchaseOptions.Add(purchaseOption);
+                            currListing.PricingInfo.PurchaseOptions = purchaseOptions;
 
-                            string[] categories = dataLine[9].Split(',');
-
-
-                            if (currListing.Categories == null)
-                                currListing.Categories = new List<string>();
-		  
-                            foreach (string cat in categories)
-                                currListing.Categories.Add(cat);
-
-
-                            if (currListing.Metadata == null)
-                                currListing.Metadata = new Dictionary<string,string>();
-                            
-                            currListing.Metadata.Add("Style", dataLine[10]);
-                            currListing.Metadata.Add("Width", dataLine[21]);
-                            currListing.Metadata.Add("Depth", dataLine[22]);
-                            currListing.Metadata.Add("Height", dataLine[23]);
-                            currListing.Metadata.Add("Materials", dataLine[24]);
-                            currListing.Metadata.Add("Manufacturer", dataLine[25]);
-                            currListing.Metadata.Add("Designer", dataLine[26]);
-
-                            string[] keywords = dataLine[36].Split(',');
-
-                            if (currListing.SearchableKeywords == null)
-                                currListing.SearchableKeywords = new List<string>();
-
-                            foreach (string keyword in keywords)
+                            if (dataLine[2].ToLower().Equals("parent"))
                             {
-                                if (keyword.Length > 0)
-                                    currListing.SearchableKeywords.Add(keyword);
+                                listingList.Add(dataLine[0], currListing);
                             }
 
                         }
-                        else
-                        {
-                            currListing = listingList[dataLine[1]];
-                            purchaseOptions = currListing.PricingInfo.PurchaseOptions;
 
-                            purchaseOption.VariantProperties = listingList[dataLine[1]].PricingInfo.PurchaseOptions.First().VariantProperties;
-
-                            //child title.
-                            purchaseOption.Title = dataLine[6];
-                        }
-
-                        
-                        purchaseOption.SKU = dataLine[0];
-
-                        purchaseOption.Quantity = int.Parse(dataLine[11]);
-                        purchaseOption.Price = double.Parse(dataLine[12]);
-
-                        List<MediaFile> tmpList = new List<MediaFile>();
-
-                        // Media files
-                        for (int i = 28; i < 32; i++)
-                        {
-                            if (dataLine[i].Length > 0)
-                            {
-                                // add media file
-                                MediaFile mf = new MediaFile();
-                                mf.Type = MediaFileType.File;
-                                mf.ContentType = "image/jpeg";
-                                mf.Key = Guid.NewGuid().ToString();
-                                mf.Url = dataLine[i];
-                                tmpList.Add(mf);
-
-                                _storageRepository.SaveFileFromUrl(mf.Key, mf.Url, mf.ContentType);
-                            }
-                        }
-                        purchaseOption.MediaFiles = tmpList.ToArray();
-
-
-                        purchaseOptions.Add(purchaseOption);
-                        currListing.PricingInfo.PurchaseOptions = purchaseOptions;
-
-                        if (dataLine[2].ToLower().Equals("parent"))
-                        {
-                            listingList.Add(dataLine[0], currListing);
-                        }
-                        
+                        lineNum++;
                     }
+                    catch (Exception exx)
+                    {
+                        skipToNextParent = true;
+                        ReportError(exx);
 
-                    lineNum++;
+                    }
                 }
 
                 // write data to storage.

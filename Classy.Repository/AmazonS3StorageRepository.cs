@@ -63,6 +63,28 @@ namespace Classy.Repository
             });
         }
 
+        public void SaveFileSync(string key, byte[] content, string contentType)
+        {
+            PutObjectRequest request = new PutObjectRequest();
+            request.BucketName = bucketName;
+            request.ContentType = contentType;
+            request.Key = key;
+            request.InputStream = new MemoryStream(content);
+            request.CannedACL = Amazon.S3.S3CannedACL.PublicReadWrite;
+           
+            try {
+	            PutObjectResponse response = s3Client.PutObject(request);
+
+                if (response.HttpStatusCode != HttpStatusCode.OK)
+                    throw new Exception("Error uploading file");
+	            }
+	        catch (Exception ex)
+	        {
+
+                throw ex;
+	        }
+        }
+
         public Stream GetFile(string key)
         {
             if (memoryCache.ContainsKey(key))
