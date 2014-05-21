@@ -63,9 +63,11 @@ namespace classy.Operations
                         if (dataLine[2].ToLower().Equals("parent"))
                         {
                             currListing = new Listing();
-                            purchaseOptions = new List<PurchaseOption>();
+                            currListing.PricingInfo = new PricingInfo();
+                            currListing.PricingInfo.PurchaseOptions = new List<PurchaseOption>();
+                            purchaseOptions = currListing.PricingInfo.PurchaseOptions;
 
-
+                            
                             currListing.ProfileId = job.ProfileId;
                             currListing.AppId = job.AppId;
                             currListing.ListingType = "Product";
@@ -132,9 +134,9 @@ namespace classy.Operations
                         else
                         {
                             currListing = listingList[dataLine[1]];
-                            purchaseOptions = currListing.PurchaseOptions;
+                            purchaseOptions = currListing.PricingInfo.PurchaseOptions;
 
-                            purchaseOption.VariantProperties = listingList[dataLine[1]].PurchaseOptions.First().VariantProperties;
+                            purchaseOption.VariantProperties = listingList[dataLine[1]].PricingInfo.PurchaseOptions.First().VariantProperties;
 
                             //child title.
                             purchaseOption.Title = dataLine[6];
@@ -166,7 +168,7 @@ namespace classy.Operations
 
 
                         purchaseOptions.Add(purchaseOption);
-                        currListing.PurchaseOptions = purchaseOptions;
+                        currListing.PricingInfo.PurchaseOptions = purchaseOptions;
 
                         if (dataLine[2].ToLower().Equals("parent"))
                         {

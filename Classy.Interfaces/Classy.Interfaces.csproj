@@ -54,6 +54,7 @@
   <ItemGroup>
     <Compile Include="Managers\EmailResult.cs" />
     <Compile Include="Managers\IAppManager.cs" />
+    <Compile Include="Managers\ICurrencyManager.cs" />
     <Compile Include="Managers\IEmailManager.cs" />
     <Compile Include="Managers\ILocalizationManager.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

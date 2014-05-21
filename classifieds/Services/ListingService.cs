@@ -31,6 +31,7 @@ namespace classy.Services
             {
                 var session = SessionAs<CustomUserSession>();
                 ListingManager.SecurityContext = session.ToSecurityContext();
+                ListingManager.Environment = request.Environment;
 
                 var listingView = ListingManager.GetListingById(
                     request.Environment.AppId,
@@ -56,6 +57,7 @@ namespace classy.Services
        { 
             try
             {
+                ListingManager.Environment = request.Environment;
                 var listingViews = ListingManager.GetListingsByProfileId(
                     request.Environment.AppId,
                     request.ProfileId,
@@ -78,6 +80,7 @@ namespace classy.Services
         {
             var session = SessionAs<CustomUserSession>();
             ListingManager.SecurityContext = session.ToSecurityContext();
+            ListingManager.Environment = request.Environment;
 
             var listing = ListingManager.SaveListing(
                 request.Environment.AppId,
@@ -85,7 +88,7 @@ namespace classy.Services
                 request.Title,
                 request.Content,
                 request.ListingType,
-                request.PurchaseOptions,
+                request.Pricing,
                 request.ContactInfo ?? session.GetDefaultContactInfo(AppManager.GetAppById(request.Environment.AppId).DefaultCountry),
                 request.SchedulingTemplate,
                 request.Metadata);
@@ -108,6 +111,7 @@ namespace classy.Services
             {
                 var session = SessionAs<CustomUserSession>();
                 ListingManager.SecurityContext = session.ToSecurityContext();
+                ListingManager.Environment = request.Environment;
 
                 var listing = ListingManager.AddExternalMediaToListing(
                     request.Environment.AppId,
@@ -130,6 +134,7 @@ namespace classy.Services
             {
                 var session = SessionAs<CustomUserSession>();
                 ListingManager.SecurityContext = session.ToSecurityContext();
+                ListingManager.Environment = request.Environment;
 
                 var listing = ListingManager.DeleteExternalMediaFromListing(
                     request.Environment.AppId,
@@ -151,6 +156,7 @@ namespace classy.Services
             try
             {
                 var session = SessionAs<CustomUserSession>();
+                ListingManager.Environment = request.Environment;
 
                 var listing = ListingManager.PublishListing(
                     request.Environment.AppId,
@@ -173,13 +179,14 @@ namespace classy.Services
             {
                 var session = SessionAs<CustomUserSession>();
                 ListingManager.SecurityContext = session.ToSecurityContext();
+                ListingManager.Environment = request.Environment;
 
                 var listing = ListingManager.UpdateListing(
                     request.Environment.AppId,
                     request.ListingId,
                     request.Title,
                     request.Content,
-                    request.PurchaseOptions,
+                    request.Pricing,
                     request.ContactInfo,
                     request.SchedulingTemplate,
                     request.Metadata,
@@ -203,6 +210,7 @@ namespace classy.Services
             {
                 var session = SessionAs<CustomUserSession>();
                 ListingManager.SecurityContext = session.ToSecurityContext();
+                ListingManager.Environment = request.Environment;
 
                 var listing = ListingManager.DeleteListing(
                     request.Environment.AppId,
@@ -224,6 +232,7 @@ namespace classy.Services
             {
                 var session = SessionAs<CustomUserSession>();
                 ListingManager.SecurityContext = session.ToSecurityContext();
+                ListingManager.Environment = request.Environment;
 
                 ListingManager.FavoriteListing(
                     request.Environment.AppId,
@@ -245,6 +254,7 @@ namespace classy.Services
             {
                 var session = SessionAs<CustomUserSession>();
                 ListingManager.SecurityContext = session.ToSecurityContext();
+                ListingManager.Environment = request.Environment;
 
                 ListingManager.UnfavoriteListing(
                     request.Environment.AppId,
@@ -266,6 +276,7 @@ namespace classy.Services
             {
                 var session = SessionAs<CustomUserSession>();
                 ListingManager.SecurityContext = session.ToSecurityContext();
+                ListingManager.Environment = request.Environment;
 
                 ListingManager.FlagListing(
                     request.Environment.AppId,
@@ -597,6 +608,7 @@ namespace classy.Services
             {
                 var session = SessionAs<CustomUserSession>();
                 ListingManager.SecurityContext = session.ToSecurityContext();
+                ListingManager.Environment = request.Environment;
                 ListingManager.SetTranslation(
                     request.Environment.AppId,
                     request.ListingId,
@@ -617,6 +629,7 @@ namespace classy.Services
             {
                 var session = SessionAs<CustomUserSession>();
                 ListingManager.SecurityContext = session.ToSecurityContext();
+                ListingManager.Environment = request.Environment;
                 ListingManager.DeleteTranslation(
                     request.Environment.AppId,
                     request.ListingId,
@@ -659,6 +672,7 @@ namespace classy.Services
 
         public object Post(GetListingMoreInfo request)
         {
+            ListingManager.Environment = request.Environment;
             return ListingManager.GetListingMoreInfo(request.Environment.AppId, request.ListingId, request.Metadata, null, request.Environment.CultureCode);
         }
 

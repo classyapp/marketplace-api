@@ -13,7 +13,7 @@ namespace Classy.Models.Response
         public double Price { get; set; }
         public double Quantity { get; set; }
         public double? CompareAtPrice { get; set; }
-        public IList<MediaFileView> MediaFiles { get; set; }
+        public MediaFileView[] MediaFiles { get; set; }
         public string DefaultImage { get; set; }
     }
 }

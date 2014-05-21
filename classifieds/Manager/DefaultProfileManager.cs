@@ -11,6 +11,7 @@ using ServiceStack.Text;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using classy.Extentions;
+using Classy.Interfaces.Managers;
 
 namespace classy.Manager
 {
@@ -25,6 +26,7 @@ namespace classy.Manager
         private ITripleStore TripleStore;
         private IStorageRepository StorageRepository;
         private readonly IIndexer<Profile> _profileIndexer;
+        private readonly ICurrencyManager _currencyManager;
 
         public DefaultProfileManager(
             IAppManager appManager,
@@ -34,7 +36,8 @@ namespace classy.Manager
             IReviewRepository reviewRepository,
             ICollectionRepository collectionRepository,
             ITripleStore tripleStore,
-            IStorageRepository storageRepository, IIndexer<Profile> profileIndexer)
+            IStorageRepository storageRepository, 
+            IIndexer<Profile> profileIndexer)
         {
             AppManager = appManager;
             LocalizationManager = localizationManager;
@@ -48,6 +51,7 @@ namespace classy.Manager
         }
 
         public ManagerSecurityContext SecurityContext { get; set; }
+        public Classy.Models.Env Environment { get; set; }
 
         public ProfileView CreateProfileProxy(
             string appId,
@@ -198,7 +202,7 @@ namespace classy.Manager
             if (includeListings)
             {
                 var listings = ListingRepository.GetByProfileId(appId, profileId, false, culture);
-                profileView.Listings = listings.ToListingViewList(culture);
+                profileView.Listings = listings.ToListingViewList(culture, _currencyManager, Environment.CurrencyCode);
             }
 
             if (includeCollections)
@@ -209,7 +213,7 @@ namespace classy.Manager
                 {
                     if (c.IncludedListings != null)
                     {
-                        c.Listings = ListingRepository.GetById(c.IncludedListings.Select(l => l.Id).ToArray(), appId, false, culture).ToListingViewList(culture);
+                        c.Listings = ListingRepository.GetById(c.IncludedListings.Select(l => l.Id).ToArray(), appId, false, culture).ToListingViewList(culture, _currencyManager, Environment.CurrencyCode);
                         if (c.CoverPhotos == null || c.CoverPhotos.Count == 0)
                         {
                             c.CoverPhotos = ListingRepository.GetById(c.IncludedListings.Select(l => l.Id).Skip(Math.Max(0, c.IncludedListings.Count - 4)).ToArray(), appId, false, null).Select(l => l.ExternalMedia[0].Key).ToArray();

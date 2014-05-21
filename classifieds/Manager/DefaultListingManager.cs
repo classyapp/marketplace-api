@@ -10,6 +10,7 @@ using ServiceStack.ServiceHost;
 using System.IO;
 using Classy.Models.Request;
 using classy.Extentions;
+using Classy.Interfaces.Managers;
 
 namespace classy.Manager
 {
@@ -24,6 +25,7 @@ namespace classy.Manager
         private readonly IAppManager AppManager;
         private readonly IIndexer<Listing> _listingIndexer;
         private readonly IIndexer<Profile> _profileIndexer;
+        private readonly ICurrencyManager _currencyManager;
 
         public DefaultListingManager(
             IAppManager appManager,
@@ -32,7 +34,10 @@ namespace classy.Manager
             IProfileRepository profileRepository,
             ICollectionRepository collectionRepository,
             ITripleStore tripleStore,
-            IStorageRepository storageRepository, IIndexer<Listing> listingIndexer, IIndexer<Profile> profileIndexer)
+            IStorageRepository storageRepository, 
+            IIndexer<Listing> listingIndexer, 
+            IIndexer<Profile> profileIndexer,
+            ICurrencyManager currencyManager)
         {
             AppManager = appManager;
             ListingRepository = listingRepository;
@@ -43,8 +48,10 @@ namespace classy.Manager
             StorageRepository = storageRepository;
             _listingIndexer = listingIndexer;
             _profileIndexer = profileIndexer;
+            _currencyManager = currencyManager;
         }
 
+        public Env Environment { get; set; }
         public ManagerSecurityContext SecurityContext { get; set; }
 
         public IList<ListingView> GetListingsByIds(string[] listingIds, string appId, bool includeDrafts, string culture)
@@ -53,7 +60,7 @@ namespace classy.Manager
             foreach (var listing in listings)
                 listing.Translate(culture);
 
-            return listings.Select(x => x.ToListingView()).ToList();
+            return listings.Select(x => x.ToListingView(_currencyManager, Environment.CurrencyCode)).ToList();
         }
 
         public ListingView GetListingById(
@@ -71,7 +78,7 @@ namespace classy.Manager
             // TODO: cache listings
             var listing = GetVerifiedListing(appId, listingId);
             listing.Translate(culture);
-            var listingView = listing.ToListingView();
+            var listingView = listing.ToListingView(_currencyManager, Environment.CurrencyCode);
 
             if (logImpression)
             {
@@ -138,7 +145,7 @@ namespace classy.Manager
             var listingViews = new List<ListingView>();
             foreach (var c in listings)
             {
-                var view = c.Translate(culture).ToListingView();
+                var view = c.Translate(culture).ToListingView(_currencyManager, Environment.CurrencyCode);
                 if (includeComments)
                 {
                     view.Comments = comments.Where(x => x.ObjectId == view.Id).ToCommentViewList();
@@ -171,7 +178,7 @@ namespace classy.Manager
             var listingViews = new List<ListingView>();
             foreach (var c in listings)
             {
-                var view = c.Translate(culture).ToListingView();
+                var view = c.Translate(culture).ToListingView(_currencyManager, Environment.CurrencyCode);
                 if (includeComments)
                 {
                     view.Comments = comments.Where(x => x.ObjectId == view.Id).ToCommentViewList();
@@ -217,7 +224,7 @@ namespace classy.Manager
             }
             listing.ExternalMedia.Union(mediaFiles);
 
-            return listing.ToListingView();
+            return listing.ToListingView(_currencyManager, Environment.CurrencyCode);
         }
 
         public ListingView DeleteExternalMediaFromListing(
@@ -235,7 +242,7 @@ namespace classy.Manager
 
                 listing.ExternalMedia.Remove(file);
             }
-            return listing.ToListingView();
+            return listing.ToListingView(_currencyManager, Environment.CurrencyCode);
         }
 
         public ListingView PublishListing(
@@ -247,7 +254,7 @@ namespace classy.Manager
             var profile = ProfileRepository.GetById(appId, listing.ProfileId, false, null);
 
             // can't publish a purchasable listing if 
-            if ((listing.PurchaseOptions != null || listing.SchedulingTemplate != null) && !profile.IsVendor)
+            if ((listing.PricingInfo != null || listing.SchedulingTemplate != null) && !profile.IsVendor)
                 throw new ApplicationException("a listing with pricing or scheduling information can only be published by a merchant profile");
 
             // publish
@@ -256,7 +263,7 @@ namespace classy.Manager
 
             _listingIndexer.Index(listing, appId);
 
-            return listing.ToListingView();
+            return listing.ToListingView(_currencyManager, Environment.CurrencyCode);
         }
 
         public ListingView SaveListing(
@@ -265,7 +272,7 @@ namespace classy.Manager
             string title,
             string content,
             string listingType,
-            IList<PurchaseOption> purchaseOptions,
+            PricingInfo pricingInfo,
             ContactInfo contactInfo,
             TimeslotSchedule timeslotSchedule,
             IDictionary<string, string> customAttributes)
@@ -295,7 +302,7 @@ namespace classy.Manager
                 listing.Hashtags = content.ExtractHashtags();
             }
 
-            if (purchaseOptions != null) listing.PurchaseOptions = purchaseOptions;
+            if (pricingInfo != null) listing.PricingInfo = pricingInfo;
             if (contactInfo != null) listing.ContactInfo = contactInfo;
             if (timeslotSchedule != null) listing.SchedulingTemplate = timeslotSchedule;
             if (customAttributes != null)
@@ -323,7 +330,7 @@ namespace classy.Manager
             }
 
             // return
-            return listing.ToListingView();
+            return listing.ToListingView(_currencyManager, Environment.CurrencyCode);
         }
 
         public ListingView UpdateListing(
@@ -331,7 +338,7 @@ namespace classy.Manager
             string listingId,
             string title,
             string content,
-            IList<PurchaseOption> purchaseOptions,
+            PricingInfo pricingInfo,
             ContactInfo contactInfo,
             TimeslotSchedule timeslotSchedule,
             IDictionary<string, string> metadata,
@@ -350,7 +357,7 @@ namespace classy.Manager
                 var newTags = string.IsNullOrEmpty(content) ? new string[0] : content.ExtractHashtags();
                 listing.Hashtags = hashtags.EmptyIfNull().Union(newTags).ToList();
             }
-            if (fields.HasFlag(ListingUpdateFields.Pricing)) listing.PurchaseOptions = purchaseOptions;
+            if (fields.HasFlag(ListingUpdateFields.Pricing)) listing.PricingInfo = pricingInfo;
             if (fields.HasFlag(ListingUpdateFields.ContactInfo)) listing.ContactInfo = contactInfo;
             if (fields.HasFlag(ListingUpdateFields.SchedulingTemplate)) listing.SchedulingTemplate = timeslotSchedule;
             if (fields.HasFlag(ListingUpdateFields.Metadata))
@@ -370,7 +377,7 @@ namespace classy.Manager
             _listingIndexer.Index(listing, appId);
 
             // return
-            return listing.ToListingView();
+            return listing.ToListingView(_currencyManager, Environment.CurrencyCode);
         }
 
         public string DeleteListing(string appId, string listingId)
@@ -589,7 +596,7 @@ namespace classy.Manager
                 }
                 if (includeListings)
                 {
-                    collectionView.Listings = ListingRepository.GetById(listingIds, appId, includeDrafts, culture).ToListingViewList(culture);
+                    collectionView.Listings = ListingRepository.GetById(listingIds, appId, includeDrafts, culture).ToListingViewList(culture, _currencyManager, Environment.CurrencyCode);
                 }
                 if (increaseViewCounter)
                 {
@@ -749,7 +756,7 @@ namespace classy.Manager
 
                 CollectionRepository.Update(collection);
                 var collectionView = collection.ToCollectionView();
-                collectionView.Listings = ListingRepository.GetById(collection.IncludedListings.Select(l => l.Id).ToArray(), appId, false, culture).ToListingViewList(culture);
+                collectionView.Listings = ListingRepository.GetById(collection.IncludedListings.Select(l => l.Id).ToArray(), appId, false, culture).ToListingViewList(culture, _currencyManager, Environment.CurrencyCode);
                 return collectionView;
             }
             catch (Exception)
@@ -842,7 +849,7 @@ namespace classy.Manager
 
                 CollectionRepository.Update(collection);
                 var collectionView = collection.Translate(culture).ToCollectionView();
-                collectionView.Listings = ListingRepository.GetById(collection.IncludedListings.Select(l => l.Id).ToArray(), appId, false, culture).ToListingViewList(culture);
+                collectionView.Listings = ListingRepository.GetById(collection.IncludedListings.Select(l => l.Id).ToArray(), appId, false, culture).ToListingViewList(culture, _currencyManager, Environment.CurrencyCode);
                 return collectionView;
             }
             catch (Exception)
@@ -1035,7 +1042,7 @@ namespace classy.Manager
             if (originalCollection != null)
             {
                 data.CollectionType = originalCollection.Type.ToLowerInvariant();
-                data.CollectionLisitngs = ListingRepository.GetById(originalCollection.IncludedListings.Select(l => l.Id).ToArray(), appId, false, culture).ToListingViewList(culture);
+                data.CollectionLisitngs = ListingRepository.GetById(originalCollection.IncludedListings.Select(l => l.Id).ToArray(), appId, false, culture).ToListingViewList(culture, _currencyManager, Environment.CurrencyCode);
             }
 
             // Search by metadata provided
@@ -1044,7 +1051,7 @@ namespace classy.Manager
                 long count = 0;
                 data.SearchResults = ListingRepository.Search(null, new string[] { listing.ListingType }, 
                     metadata, 
-                    null, null, location, appId, false, false, 0, 0, ref count, culture).ToListingViewList(culture);
+                    null, null, location, appId, false, false, 0, 0, ref count, culture).ToListingViewList(culture, _currencyManager, Environment.CurrencyCode);
                 if (data.SearchResults != null)
                 {
                     data.SearchResults.Remove(data.SearchResults.First(wl => wl.Id == listingId));
@@ -1083,37 +1090,5 @@ namespace classy.Manager
                 throw;
             }
         }
-
-#if DEBUG
-        private void CreateProduct()
-        {
-            var options = new List<PurchaseOption>();
-            options.Add(new PurchaseOption() { Title = "Product #1", SKU = "123456", Quantity = 1, Price = 12, CompareAtPrice = 14,
-                                               MediaFiles = new MediaFile[] { new MediaFile { Type = MediaFileType.Image, Key = "2c6a6734-6580-4fa9-9bb8-ab24973dde3e", ContentType = "image/jpeg", Url = "http://d107oye3n9eb07.cloudfront.net/2c6a6734-6580-4fa9-9bb8-ab24973dde3e" } } 
-            });
-            Listing listing = new Listing()
-            {
-                Title = "Product #1",
-                Content = "Product Description",
-                Categories = new string[] { "kitchen", "aprons" },
-                ClickCount = 0,
-                AddToCollectionCount = 0,
-                AppId = "v1.0",
-                CommentCount = 0,
-                Created = DateTime.UtcNow,
-                DefaultCulture = "en",
-                ExternalMedia = null,
-                FavoriteCount = 0,
-                IsPublished = true,
-                ListingType = "Product",
-                ProfileId = "172",
-                PurchaseCount = 0,
-                PurchaseOptions = options,
-                ViewCount = 0
-            };
-
-            ListingRepository.Update(listing);
-        }
-#endif
     }
 }

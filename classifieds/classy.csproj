@@ -203,9 +203,9 @@
     <Compile Include="Extentions\FuncExtensions.cs" />
     <Compile Include="Extentions\LocalizationResourceViewExtensions.cs" />
     <Compile Include="Extentions\ModelExtensions.cs" />
+    <Compile Include="Extentions\PricingInfoViewExtensions.cs" />
     <Compile Include="Extentions\MediaFileViewExtensions.cs" />
     <Compile Include="Extentions\LocationViewExtensions.cs" />
-    <Compile Include="Extentions\PurchaseOptionViewExtentions.cs" />
     <Compile Include="Extentions\ReviewViewExtensions.cs" />
     <Compile Include="Extentions\SellerViewExtentions.cs" />
     <Compile Include="Extentions\ProxyClaimViewExtentions.cs" />
@@ -218,6 +218,7 @@
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
     <Compile Include="HtmlUtilities.cs" />
+    <Compile Include="Manager\CurrencyManager.cs" />
     <Compile Include="Manager\DefaultAnalyticsManager.cs" />
     <Compile Include="Manager\DefaultJobManager.cs" />
     <Compile Include="Manager\IAnalyticsManager.cs" />
@@ -243,6 +244,7 @@
     <Compile Include="Manager\Search\ListingSearchProvider.cs" />
     <Compile Include="Manager\Search\ProfileSearchProvider.cs" />
     <Compile Include="Manager\Search\SearchClientFactory.cs" />
+    <Compile Include="Manager\StubCurrencyRepository.cs" />
     <Compile Include="Operations\ImportProductCatalogJob.cs" />
     <Compile Include="Operations\IOperator.cs" />
     <Compile Include="Operations\ProductCatalogImportOperator.cs" />

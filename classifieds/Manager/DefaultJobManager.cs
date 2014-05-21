@@ -18,6 +18,8 @@ namespace classy.Manager
         private IStorageRepository _storageRepository = null;
         private IMessageQueueClient _messageQueueClient = null;
 
+        public Env Environment { get; set; }
+
         public DefaultJobManager(IJobRepository jobsRepository,
             IStorageRepository storageRepository,
             IMessageQueueClient messageQueueClient)
@@ -43,7 +45,7 @@ namespace classy.Manager
                     Key = fileKey,
                     Type = MediaFileType.File
                 } },
-                Properties = new Dictionary<string, object> { { "OverwriteListings", overwriteListings }, { "UpdateImages", updateImages }, { "CatalogFormat", catalogFormat } }
+                Properties = new Dictionary<string, object> { { "CurrencyCode", Environment.CurrencyCode }, { "OverwriteListings", overwriteListings }, { "UpdateImages", updateImages }, { "CatalogFormat", catalogFormat } }
             };
 
             _jobsRepository.Save(job);

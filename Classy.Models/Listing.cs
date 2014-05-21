@@ -1,14 +1,11 @@
 ﻿using System.Collections.Generic;
 using MongoDB.Bson.Serialization.Attributes;
-using System.Linq;
-using System;
 
 namespace Classy.Models
 {
     /// <summary>
     /// a <see cref="Listing"/> is the basic unit of the marketplace
     /// </summary>
-    [BsonIgnoreExtraElements]
     public class Listing : BaseObject, ITranslatable<Listing>
     {
         public Listing()
@@ -91,8 +88,10 @@ namespace Classy.Models
         /// </summary>
         public ContactInfo ContactInfo { get; set; }
 
-        // Product configurations - at least one
-        public IList<PurchaseOption> PurchaseOptions { get; set; }
+        /// <summary>
+        /// pricing information for the listing. when present, the listing can be purchased
+        /// </summary>
+        public PricingInfo PricingInfo { get; set; }
 
         /// <summary>
         /// scheduling and booking pricing information for the listing. when present, the listing can be booked
@@ -108,13 +107,6 @@ namespace Classy.Models
         public string DefaultCulture { get; set; }
 
         public IList<string> Categories { get; set; }
-
-        public double GetPriceForSKU(string sku)
-        {
-            var option = PurchaseOptions.SingleOrDefault(x => x.SKU == sku);
-            if (option != null) return option.Price;
-            throw new ApplicationException("invalid SKU");
-        }
 
         // Errors
         [BsonIgnoreIfNull]

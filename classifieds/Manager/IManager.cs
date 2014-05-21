@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Classy.Models;
 
 namespace classy.Manager
 {
@@ -16,5 +17,6 @@ namespace classy.Manager
     public interface IManager
     {
         ManagerSecurityContext SecurityContext { get; set; }
+        Env Environment { get; set; }
     }
 }
