@@ -162,6 +162,8 @@ namespace classy.Operations
                                 mf.Key = Guid.NewGuid().ToString();
                                 mf.Url = dataLine[i];
                                 tmpList.Add(mf);
+
+                                _storageRepository.SaveFileFromUrl(mf.Key, mf.Url, mf.ContentType);
                             }
                         }
                         purchaseOption.MediaFiles = tmpList.ToArray();
