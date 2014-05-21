@@ -2,7 +2,7 @@ using System;
 using System.Diagnostics;
 using System.Globalization;
 
-namespace Classy.DotNet.Mvc.SitemapGenerator
+namespace Classy.UtilRunner.Utilities.SitemapBuilders
 {
   /// <summary>
   /// Provides helper methods for asserting arguments.

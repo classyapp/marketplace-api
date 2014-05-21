@@ -5,7 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Classy.DotNet.Mvc.SitemapGenerator
+namespace Classy.UtilRunner.Utilities.SitemapBuilders
 {
     public abstract class ClassySitemapGenerator : BaseSitemapIndexGenerator
     {

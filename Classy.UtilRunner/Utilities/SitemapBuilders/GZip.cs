@@ -5,7 +5,7 @@ using System.Text;
 using System.IO;
 using System.IO.Compression;
 
-namespace Classy.DotNet.Mvc.SitemapGenerator
+namespace Classy.UtilRunner.Utilities.SitemapBuilders
 {
   public static class GZip
   {

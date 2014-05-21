@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-namespace Classy.DotNet.Mvc.SitemapGenerator
+namespace Classy.UtilRunner.Utilities.SitemapBuilders
 {
   public static class UpdateFrequency
   {
