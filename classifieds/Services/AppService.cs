@@ -14,7 +14,7 @@ namespace classy.Services
         public object Get(GetAppSettings request)
         {
             var app = AppManager.GetAppById(request.Environment.AppId);
-            return new HttpResult(app.TranslateTo<AppView>(), HttpStatusCode.OK);
+            return new HttpResult(app.Translate(request.Environment.CultureCode).ToAppView(), HttpStatusCode.OK);
         }
     }
 }
