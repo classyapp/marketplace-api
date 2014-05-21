@@ -76,7 +76,7 @@ namespace classy.Manager.Search
             {
                 suggestions.Add(new SearchSuggestion
                 {
-                    Key = suggestion.CompanyName,
+                    Key = suggestion.Id,
                     Value = suggestion.CompanyName
                 });
             }
