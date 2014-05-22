@@ -47,6 +47,7 @@ namespace Classy.Models.Response
         //
         public IList<string> Hashtags { get; set; }
         public IDictionary<string, IList<string>> TranslatedKeywords { get; set; }
+        public IList<string> SearchableKeywords { get; set; }
         //
         public ProfileView Profile { get; set; }
         public IList<ProfileView> FavoritedBy { get; set; }
