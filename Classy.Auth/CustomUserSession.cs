@@ -57,25 +57,25 @@ namespace Classy.Auth
             {
                 if (authToken.Provider == FacebookAuthProvider.Name)
                 {
-                    profile.ContactInfo.FirstName = authToken.FirstName;
-                    profile.ContactInfo.LastName = authToken.LastName;
-                    profile.ContactInfo.Email = authToken.Email;
                     profile.FacebookUserId = authToken.UserId;
                     profile.FacebookUserName = authToken.UserName;
                     if (isNew)
                     {
+                        profile.ContactInfo.FirstName = authToken.FirstName;
+                        profile.ContactInfo.LastName = authToken.LastName;
+                        profile.ContactInfo.Email = authToken.Email;
                         profile.UserName = authToken.UserName;
                         profile.Avatar = CreateAvatar(storage, string.Format("http://graph.facebook.com/{0}/picture?type=large", authToken.UserName), session.UserAuthId);
                     }
                 }
                 else if (authToken.Provider == GoogleOAuth2Provider.Name)
                 {
-                    profile.ContactInfo.FirstName = authToken.FirstName;
-                    profile.ContactInfo.LastName = authToken.LastName;
-                    profile.ContactInfo.Email = authToken.Email;
                     profile.GoogleUserName = authToken.UserName;
                     if (isNew)
                     {
+                        profile.ContactInfo.FirstName = authToken.FirstName;
+                        profile.ContactInfo.LastName = authToken.LastName;
+                        profile.ContactInfo.Email = authToken.Email;
                         profile.UserName = authToken.UserName;
                         //profile.Avatar = CreateAvatar(storage, string.Format("https://plus.google.com/s2/photos/profile/{0}?sz=220", authToken.UserId), session.UserAuthId);
                     }
