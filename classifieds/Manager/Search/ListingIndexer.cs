@@ -30,7 +30,7 @@ namespace classy.Manager.Search
         public void Index(Listing[] entities, string appId)
         {
             var client = _searchClientFactory.GetClient("listings", appId);
-            var indexingInfo = _appManager.GetAppById(appId).IndexingInfo;
+            var indexingInfo = _appManager.GetAppById(appId).IndexingInfo ?? new IndexingInfo();
 
             var listingsToIndex = new List<ListingIndexDto>();
             foreach (var entity in entities)
@@ -58,7 +58,9 @@ namespace classy.Manager.Search
                         .Select(x => x.Value).ToArray()
                 });
             }
-            client.IndexMany(listingsToIndex);
+
+            if (!listingsToIndex.IsNullOrEmpty())
+                client.IndexMany(listingsToIndex);
         }
 
         public void Increment<T>(string id, string appId, Expression<Func<Listing, T>> property, int amount = 1)
