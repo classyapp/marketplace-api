@@ -3,17 +3,14 @@ using Funq;
 using MongoDB.Driver;
 using MongoDB.Driver.Builders;
 using System;
-using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
 
 namespace Classy.UtilRunner.Utilities.ExportProfiles
 {
     public class ExportProfiles : IUtility
     {
-        private const int BatchSize = 100;
         private readonly MongoCollection<Profile> _profiles;
 
         public ExportProfiles(Container container)
@@ -24,7 +21,7 @@ namespace Classy.UtilRunner.Utilities.ExportProfiles
 
         public StatusCode Run(string[] args)
         {
-            if (args == null || args.Count() == 0) return StatusCode.MissingArguments;
+            if (args == null || !args.Any()) return StatusCode.MissingArguments;
 
             var startTime = DateTime.Now;
 
