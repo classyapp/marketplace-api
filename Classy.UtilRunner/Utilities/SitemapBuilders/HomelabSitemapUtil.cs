@@ -18,8 +18,12 @@ namespace Classy.UtilRunner.Utilities.SitemapBuilders
 
         public StatusCode Run(string[] args)
         {
+            // generate sitemap
             var generator = new HomelabSitemapGenerator(_container);
-            generator.Generate("http://www.homelab.com", "C:\\");
+            generator.Generate("http://www.homelab.com", "C:\\temp");
+
+            // upload files to S3
+
             return StatusCode.Success;
         }
     }

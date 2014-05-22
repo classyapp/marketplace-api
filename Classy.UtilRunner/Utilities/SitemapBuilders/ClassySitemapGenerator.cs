@@ -15,8 +15,8 @@ namespace Classy.UtilRunner.Utilities.SitemapBuilders
 
         protected override void GenerateUrlNodes()
         {
-            //GenerateStaticNodes();
-            //GenerateListingNodes();
+            GenerateStaticNodes();
+            GenerateListingNodes();
             GenerateProfessionalNodes();
         }
     }

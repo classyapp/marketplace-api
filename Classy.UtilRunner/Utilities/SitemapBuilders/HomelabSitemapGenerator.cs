@@ -61,51 +61,55 @@ namespace Classy.UtilRunner.Utilities.SitemapBuilders
                 foreach(var style in styles.ListItems)
                 {
                     // output the room+style combination url
+                    Console.WriteLine(string.Format("room: {0}, style: {1}", room.Value, style.Value));
                     foreach (var culture in _supportedCultures)
                     {
                         WriteUrlLocation(culture.ToLower() + "/photo/" + room.Value + "/" + style.Value, UpdateFrequency.Daily, DateTime.UtcNow);
                     }
+                }
+            }
 
-                    // all photo urls for this room and style combination
-                    var page = 1;
-                    var photos = _listingService.SearchListings(
-                        App.AppId,
-                        null,
-                        new string[] { "Photo" },
-                        new Dictionary<string, string[]> { { "Room", new string[] { room.Value } }, { "Style", new string[] { style.Value } } },
-                        null,
-                        null,
-                        null,
-                        false,
-                        false,
-                        page, 
-                        200,
-                        "en");
-                    while (photos != null && photos.Results.Count > 0)
+            // all individual photo urls
+            var page = 1;
+            var pageSize = 200;
+            var photos = _listingService.SearchListings(
+                App.AppId,
+                null,
+                new string[] { "Photo" },
+                null,
+                null,
+                null,
+                null,
+                false,
+                false,
+                page,
+                pageSize,
+                "en");
+            while (photos != null && photos.Results.Count > 0)
+            {
+                Console.WriteLine(string.Format("page: {0}, results: {1}", page, photos.Results.Count()));
+
+                foreach (var photo in photos.Results)
+                {
+                    foreach (var culture in _supportedCultures)
                     {
-                        foreach (var photo in photos.Results)
-                        {
-                            foreach (var culture in _supportedCultures)
-                            {
-                                WriteUrlLocation(culture.ToLower() + "/photo/" + photo.Id + "--" + ToSlug(photo.Title), UpdateFrequency.Daily, DateTime.UtcNow);
-                            }
-                        }
-
-                        photos = _listingService.SearchListings(
-                            App.AppId,
-                            null,
-                            new string[] { "Photo" },
-                            new Dictionary<string, string[]> { { "Room", new string[] { room.Value } }, { "Style", new string[] { style.Value } } },
-                            null,
-                            null,
-                            null,
-                            false,
-                            false,
-                            ++page,
-                            200,
-                            "en");
+                        WriteUrlLocation(culture.ToLower() + "/photo/" + photo.Id + "--" + ToSlug(photo.Title), UpdateFrequency.Daily, DateTime.UtcNow);
                     }
                 }
+
+                photos = _listingService.SearchListings(
+                    App.AppId,
+                    null,
+                    new string[] { "Photo" },
+                    null,
+                    null,
+                    null,
+                    null,
+                    false,
+                    false,
+                    ++page,
+                    pageSize,
+                    "en");
             }
         }
 
@@ -141,55 +145,56 @@ namespace Classy.UtilRunner.Utilities.SitemapBuilders
                     foreach (var city in cities)
                     {
                         // output all country + category + city combinations
+                        Console.WriteLine(string.Format("category: {0}, city: {1}, country: {2}", category.Value, city, country.Value));
                         foreach (var culture in _supportedCultures)
                         {
                             WriteUrlLocation(culture.ToLower() + "/profile/search/" + category.Value + "/" + city + "/" + country.Value, UpdateFrequency.Daily, DateTime.UtcNow);
                         }
-
-                        // all profiles under this combination
-                        var page = 1;
-                        var pageSize = 500;
-                        long count = 0;
-                        var profiles = _profileService.Search(
-                            App.AppId,
-                            null,
-                            category.Value,
-                            new Location { Address = new PhysicalAddress { City = city, Country = country.Value } },
-                            null,
-                            true,
-                            false,
-                            page,
-                            pageSize,
-                            ref count,
-                            "en");
-
-                        while (profiles != null && profiles.Count() > 0)
-                        {
-                            Console.WriteLine(string.Format("city: {0}, country: {1}, page: {2}, results: {3}", city, country.Value, page, profiles.Count()));
-
-                            foreach (var profile in profiles)
-                            {
-                                foreach (var culture in _supportedCultures)
-                                {
-                                    WriteUrlLocation(culture.ToLower() + "/profile/" + profile.Id + "/" + ToSlug(GetProfileName(profile)), UpdateFrequency.Daily, DateTime.UtcNow);
-                                }
-                            }
-
-                            profiles = _profileService.Search(
-                                App.AppId,
-                                null,
-                                category.Value,
-                                new Location{ Address = new PhysicalAddress { City = city, Country = country.Value } },
-                                null,
-                                true,
-                                false,
-                                ++page,
-                                pageSize,
-                                ref count,
-                                "en");
-                        }
                     }
                 }
+            }
+
+            // individual profiles
+            var page = 1;
+            var pageSize = 1000;
+            long count = 0;
+            var profiles = _profileService.Search(
+                App.AppId,
+                null,
+                null,
+                null,
+                null,
+                true,
+                false,
+                page,
+                pageSize,
+                ref count,
+                "en");
+
+            while (profiles != null && profiles.Count() > 0)
+            {
+                Console.WriteLine(string.Format("page: {0}, results: {1}", page, profiles.Count()));
+
+                foreach (var profile in profiles)
+                {
+                    foreach (var culture in _supportedCultures)
+                    {
+                        WriteUrlLocation(culture.ToLower() + "/profile/" + profile.Id + "/" + ToSlug(GetProfileName(profile)), UpdateFrequency.Daily, DateTime.UtcNow);
+                    }
+                }
+
+                profiles = _profileService.Search(
+                    App.AppId,
+                    null,
+                    null,
+                    null,
+                    null,
+                    true,
+                    false,
+                    ++page,
+                    pageSize,
+                    ref count,
+                    "en");
             }
         }
 
