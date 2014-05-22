@@ -6,6 +6,7 @@ using Classy.Interfaces.Search;
 using Classy.Models;
 using Classy.Models.Search;
 using ServiceStack.Common.Extensions;
+using ServiceStack.Text;
 
 namespace classy.Manager.Search
 {
@@ -23,7 +24,7 @@ namespace classy.Manager.Search
         public void Index(Profile[] entities, string appId)
         {
             var client = _searchClientFactory.GetClient("profiles", appId);
-            var indexingInfo = _appManager.GetAppById(appId).IndexingInfo;
+            var indexingInfo = _appManager.GetAppById(appId).IndexingInfo ?? new IndexingInfo();
 
             var profilesToIndex = new List<ProfileIndexDto>();
             foreach (var entity in entities)
@@ -47,7 +48,9 @@ namespace classy.Manager.Search
                     ViewCount = entity.ViewCount
                 });
             }
-            client.IndexMany(profilesToIndex);
+
+            if (!profilesToIndex.IsNullOrEmpty())
+                client.IndexMany(profilesToIndex);
         }
 
         public void RemoveFromIndex(Profile entity, string appId)
