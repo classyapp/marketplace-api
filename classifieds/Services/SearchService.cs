@@ -48,6 +48,7 @@ namespace classy.Services
 
         public object Post(SearchListings request)
         {
+            ListingManager.Environment = request.Environment;
             var listingViews = ListingManager.SearchListings(
                 request.Environment.AppId,
                 request.Tags,

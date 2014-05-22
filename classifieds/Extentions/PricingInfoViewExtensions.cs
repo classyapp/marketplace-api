@@ -20,6 +20,8 @@ namespace classy
                 {
                     var v = o.TranslateTo<PurchaseOptionView>();
                     v.Price *= adjustRate;
+                    if (v.CompareAtPrice.HasValue) { v.CompareAtPrice *= adjustRate; }
+                    v.MediaFiles = o.MediaFiles.Select(m => m.TranslateTo<MediaFileView>()).ToArray();
                     to.PurchaseOptions.Add(v);
                 }
             }

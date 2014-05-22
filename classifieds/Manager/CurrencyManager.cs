@@ -18,6 +18,9 @@ namespace classy.Manager
 
         public double GetRate(string fromCurrency, string toCurrency, double adjustPercentage)
         {
+            if (fromCurrency == toCurrency)
+                return 1.0;
+
             double? rate = _currencyRepository.GetExchangeRate(fromCurrency, toCurrency);
             if (rate.HasValue)
                 return rate.Value * (1 + adjustPercentage);
