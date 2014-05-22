@@ -9,5 +9,6 @@ namespace Classy.Interfaces.Search
         void RemoveFromIndex(T entity, string appId);
         void Increment<TPropertyType>(string id, string appId, Expression<Func<T, TPropertyType>> property, int amount = 1);
         void Increment<TPropertyType>(string[] ids, string appId, Expression<Func<T, TPropertyType>> property, int amount = 1);
+        void UpdateMultipleListings(string[] ids, int editorsRank, string appId);
     }
 }

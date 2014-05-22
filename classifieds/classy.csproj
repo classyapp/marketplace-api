@@ -124,6 +124,7 @@
     <Compile Include="DTO\Request\CancelSingleItemOrder.cs" />
     <Compile Include="DTO\Request\ClaimProxyProfile.cs" />
     <Compile Include="DTO\Request\AddListingToCollection.cs" />
+    <Compile Include="DTO\Request\EditMultipleListings.cs" />
     <Compile Include="DTO\Request\ForgotPasswordRequest.cs" />
     <Compile Include="DTO\Request\GetCitiesByCountry.cs" />
     <Compile Include="DTO\Request\GetCollectionTranslation.cs" />

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Web;
+using classy.DTO.Request;
 using classy.DTO.Request.Search;
 using classy.Extensions;
 using classy.Services;
@@ -134,6 +135,7 @@ namespace classy
                 .Add<GetThumbnail>("/thumbnail/{ImageKey}", "GET")
 
                 // Listings
+                .Add<EditMultipleListings>("/listings/edit-multiple", "POST")
                 .Add<GetListingById>("/listing/{ListingId}", "GET") // get listing by id, update listing
                 .Add<DeleteListing>("/listing/{ListingId}", "DELETE") // delete listing by id, update listing
                 .Add<PostListing>("/listing/new", "POST") // post new listing

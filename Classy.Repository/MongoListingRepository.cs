@@ -1,14 +1,10 @@
 ﻿using MongoDB.Bson;
-using MongoDB.Bson.Serialization;
 using MongoDB.Driver;
-using MongoDB.Driver.Linq;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Web;
 using MongoDB.Driver.Builders;
 using Classy.Models;
-using System.IO;
 using System.Text.RegularExpressions;
 
 namespace Classy.Repository
@@ -362,6 +358,13 @@ namespace Classy.Repository
                 listing.Errors = error;
                 ListingsCollection.Save(listing);
             }
+        }
+
+        public void EditMultipleListings(string[] ids, int editorsRank, string appId)
+        {
+            ListingsCollection.Update(
+                Query.And(Query<Listing>.In(x => x.Id, ids), Query<Listing>.EQ(x => x.AppId, appId)),
+                new UpdateBuilder<Listing>().Set(x => x.EditorsRank, editorsRank));
         }
    }
 }

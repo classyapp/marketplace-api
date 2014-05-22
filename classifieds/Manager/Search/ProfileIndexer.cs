@@ -74,6 +74,12 @@ namespace classy.Manager.Search
             ids.ForEach(x => Increment(x, appId, property, amount));
         }
 
+        public void UpdateMultipleListings(string[] ids, int editorsRank, string appId)
+        {
+            // TODO: remove this from the interface and put somewhere more appropriate
+            throw new NotImplementedException();
+        }
+
         private static GPSLocation GetGpsLocation(Profile professional)
         {
             if (professional.ContactInfo == null)
