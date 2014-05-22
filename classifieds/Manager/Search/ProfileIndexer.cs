@@ -42,7 +42,6 @@ namespace classy.Manager.Search
                     Metadata = entity.Metadata
                         .Where(x => indexingInfo.MetadataPerListing["Profile"].Contains(x.Key))
                         .Select(x => x.Value).ToArray(),
-                    Rank = entity.Rank,
                     ReviewAverageScore = entity.ReviewAverageScore,
                     ReviewCount = entity.ReviewCount,
                     ViewCount = entity.ViewCount

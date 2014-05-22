@@ -13,7 +13,6 @@ namespace Classy.Models.Search
         [ElasticProperty(Index = FieldIndexOption.not_analyzed)]
         public string Country { get; set; } // country code for fast filtering
 
-        public int Rank { get; set; }
         public int FollowerCount { get; set; }
         public int FollowingCount { get; set; }
         public int ListingCount { get; set; }
