@@ -364,7 +364,7 @@ namespace Classy.Repository
         {
             ListingsCollection.Update(
                 Query.And(Query<Listing>.In(x => x.Id, ids), Query<Listing>.EQ(x => x.AppId, appId)),
-                new UpdateBuilder<Listing>().Set(x => x.EditorsRank, editorsRank));
+                new UpdateBuilder<Listing>().Set(x => x.EditorsRank, editorsRank), UpdateFlags.Multi);
         }
    }
 }
