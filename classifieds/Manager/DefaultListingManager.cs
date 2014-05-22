@@ -172,7 +172,7 @@ namespace classy.Manager
             long count = 0;
 
             // TODO: cache listings
-            var listings = ListingRepository.Search(tags, listingTypes, metadata, priceMin, priceMax, location, appId, false, false, page, pageSize, ref count, culture);
+            var listings = ListingRepository.Search(tags, listingTypes, metadata, null, priceMin, priceMax, location, appId, false, false, page, pageSize, ref count, culture);
             var comments = includeComments ?
                 CommentRepository.GetByListingIds(listings.Select(x => x.Id).AsEnumerable(), formatCommentsAsHtml) : null;
             var listingViews = new List<ListingView>();
@@ -1031,7 +1031,7 @@ namespace classy.Manager
         }
 
 
-        public ListingMoreInfoView GetListingMoreInfo(string appId, string listingId, Dictionary<string, string[]> metadata, Location location, string culture)
+        public ListingMoreInfoView GetListingMoreInfo(string appId, string listingId, Dictionary<string, string[]> metadata, Dictionary<string, string[]> query, Location location, string culture)
         {
             ListingMoreInfoView data = new ListingMoreInfoView();
 
@@ -1046,11 +1046,11 @@ namespace classy.Manager
             }
 
             // Search by metadata provided
-            if (metadata != null)
+            if (metadata != null || query != null)
             {
                 long count = 0;
                 data.SearchResults = ListingRepository.Search(null, new string[] { listing.ListingType }, 
-                    metadata, 
+                    metadata, query,
                     null, null, location, appId, false, false, 0, 0, ref count, culture).ToListingViewList(culture, _currencyManager, Environment.CurrencyCode);
                 if (data.SearchResults != null)
                 {

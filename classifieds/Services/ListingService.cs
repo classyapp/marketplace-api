@@ -673,7 +673,7 @@ namespace classy.Services
         public object Post(GetListingMoreInfo request)
         {
             ListingManager.Environment = request.Environment;
-            return ListingManager.GetListingMoreInfo(request.Environment.AppId, request.ListingId, request.Metadata, null, request.Environment.CultureCode);
+            return ListingManager.GetListingMoreInfo(request.Environment.AppId, request.ListingId, request.Metadata, request.Query, null, request.Environment.CultureCode);
         }
 
         public object Get(VerifyEmailRequest request)
