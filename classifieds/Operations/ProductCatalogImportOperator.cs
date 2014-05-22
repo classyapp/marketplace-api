@@ -17,7 +17,6 @@ namespace classy.Operations
         private readonly IListingRepository _listingRepository; //MONGO
         private readonly IJobRepository _jobRepository; // JOBS
         private readonly ICurrencyManager _currencyManager; // 
-       // private readonly IAppManager _appManager;
 
         public ProductCatalogImportOperator(IStorageRepository storageRepo, IListingRepository listingRepo, IJobRepository jobRepo, ICurrencyManager currencyManager)
         {
@@ -25,21 +24,25 @@ namespace classy.Operations
             _listingRepository = listingRepo;
             _jobRepository = jobRepo;
             _currencyManager = currencyManager;
-            //_appManager = appManager;
         }
 
-        private void ReportError(Exception ex)
+        private void ReportError(Exception ex, Job job, IJobRepository jobRepo, int savedProducts, int errors)
         {
+            job.ImportErrors.Add(ex.Message);
+            job.ProgressInfo = savedProducts + " products saved, " + errors + " errors encountered";
+            jobRepo.Save(job);
         }
 
         public void PerformOperation(ImportProductCatalogJob request)
         {
-          
+
             var job = _jobRepository.GetById(request.AppId, request.JobId);
             bool overwriteListings;
             int catalogFormat;
             bool updateImages;
-            string currencyCode=null;
+            string currencyCode = null;
+            int numProductsSaved = 0;
+            int numErrors = 0;
 
             try
             {
@@ -47,25 +50,28 @@ namespace classy.Operations
                 updateImages = (bool)job.Properties["UpdateImages"];
                 catalogFormat = (int)job.Properties["CatalogFormat"];
                 currencyCode = (string)job.Properties["CurrencyCode"];
-            }catch(Exception ex)
+            }
+            catch (Exception ex)
             {
-                ReportError(new Exception("One of the required properties for the job is missing: " + ex.Message));
+                ++numErrors;
+                ReportError(new Exception("One of the required properties for the job is missing: " + ex.Message), job, _jobRepository, numProductsSaved, numErrors);
             }
 
             if (job.Attachments.Count() > 0)
             {
                 Stream file = _storageRepository.GetFile(job.Attachments[0].Key);
-
                 StreamReader reader = new StreamReader(file);
-
                 int lineNum = 0;
-                Dictionary<string, Listing> listingList = new Dictionary<string, Listing>();
-
+                Listing activeListing = null;
                 bool skipToNextParent = false;
-                while (!reader.EndOfStream)
+                Dictionary<string, string> variantProperties = new Dictionary<string, string>();
+
+                try
                 {
-                    try
+                    job.Status = "Executing";
+                    while (!reader.EndOfStream)
                     {
+
                         string currLine = reader.ReadLine();
 
                         if (lineNum != 0)
@@ -75,17 +81,43 @@ namespace classy.Operations
 
                             string[] dataLine = currLine.Split(';');
 
-
                             Listing currListing = null;
                             IList<PurchaseOption> purchaseOptions = null;
-                            PurchaseOption purchaseOption = new PurchaseOption();
+                            PurchaseOption purchaseOption = null; // = new PurchaseOption();
 
                             string[] variants = null;
 
-                            if (dataLine[2].ToLower().Equals("parent"))
+                            if (dataLine[2].ToLower().Equals("parent") || dataLine[2].ToLower().Trim().Equals(""))
                             {
+
+                                if (activeListing != null)
+                                {
+                                    // persist the last listing and create a new one.
+                                    activeListing.IsPublished = true;
+
+                                    try
+                                    {
+                                        _listingRepository.Insert(activeListing);
+                                    }
+                                    catch (Exception ex)
+                                    {
+                                        throw new Exception("Error persisting listing: " + activeListing.Id + ". Error: " + ex.Message);
+                                    }
+
+                                    try
+                                    {
+                                        job.ProgressInfo = ++numProductsSaved + " products saved, " + numErrors + " errors encountered";
+                                        _jobRepository.Save(job);
+                                    }
+                                    catch (Exception ex)
+                                    {
+                                        throw new Exception("Error persisting job status, error was: " + ex.Message);
+                                    }
+                                    activeListing = null;
+                                }
+
                                 skipToNextParent = false;
-                                
+
                                 currListing = new Listing();
                                 currListing.PricingInfo = new PricingInfo();
                                 currListing.PricingInfo.PurchaseOptions = new List<PurchaseOption>();
@@ -98,19 +130,19 @@ namespace classy.Operations
 
                                 variants = dataLine[4].Split(',');
 
-                                purchaseOption.VariantProperties = new Dictionary<string, string>();
+                                variantProperties = new Dictionary<string, string>();
                                 foreach (string variation in variants)
                                 {
                                     switch (variation.ToLower())
                                     {
                                         case "color":
-                                            purchaseOption.VariantProperties.Add("Color", dataLine[18]);
+                                            variantProperties.Add("Color", null);
                                             break;
                                         case "size":
-                                            purchaseOption.VariantProperties.Add("Size", dataLine[19]);
+                                            variantProperties.Add("Size", null);
                                             break;
                                         case "design":
-                                            purchaseOption.VariantProperties.Add("Design", dataLine[20]);
+                                            variantProperties.Add("Design", null);
                                             break;
                                         default:
                                             break;
@@ -142,6 +174,7 @@ namespace classy.Operations
                                 currListing.Metadata.Add("Materials", dataLine[24]);
                                 currListing.Metadata.Add("Manufacturer", dataLine[25]);
                                 currListing.Metadata.Add("Designer", dataLine[26]);
+                                currListing.Metadata.Add("ProductUrl", dataLine[7]);
 
                                 string[] keywords = dataLine[36].Split(',');
 
@@ -154,29 +187,65 @@ namespace classy.Operations
                                         currListing.SearchableKeywords.Add(keyword);
                                 }
 
+
+                                // special treatment of childless listings
+                                if (dataLine[2].ToLower().Trim().Equals(""))
+                                {
+                                    purchaseOption = new PurchaseOption();
+                                    if (purchaseOption.VariantProperties.Keys.Contains("Color"))
+                                        purchaseOption.VariantProperties["Color"] = dataLine[18];
+                                    if (purchaseOption.VariantProperties.Keys.Contains("Size"))
+                                        purchaseOption.VariantProperties["Size"] = dataLine[19];
+                                    if (purchaseOption.VariantProperties.Keys.Contains("Design"))
+                                        purchaseOption.VariantProperties["Design"] = dataLine[20];
+
+                                    purchaseOption.Title = dataLine[6];
+
+                                    if (dataLine[7].Length > 0)
+                                        purchaseOption.ProductUrl = dataLine[7];
+
+                                    purchaseOption.SKU = dataLine[0];
+
+                                    purchaseOption.Quantity = int.Parse(dataLine[11]);
+                                    purchaseOption.Price = double.Parse(dataLine[12]);
+                                    purchaseOption.NeutralPrice = purchaseOption.Price * _currencyManager.GetRate(currencyCode, "USD", 0);
+                                }
+
                             }
-                            else
+
+                            else if (dataLine[2].ToLower().Equals("child"))
                             {
                                 if (skipToNextParent)
                                 {
                                     continue;
                                 }
-                                currListing = listingList[dataLine[1]];
-                                purchaseOptions = currListing.PricingInfo.PurchaseOptions;
 
-                                purchaseOption.VariantProperties = listingList[dataLine[1]].PricingInfo.PurchaseOptions.First().VariantProperties;
+                                purchaseOption = new PurchaseOption();
+                                purchaseOptions = activeListing.PricingInfo.PurchaseOptions;
+
+                                purchaseOption.VariantProperties = variantProperties;
+
+                                if (purchaseOption.VariantProperties.Keys.Contains("Color"))
+                                    purchaseOption.VariantProperties["Color"] = dataLine[18];
+                                if (purchaseOption.VariantProperties.Keys.Contains("Size"))
+                                    purchaseOption.VariantProperties["Size"] = dataLine[19];
+                                if (purchaseOption.VariantProperties.Keys.Contains("Design"))
+                                    purchaseOption.VariantProperties["Design"] = dataLine[20];
+
+
 
                                 //child title.
                                 purchaseOption.Title = dataLine[6];
+
+                                if (dataLine[7].Length > 0)
+                                    purchaseOption.ProductUrl = dataLine[7];
+
+                                purchaseOption.SKU = dataLine[0];
+
+                                purchaseOption.Quantity = int.Parse(dataLine[11]);
+                                purchaseOption.Price = double.Parse(dataLine[12]);
+                                purchaseOption.NeutralPrice = purchaseOption.Price * _currencyManager.GetRate(currencyCode, "USD", 0);
                             }
-
-
-                            purchaseOption.SKU = dataLine[0];
-
-                            purchaseOption.Quantity = int.Parse(dataLine[11]);
-                            purchaseOption.Price = double.Parse(dataLine[12]);
-                            purchaseOption.NeutralPrice = purchaseOption.Price * _currencyManager.GetRate(currencyCode, "USD", 0);
-
 
                             List<MediaFile> tmpList = new List<MediaFile>();
 
@@ -200,9 +269,10 @@ namespace classy.Operations
                                     {
                                         img = client.DownloadData(mf.Url);
                                     }
-                                    catch (Exception ex)
+                                    catch (Exception)
                                     {
-                                        throw new Exception("Error downloading image: " + mf.Url + ", line #:" + lineNum + ":" + currLine);
+                                        client.Dispose();
+                                        throw new Exception("Error downloading image: " + mf.Url + ", line # " + lineNum + " : " + currLine);
                                     }
                                     client.Dispose();
 
@@ -210,41 +280,74 @@ namespace classy.Operations
                                     {
                                         _storageRepository.SaveFileSync(mf.Key, img, mf.ContentType);
                                     }
-                                    catch (Exception ex)
+                                    catch (Exception)
                                     {
-                                        throw new Exception("Error saving image: " + mf.Url + ", line#:" + lineNum + ":" + currLine);
+                                        throw new Exception("Error saving image: " + mf.Url + ", line# " + lineNum + " : " + currLine);
                                     }
                                 }
                             }
-                            purchaseOption.MediaFiles = tmpList.ToArray();
 
 
-                            purchaseOptions.Add(purchaseOption);
-                            currListing.PricingInfo.PurchaseOptions = purchaseOptions;
-
-                            if (dataLine[2].ToLower().Equals("parent"))
+                            if (dataLine[2].ToLower().Equals("parent") || dataLine[2].Trim().Equals(""))
                             {
-                                listingList.Add(dataLine[0], currListing);
+                                currListing.ExternalMedia = tmpList.ToArray();
+                            }
+                            else if (dataLine[2].ToLower().Equals("child"))
+                            {
+                                purchaseOption.MediaFiles = tmpList.ToArray();
+                                purchaseOptions.Add(purchaseOption);
+                                activeListing.PricingInfo.PurchaseOptions = purchaseOptions;
+                            }
+
+
+
+                            if (dataLine[2].ToLower().Equals("parent") || dataLine[2].Trim().Equals(""))
+                            {
+                                activeListing = currListing;
                             }
 
                         }
 
                         lineNum++;
                     }
-                    catch (Exception exx)
-                    {
-                        skipToNextParent = true;
-                        ReportError(exx);
 
+                    // persist last product.
+                    if (activeListing != null)
+                    {
+                        // persist the last listing and create a new one.
+                        activeListing.IsPublished = true;
+
+                        try
+                        {
+                            _listingRepository.Insert(activeListing);
+                        }
+                        catch (Exception ex)
+                        {
+                            throw new Exception("Error persisting listing: " + activeListing.Id + ". Error: " + ex.Message);
+                        }
+
+                        try
+                        {
+                            job.ProgressInfo = ++numProductsSaved + " products saved, " + numErrors + " errors encountered";
+                            _jobRepository.Save(job);
+
+                            job.Status = "Finished";
+                            _jobRepository.Save(job);
+                        }
+                        catch (Exception ex)
+                        {
+                            throw new Exception("Error saving job status, error was : " + ex.Message);
+                        }
+
+                        activeListing = null;
                     }
                 }
-
-                // write data to storage.
-                foreach (Listing currListing in listingList.Values)
+                catch (Exception exx)
                 {
-                    currListing.IsPublished = true;
+                    skipToNextParent = true;
+                    ++numErrors;
+                    ReportError(exx, job, _jobRepository, numProductsSaved, numErrors);
 
-                    _listingRepository.Insert(currListing);
                 }
             }
         }

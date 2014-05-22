@@ -18,5 +18,7 @@ namespace Classy.Models
         public string Status { get; set; }
         public MediaFile[] Attachments { get; set; }
         public Dictionary<string, object> Properties { get; set; }
+        public string ProgressInfo { get; set; }
+        public List<string> ImportErrors { get; set; }
     }
 }
