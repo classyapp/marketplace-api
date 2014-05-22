@@ -33,6 +33,8 @@ namespace classy.Extensions
             container.Register<ISearchClientFactory>(_ => new SearchClientFactory());
             container.Register<IListingSearchProvider>(
                 c => new ListingSearchProvider(c.TryResolve<ISearchClientFactory>()));
+            container.Register<IProfileSearchProvider>(
+                c => new ProfileSearchProvider(c.TryResolve<ISearchClientFactory>()));
 
             container.Register<IIndexer<Listing>>(x =>
                 new ListingIndexer(x.TryResolve<ISearchClientFactory>(), x.TryResolve<IAppManager>()));
@@ -162,6 +164,8 @@ namespace classy.Extensions
             container.Register<IThumbnailManager>(c =>
                 new DefaultThumbnailManager(
                     c.TryResolve<IStorageRepository>()));
+            container.Register<ISearchSuggestionsProvider>(c => 
+                new SearchSuggestionsProvider(c.TryResolve<ISearchClientFactory>()));
         }
     }
 }

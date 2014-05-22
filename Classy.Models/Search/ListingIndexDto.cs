@@ -15,12 +15,21 @@ namespace Classy.Models.Search
 
         [ElasticProperty(Index = FieldIndexOption.analyzed)]
         public string Title { get; set; }
+
+        [ElasticProperty(Index = FieldIndexOption.analyzed, OmitNorms = true, SearchAnalyzer = "standard", IndexAnalyzer = "suggest_analyzer")]
+        public string AnalyzedTitle { get; set; }
+
         [ElasticProperty(Index = FieldIndexOption.analyzed)]
         public string Content { get; set; }
         [ElasticProperty(Index = FieldIndexOption.not_analyzed)]
         public string ListingType { get; set; }
         [ElasticProperty(Index = FieldIndexOption.analyzed)]
         public string[] Keywords { get; set; } // comes from SearchableKeywords
+
+        [ElasticProperty(Index = FieldIndexOption.not_analyzed)]
+        public string[] BoostedCategories { get; set; }
+
+        public int EditorRank { get; set; }
 
         // These fields are here for scoring/relevance
         public int CommentCount { get; set; }

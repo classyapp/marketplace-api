@@ -50,8 +50,6 @@ namespace classy.Manager
         public IList<ListingView> GetListingsByIds(string[] listingIds, string appId, bool includeDrafts, string culture)
         {
             var listings = ListingRepository.GetById(listingIds, appId, includeDrafts, null);
-            foreach (var listing in listings)
-                listing.Translate(culture);
 
             return listings.Select(x => x.ToListingView()).ToList();
         }
@@ -67,6 +65,7 @@ namespace classy.Manager
             bool includeProfile,
             bool includeFavoritedByProfiles,
             string culture)
+            // add parameter for editor's fields and only retrieve them when needed
         {
             // TODO: cache listings
             var listing = GetVerifiedListing(appId, listingId);
@@ -119,6 +118,12 @@ namespace classy.Manager
             }
 
             return listingView;
+        }
+
+        public void EditMultipleListings(string[] listingIds, int editorsRank, string appId)
+        {
+            ListingRepository.EditMultipleListings(listingIds, editorsRank, appId);
+            _listingIndexer.UpdateMultipleListings(listingIds, editorsRank, appId);
         }
 
         public IList<ListingView> GetListingsByProfileId(
@@ -419,10 +424,6 @@ namespace classy.Manager
             ProfileRepository.IncreaseCounter(appId, SecurityContext.AuthenticatedProfileId, ProfileCounters.Comments, 1);
             _profileIndexer.Increment(SecurityContext.AuthenticatedProfileId, appId, l => l.CommentCount);
 
-            // increase rank of listing owner
-            ProfileRepository.IncreaseCounter(appId, listing.ProfileId, ProfileCounters.Rank, 1);
-            _profileIndexer.Increment(SecurityContext.AuthenticatedProfileId, appId, l => l.Rank);
-
             // add hashtags to listing if the comment is by the listing owner
             if (SecurityContext.AuthenticatedProfileId == listing.ProfileId || SecurityContext.IsAdmin)
             {
@@ -438,10 +439,6 @@ namespace classy.Manager
             {
                 var mentionedProfile = ProfileRepository.GetByUsername(appId, mentionedUsername.TrimStart('@'), false, null);
                 TripleStore.LogActivity(appId, SecurityContext.AuthenticatedProfileId, ActivityPredicate.MENTION_PROFILE, mentionedProfile.Id, ref count);
-
-                // increase rank of mentioned profile
-                ProfileRepository.IncreaseCounter(appId, mentionedProfile.Id, ProfileCounters.Rank, 1);
-                _profileIndexer.Increment(mentionedProfile.Id, appId, p => p.Rank);
             }
 
             // format as html
@@ -454,8 +451,6 @@ namespace classy.Manager
             string appId,
             string listingId)
         {
-            var listing = GetVerifiedListing(appId, listingId);
-
             int count = 0;
             TripleStore.LogActivity(appId, SecurityContext.AuthenticatedProfileId, ActivityPredicate.FAVORITE_LISTING, listingId, ref count);
             if (count == 1)
@@ -464,8 +459,6 @@ namespace classy.Manager
                 if (SecurityContext.IsAdmin) listingCounters |= ListingCounters.DisplayOrder;
                 ListingRepository.IncreaseCounter(listingId, appId, listingCounters, 1);
                 _listingIndexer.Increment(listingId, appId, l => l.FavoriteCount);
-                ProfileRepository.IncreaseCounter(appId, listing.ProfileId, ProfileCounters.Rank, 1);
-                _profileIndexer.Increment(listing.ProfileId, appId, p => p.Rank);
             }
         }
 
@@ -473,16 +466,12 @@ namespace classy.Manager
             string appId,
             string listingId)
         {
-            var listing = GetVerifiedListing(appId, listingId);
-
             int count = 0;
             TripleStore.ResetActivity(appId, SecurityContext.AuthenticatedProfileId, ActivityPredicate.FAVORITE_LISTING, listingId);
             if (count == 0)
             {
                 ListingRepository.IncreaseCounter(listingId, appId, ListingCounters.Favorites, -1);
                 _listingIndexer.Increment(listingId, appId, p => p.FavoriteCount, -1);
-                ProfileRepository.IncreaseCounter(appId, listing.ProfileId, ProfileCounters.Rank, -1);
-                _profileIndexer.Increment(listing.ProfileId, appId, p => p.Rank, -1);
             }
         }
 
@@ -491,15 +480,11 @@ namespace classy.Manager
             string listingId,
             FlagReason FlagReason)
         {
-            var listing = GetVerifiedListing(appId, listingId);
-
             switch (FlagReason)
             {
                 case FlagReason.Inapropriate:
                     ListingRepository.IncreaseCounter(listingId, appId, ListingCounters.Flags, 1);
                     _listingIndexer.Increment(listingId, appId, l => l.FlagCount);
-                    ProfileRepository.IncreaseCounter(appId, SecurityContext.AuthenticatedProfileId, ProfileCounters.Rank, -3);
-                    _profileIndexer.Increment(SecurityContext.AuthenticatedProfileId, appId, p => p.Rank, -3);
                     break;
                 case FlagReason.Dislike:
                 default:
@@ -550,8 +535,6 @@ namespace classy.Manager
                     {
                         ListingRepository.IncreaseCounter(listing.Id, appId, ListingCounters.AddToCollection, 1);
                         _listingIndexer.Increment(listing.Id, appId, l => l.AddToCollectionCount);
-                        ProfileRepository.IncreaseCounter(appId, profileId, ProfileCounters.Rank, 1);
-                        _profileIndexer.Increment(profileId, appId, p => p.Rank);
                     }
                 }
 
@@ -796,11 +779,7 @@ namespace classy.Manager
             // increase comment count for profile of commenter
             ProfileRepository.IncreaseCounter(appId, SecurityContext.AuthenticatedProfileId, ProfileCounters.Comments, 1);
             _profileIndexer.Increment(SecurityContext.AuthenticatedProfileId, appId, p => p.CommentCount);
-
-            // increase rank of listing owner
-            ProfileRepository.IncreaseCounter(appId, collection.ProfileId, ProfileCounters.Rank, 1);
-            _profileIndexer.Increment(collection.ProfileId, appId, p => p.Rank);
-
+            
             // add hashtags to listing if the comment is by the listing owner
             if (SecurityContext.AuthenticatedProfileId == collection.ProfileId || SecurityContext.IsAdmin)
             {
@@ -816,10 +795,6 @@ namespace classy.Manager
             {
                 var mentionedProfile = ProfileRepository.GetByUsername(appId, mentionedUsername.TrimStart('@'), false, null);
                 TripleStore.LogActivity(appId, SecurityContext.AuthenticatedProfileId, ActivityPredicate.MENTION_PROFILE, mentionedProfile.Id, ref count);
-
-                // increase rank of mentioned profile
-                ProfileRepository.IncreaseCounter(appId, mentionedProfile.Id, ProfileCounters.Rank, 1);
-                _profileIndexer.Increment(mentionedProfile.Id, appId, p => p.Rank);
             }
 
             // format as html

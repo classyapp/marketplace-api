@@ -28,13 +28,17 @@ namespace Classy.UtilRunner.Utilities.Indexing
         {
             var indexName = "profiles" + "_v1.0";
 
-            var client = _searchClientFactory.GetClient("profiles", "v1.0");
-            client.DeleteIndex(d => d.Index<ProfileIndexDto>());
-            client.CreateIndex("profiles_v1.0",
-                s => s.Settings(_ => new IndexSettings())
-                    .AddMapping<ProfileIndexDto>(m => m.MapFromAttributes()));
+            //var client = _searchClientFactory.GetClient("profiles", "v1.0");
+            //client.DeleteIndex(d => d.Index<ProfileIndexDto>());
+            //client.CreateIndex("profiles_v1.0", s => s.Settings(_ => new IndexSettings()));
+            //client.Map<ProfileIndexDto>(
+            //    m => m.MapFromAttributes().Properties(
+            //        p => p.Completion(
+            //            c => c.Name(n => n.CompanyName).IndexAnalyzer("simple").SearchAnalyzer("simple")
+            //                .Payloads(true).MaxInputLength(20))));
 
-            client = _searchClientFactory.GetClient("profiles", "v1.0");
+            var client = _searchClientFactory.GetClient("profiles", "v1.0");
+            client.Map<ProfileIndexDto>(m => m.MapFromAttributes());
 
             var i = 0;
             var cursor = _profiles.Find(MongoDB.Driver.Builders.Query<Profile>.NE(x => x.ProfessionalInfo, null)).SetBatchSize(BatchSize);
@@ -47,14 +51,15 @@ namespace Classy.UtilRunner.Utilities.Indexing
                     toIndex.Add(new ProfileIndexDto {
                         Id = professional.Id,
                         CommentCount = professional.CommentCount,
-                        ComnpanyName = professional.ProfessionalInfo.CompanyName,
+                        CompanyName = professional.ProfessionalInfo.CompanyName,
+                        AnalyzedCompanyName = professional.ProfessionalInfo.CompanyName,
                         FollowerCount= professional.FollowerCount,
                         FollowingCount= professional.FollowingCount,
                         IsVendor= professional.IsVendor,
                         ListingCount= professional.ListingCount,
                         Location= GetGpsLocation(professional),
+                        Country = GetCountry(professional),
                         Metadata = professional.Metadata.Select(x => x.Value).ToArray(),
-                        Rank= professional.Rank,
                         ReviewAverageScore= professional.ReviewAverageScore,
                         ReviewCount= professional.ReviewCount,
                         ViewCount= professional.ViewCount
@@ -67,6 +72,19 @@ namespace Classy.UtilRunner.Utilities.Indexing
             }
 
             return StatusCode.Success;
+        }
+
+        private string GetCountry(Profile professional)
+        {
+            if (professional.ProfessionalInfo == null)
+                return null;
+            if (professional.ProfessionalInfo.CompanyContactInfo == null)
+                return null;
+            if (professional.ProfessionalInfo.CompanyContactInfo.Location == null)
+                return null;
+            if (professional.ProfessionalInfo.CompanyContactInfo.Location.Address == null)
+                return null;
+            return professional.ProfessionalInfo.CompanyContactInfo.Location.Address.Country;
         }
 
         private static GPSLocation GetGpsLocation(Profile professional)
