@@ -29,6 +29,8 @@ namespace Classy.Models.Search
         [ElasticProperty(Index = FieldIndexOption.not_analyzed)]
         public string[] BoostedCategories { get; set; }
 
+        public int EditorRank { get; set; }
+
         // These fields are here for scoring/relevance
         public int CommentCount { get; set; }
         public int FavoriteCount { get; set; }
