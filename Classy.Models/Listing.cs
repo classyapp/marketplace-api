@@ -83,6 +83,8 @@ namespace Classy.Models
         /// </summary>
         public int DisplayOrder { get; set; }
 
+        public int EditorsRank { get; set; }
+
         /// <summary>
         /// contact info for the listing. use to override contact info of the listing owner <see cref="Profile"/>
         /// </summary>

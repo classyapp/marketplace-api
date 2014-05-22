@@ -33,6 +33,7 @@ namespace classy
             if (from.TranslatedKeywords != null && from.TranslatedKeywords.Count > 0)
                 to.TranslatedKeywords = from.TranslatedKeywords;
             to.SearchableKeywords = from.SearchableKeywords;
+            to.EditorsRank = from.EditorsRank;
             
             return to;
         }

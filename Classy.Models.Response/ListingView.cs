@@ -27,6 +27,7 @@ namespace Classy.Models.Response
         public int PurchaseCount { get; set; }
         public int AddToCollectionCount { get; set; }
         public int DisplayOrder { get; set; }
+        public int EditorsRank { get; set; }
         public bool IsPublished { get; set; }
         //
         public IList<CommentView> Comments { get; set; }

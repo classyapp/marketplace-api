@@ -65,6 +65,7 @@ namespace classy.Manager
             bool includeProfile,
             bool includeFavoritedByProfiles,
             string culture)
+            // add parameter for editor's fields and only retrieve them when needed
         {
             // TODO: cache listings
             var listing = GetVerifiedListing(appId, listingId);
