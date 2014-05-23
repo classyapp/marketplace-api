@@ -309,7 +309,7 @@ namespace classy.Operations
                             List<MediaFile> tmpList = new List<MediaFile>();
 
                             // Media files
-                            for (int i = 28; i < 32; i++)
+                            for (int i = 27; i < 32; i++)
                             {
                                 if (dataLine[i].Length > 0)
                                 {
@@ -350,6 +350,7 @@ namespace classy.Operations
                             if (dataLine[2].ToLower().Equals("parent") || dataLine[2].Trim().Equals(""))
                             {
                                 currListing.ExternalMedia = tmpList.ToArray();
+                                activeListing = currListing;
 
                                 
                             }
@@ -359,14 +360,6 @@ namespace classy.Operations
                                 purchaseOptions.Add(purchaseOption);
                                 activeListing.PricingInfo.PurchaseOptions = purchaseOptions;
                             }
-
-
-
-                            if (dataLine[2].ToLower().Equals("parent") || dataLine[2].Trim().Equals(""))
-                            {
-                                activeListing = currListing;
-                            }
-
                         }
 
                         lineNum++;
