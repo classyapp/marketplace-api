@@ -17,9 +17,9 @@ namespace Classy.Models
         public string DefaultImage { get; set; }
         public string ProductUrl { get; set; }
         public double NeutralPrice { get; set; }
-        public string height { get; set; }
-        public string width { get; set; }
-        public string depth { get; set; }
+        public string Height { get; set; }
+        public string Width { get; set; }
+        public string Depth { get; set; }
 
     }
 }

@@ -16,14 +16,16 @@ namespace classy.Operations
         private readonly IStorageRepository _storageRepository; // AWS
         private readonly IListingRepository _listingRepository; //MONGO
         private readonly IJobRepository _jobRepository; // JOBS
-        private readonly ICurrencyManager _currencyManager; // 
+        private readonly ICurrencyManager _currencyManager; // Currencies
+        private readonly IProfileRepository _profileRepository; // Profiles.
 
-        public ProductCatalogImportOperator(IStorageRepository storageRepo, IListingRepository listingRepo, IJobRepository jobRepo, ICurrencyManager currencyManager)
+        public ProductCatalogImportOperator(IStorageRepository storageRepo, IListingRepository listingRepo, IJobRepository jobRepo, ICurrencyManager currencyManager, IProfileRepository profileRepository)
         {
             _storageRepository = storageRepo;
             _listingRepository = listingRepo;
             _jobRepository = jobRepo;
             _currencyManager = currencyManager;
+            _profileRepository = profileRepository;
         }
 
         private void ReportError(Exception ex, Job job, IJobRepository jobRepo, int savedProducts, int errors)
@@ -65,6 +67,9 @@ namespace classy.Operations
                 Listing activeListing = null;
                 bool skipToNextParent = false;
                 Dictionary<string, string> variantProperties = new Dictionary<string, string>();
+
+                string defaultCulture = _profileRepository.GetById(request.AppId, job.ProfileId, false, null).DefaultCulture;
+
 
                 try
                 {
@@ -135,6 +140,7 @@ namespace classy.Operations
                                 purchaseOptions = currListing.PricingInfo.PurchaseOptions;
                                 currListing.PricingInfo.CurrencyCode = currencyCode;
 
+                                currListing.DefaultCulture = defaultCulture;
 
                                 currListing.ProfileId = job.ProfileId;
                                 currListing.AppId = job.AppId;
@@ -217,9 +223,9 @@ namespace classy.Operations
                                     throwIfEmpty(dataLine[21], 21);
                                     throwIfEmpty(dataLine[22], 22);
                                     throwIfEmpty(dataLine[23], 23);
-                                    purchaseOption.width = dataLine[21];
-                                    purchaseOption.depth = dataLine[22];
-                                    purchaseOption.height = dataLine[23];
+                                    purchaseOption.Width = dataLine[21];
+                                    purchaseOption.Depth = dataLine[22];
+                                    purchaseOption.Height = dataLine[23];
 
                                     if (dataLine[13].Length > 0)
                                         purchaseOption.CompareAtPrice = Double.Parse(dataLine[13]);
@@ -245,6 +251,7 @@ namespace classy.Operations
                                     if (dataLine[12].Length > 0)
                                         purchaseOption.Price = double.Parse(dataLine[12]);
                                     
+
                                     purchaseOption.NeutralPrice = purchaseOption.Price * _currencyManager.GetRate(currencyCode, "USD", 0);
                                     purchaseOptions.Add(purchaseOption);
                                     currListing.PricingInfo.PurchaseOptions = purchaseOptions;
@@ -257,9 +264,9 @@ namespace classy.Operations
                                 throwIfEmpty(dataLine[21], 21);
                                 throwIfEmpty(dataLine[22], 22);
                                 throwIfEmpty(dataLine[23], 23);
-                                purchaseOption.width = dataLine[21];
-                                purchaseOption.depth = dataLine[22];
-                                purchaseOption.height = dataLine[23];
+                                purchaseOption.Width = dataLine[21];
+                                purchaseOption.Depth = dataLine[22];
+                                purchaseOption.Height = dataLine[23];
                             
 
                                 if (skipToNextParent)
@@ -408,7 +415,7 @@ namespace classy.Operations
 
         private void throwIfEmpty(string p, int index)
         {
-            if (p == null || p.Length == 0)
+            if (string.IsNullOrWhiteSpace(p))
                 throw new Exception("Required field at index " + index + " is missing a value!");
         }
     }

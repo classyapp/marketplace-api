@@ -46,7 +46,8 @@ namespace Classy.Tests
                     new ProductCatalogImportOperator(new AmazonS3StorageRepository(s3Client, ConfigurationManager.AppSettings["S3BucketName"]),
                     new MongoListingRepository(mongoDB),
                     new MongoJobRepository(mongoDB),
-                    new CurrencyManager(new StubCurrencyRepository()));
+                    new CurrencyManager(new StubCurrencyRepository()),
+                    new MongoProfileRepository(mongoDB));
 
                 catalogImport.PerformOperation(new ImportProductCatalogJob("5373ab038e65962b7cd8eac9", "v1.0"));
                 
