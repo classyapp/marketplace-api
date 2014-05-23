@@ -71,8 +71,7 @@ namespace classy.Operations
                     job.Status = "Executing";
                     while (!reader.EndOfStream)
                     {
-
-                        string currLine = reader.ReadLine();
+                         string currLine = reader.ReadLine();
 
                         if (lineNum != 0)
                         {
@@ -80,6 +79,18 @@ namespace classy.Operations
                             Trace.WriteLine(currLine);
 
                             string[] dataLine = currLine.Split(';');
+
+                            // check required values
+                            throwIfEmpty(dataLine[0], 0);
+                            throwIfEmpty(dataLine[6], 6);
+                            throwIfEmpty(dataLine[7], 7);
+                            throwIfEmpty(dataLine[8], 8);
+                            throwIfEmpty(dataLine[9], 9);
+                            throwIfEmpty(dataLine[10], 10);
+                            throwIfEmpty(dataLine[11], 11);
+                            throwIfEmpty(dataLine[12], 12);
+                            throwIfEmpty(dataLine[27], 27);
+
 
                             Listing currListing = null;
                             IList<PurchaseOption> purchaseOptions = null;
@@ -151,8 +162,11 @@ namespace classy.Operations
 
 
                                 // only fill out the listing parent once.
-                                currListing.Title = dataLine[6];
-                                currListing.Content = dataLine[8];
+                                if (dataLine[6].Length > 0)
+                                    currListing.Title = dataLine[6];
+                                
+                                if (dataLine[8].Length > 0)
+                                    currListing.Content = dataLine[8];
 
                                 string[] categories = dataLine[9].Split(',');
 
@@ -167,14 +181,20 @@ namespace classy.Operations
                                 if (currListing.Metadata == null)
                                     currListing.Metadata = new Dictionary<string, string>();
 
-                                currListing.Metadata.Add("Style", dataLine[10]);
-                                currListing.Metadata.Add("Width", dataLine[21]);
-                                currListing.Metadata.Add("Depth", dataLine[22]);
-                                currListing.Metadata.Add("Height", dataLine[23]);
-                                currListing.Metadata.Add("Materials", dataLine[24]);
-                                currListing.Metadata.Add("Manufacturer", dataLine[25]);
-                                currListing.Metadata.Add("Designer", dataLine[26]);
-                                currListing.Metadata.Add("ProductUrl", dataLine[7]);
+                                if (dataLine[10].Length > 0)
+                                    currListing.Metadata.Add("Style", dataLine[10]);
+
+                                if (dataLine[24].Length > 0)
+                                    currListing.Metadata.Add("Materials", dataLine[24]);
+
+                                if (dataLine[25].Length > 0)
+                                    currListing.Metadata.Add("Manufacturer", dataLine[25]);
+
+                                if (dataLine[26].Length > 0)
+                                    currListing.Metadata.Add("Designer", dataLine[26]);
+
+                                if (dataLine[7].Length > 0)
+                                    currListing.Metadata.Add("ProductUrl", dataLine[7]);
 
                                 string[] keywords = dataLine[36].Split(',');
 
@@ -192,11 +212,23 @@ namespace classy.Operations
                                 if (dataLine[2].ToLower().Trim().Equals(""))
                                 {
                                     purchaseOption = new PurchaseOption();
-                                    if (purchaseOption.VariantProperties.Keys.Contains("Color"))
+
+                                    throwIfEmpty(dataLine[21], 21);
+                                    throwIfEmpty(dataLine[22], 22);
+                                    throwIfEmpty(dataLine[23], 23);
+                                    purchaseOption.width = dataLine[21];
+                                    purchaseOption.depth = dataLine[22];
+                                    purchaseOption.height = dataLine[23];
+
+                                    if (dataLine[13].Length > 0)
+                                        purchaseOption.CompareAtPrice = Double.Parse(dataLine[13]);
+
+                                    purchaseOption.VariantProperties = new Dictionary<string, string>();
+                                    if (dataLine[18].Length > 0)
                                         purchaseOption.VariantProperties["Color"] = dataLine[18];
-                                    if (purchaseOption.VariantProperties.Keys.Contains("Size"))
+                                    if (dataLine[19].Length > 0)
                                         purchaseOption.VariantProperties["Size"] = dataLine[19];
-                                    if (purchaseOption.VariantProperties.Keys.Contains("Design"))
+                                    if (dataLine[20].Length > 0)
                                         purchaseOption.VariantProperties["Design"] = dataLine[20];
 
                                     purchaseOption.Title = dataLine[6];
@@ -204,10 +236,14 @@ namespace classy.Operations
                                     if (dataLine[7].Length > 0)
                                         purchaseOption.ProductUrl = dataLine[7];
 
-                                    purchaseOption.SKU = dataLine[0];
+                                    if (dataLine[0].Length > 0)
+                                        purchaseOption.SKU = dataLine[0];
 
-                                    purchaseOption.Quantity = int.Parse(dataLine[11]);
-                                    purchaseOption.Price = double.Parse(dataLine[12]);
+                                    if (dataLine[11].Length > 0)
+                                        purchaseOption.Quantity = int.Parse(dataLine[11]);
+                                    if (dataLine[12].Length > 0)
+                                        purchaseOption.Price = double.Parse(dataLine[12]);
+                                    
                                     purchaseOption.NeutralPrice = purchaseOption.Price * _currencyManager.GetRate(currencyCode, "USD", 0);
                                 }
 
@@ -215,6 +251,14 @@ namespace classy.Operations
 
                             else if (dataLine[2].ToLower().Equals("child"))
                             {
+                                throwIfEmpty(dataLine[21], 21);
+                                throwIfEmpty(dataLine[22], 22);
+                                throwIfEmpty(dataLine[23], 23);
+                                purchaseOption.width = dataLine[21];
+                                purchaseOption.depth = dataLine[22];
+                                purchaseOption.height = dataLine[23];
+                            
+
                                 if (skipToNextParent)
                                 {
                                     continue;
@@ -225,25 +269,30 @@ namespace classy.Operations
 
                                 purchaseOption.VariantProperties = variantProperties;
 
-                                if (purchaseOption.VariantProperties.Keys.Contains("Color"))
+                                if (purchaseOption.VariantProperties.Keys.Contains("Color") && dataLine[18].Length > 0)
                                     purchaseOption.VariantProperties["Color"] = dataLine[18];
-                                if (purchaseOption.VariantProperties.Keys.Contains("Size"))
+                                if (purchaseOption.VariantProperties.Keys.Contains("Size") && dataLine[19].Length > 0)
                                     purchaseOption.VariantProperties["Size"] = dataLine[19];
-                                if (purchaseOption.VariantProperties.Keys.Contains("Design"))
+                                if (purchaseOption.VariantProperties.Keys.Contains("Design") && dataLine[20].Length > 0)
                                     purchaseOption.VariantProperties["Design"] = dataLine[20];
 
 
 
                                 //child title.
-                                purchaseOption.Title = dataLine[6];
+                                if (dataLine[6].Length > 0)
+                                    purchaseOption.Title = dataLine[6];
 
                                 if (dataLine[7].Length > 0)
                                     purchaseOption.ProductUrl = dataLine[7];
 
-                                purchaseOption.SKU = dataLine[0];
+                                if(dataLine[0].Length > 0)
+                                    purchaseOption.SKU = dataLine[0];
 
-                                purchaseOption.Quantity = int.Parse(dataLine[11]);
-                                purchaseOption.Price = double.Parse(dataLine[12]);
+                                if (dataLine[11].Length > 0)
+                                    purchaseOption.Quantity = int.Parse(dataLine[11]);
+                                
+                                if (dataLine[12].Length > 0)
+                                    purchaseOption.Price = double.Parse(dataLine[12]);
                                 purchaseOption.NeutralPrice = purchaseOption.Price * _currencyManager.GetRate(currencyCode, "USD", 0);
                             }
 
@@ -350,6 +399,12 @@ namespace classy.Operations
 
                 }
             }
+        }
+
+        private void throwIfEmpty(string p, int index)
+        {
+            if (p == null || p.Length == 0)
+                throw new Exception("Required field at index " + index + " is missing a value!");
         }
     }
 }
