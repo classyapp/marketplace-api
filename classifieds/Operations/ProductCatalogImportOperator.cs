@@ -133,6 +133,7 @@ namespace classy.Operations
                                 currListing.PricingInfo = new PricingInfo();
                                 currListing.PricingInfo.PurchaseOptions = new List<PurchaseOption>();
                                 purchaseOptions = currListing.PricingInfo.PurchaseOptions;
+                                currListing.PricingInfo.CurrencyCode = currencyCode;
 
 
                                 currListing.ProfileId = job.ProfileId;
@@ -245,6 +246,8 @@ namespace classy.Operations
                                         purchaseOption.Price = double.Parse(dataLine[12]);
                                     
                                     purchaseOption.NeutralPrice = purchaseOption.Price * _currencyManager.GetRate(currencyCode, "USD", 0);
+                                    purchaseOptions.Add(purchaseOption);
+                                    currListing.PricingInfo.PurchaseOptions = purchaseOptions;
                                 }
 
                             }
@@ -340,6 +343,8 @@ namespace classy.Operations
                             if (dataLine[2].ToLower().Equals("parent") || dataLine[2].Trim().Equals(""))
                             {
                                 currListing.ExternalMedia = tmpList.ToArray();
+
+                                
                             }
                             else if (dataLine[2].ToLower().Equals("child"))
                             {
