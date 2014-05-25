@@ -110,7 +110,7 @@ namespace Classy.UtilRunner.Utilities.Indexing
                         FavoriteCount = listing.FavoriteCount,
                         FlagCount = listing.FlagCount,
                         Keywords =
-                            listing.SearchableKeywords != null ? listing.SearchableKeywords.ToArray() : new string[0],
+                            listing.SearchableKeywords != null ? listing.SearchableKeywords.Union(listing.Hashtags).ToArray() : new string[0],
                         ImageUrl = 
                             !listing.ExternalMedia.IsNullOrEmpty() ? listing.ExternalMedia[0].Url : null,
                         ListingType = listing.ListingType,

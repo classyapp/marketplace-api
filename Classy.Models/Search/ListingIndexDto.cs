@@ -23,7 +23,7 @@ namespace Classy.Models.Search
         public string Content { get; set; }
         [ElasticProperty(Index = FieldIndexOption.not_analyzed)]
         public string ListingType { get; set; }
-        [ElasticProperty(Index = FieldIndexOption.analyzed)]
+        [ElasticProperty(Index = FieldIndexOption.analyzed, SearchAnalyzer = "standard")]
         public string[] Keywords { get; set; } // comes from SearchableKeywords
 
         [ElasticProperty(Index = FieldIndexOption.not_analyzed)]
