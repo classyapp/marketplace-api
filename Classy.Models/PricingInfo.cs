@@ -1,11 +1,12 @@
-﻿using ServiceStack.FluentValidation;
+﻿using MongoDB.Bson.Serialization.Attributes;
+using ServiceStack.FluentValidation;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 
 namespace Classy.Models
 {
+    [BsonIgnoreExtraElements]
     public class PricingInfo
     {
         // Product configurations - at least one
