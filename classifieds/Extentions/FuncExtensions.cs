@@ -1,11 +1,9 @@
-﻿using Amazon.OpsWorks.Model;
-using classy.Cache;
+﻿using classy.Cache;
 using Classy.Interfaces.Search;
 using classy.Manager;
 using classy.Manager.Search;
 using Classy.Models;
 using Classy.Repository;
-using MongoDB.Bson.Serialization;
 using MongoDB.Driver;
 using ServiceStack.Messaging;
 using ServiceStack.Redis;
@@ -111,6 +109,8 @@ namespace classy.Extensions
                     c.TryResolve<ITripleStore>(),
                     c.TryResolve<ITaxCalculator>(),
                     c.TryResolve<IShippingCalculator>()));
+            container.Register<IKeywordsRepository>(c =>
+                new KeywordsRepository(c.TryResolve<MongoDatabase>()));
             container.Register<IListingManager>(c =>
                 new DefaultListingManager(
                     c.TryResolve<IAppManager>(),
@@ -121,7 +121,8 @@ namespace classy.Extensions
                     c.TryResolve<ITripleStore>(),
                     c.TryResolve<IStorageRepository>(),
                     c.TryResolve<IIndexer<Listing>>(),
-                    c.TryResolve<IIndexer<Profile>>()));
+                    c.TryResolve<IIndexer<Profile>>(),
+                    c.TryResolve<IKeywordsRepository>()));
             container.Register<IProfileManager>(c =>
                 new DefaultProfileManager(
                     c.TryResolve<IAppManager>(),
@@ -154,7 +155,8 @@ namespace classy.Extensions
                     c.TryResolve<ITripleStore>(),
                     c.TryResolve<IStorageRepository>(),
                     c.TryResolve<IIndexer<Listing>>(),
-                    c.TryResolve<IIndexer<Profile>>()));
+                    c.TryResolve<IIndexer<Profile>>(),
+                    c.TryResolve<IKeywordsRepository>()));
             container.Register<IAnalyticsManager>(c =>
                 new DefaultAnalyticsManager(
                     c.TryResolve<ITripleStore>()));
@@ -166,11 +168,7 @@ namespace classy.Extensions
                 new DefaultThumbnailManager(
                     c.TryResolve<IStorageRepository>()));
             container.Register<ISearchSuggestionsProvider>(c => 
-                new SearchSuggestionsProvider(c.TryResolve<ISearchClientFactory>()));
-
-            // register mongo classes
-            BsonClassMap.RegisterClassMap<Listing>(c => c.AutoMap());
-            BsonClassMap.RegisterClassMap<Profile>(c => c.AutoMap());
+                new SearchSuggestionsProvider(c.TryResolve<ISearchClientFactory>(), c.TryResolve<MongoDatabase>()));
         }
     }
 }

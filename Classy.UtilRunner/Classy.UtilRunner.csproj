@@ -32,6 +32,10 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="AWSSDK, Version=2.0.4.1, Culture=neutral, PublicKeyToken=9f476d3089b52be3, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\lib\AWSSDK.dll</HintPath>
+    </Reference>
     <Reference Include="Elasticsearch.Net">
       <HintPath>..\packages\Elasticsearch.Net.1.0.0-beta1\lib\Elasticsearch.Net.dll</HintPath>
     </Reference>
@@ -83,8 +87,16 @@
     <Compile Include="Utilities\HashtagCleaning\CleanCommentsHashtags.cs" />
     <Compile Include="Utilities\HashtagCleaning\CleanDescriptionHashtags.cs" />
     <Compile Include="Utilities\HashtagCleaning\TempHashtagRestore.cs" />
+    <Compile Include="Utilities\Indexing\KeywordsIndexer.cs" />
     <Compile Include="Utilities\Indexing\ProfileIndexer.cs" />
     <Compile Include="Utilities\Indexing\ListingIndexer.cs" />
+    <Compile Include="Utilities\SitemapBuilders\ArgumentHelper.cs" />
+    <Compile Include="Utilities\SitemapBuilders\BaseSitemapGenerator.cs" />
+    <Compile Include="Utilities\SitemapBuilders\BaseSitemapIndexGenerator.cs" />
+    <Compile Include="Utilities\SitemapBuilders\HomelabSitemapUtil.cs" />
+    <Compile Include="Utilities\SitemapBuilders\GZip.cs" />
+    <Compile Include="Utilities\SitemapBuilders\HomelabSitemapGenerator.cs" />
+    <Compile Include="Utilities\SitemapBuilders\UpdateFrequency.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
@@ -99,9 +111,17 @@
       <Project>{9C0DED9F-8160-4BDF-A599-6B33A983353A}</Project>
       <Name>Classy.Interfaces</Name>
     </ProjectReference>
+    <ProjectReference Include="..\Classy.Models.Response\Classy.Models.Response.csproj">
+      <Project>{7dba45e3-cb30-4f3c-9577-27e955dd3f49}</Project>
+      <Name>Classy.Models.Response</Name>
+    </ProjectReference>
     <ProjectReference Include="..\Classy.Models\Classy.Models.csproj">
       <Project>{AC13DF42-51BB-4798-A0AB-9B2776B4844F}</Project>
       <Name>Classy.Models</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Classy.Repository\Classy.Repository.csproj">
+      <Project>{8bb8c610-ffdb-49de-af0c-0e4cb37e4b1e}</Project>
+      <Name>Classy.Repository</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

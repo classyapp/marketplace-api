@@ -22,7 +22,6 @@ namespace Classy.UtilRunner.Utilities.Indexing
         {
             _searchClientFactory = container.Resolve<ISearchClientFactory>();
             var mongoDatabase = container.Resolve<MongoDatabase>();
-            BsonClassMap.RegisterClassMap<Listing>(c => c.AutoMap());
             _listings = mongoDatabase.GetCollection<Listing>("classifieds");
         }
         
@@ -116,7 +115,7 @@ namespace Classy.UtilRunner.Utilities.Indexing
                         FavoriteCount = listing.FavoriteCount,
                         FlagCount = listing.FlagCount,
                         Keywords =
-                            listing.SearchableKeywords != null ? listing.SearchableKeywords.Union(listing.Hashtags).ToArray() : new string[0],
+                            listing.SearchableKeywords != null ? listing.SearchableKeywords.Union(listing.Hashtags).ToArray() : listing.Hashtags.EmptyIfNull().ToArray(),
                         ImageUrl = 
                             !listing.ExternalMedia.IsNullOrEmpty() ? listing.ExternalMedia[0].Url : null,
                         ListingType = listing.ListingType,

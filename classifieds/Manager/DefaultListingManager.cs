@@ -24,6 +24,7 @@ namespace classy.Manager
         private readonly IAppManager AppManager;
         private readonly IIndexer<Listing> _listingIndexer;
         private readonly IIndexer<Profile> _profileIndexer;
+        private readonly IKeywordsRepository _keywordsRepository;
 
         public DefaultListingManager(
             IAppManager appManager,
@@ -32,7 +33,7 @@ namespace classy.Manager
             IProfileRepository profileRepository,
             ICollectionRepository collectionRepository,
             ITripleStore tripleStore,
-            IStorageRepository storageRepository, IIndexer<Listing> listingIndexer, IIndexer<Profile> profileIndexer)
+            IStorageRepository storageRepository, IIndexer<Listing> listingIndexer, IIndexer<Profile> profileIndexer, IKeywordsRepository keywordsRepository)
         {
             AppManager = appManager;
             ListingRepository = listingRepository;
@@ -43,6 +44,7 @@ namespace classy.Manager
             StorageRepository = storageRepository;
             _listingIndexer = listingIndexer;
             _profileIndexer = profileIndexer;
+            _keywordsRepository = keywordsRepository;
         }
 
         public ManagerSecurityContext SecurityContext { get; set; }

@@ -126,5 +126,13 @@ namespace classy.Services
 
             return new HttpResult(suggestions, HttpStatusCode.OK);
         }
+
+        public object Get(KeywordSuggestionRequest request)
+        {
+            var suggestions = SearchSuggestionsProvider.KeywordSuggestions(request.q, request.Lang,
+                request.Environment.AppId);
+
+            return new HttpResult(suggestions, HttpStatusCode.OK);
+        }
     }
 }
