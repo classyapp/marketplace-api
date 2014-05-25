@@ -37,7 +37,8 @@ namespace classy.Manager
             ICollectionRepository collectionRepository,
             ITripleStore tripleStore,
             IStorageRepository storageRepository, 
-            IIndexer<Profile> profileIndexer)
+            IIndexer<Profile> profileIndexer,
+            ICurrencyManager currencyManager)
         {
             AppManager = appManager;
             LocalizationManager = localizationManager;
@@ -48,6 +49,7 @@ namespace classy.Manager
             TripleStore = tripleStore;
             StorageRepository = storageRepository;
             _profileIndexer = profileIndexer;
+            _currencyManager = currencyManager;
         }
 
         public ManagerSecurityContext SecurityContext { get; set; }

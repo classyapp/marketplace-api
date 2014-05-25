@@ -61,6 +61,7 @@ namespace classy.Services
             try
             {
                 var session = SessionAs<CustomUserSession>();
+                ProfileManager.Environment = request.Environment;
 
                 var profile = ProfileManager.GetProfileById(
                     request.Environment.AppId,

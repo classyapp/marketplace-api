@@ -19,6 +19,7 @@ namespace classy.Services
             IFile file = Request.Files[0];
             byte[] content = new byte[file.ContentLength];
             file.InputStream.Read(content, 0, content.Length);
+            JobManager.Environment = request.Environment;
             return JobManager.ScheduleCatalogImport(request.Environment.AppId, request.ProfileId, request.OverwriteListings, request.UpdateImages, content, file.ContentType, request.CatalogTemplateType);
         }
     }
