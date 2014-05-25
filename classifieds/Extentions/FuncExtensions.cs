@@ -1,11 +1,9 @@
-﻿using Amazon.OpsWorks.Model;
-using classy.Cache;
+﻿using classy.Cache;
 using Classy.Interfaces.Search;
 using classy.Manager;
 using classy.Manager.Search;
 using Classy.Models;
 using Classy.Repository;
-using MongoDB.Bson.Serialization;
 using MongoDB.Driver;
 using ServiceStack.Messaging;
 using ServiceStack.Redis;
@@ -171,10 +169,6 @@ namespace classy.Extensions
                     c.TryResolve<IStorageRepository>()));
             container.Register<ISearchSuggestionsProvider>(c => 
                 new SearchSuggestionsProvider(c.TryResolve<ISearchClientFactory>(), c.TryResolve<MongoDatabase>()));
-
-            // register mongo classes
-            BsonClassMap.RegisterClassMap<Listing>(c => c.AutoMap());
-            BsonClassMap.RegisterClassMap<Profile>(c => c.AutoMap());
         }
     }
 }
