@@ -52,6 +52,10 @@ namespace Classy.UtilRunner.Utilities.Indexing
             //              "type":"custom",
             //              "tokenizer":"standard",
             //              "filter": ["lowercase","standard","asciifolding","suggest_filter"] 
+            //            },
+            //            "snowball_analyzer": {
+            //              "type":"snowball",
+            //              "language":"English"
             //            }
             //          }
             //        }
