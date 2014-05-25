@@ -16,6 +16,7 @@ namespace Classy.UtilRunner.Utilities.SitemapBuilders
     public class HomelabSitemapGenerator : BaseSitemapIndexGenerator
     {
         private string[] _supportedCultures = { "fr", "en", "he", "nl" };
+        private int _count = 0;
 
         public HomelabSitemapGenerator(
             App app,
@@ -34,6 +35,8 @@ namespace Classy.UtilRunner.Utilities.SitemapBuilders
             GenerateStaticNodes();
             GenerateListingNodes();
             GenerateProfessionalNodes();
+
+            Console.WriteLine(string.Format("Finished writing {0} URLs.", _count));
         }
 
         public void GenerateStaticNodes()
@@ -45,14 +48,18 @@ namespace Classy.UtilRunner.Utilities.SitemapBuilders
                 WriteUrlLocation(culture.ToLower() + "/terms", UpdateFrequency.Monthly, DateTime.UtcNow);
                 WriteUrlLocation(culture.ToLower() + "/privacy", UpdateFrequency.Monthly, DateTime.UtcNow);
             }
+            _count += 4;
         }
 
         public void GenerateListingNodes()
         {
+            var keywords = new Dictionary<string, HashSet<string>>();
+
             // all photos
             foreach (var culture in _supportedCultures)
             {
                 WriteUrlLocation(culture.ToLower() + "/photo", UpdateFrequency.Daily, DateTime.UtcNow);
+                _count++;
             }
 
             // room and style combinations
@@ -67,6 +74,7 @@ namespace Classy.UtilRunner.Utilities.SitemapBuilders
                     foreach (var culture in _supportedCultures)
                     {
                         WriteUrlLocation(culture.ToLower() + "/photo/" + room.Value + "/" + style.Value, UpdateFrequency.Daily, DateTime.UtcNow);
+                        _count++;
                     }
                 }
             }
@@ -95,7 +103,17 @@ namespace Classy.UtilRunner.Utilities.SitemapBuilders
                 {
                     foreach (var culture in _supportedCultures)
                     {
-                        WriteUrlLocation(culture.ToLower() + "/photo/" + photo.Id + "--" + ToSlug(photo.Title), UpdateFrequency.Daily, DateTime.UtcNow);
+                        WriteUrlLocation(culture.ToLower() + "/photo/" + photo.Id + "--" + System.Web.HttpUtility.UrlEncode(ToSlug(photo.Title)), UpdateFrequency.Daily, DateTime.UtcNow);
+                        _count++;
+                        var photoKeywords = photo.TranslatedKeywords != null && photo.TranslatedKeywords.ContainsKey(culture) ? photo.TranslatedKeywords[culture] : null;
+                        if (photoKeywords != null)
+                        {
+                            foreach (var k in photoKeywords)
+                            {
+                                if (!keywords.ContainsKey(culture.ToLower())) keywords.Add(culture.ToLower(), new HashSet<string>());
+                                keywords[culture.ToLower()].Add(k);
+                            }
+                        }
                     }
                 }
 
@@ -113,6 +131,17 @@ namespace Classy.UtilRunner.Utilities.SitemapBuilders
                     pageSize,
                     "en");
             }
+
+            // add search routes
+            foreach (var culture in _supportedCultures)
+            {
+                Console.WriteLine(string.Format("Found {0} keywords for culture {1}", keywords[culture.ToLower()].Count, culture.ToLower()));
+                foreach(var k in keywords[culture.ToLower()])
+                {
+                    WriteUrlLocation(culture.ToLower() + "/photo/" + System.Web.HttpUtility.UrlEncode(k.Replace(" ", "-")), UpdateFrequency.Daily, DateTime.UtcNow);
+                    _count++;
+                }
+            }
         }
 
         public void GenerateProfessionalNodes()
@@ -121,6 +150,7 @@ namespace Classy.UtilRunner.Utilities.SitemapBuilders
             foreach (var culture in _supportedCultures)
             {
                 WriteUrlLocation(culture.ToLower() + "/profile/search", UpdateFrequency.Daily, DateTime.UtcNow);
+                _count++;
             }
 
             // category, city cominations
@@ -133,6 +163,7 @@ namespace Classy.UtilRunner.Utilities.SitemapBuilders
                 foreach (var culture in _supportedCultures)
                 {
                     WriteUrlLocation(culture.ToLower() + "/profile/search/" + category.Value, UpdateFrequency.Daily, DateTime.UtcNow);
+                    _count++;
                 }
 
                 foreach (var country in countries.ListItems)
@@ -141,6 +172,7 @@ namespace Classy.UtilRunner.Utilities.SitemapBuilders
                     foreach (var culture in _supportedCultures)
                     {
                         WriteUrlLocation(culture.ToLower() + "/profile/search/" + category.Value + "/" + country.Value, UpdateFrequency.Daily, DateTime.UtcNow);
+                        _count++;
                     }
 
                     var cities = _localizationService.GetCitiesByCountry(_app.AppId, country.Value);
@@ -151,6 +183,7 @@ namespace Classy.UtilRunner.Utilities.SitemapBuilders
                         foreach (var culture in _supportedCultures)
                         {
                             WriteUrlLocation(culture.ToLower() + "/profile/search/" + category.Value + "/" + city + "/" + country.Value, UpdateFrequency.Daily, DateTime.UtcNow);
+                            _count++;
                         }
                     }
                 }
@@ -181,7 +214,8 @@ namespace Classy.UtilRunner.Utilities.SitemapBuilders
                 {
                     foreach (var culture in _supportedCultures)
                     {
-                        WriteUrlLocation(culture.ToLower() + "/profile/" + profile.Id + "/" + ToSlug(GetProfileName(profile)), UpdateFrequency.Daily, DateTime.UtcNow);
+                        WriteUrlLocation(culture.ToLower() + "/profile/" + profile.Id + "/" + System.Web.HttpUtility.UrlEncode(ToSlug(GetProfileName(profile))), UpdateFrequency.Daily, DateTime.UtcNow);
+                        _count++;
                     }
                 }
 
