@@ -385,7 +385,7 @@ namespace classy.Manager
             }
 
             listing.TranslatedKeywords = editorKeywords;
-            listing.SearchableKeywords = editorKeywords.SelectMany(x => x.Value).Union(listing.Hashtags).ToArray();
+            listing.SearchableKeywords = editorKeywords.EmptyIfNull().SelectMany(x => x.Value).Union(listing.Hashtags).ToArray();
             ListingRepository.Update(listing);
 
             _listingIndexer.Index(listing, appId);
