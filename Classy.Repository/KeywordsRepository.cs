@@ -10,16 +10,26 @@ namespace Classy.Repository
 
         public KeywordsRepository(MongoDatabase db)
         {
-            KeywordsCollection = db.GetCollection<Keyword>("classifieds");
+            KeywordsCollection = db.GetCollection<Keyword>("keywords");
         }
 
-        public void IncrementCount(string key, string lang, int amount = 1)
+        // TODO: make this method thread safe!
+        public void IncrementCount(string key, string lang, string appId, int amount = 1, bool upsert = false)
         {
-            KeywordsCollection.Update(
+            var result = KeywordsCollection.Update(
                 Query.And(
                     Query<Keyword>.EQ(x => x.Name, key),
-                    Query<Keyword>.EQ(x => x.Language, lang)
+                    Query<Keyword>.EQ(x => x.Language, lang),
+                    Query<Keyword>.EQ(x => x.AppId, appId)
                 ), new UpdateBuilder<Keyword>().Inc(x => x.Count, amount));
+
+            if (upsert && !result.UpdatedExisting)
+                KeywordsCollection.Insert(new Keyword {
+                    Name = key,
+                    Language = lang,
+                    Count = 1,
+                    AppId = appId
+                });
         }
     }
 }

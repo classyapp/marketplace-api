@@ -2,6 +2,6 @@
 {
     public interface IKeywordsRepository
     {
-        void IncrementCount(string key, string lang, int amount = 1);
+        void IncrementCount(string key, string lang, string appId, int amount = 1, bool upsert = false);
     }
 }

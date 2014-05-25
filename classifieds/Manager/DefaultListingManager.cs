@@ -380,7 +380,7 @@ namespace classy.Manager
                 {
                     if (oldKeywords.Contains(newKeyword))
                         continue;
-                    _keywordsRepository.IncrementCount(newKeyword, newKeywordLang.Key);
+                    _keywordsRepository.IncrementCount(newKeyword, newKeywordLang.Key, appId, 1, true);
                 }
             }
 
