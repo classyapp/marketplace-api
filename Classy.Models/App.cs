@@ -2,6 +2,7 @@ using System.Collections.Generic;
 
 namespace Classy.Models
 {
+    [BsonIgnoreExtraElements]
     public class App : BaseObject, ITranslatable<App>
     {
         public int PageSize { get; set; }
