@@ -1,11 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using classy.Extentions;
 using Classy.Interfaces.Search;
 using Classy.Models;
 using Classy.Models.Keywords;
 using Funq;
 using MongoDB.Driver;
+using ServiceStack.ServiceModel.Serialization;
 
 namespace Classy.UtilRunner.Utilities.Indexing
 {
@@ -37,12 +39,19 @@ namespace Classy.UtilRunner.Utilities.Indexing
             {
                 foreach (var listing in listingsBulk)
                 {
-                    foreach (var keyword in listing.SearchableKeywords.EmptyIfNull())
-                    {
-                        if (!keywords.ContainsKey(keyword))
-                            keywords.Add(keyword, 0);
+                    if (listing.TranslatedKeywords == null || !listing.TranslatedKeywords.Any())
+                        continue;
 
-                        keywords[keyword] = keywords[keyword] += 1;
+                    foreach (var language in listing.TranslatedKeywords)
+                    {
+                        foreach (var word in listing.TranslatedKeywords[language.Key])
+                        {
+                            var key = word + "__" + language.Key;
+                            if (!keywords.ContainsKey(key))
+                                keywords.Add(key, 0);
+
+                            keywords[key] = keywords[key] + 1;
+                        }
                     }
                 }
 
@@ -53,7 +62,8 @@ namespace Classy.UtilRunner.Utilities.Indexing
             {
                 client.Index(new KeywordIndexDto
                 {
-                    Keyword = keyword.Key,
+                    Keyword = keyword.Key.Substring(0, keyword.Key.IndexOf("__")),
+                    Language = keyword.Key.Substring(keyword.Key.IndexOf("__") + 2),
                     Count = keyword.Value
                 });
             }

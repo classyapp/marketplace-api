@@ -8,6 +8,8 @@ namespace Classy.Models.Keywords
         [ElasticProperty(Index = FieldIndexOption.not_analyzed)]
         public string Keyword { get; set; }
 
+        public string Language { get; set; }
+
         public int Count { get; set; }
     }
 }
