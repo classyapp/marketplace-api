@@ -369,6 +369,19 @@ namespace classy.Manager
                     listing.Metadata.Add(c);
                 }
             }
+
+            // update the keywords collection in the db
+            var oldKeywords = listing.TranslatedKeywords.EmptyIfNull().SelectMany(x => x.Value).ToList();
+            foreach (var newKeywordLang in editorKeywords.EmptyIfNull())
+            {
+                foreach (var newKeyword in newKeywordLang.Value)
+                {
+                    if (oldKeywords.Contains(newKeyword))
+                        continue;
+                    _keywordsRepository.IncrementCount(newKeyword, newKeywordLang.Key);
+                }
+            }
+
             listing.TranslatedKeywords = editorKeywords;
             listing.SearchableKeywords = editorKeywords.SelectMany(x => x.Value).Union(listing.Hashtags).ToArray();
             ListingRepository.Update(listing);
