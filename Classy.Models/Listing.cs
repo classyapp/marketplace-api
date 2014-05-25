@@ -5,7 +5,8 @@ namespace Classy.Models
 {
     /// <summary>
     /// a <see cref="Listing"/> is the basic unit of the marketplace
-    /// </summary>
+    /// </summary
+    [BsonIgnoreExtraElements]
     public class Listing : BaseObject, ITranslatable<Listing>
     {
         public Listing()
