@@ -370,7 +370,7 @@ namespace classy.Manager
                 }
             }
             listing.TranslatedKeywords = editorKeywords;
-            listing.SearchableKeywords = editorKeywords.SelectMany(x => x.Value).ToArray();
+            listing.SearchableKeywords = editorKeywords.SelectMany(x => x.Value).Union(listing.Hashtags).ToArray();
             ListingRepository.Update(listing);
 
             _listingIndexer.Index(listing, appId);
