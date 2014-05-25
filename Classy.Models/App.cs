@@ -8,6 +8,7 @@ using System.Drawing;
 
 namespace Classy.Models
 {
+    [BsonIgnoreExtraElements]
     public class App : BaseObject
     {
         public int PageSize { get; set; }

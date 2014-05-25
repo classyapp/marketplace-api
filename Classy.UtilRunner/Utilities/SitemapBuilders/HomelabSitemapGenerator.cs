@@ -13,30 +13,32 @@ using Classy.Repository;
 
 namespace Classy.UtilRunner.Utilities.SitemapBuilders
 {
-    public class HomelabSitemapGenerator : ClassySitemapGenerator
+    public class HomelabSitemapGenerator : BaseSitemapIndexGenerator
     {
-        private readonly MongoCollection<App> _apps;
-        private readonly IListingManager _listingService;
-        private readonly ILocalizationManager _localizationService;
-        private readonly IProfileRepository _profileService;
         private string[] _supportedCultures = { "fr", "en", "he", "nl" };
-        private App App { get; set; }
 
-        public HomelabSitemapGenerator(Container container)
+        public HomelabSitemapGenerator(
+            App app,
+            IListingManager listingService,
+            IProfileRepository profileService,
+            ILocalizationManager localizationService)
         {
-            var mongoDatabase = container.Resolve<MongoDatabase>();
-
-            _apps = mongoDatabase.GetCollection<App>("apps");
-            App = _apps.FindOneById("5378a5cf488c7623b5a648ab"); // AppId == "v1.0"
-
-            _listingService = container.Resolve<IListingManager>();
-            _profileService = container.Resolve<IProfileRepository>();
-            _localizationService = container.Resolve<ILocalizationManager>();
+            _app = app;
+            _listingService = listingService;
+            _profileService = profileService;
+            _localizationService = localizationService;
         }
 
-        public override void GenerateStaticNodes()
+        protected override void GenerateUrlNodes()
         {
-            foreach(var culture in _supportedCultures )
+            GenerateStaticNodes();
+            GenerateListingNodes();
+            GenerateProfessionalNodes();
+        }
+
+        public void GenerateStaticNodes()
+        {
+            foreach(var culture in _supportedCultures)
             {
                 WriteUrlLocation(culture.ToLower(), UpdateFrequency.Daily, DateTime.UtcNow);
                 WriteUrlLocation(culture.ToLower() + "/careers", UpdateFrequency.Weekly, DateTime.UtcNow);
@@ -45,7 +47,7 @@ namespace Classy.UtilRunner.Utilities.SitemapBuilders
             }
         }
 
-        public override void GenerateListingNodes()
+        public void GenerateListingNodes()
         {
             // all photos
             foreach (var culture in _supportedCultures)
@@ -54,8 +56,8 @@ namespace Classy.UtilRunner.Utilities.SitemapBuilders
             }
 
             // room and style combinations
-            var rooms = _localizationService.GetListResourceByKey(App.AppId, "rooms");
-            var styles = _localizationService.GetListResourceByKey(App.AppId, "room-styles");
+            var rooms = _localizationService.GetListResourceByKey(_app.AppId, "rooms");
+            var styles = _localizationService.GetListResourceByKey(_app.AppId, "room-styles");
             foreach(var room in rooms.ListItems)
             {
                 foreach(var style in styles.ListItems)
@@ -71,9 +73,9 @@ namespace Classy.UtilRunner.Utilities.SitemapBuilders
 
             // all individual photo urls
             var page = 1;
-            var pageSize = 200;
+            var pageSize = 1000;
             var photos = _listingService.SearchListings(
-                App.AppId,
+                _app.AppId,
                 null,
                 new string[] { "Photo" },
                 null,
@@ -98,7 +100,7 @@ namespace Classy.UtilRunner.Utilities.SitemapBuilders
                 }
 
                 photos = _listingService.SearchListings(
-                    App.AppId,
+                    _app.AppId,
                     null,
                     new string[] { "Photo" },
                     null,
@@ -113,7 +115,7 @@ namespace Classy.UtilRunner.Utilities.SitemapBuilders
             }
         }
 
-        public override void GenerateProfessionalNodes()
+        public void GenerateProfessionalNodes()
         {
             // all photos
             foreach (var culture in _supportedCultures)
@@ -122,8 +124,8 @@ namespace Classy.UtilRunner.Utilities.SitemapBuilders
             }
 
             // category, city cominations
-            var categories = _localizationService.GetListResourceByKey(App.AppId, "professional-categories");
-            var countries = _localizationService.GetListResourceByKey(App.AppId, "supported-countries");
+            var categories = _localizationService.GetListResourceByKey(_app.AppId, "professional-categories");
+            var countries = _localizationService.GetListResourceByKey(_app.AppId, "supported-countries");
 
             foreach (var category in categories.ListItems)
             {
@@ -141,7 +143,7 @@ namespace Classy.UtilRunner.Utilities.SitemapBuilders
                         WriteUrlLocation(culture.ToLower() + "/profile/search/" + category.Value + "/" + country.Value, UpdateFrequency.Daily, DateTime.UtcNow);
                     }
 
-                    var cities = _localizationService.GetCitiesByCountry(App.AppId, country.Value);
+                    var cities = _localizationService.GetCitiesByCountry(_app.AppId, country.Value);
                     foreach (var city in cities)
                     {
                         // output all country + category + city combinations
@@ -159,7 +161,7 @@ namespace Classy.UtilRunner.Utilities.SitemapBuilders
             var pageSize = 1000;
             long count = 0;
             var profiles = _profileService.Search(
-                App.AppId,
+                _app.AppId,
                 null,
                 null,
                 null,
@@ -184,7 +186,7 @@ namespace Classy.UtilRunner.Utilities.SitemapBuilders
                 }
 
                 profiles = _profileService.Search(
-                    App.AppId,
+                    _app.AppId,
                     null,
                     null,
                     null,

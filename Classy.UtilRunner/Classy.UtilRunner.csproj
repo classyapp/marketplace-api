@@ -32,6 +32,10 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="AWSSDK, Version=2.0.4.1, Culture=neutral, PublicKeyToken=9f476d3089b52be3, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\lib\AWSSDK.dll</HintPath>
+    </Reference>
     <Reference Include="Elasticsearch.Net">
       <HintPath>..\packages\Elasticsearch.Net.1.0.0-beta1\lib\Elasticsearch.Net.dll</HintPath>
     </Reference>
@@ -89,7 +93,6 @@
     <Compile Include="Utilities\SitemapBuilders\BaseSitemapGenerator.cs" />
     <Compile Include="Utilities\SitemapBuilders\BaseSitemapIndexGenerator.cs" />
     <Compile Include="Utilities\SitemapBuilders\HomelabSitemapUtil.cs" />
-    <Compile Include="Utilities\SitemapBuilders\ClassySitemapGenerator.cs" />
     <Compile Include="Utilities\SitemapBuilders\GZip.cs" />
     <Compile Include="Utilities\SitemapBuilders\HomelabSitemapGenerator.cs" />
     <Compile Include="Utilities\SitemapBuilders\UpdateFrequency.cs" />

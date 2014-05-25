@@ -4,6 +4,9 @@ using System.Linq;
 using System.Text;
 using System.Xml;
 using System.IO;
+using Classy.Repository;
+using Classy.Models;
+using classy.Manager;
 
 namespace Classy.UtilRunner.Utilities.SitemapBuilders
 {
@@ -46,16 +49,19 @@ namespace Classy.UtilRunner.Utilities.SitemapBuilders
     /// This will build an xml sitemap index and sitemaps for better index with search engines.
     /// See http://en.wikipedia.org/wiki/Sitemaps for more information.
     /// </summary>
-    /// <param name="rootUrl">Root url for sitemap (i.e. http://www.intuitiveshopping.com)</param>
-    /// <param name="directoryLocation">Directory location to put all the files.</param>
-    public void Generate(string rootUrl, string directoryLocation)
+    /// <param name="websiteRootUrl">Root url for sitemap (i.e. http://www.intuitiveshopping.com)</param>
+    /// <param name="tempDirectoryLocation">Directory location to put all the files.</param>
+    public void Generate(
+        string websiteRootUrl, 
+        string tempDirectoryLocation)
     {
-      ArgumentHelper.AssertNotEmptyAndNotNull(rootUrl, "rootUrl");
-      ArgumentHelper.AssertNotEmptyAndNotNull(directoryLocation, "directoryLocation");
+      ArgumentHelper.AssertNotEmptyAndNotNull(websiteRootUrl, "rootUrl");
+      ArgumentHelper.AssertNotEmptyAndNotNull(tempDirectoryLocation, "directoryLocation");
 
-      _rootUrl = rootUrl.TrimEnd('/', '\\');
-      _directoryLocation = directoryLocation.TrimEnd('/', '\\');
-      _indexWriter = new XmlTextWriter(Path.Combine(directoryLocation, _sitemapIndexFileName), Encoding.UTF8);
+      _rootUrl = websiteRootUrl.TrimEnd('/', '\\');
+      _directoryLocation = tempDirectoryLocation.TrimEnd('/', '\\');
+      var filename = Path.Combine(tempDirectoryLocation, _sitemapIndexFileName);
+      _indexWriter = new XmlTextWriter(filename, Encoding.UTF8);
       _indexWriter.Formatting = Formatting.Indented;
       _indexWriter.WriteStartDocument();
       _indexWriter.WriteStartElement("sitemapindex");
@@ -73,6 +79,11 @@ namespace Classy.UtilRunner.Utilities.SitemapBuilders
     #endregion
 
     #region Protected Members
+    protected App _app = null;
+    protected IStorageRepository _storageRepository = null;
+    protected ILocalizationManager _localizationService = null;
+    protected IListingManager _listingService = null;
+    protected IProfileRepository _profileService = null;
 
     /// <summary>
     /// Method that is overridden, that handles creation of child urls.
@@ -146,7 +157,8 @@ namespace Classy.UtilRunner.Utilities.SitemapBuilders
       File.Delete(compressedFileLocation);
       File.Move(fileLocation, compressedFileLocation);
       GZip.CompressFile(compressedFileLocation);
-      WriteSitemapLocation(Path.GetFileName(compressedFileLocation), DateTime.Now);
+      var filename = Path.GetFileName(compressedFileLocation);
+      WriteSitemapLocation(filename, DateTime.Now);
     }
 
     /// <summary>
@@ -156,8 +168,9 @@ namespace Classy.UtilRunner.Utilities.SitemapBuilders
     /// <param name="lastUpdated">Date last updated.</param>
     private void WriteSitemapLocation(string url, DateTime lastUpdated)
     {
+      var hostRootUrl = "https://s3.amazonaws.com/classy-myhome";
       _indexWriter.WriteStartElement("sitemap");
-      _indexWriter.WriteElementString("loc", String.Format("{0}/{1}", _rootUrl, url));
+      _indexWriter.WriteElementString("loc", String.Format("{0}/{1}", hostRootUrl, url));
       _indexWriter.WriteElementString("lastmod", lastUpdated.ToString(DateFormat));
       _indexWriter.WriteEndElement();
     }
