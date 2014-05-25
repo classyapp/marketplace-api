@@ -24,6 +24,7 @@ namespace classy.Manager
         private readonly IAppManager AppManager;
         private readonly IIndexer<Listing> _listingIndexer;
         private readonly IIndexer<Profile> _profileIndexer;
+        private readonly IKeywordsRepository _keywordsRepository;
 
         public DefaultListingManager(
             IAppManager appManager,
@@ -32,7 +33,7 @@ namespace classy.Manager
             IProfileRepository profileRepository,
             ICollectionRepository collectionRepository,
             ITripleStore tripleStore,
-            IStorageRepository storageRepository, IIndexer<Listing> listingIndexer, IIndexer<Profile> profileIndexer)
+            IStorageRepository storageRepository, IIndexer<Listing> listingIndexer, IIndexer<Profile> profileIndexer, IKeywordsRepository keywordsRepository)
         {
             AppManager = appManager;
             ListingRepository = listingRepository;
@@ -43,6 +44,7 @@ namespace classy.Manager
             StorageRepository = storageRepository;
             _listingIndexer = listingIndexer;
             _profileIndexer = profileIndexer;
+            _keywordsRepository = keywordsRepository;
         }
 
         public ManagerSecurityContext SecurityContext { get; set; }
@@ -369,6 +371,19 @@ namespace classy.Manager
                     listing.Metadata.Add(c);
                 }
             }
+
+            // update the keywords collection in the db
+            var oldKeywords = listing.TranslatedKeywords.SelectMany(x => x.Value).ToList();
+            foreach (var newKeywordLang in editorKeywords)
+            {
+                foreach (var newKeyword in newKeywordLang.Value)
+                {
+                    if (oldKeywords.Contains(newKeyword))
+                        continue;
+                    _keywordsRepository.IncrementCount(newKeyword, newKeywordLang.Key);
+                }
+            }
+
             listing.TranslatedKeywords = editorKeywords;
             listing.SearchableKeywords = editorKeywords.SelectMany(x => x.Value).Union(listing.Hashtags).ToArray();
             ListingRepository.Update(listing);
