@@ -84,6 +84,7 @@
     <Compile Include="IncludedListing.cs" />
     <Compile Include="ITranslatable.cs" />
     <Compile Include="Job.cs" />
+    <Compile Include="Keywords\Keyword.cs" />
     <Compile Include="Keywords\KeywordIndexDto.cs" />
     <Compile Include="LocalizationListResource.cs" />
     <Compile Include="LocalizationResource.cs" />

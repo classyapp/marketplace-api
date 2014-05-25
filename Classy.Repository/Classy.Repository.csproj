@@ -63,7 +63,9 @@
   <ItemGroup>
     <Compile Include="AmazonS3StorageRepository.cs" />
     <Compile Include="IJobRepository.cs" />
+    <Compile Include="IKeywordsRepository.cs" />
     <Compile Include="ILocalizationRepository.cs" />
+    <Compile Include="KeywordsRepository.cs" />
     <Compile Include="MongoCollectionRepository.cs" />
     <Compile Include="ICollectionRepository.cs" />
     <Compile Include="DummyCalculators.cs" />

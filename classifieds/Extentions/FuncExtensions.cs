@@ -111,6 +111,8 @@ namespace classy.Extensions
                     c.TryResolve<ITripleStore>(),
                     c.TryResolve<ITaxCalculator>(),
                     c.TryResolve<IShippingCalculator>()));
+            container.Register<IKeywordsRepository>(c =>
+                new KeywordsRepository(c.TryResolve<MongoDatabase>()));
             container.Register<IListingManager>(c =>
                 new DefaultListingManager(
                     c.TryResolve<IAppManager>(),
@@ -121,7 +123,8 @@ namespace classy.Extensions
                     c.TryResolve<ITripleStore>(),
                     c.TryResolve<IStorageRepository>(),
                     c.TryResolve<IIndexer<Listing>>(),
-                    c.TryResolve<IIndexer<Profile>>()));
+                    c.TryResolve<IIndexer<Profile>>(),
+                    c.TryResolve<IKeywordsRepository>()));
             container.Register<IProfileManager>(c =>
                 new DefaultProfileManager(
                     c.TryResolve<IAppManager>(),
@@ -154,7 +157,8 @@ namespace classy.Extensions
                     c.TryResolve<ITripleStore>(),
                     c.TryResolve<IStorageRepository>(),
                     c.TryResolve<IIndexer<Listing>>(),
-                    c.TryResolve<IIndexer<Profile>>()));
+                    c.TryResolve<IIndexer<Profile>>(),
+                    c.TryResolve<IKeywordsRepository>()));
             container.Register<IAnalyticsManager>(c =>
                 new DefaultAnalyticsManager(
                     c.TryResolve<ITripleStore>()));
@@ -166,7 +170,7 @@ namespace classy.Extensions
                 new DefaultThumbnailManager(
                     c.TryResolve<IStorageRepository>()));
             container.Register<ISearchSuggestionsProvider>(c => 
-                new SearchSuggestionsProvider(c.TryResolve<ISearchClientFactory>()));
+                new SearchSuggestionsProvider(c.TryResolve<ISearchClientFactory>(), c.TryResolve<MongoDatabase>()));
 
             // register mongo classes
             BsonClassMap.RegisterClassMap<Listing>(c => c.AutoMap());

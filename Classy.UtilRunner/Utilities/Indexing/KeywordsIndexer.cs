@@ -7,7 +7,6 @@ using Classy.Models;
 using Classy.Models.Keywords;
 using Funq;
 using MongoDB.Driver;
-using ServiceStack.ServiceModel.Serialization;
 
 namespace Classy.UtilRunner.Utilities.Indexing
 {
@@ -15,22 +14,17 @@ namespace Classy.UtilRunner.Utilities.Indexing
     {
         private const int BatchSize = 300;
         private readonly MongoCollection<Listing> _listings;
-        private readonly ISearchClientFactory _searchClientFactory;
+        private readonly MongoCollection<Keyword> _keywords;
         
         public KeywordsIndexer(Container container)
         {
-            _searchClientFactory = container.Resolve<ISearchClientFactory>();
             var mongoDatabase = container.Resolve<MongoDatabase>();
             _listings = mongoDatabase.GetCollection<Listing>("classifieds");
+            _keywords = mongoDatabase.GetCollection<Keyword>("keywords");
         }
 
         public StatusCode Run(string[] args)
         {
-            var client = _searchClientFactory.GetClient(null, null);
-            client.CreateIndex("keywords_v1.0");
-            client = _searchClientFactory.GetClient("keywords", "v1.0");
-            client.Map<KeywordIndexDto>(m => m.MapFromAttributes());
-            
             var keywords = new Dictionary<string, int>();
 
             var i = 0;
@@ -60,9 +54,8 @@ namespace Classy.UtilRunner.Utilities.Indexing
 
             foreach (var keyword in keywords)
             {
-                client.Index(new KeywordIndexDto
-                {
-                    Keyword = keyword.Key.Substring(0, keyword.Key.IndexOf("__")),
+                _keywords.Insert(new Keyword {
+                    Name = keyword.Key.Substring(0, keyword.Key.IndexOf("__")),
                     Language = keyword.Key.Substring(keyword.Key.IndexOf("__") + 2),
                     Count = keyword.Value
                 });

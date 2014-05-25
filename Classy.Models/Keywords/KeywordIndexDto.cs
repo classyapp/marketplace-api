@@ -5,6 +5,8 @@ namespace Classy.Models.Keywords
     [ElasticType(Name = "keyword")]
     public class KeywordIndexDto
     {
+        public string Id { get; set; }
+
         [ElasticProperty(Index = FieldIndexOption.not_analyzed)]
         public string Keyword { get; set; }
 
