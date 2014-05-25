@@ -1,10 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Web;
+﻿using MongoDB.Bson.Serialization.Attributes;
 
 namespace Classy.Models
 {
+    [BsonIgnoreExtraElements]
     public class ProfessionalInfo
     {
         public ProfessionalInfo()

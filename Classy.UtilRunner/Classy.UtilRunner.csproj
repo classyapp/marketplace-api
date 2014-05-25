@@ -87,6 +87,7 @@
     <Compile Include="Utilities\HashtagCleaning\CleanCommentsHashtags.cs" />
     <Compile Include="Utilities\HashtagCleaning\CleanDescriptionHashtags.cs" />
     <Compile Include="Utilities\HashtagCleaning\TempHashtagRestore.cs" />
+    <Compile Include="Utilities\Indexing\KeywordsIndexer.cs" />
     <Compile Include="Utilities\Indexing\ProfileIndexer.cs" />
     <Compile Include="Utilities\Indexing\ListingIndexer.cs" />
     <Compile Include="Utilities\SitemapBuilders\ArgumentHelper.cs" />

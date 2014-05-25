@@ -1,14 +1,7 @@
-﻿using classy.Extentions;
-using Classy.Auth;
-using Classy.Models;
+﻿using Classy.Models;
 using Classy.Models.Request;
 using Classy.Models.Response;
-using System;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace classy.Manager
 {
@@ -116,6 +109,8 @@ namespace classy.Manager
             bool includeFavorites,
             bool logImpression,
             string culture);
+
+        List<ProfileView> GetProfilesByIds(string[] profileIds, string appId, string culture);
 
         /// <summary>
         /// 

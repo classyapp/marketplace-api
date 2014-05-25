@@ -30,7 +30,7 @@ namespace classy.Manager.Search
         public void Index(Listing[] entities, string appId)
         {
             var client = _searchClientFactory.GetClient("listings", appId);
-            var indexingInfo = _appManager.GetAppById(appId).IndexingInfo;
+            var indexingInfo = _appManager.GetAppById(appId).IndexingInfo ?? new IndexingInfo();
 
             var listingsToIndex = new List<ListingIndexDto>();
             foreach (var entity in entities)
@@ -48,7 +48,7 @@ namespace classy.Manager.Search
                     FlagCount = entity.FlagCount,
                     Id = entity.Id,
                     ImageUrl = entity.ExternalMedia.IsNullOrEmpty() ? entity.ExternalMedia[0].Url : null,
-                    Keywords = entity.SearchableKeywords.ToArray(),
+                    Keywords = entity.SearchableKeywords.EmptyIfNull().ToArray(),
                     ListingType = entity.ListingType,
                     PurchaseCount = entity.PurchaseCount,
                     Title = entity.Title,
@@ -58,7 +58,9 @@ namespace classy.Manager.Search
                         .Select(x => x.Value).ToArray()
                 });
             }
-            client.IndexMany(listingsToIndex);
+
+            if (!listingsToIndex.IsNullOrEmpty())
+                client.IndexMany(listingsToIndex);
         }
 
         public void Increment<T>(string id, string appId, Expression<Func<Listing, T>> property, int amount = 1)
@@ -77,6 +79,15 @@ namespace classy.Manager.Search
         public void Increment<T>(string[] ids, string appId, Expression<Func<Listing, T>> property, int amount = 1)
         {
             ids.ForEach(x => Increment(x, appId, property, amount));
+        }
+
+        public void UpdateMultipleListings(string[] ids, int editorsRank, string appId)
+        {
+            var script = "ctx._source.editorsRank = " + editorsRank;
+
+            var client = _searchClientFactory.GetClient("listings", appId);
+            foreach (var id in ids)
+                client.Update<ListingIndexDto>(d => d.Id(id).Script(script));
         }
     }
 }

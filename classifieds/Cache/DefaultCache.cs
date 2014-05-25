@@ -1,16 +1,9 @@
-﻿using System;
+using System;
 using System.Web;
 using System.Web.Caching;
 
 namespace classy.Cache
 {
-    public interface ICache<T>
-    {
-        void Add(string key, T value);
-        void Add(string key, T value, int timeToExpire);
-        T Get(string key);
-    }
-
     public class DefaultCache<T> : ICache<T> where T : class
     {
         private const int DefaultCacheExpiration = 30;

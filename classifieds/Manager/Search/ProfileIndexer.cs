@@ -6,6 +6,7 @@ using Classy.Interfaces.Search;
 using Classy.Models;
 using Classy.Models.Search;
 using ServiceStack.Common.Extensions;
+using ServiceStack.Text;
 
 namespace classy.Manager.Search
 {
@@ -23,7 +24,7 @@ namespace classy.Manager.Search
         public void Index(Profile[] entities, string appId)
         {
             var client = _searchClientFactory.GetClient("profiles", appId);
-            var indexingInfo = _appManager.GetAppById(appId).IndexingInfo;
+            var indexingInfo = _appManager.GetAppById(appId).IndexingInfo ?? new IndexingInfo();
 
             var profilesToIndex = new List<ProfileIndexDto>();
             foreach (var entity in entities)
@@ -33,7 +34,7 @@ namespace classy.Manager.Search
 
                 profilesToIndex.Add(new ProfileIndexDto {
                     CommentCount = entity.CommentCount,
-                    ComnpanyName = entity.ProfessionalInfo.CompanyName,
+                    CompanyName = entity.ProfessionalInfo.CompanyName,
                     FollowerCount = entity.FollowerCount,
                     FollowingCount = entity.FollowingCount,
                     IsVendor = entity.IsVendor,
@@ -42,13 +43,14 @@ namespace classy.Manager.Search
                     Metadata = entity.Metadata
                         .Where(x => indexingInfo.MetadataPerListing["Profile"].Contains(x.Key))
                         .Select(x => x.Value).ToArray(),
-                    Rank = entity.Rank,
                     ReviewAverageScore = entity.ReviewAverageScore,
                     ReviewCount = entity.ReviewCount,
                     ViewCount = entity.ViewCount
                 });
             }
-            client.IndexMany(profilesToIndex);
+
+            if (!profilesToIndex.IsNullOrEmpty())
+                client.IndexMany(profilesToIndex);
         }
 
         public void RemoveFromIndex(Profile entity, string appId)
@@ -73,6 +75,12 @@ namespace classy.Manager.Search
         public void Increment<T>(string[] ids, string appId, Expression<Func<Profile, T>> property, int amount = 1)
         {
             ids.ForEach(x => Increment(x, appId, property, amount));
+        }
+
+        public void UpdateMultipleListings(string[] ids, int editorsRank, string appId)
+        {
+            // TODO: remove this from the interface and put somewhere more appropriate
+            throw new NotImplementedException();
         }
 
         private static GPSLocation GetGpsLocation(Profile professional)

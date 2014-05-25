@@ -5,7 +5,8 @@ namespace Classy.Models
 {
     /// <summary>
     /// a <see cref="Listing"/> is the basic unit of the marketplace
-    /// </summary>
+    /// </summary
+    [BsonIgnoreExtraElements]
     public class Listing : BaseObject, ITranslatable<Listing>
     {
         public Listing()
@@ -82,6 +83,8 @@ namespace Classy.Models
         /// 
         /// </summary>
         public int DisplayOrder { get; set; }
+
+        public int EditorsRank { get; set; }
 
         /// <summary>
         /// contact info for the listing. use to override contact info of the listing owner <see cref="Profile"/>

@@ -1,5 +1,4 @@
-﻿using Amazon.OpsWorks.Model;
-using classy.Cache;
+﻿using classy.Cache;
 using Classy.Interfaces.Search;
 using classy.Manager;
 using classy.Manager.Search;
@@ -33,6 +32,8 @@ namespace classy.Extensions
             container.Register<ISearchClientFactory>(_ => new SearchClientFactory());
             container.Register<IListingSearchProvider>(
                 c => new ListingSearchProvider(c.TryResolve<ISearchClientFactory>()));
+            container.Register<IProfileSearchProvider>(
+                c => new ProfileSearchProvider(c.TryResolve<ISearchClientFactory>()));
 
             container.Register<IIndexer<Listing>>(x =>
                 new ListingIndexer(x.TryResolve<ISearchClientFactory>(), x.TryResolve<IAppManager>()));
@@ -108,6 +109,8 @@ namespace classy.Extensions
                     c.TryResolve<ITripleStore>(),
                     c.TryResolve<ITaxCalculator>(),
                     c.TryResolve<IShippingCalculator>()));
+            container.Register<IKeywordsRepository>(c =>
+                new KeywordsRepository(c.TryResolve<MongoDatabase>()));
             container.Register<IListingManager>(c =>
                 new DefaultListingManager(
                     c.TryResolve<IAppManager>(),
@@ -118,7 +121,8 @@ namespace classy.Extensions
                     c.TryResolve<ITripleStore>(),
                     c.TryResolve<IStorageRepository>(),
                     c.TryResolve<IIndexer<Listing>>(),
-                    c.TryResolve<IIndexer<Profile>>()));
+                    c.TryResolve<IIndexer<Profile>>(),
+                    c.TryResolve<IKeywordsRepository>()));
             container.Register<IProfileManager>(c =>
                 new DefaultProfileManager(
                     c.TryResolve<IAppManager>(),
@@ -151,7 +155,8 @@ namespace classy.Extensions
                     c.TryResolve<ITripleStore>(),
                     c.TryResolve<IStorageRepository>(),
                     c.TryResolve<IIndexer<Listing>>(),
-                    c.TryResolve<IIndexer<Profile>>()));
+                    c.TryResolve<IIndexer<Profile>>(),
+                    c.TryResolve<IKeywordsRepository>()));
             container.Register<IAnalyticsManager>(c =>
                 new DefaultAnalyticsManager(
                     c.TryResolve<ITripleStore>()));
@@ -162,6 +167,8 @@ namespace classy.Extensions
             container.Register<IThumbnailManager>(c =>
                 new DefaultThumbnailManager(
                     c.TryResolve<IStorageRepository>()));
+            container.Register<ISearchSuggestionsProvider>(c => 
+                new SearchSuggestionsProvider(c.TryResolve<ISearchClientFactory>(), c.TryResolve<MongoDatabase>()));
         }
     }
 }
