@@ -6,8 +6,8 @@ using Classy.Interfaces.Search;
 using Classy.Models;
 using Classy.Models.Search;
 using Funq;
+using MongoDB.Bson.Serialization;
 using MongoDB.Driver;
-using Nest;
 
 namespace Classy.UtilRunner.Utilities.Indexing
 {
@@ -21,6 +21,7 @@ namespace Classy.UtilRunner.Utilities.Indexing
         {
             _searchClientFactory = container.Resolve<ISearchClientFactory>();
             var mongoDatabase = container.Resolve<MongoDatabase>();
+            BsonClassMap.RegisterClassMap<Profile>(c => c.AutoMap());
             _profiles = mongoDatabase.GetCollection<Profile>("profiles");
         }
         
