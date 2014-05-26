@@ -251,7 +251,10 @@ namespace Classy.Repository
         
         {
             // set sort order
-            var sortOrder = SortBy<Listing>.Descending(x => x.DisplayOrder).Descending(x => x.FavoriteCount);
+            var sortOrder = SortBy<Listing>
+                .Descending(x => x.EditorsRank)
+                .Descending(x => x.DisplayOrder)
+                .Descending(x => x.FavoriteCount);
 
             // app id
             var queries = new List<IMongoQuery>() {

@@ -59,7 +59,9 @@ namespace classy.Manager.Search
                                 ss => ss.Script(script)
                                 )
                         )
-                    ));
+                    ))
+                .SortDescending(x => x.EditorRank)
+                .SortDescending("_score");
             
             descriptor
                 .Size(amount)

@@ -46,6 +46,7 @@ namespace classy.Manager.Search
                     Content = entity.Content,
                     FavoriteCount = entity.FavoriteCount,
                     FlagCount = entity.FlagCount,
+                    EditorRank = entity.EditorsRank,
                     Id = entity.Id,
                     ImageUrl = entity.ExternalMedia.IsNullOrEmpty() ? entity.ExternalMedia[0].Url : null,
                     Keywords = entity.SearchableKeywords.EmptyIfNull().ToArray(),
