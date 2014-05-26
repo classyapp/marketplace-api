@@ -1,18 +1,13 @@
-using System;
-using System.Text;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Web;
+using Classy.Interfaces.Search;
 using Classy.Models;
 using Classy.Models.Response;
 using Classy.Repository;
-using Classy.Auth;
 using ServiceStack.Common;
 using ServiceStack.ServiceHost;
 using System.IO;
-using ServiceStack.Messaging;
-using classy.Operations;
-using ServiceStack.CacheAccess;
 using Classy.Models.Request;
 using classy.Extentions;
 
@@ -20,26 +15,26 @@ namespace classy.Manager
 {
     public class DefaultListingManager : IListingManager, ICollectionManager
     {
-        private IMessageQueueClient _messageQueueClient;
-        private IListingRepository ListingRepository;
-        private ICommentRepository CommentRepository;
-        private IProfileRepository ProfileRepository;
-        private ICollectionRepository CollectionRepository;
-        private ITripleStore TripleStore;
-        private IStorageRepository StorageRepository;
-        private IAppManager AppManager;
+        private readonly IListingRepository ListingRepository;
+        private readonly ICommentRepository CommentRepository;
+        private readonly IProfileRepository ProfileRepository;
+        private readonly ICollectionRepository CollectionRepository;
+        private readonly ITripleStore TripleStore;
+        private readonly IStorageRepository StorageRepository;
+        private readonly IAppManager AppManager;
+        private readonly IIndexer<Listing> _listingIndexer;
+        private readonly IIndexer<Profile> _profileIndexer;
+        private readonly IKeywordsRepository _keywordsRepository;
 
         public DefaultListingManager(
             IAppManager appManager,
-            IMessageQueueClient messageQueueClient,
             IListingRepository listingRepository,
             ICommentRepository commentRepository,
             IProfileRepository profileRepository,
             ICollectionRepository collectionRepository,
             ITripleStore tripleStore,
-            IStorageRepository storageRepository)
+            IStorageRepository storageRepository, IIndexer<Listing> listingIndexer, IIndexer<Profile> profileIndexer, IKeywordsRepository keywordsRepository)
         {
-            _messageQueueClient = messageQueueClient;
             AppManager = appManager;
             ListingRepository = listingRepository;
             CommentRepository = commentRepository;
@@ -47,9 +42,19 @@ namespace classy.Manager
             CollectionRepository = collectionRepository;
             TripleStore = tripleStore;
             StorageRepository = storageRepository;
+            _listingIndexer = listingIndexer;
+            _profileIndexer = profileIndexer;
+            _keywordsRepository = keywordsRepository;
         }
 
         public ManagerSecurityContext SecurityContext { get; set; }
+
+        public IList<ListingView> GetListingsByIds(string[] listingIds, string appId, bool includeDrafts, string culture)
+        {
+            var listings = ListingRepository.GetById(listingIds, appId, includeDrafts, null);
+
+            return listings.Select(x => x.ToListingView()).ToList();
+        }
 
         public ListingView GetListingById(
             string appId,
@@ -62,6 +67,7 @@ namespace classy.Manager
             bool includeProfile,
             bool includeFavoritedByProfiles,
             string culture)
+            // add parameter for editor's fields and only retrieve them when needed
         {
             // TODO: cache listings
             var listing = GetVerifiedListing(appId, listingId);
@@ -71,6 +77,7 @@ namespace classy.Manager
             if (logImpression)
             {
                 ListingRepository.IncreaseCounter(listingId, appId, ListingCounters.Views, 1);
+                _listingIndexer.Increment(listingId, appId, l => l.ViewCount);
             }
 
             if (includeComments)
@@ -103,6 +110,9 @@ namespace classy.Manager
                     listingView.FavoritedBy.Add(p.ToProfileView());
                 }
             }
+
+            // i don't think we should be logging impressions here... 
+            // it should be in the UI level since only there we really know what the user saw
             if (logImpression)
             {
                 int count = 1;
@@ -110,6 +120,13 @@ namespace classy.Manager
             }
 
             return listingView;
+        }
+
+        public void EditMultipleListings(string[] listingIds, int? editorsRank, Dictionary<string, string> metadata, string appId)
+        {
+            ListingRepository.EditMultipleListings(listingIds, editorsRank, appId, metadata);
+            var updatedListings = ListingRepository.GetById(listingIds, appId, true, null).ToArray();
+            _listingIndexer.Index(updatedListings, appId);
         }
 
         public IList<ListingView> GetListingsByProfileId(
@@ -179,36 +196,28 @@ namespace classy.Manager
         {
             var listing = GetVerifiedListing(appId, listingId, true, true);
             var mediaFiles = new List<MediaFile>();
+
             if (files != null && files.Count() > 0)
             {
-                System.Diagnostics.Trace.TraceInformation(string.Format("adding {0} external media files to listing {1}", files.Count(), listingId));
                 foreach (IFile file in files)
                 {
                     if (file.ContentType.Contains("image")) // only images for now
                     {
                         using (var reader = new BinaryReader(file.InputStream))
                         {
-                            try
+                            var key = Guid.NewGuid().ToString();
+                            byte[] content = reader.ReadBytes((int)file.ContentLength);
+                            byte[] reducedContent = content.Rescale(AppManager.GetAppById(appId).ImageReducedSize);
+                            StorageRepository.SaveFile(key, content, file.ContentType, false, ListingRepository);
+                            StorageRepository.SaveFile(key + "_reduced", reducedContent, file.ContentType, true, ListingRepository);
+                            var mediaFile = new MediaFile
                             {
-                                var key = Guid.NewGuid().ToString();
-                                byte[] content = reader.ReadBytes((int)file.ContentLength);
-                                byte[] reducedContent = content.Rescale(AppManager.GetAppById(appId).ImageReducedSize);
-                                StorageRepository.SaveFile(key, content, file.ContentType, false, ListingRepository);
-                                StorageRepository.SaveFile(key + "_reduced", reducedContent, file.ContentType, true, ListingRepository);
-                                var mediaFile = new MediaFile
-                                {
-                                    Type = MediaFileType.Image,
-                                    ContentType = file.ContentType,
-                                    Url = StorageRepository.KeyToUrl(key),
-                                    Key = key
-                                };
-                                mediaFiles.Add(mediaFile);
-                            }
-                            catch (Exception ex)
-                            {
-                                System.Diagnostics.Trace.WriteLine("Error saving external media " + ex.ToString());
-                                throw ex;
-                            }
+                                Type = MediaFileType.Image,
+                                ContentType = file.ContentType,
+                                Url = StorageRepository.KeyToUrl(key),
+                                Key = key
+                            };
+                            mediaFiles.Add(mediaFile);
                         }
                     }
                 }
@@ -252,6 +261,9 @@ namespace classy.Manager
             // publish
             ListingRepository.Publish(listingId, appId);
             listing.IsPublished = true;
+
+            _listingIndexer.Index(listing, appId);
+
             return listing.ToListingView();
         }
 
@@ -313,7 +325,9 @@ namespace classy.Manager
             }
             else
             {
+                // do we really use this ? We have a separate 'UpdateListing' method
                 ListingRepository.Update(listing);
+                _listingIndexer.Index(listing, appId);
             }
 
             // return
@@ -358,9 +372,24 @@ namespace classy.Manager
                     listing.Metadata.Add(c);
                 }
             }
-            listing.TranslatedKeywords = editorKeywords;
 
+            // update the keywords collection in the db
+            var oldKeywords = listing.TranslatedKeywords.EmptyIfNull().SelectMany(x => x.Value).ToList();
+            foreach (var newKeywordLang in editorKeywords.EmptyIfNull())
+            {
+                foreach (var newKeyword in newKeywordLang.Value)
+                {
+                    if (oldKeywords.Contains(newKeyword))
+                        continue;
+                    _keywordsRepository.IncrementCount(newKeyword, newKeywordLang.Key, appId, 1, true);
+                }
+            }
+
+            listing.TranslatedKeywords = editorKeywords;
+            listing.SearchableKeywords = editorKeywords.EmptyIfNull().SelectMany(x => x.Value).Union(listing.Hashtags).ToArray();
             ListingRepository.Update(listing);
+
+            _listingIndexer.Index(listing, appId);
 
             // return
             return listing.ToListingView();
@@ -379,6 +408,8 @@ namespace classy.Manager
                 StorageRepository.DeleteFile(file.Key);
             }
             ListingRepository.Delete(listingId, appId);
+
+            _listingIndexer.RemoveFromIndex(listing, appId);
 
             return listingId;
         }
@@ -404,12 +435,11 @@ namespace classy.Manager
 
             // increase comment count for listing
             ListingRepository.IncreaseCounter(listingId, appId, ListingCounters.Comments, 1);
+            _listingIndexer.Increment(listing.Id, appId, l => l.Content);
 
             // increase comment count for profile of commenter
             ProfileRepository.IncreaseCounter(appId, SecurityContext.AuthenticatedProfileId, ProfileCounters.Comments, 1);
-
-            // increase rank of listing owner
-            ProfileRepository.IncreaseCounter(appId, listing.ProfileId, ProfileCounters.Rank, 1);
+            _profileIndexer.Increment(SecurityContext.AuthenticatedProfileId, appId, l => l.CommentCount);
 
             // add hashtags to listing if the comment is by the listing owner
             if (SecurityContext.AuthenticatedProfileId == listing.ProfileId || SecurityContext.IsAdmin)
@@ -426,9 +456,6 @@ namespace classy.Manager
             {
                 var mentionedProfile = ProfileRepository.GetByUsername(appId, mentionedUsername.TrimStart('@'), false, null);
                 TripleStore.LogActivity(appId, SecurityContext.AuthenticatedProfileId, ActivityPredicate.MENTION_PROFILE, mentionedProfile.Id, ref count);
-
-                // increase rank of mentioned profile
-                ProfileRepository.IncreaseCounter(appId, mentionedProfile.Id, ProfileCounters.Rank, 1);
             }
 
             // format as html
@@ -441,8 +468,6 @@ namespace classy.Manager
             string appId,
             string listingId)
         {
-            var listing = GetVerifiedListing(appId, listingId);
-
             int count = 0;
             TripleStore.LogActivity(appId, SecurityContext.AuthenticatedProfileId, ActivityPredicate.FAVORITE_LISTING, listingId, ref count);
             if (count == 1)
@@ -450,7 +475,7 @@ namespace classy.Manager
                 var listingCounters = ListingCounters.Favorites;
                 if (SecurityContext.IsAdmin) listingCounters |= ListingCounters.DisplayOrder;
                 ListingRepository.IncreaseCounter(listingId, appId, listingCounters, 1);
-                ProfileRepository.IncreaseCounter(appId, listing.ProfileId, ProfileCounters.Rank, 1);
+                _listingIndexer.Increment(listingId, appId, l => l.FavoriteCount);
             }
         }
 
@@ -458,14 +483,12 @@ namespace classy.Manager
             string appId,
             string listingId)
         {
-            var listing = GetVerifiedListing(appId, listingId);
-
             int count = 0;
             TripleStore.ResetActivity(appId, SecurityContext.AuthenticatedProfileId, ActivityPredicate.FAVORITE_LISTING, listingId);
             if (count == 0)
             {
                 ListingRepository.IncreaseCounter(listingId, appId, ListingCounters.Favorites, -1);
-                ProfileRepository.IncreaseCounter(appId, listing.ProfileId, ProfileCounters.Rank, -1);
+                _listingIndexer.Increment(listingId, appId, p => p.FavoriteCount, -1);
             }
         }
 
@@ -474,13 +497,11 @@ namespace classy.Manager
             string listingId,
             FlagReason FlagReason)
         {
-            var listing = GetVerifiedListing(appId, listingId);
-
             switch (FlagReason)
             {
                 case FlagReason.Inapropriate:
                     ListingRepository.IncreaseCounter(listingId, appId, ListingCounters.Flags, 1);
-                    ProfileRepository.IncreaseCounter(appId, SecurityContext.AuthenticatedProfileId, ProfileCounters.Rank, -3);
+                    _listingIndexer.Increment(listingId, appId, l => l.FlagCount);
                     break;
                 case FlagReason.Dislike:
                 default:
@@ -530,7 +551,7 @@ namespace classy.Manager
                     if (count == 1)
                     {
                         ListingRepository.IncreaseCounter(listing.Id, appId, ListingCounters.AddToCollection, 1);
-                        ProfileRepository.IncreaseCounter(appId, profileId, ProfileCounters.Rank, 1);
+                        _listingIndexer.Increment(listing.Id, appId, l => l.AddToCollectionCount);
                     }
                 }
 
@@ -559,6 +580,8 @@ namespace classy.Manager
             try
             {
                 var collection = GetVerifiedCollection(appId, collectionId, culture);
+                string[] listingIds = collection.IncludedListings.Select(l => l.Id).ToArray();
+
                 var collectionView = collection.Translate(culture).ToCollectionView();
                 if (includeProfile)
                 {
@@ -566,12 +589,7 @@ namespace classy.Manager
                 }
                 if (includeListings)
                 {
-                    collectionView.Listings = ListingRepository.GetById(collection.IncludedListings.Select(l => l.Id).ToArray(), appId, includeDrafts, culture).ToListingViewList(culture);
-                    var profiles = ProfileRepository.GetByIds(appId, collectionView.Listings.Select(x => x.ProfileId).ToArray(), culture);
-                    foreach(var l in collectionView.Listings)
-                    {
-                        l.Profile = profiles.Single(x => x.Id == l.ProfileId).ToProfileView();
-                    }
+                    collectionView.Listings = ListingRepository.GetById(listingIds, appId, includeDrafts, culture).ToListingViewList(culture);
                 }
                 if (increaseViewCounter)
                 {
@@ -580,7 +598,8 @@ namespace classy.Manager
                     //CollectionRepository.IncreaseCounter(appId, collectionId);
                     if (increaseViewCounterOnListings)
                     {
-                        ListingRepository.IncreaseCounter(collection.IncludedListings.Select(l => l.Id).ToArray(), appId, ListingCounters.Views, 1);
+                        ListingRepository.IncreaseCounter(listingIds, appId, ListingCounters.Views, 1);
+                        _listingIndexer.Increment(listingIds, appId, l => l.ViewCount);
                     }
                     //    var update = Update<Listing>.Inc(x => x.ViewCount, 1);
                     //    ListingsCollection.Update(query, update, new MongoUpdateOptions { Flags = UpdateFlags.Multi });
@@ -661,6 +680,7 @@ namespace classy.Manager
                         TripleStore.LogActivity(appId, SecurityContext.AuthenticatedProfileId, ActivityPredicate.ADD_LISTING_TO_COLLECTION, listing.Id, ref count);
                         collection.IncludedListings.Add(new Classy.Models.IncludedListing { Id = listing.Id, Comments = listing.Comments, ListingType = listing.ListingType });
                         ListingRepository.IncreaseCounter(listing.Id, appId, ListingCounters.AddToCollection, 1);
+                        _listingIndexer.Increment(listing.Id, appId, l => l.AddToCollectionCount);
                     }
                 }
                 if (changed)
@@ -775,10 +795,8 @@ namespace classy.Manager
 
             // increase comment count for profile of commenter
             ProfileRepository.IncreaseCounter(appId, SecurityContext.AuthenticatedProfileId, ProfileCounters.Comments, 1);
-
-            // increase rank of listing owner
-            ProfileRepository.IncreaseCounter(appId, collection.ProfileId, ProfileCounters.Rank, 1);
-
+            _profileIndexer.Increment(SecurityContext.AuthenticatedProfileId, appId, p => p.CommentCount);
+            
             // add hashtags to listing if the comment is by the listing owner
             if (SecurityContext.AuthenticatedProfileId == collection.ProfileId || SecurityContext.IsAdmin)
             {
@@ -794,9 +812,6 @@ namespace classy.Manager
             {
                 var mentionedProfile = ProfileRepository.GetByUsername(appId, mentionedUsername.TrimStart('@'), false, null);
                 TripleStore.LogActivity(appId, SecurityContext.AuthenticatedProfileId, ActivityPredicate.MENTION_PROFILE, mentionedProfile.Id, ref count);
-
-                // increase rank of mentioned profile
-                ProfileRepository.IncreaseCounter(appId, mentionedProfile.Id, ProfileCounters.Rank, 1);
             }
 
             // format as html
