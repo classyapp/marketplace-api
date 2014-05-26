@@ -360,9 +360,11 @@ namespace Classy.Repository
             }
         }
 
-        public void EditMultipleListings(string[] ids, int editorsRank, string appId, Dictionary<string, string> metadata)
+        public void EditMultipleListings(string[] ids, int? editorsRank, string appId, Dictionary<string, string> metadata)
         {
-            var updateBuilder = new UpdateBuilder<Listing>().Set(x => x.EditorsRank, editorsRank);
+            var updateBuilder = new UpdateBuilder<Listing>();
+            if (editorsRank.HasValue)
+                updateBuilder.Set(x => x.EditorsRank, editorsRank);
 
             var metadataUpdater = new UpdateBuilder();
             foreach (var listingInfo in metadata)

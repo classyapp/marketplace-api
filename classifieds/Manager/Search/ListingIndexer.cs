@@ -80,14 +80,5 @@ namespace classy.Manager.Search
         {
             ids.ForEach(x => Increment(x, appId, property, amount));
         }
-
-        public void UpdateMultipleListings(string[] ids, int editorsRank, string appId)
-        {
-            var script = "ctx._source.editorsRank = " + editorsRank;
-
-            var client = _searchClientFactory.GetClient("listings", appId);
-            foreach (var id in ids)
-                client.Update<ListingIndexDto>(d => d.Id(id).Script(script));
-        }
     }
 }

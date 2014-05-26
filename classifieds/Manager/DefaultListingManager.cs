@@ -122,10 +122,11 @@ namespace classy.Manager
             return listingView;
         }
 
-        public void EditMultipleListings(string[] listingIds, int editorsRank, Dictionary<string, string> metadata, string appId)
+        public void EditMultipleListings(string[] listingIds, int? editorsRank, Dictionary<string, string> metadata, string appId)
         {
             ListingRepository.EditMultipleListings(listingIds, editorsRank, appId, metadata);
-            _listingIndexer.UpdateMultipleListings(listingIds, editorsRank, appId);
+            var updatedListings = ListingRepository.GetById(listingIds, appId, true, null).ToArray();
+            _listingIndexer.Index(updatedListings, appId);
         }
 
         public IList<ListingView> GetListingsByProfileId(

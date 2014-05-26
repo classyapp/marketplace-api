@@ -43,6 +43,6 @@ namespace Classy.Repository
         void Update(Listing listing);
         void SetListingErrorForMediaFile(string key, string error);
 
-        void EditMultipleListings(string[] ids, int editorsRank, string appId, Dictionary<string, string> metadata);
+        void EditMultipleListings(string[] ids, int? editorsRank, string appId, Dictionary<string, string> metadata);
     }
 }
