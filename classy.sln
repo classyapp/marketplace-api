@@ -1,8 +1,6 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 2013
-VisualStudioVersion = 12.0.21005.1
-MinimumVisualStudioVersion = 10.0.40219.1
+# Visual Studio 2012
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "classy", "classifieds\classy.csproj", "{F03039CF-DC12-4A37-A2B6-9E9B78E59FB1}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Classy.Models", "Classy.Models\Classy.Models.csproj", "{AC13DF42-51BB-4798-A0AB-9B2776B4844F}"
@@ -62,6 +60,12 @@ Global
 		{9C0DED9F-8160-4BDF-A599-6B33A983353A}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{9C0DED9F-8160-4BDF-A599-6B33A983353A}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{9C0DED9F-8160-4BDF-A599-6B33A983353A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{FBF99D6F-7815-49C7-99B6-BFA9B8FDBEDE}.AppHarbor|Any CPU.ActiveCfg = Release|Any CPU
+		{FBF99D6F-7815-49C7-99B6-BFA9B8FDBEDE}.AppHarbor|Any CPU.Build.0 = Release|Any CPU
+		{FBF99D6F-7815-49C7-99B6-BFA9B8FDBEDE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{FBF99D6F-7815-49C7-99B6-BFA9B8FDBEDE}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{FBF99D6F-7815-49C7-99B6-BFA9B8FDBEDE}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{FBF99D6F-7815-49C7-99B6-BFA9B8FDBEDE}.Release|Any CPU.Build.0 = Release|Any CPU
 		{0B3E9ACC-1579-4C04-825F-3485E30E2E0D}.AppHarbor|Any CPU.ActiveCfg = Release|Any CPU
 		{0B3E9ACC-1579-4C04-825F-3485E30E2E0D}.AppHarbor|Any CPU.Build.0 = Release|Any CPU
 		{0B3E9ACC-1579-4C04-825F-3485E30E2E0D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU

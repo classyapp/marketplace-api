@@ -13,6 +13,48 @@ namespace classy.Operations
 {
     public class ProductCatalogImportOperator : IOperator<ImportProductCatalogJob>
     {
+        public enum Columns
+        {
+            SKU_0,
+            ParentSKU_1,
+            Parantage_2,
+            RelationshipType_3,
+            VariationTheme_4,
+            UPC_5,
+            Title_6,
+            ProductUrl_7,
+            Description_8,
+            Category_9,
+            Style_10,
+            Quantity_11,
+            Price_12,
+            MSRP_13,
+            StandardShipping_14,
+            ExpeditedShipping_15,
+            LeadTimeMin_16,
+            LeadTimeMax_17,
+            Color_18,
+            Size_19,
+            Design_20,
+            Width_21,
+            Depth_22,
+            Height_23,
+            Materials_24,
+            Manufacturer_25,
+            Designer_26,
+            Image_27,
+            Image2_28,
+            Image3_29,
+            Image4_30,
+            Image5_31,
+            BulkItem_32,
+            BulkCurbsideShipping_33,
+            BulkInsideShipping_34,
+            Configuration_35,
+            Keywords_36,
+            All
+        }
+
         private readonly IStorageRepository _storageRepository; // AWS
         private readonly IListingRepository _listingRepository; //MONGO
         private readonly IJobRepository _jobRepository; // JOBS
@@ -32,6 +74,7 @@ namespace classy.Operations
         {
             job.Succeeded = savedProducts;
             job.Failed = errors;
+            job.Errors.Add(ex.Message);
             jobRepo.Save(job);
         }
 
@@ -86,17 +129,9 @@ namespace classy.Operations
                             string[] dataLine = currLine.Split(';');
 
                             // check required values
-                            throwIfEmpty(dataLine[0], 0);
-                            throwIfEmpty(dataLine[6], 6);
-                            throwIfEmpty(dataLine[7], 7);
-                            throwIfEmpty(dataLine[8], 8);
-                            throwIfEmpty(dataLine[9], 9);
-                            throwIfEmpty(dataLine[10], 10);
-                            throwIfEmpty(dataLine[11], 11);
-                            throwIfEmpty(dataLine[12], 12);
-                            throwIfEmpty(dataLine[27], 27);
-
-
+                            throwIfEmpty(dataLine, new int[] { (int)Columns.SKU_0, (int)Columns.Title_6, (int)Columns.ProductUrl_7, (int)Columns.Description_8, (int)Columns.Category_9,(int)Columns.Style_10,
+                            (int)Columns.Quantity_11, (int)Columns.Price_12, (int)Columns.Image_27});
+                           
                             Listing currListing = null;
                             IList<PurchaseOption> purchaseOptions = null;
                             PurchaseOption purchaseOption = null; // = new PurchaseOption();
@@ -220,9 +255,8 @@ namespace classy.Operations
                                 {
                                     purchaseOption = new PurchaseOption();
 
-                                    throwIfEmpty(dataLine[21], 21);
-                                    throwIfEmpty(dataLine[22], 22);
-                                    throwIfEmpty(dataLine[23], 23);
+                                    throwIfEmpty(dataLine, new int[] { (int)Columns.Width_21, (int)Columns.Depth_22, (int)Columns.Height_23});
+
                                     purchaseOption.Width = dataLine[21];
                                     purchaseOption.Depth = dataLine[22];
                                     purchaseOption.Height = dataLine[23];
@@ -261,12 +295,7 @@ namespace classy.Operations
 
                             else if (dataLine[2].ToLower().Equals("child"))
                             {
-                                throwIfEmpty(dataLine[21], 21);
-                                throwIfEmpty(dataLine[22], 22);
-                                throwIfEmpty(dataLine[23], 23);
-                                purchaseOption.Width = dataLine[21];
-                                purchaseOption.Depth = dataLine[22];
-                                purchaseOption.Height = dataLine[23];
+                                
                             
 
                                 if (skipToNextParent)
@@ -276,6 +305,12 @@ namespace classy.Operations
 
                                 purchaseOption = new PurchaseOption();
                                 purchaseOptions = activeListing.PricingInfo.PurchaseOptions;
+
+                                throwIfEmpty(dataLine, new int[] { (int)Columns.Width_21, (int)Columns.Depth_22, (int)Columns.Height_23 });
+
+                                purchaseOption.Width = dataLine[21];
+                                purchaseOption.Depth = dataLine[22];
+                                purchaseOption.Height = dataLine[23];
 
                                 purchaseOption.VariantProperties = variantProperties;
 
@@ -406,10 +441,16 @@ namespace classy.Operations
             }
         }
 
-        private void throwIfEmpty(string p, int index)
+        private void throwIfEmpty(string[] data, int[] index)
         {
-            if (string.IsNullOrWhiteSpace(p))
-                throw new Exception("Required field at index " + index + " is missing a value!");
+            List<string> missingFields = new List<string>();
+            foreach (var idx in index)
+            {
+                if (string.IsNullOrWhiteSpace(data[idx]))
+                    missingFields.Add(((Columns)idx).ToString().Split('_')[0]);
+            }
+            if (missingFields.Count > 0)
+                throw new Exception("Required field(s) " + string.Join(", ", missingFields.ToArray()) + " is missing a value!");
         }
     }
 }

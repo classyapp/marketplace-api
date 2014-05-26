@@ -16,7 +16,7 @@ using System.Threading.Tasks;
 
 namespace Classy.Tests
 {
-    [TestFixture]
+    //[TestFixture]
     public class CatalogImportTests
     {
 
@@ -25,7 +25,7 @@ namespace Classy.Tests
 
         }
        
-        [Test]
+        //[Test]
         public void TestImport()
         {
             try
@@ -44,10 +44,10 @@ namespace Classy.Tests
 
                 ProductCatalogImportOperator catalogImport =
                     new ProductCatalogImportOperator(new AmazonS3StorageRepository(s3Client, ConfigurationManager.AppSettings["S3BucketName"]),
-                    new MongoListingRepository(mongoDB),
-                    new MongoJobRepository(mongoDB),
+                    new MongoListingRepository(new Repository.Infrastructure.MongoDatabaseProvider(mongoDB)),
+                    new MongoJobRepository(new Repository.Infrastructure.MongoDatabaseProvider(mongoDB)),
                     new CurrencyManager(new StubCurrencyRepository()),
-                    new MongoProfileRepository(mongoDB));
+                    new MongoProfileRepository(new Repository.Infrastructure.MongoDatabaseProvider(mongoDB)));
 
                 catalogImport.PerformOperation(new ImportProductCatalogJob("5373ab038e65962b7cd8eac9", "v1.0"));
                 

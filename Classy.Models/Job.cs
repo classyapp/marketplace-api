@@ -22,5 +22,10 @@ namespace Classy.Models
         public DateTime CreatedAt { get; set; }
         public DateTime? UpdatedAt { get; set; }
         public List<string> Errors { get; set; }
+
+        public Job()
+        {
+            Errors = new List<string>();
+        }
     }
 }
