@@ -130,7 +130,7 @@ namespace classy.Services
                 var session = SessionAs<CustomUserSession>();
                 ListingManager.SecurityContext = session.ToSecurityContext();
 
-                ListingManager.EditMultipleListings(request.ListingIds, request.EditorsRank, request.Environment.AppId);
+                ListingManager.EditMultipleListings(request.ListingIds, request.EditorsRank, request.Metadata, request.Environment.AppId);
 
                 return new HttpResult(HttpStatusCode.OK);
             }

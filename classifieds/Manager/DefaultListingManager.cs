@@ -122,9 +122,9 @@ namespace classy.Manager
             return listingView;
         }
 
-        public void EditMultipleListings(string[] listingIds, int editorsRank, string appId)
+        public void EditMultipleListings(string[] listingIds, int editorsRank, Dictionary<string, string> metadata, string appId)
         {
-            ListingRepository.EditMultipleListings(listingIds, editorsRank, appId);
+            ListingRepository.EditMultipleListings(listingIds, editorsRank, appId, metadata);
             _listingIndexer.UpdateMultipleListings(listingIds, editorsRank, appId);
         }
 

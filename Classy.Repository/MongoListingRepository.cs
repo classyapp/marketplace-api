@@ -360,11 +360,17 @@ namespace Classy.Repository
             }
         }
 
-        public void EditMultipleListings(string[] ids, int editorsRank, string appId)
+        public void EditMultipleListings(string[] ids, int editorsRank, string appId, Dictionary<string, string> metadata)
         {
+            var updateBuilder = new UpdateBuilder<Listing>().Set(x => x.EditorsRank, editorsRank);
+
+            var metadataUpdater = new UpdateBuilder();
+            foreach (var listingInfo in metadata)
+                metadataUpdater.Set("Metadata." + listingInfo.Key, new BsonString(listingInfo.Value));
+
             ListingsCollection.Update(
                 Query.And(Query<Listing>.In(x => x.Id, ids), Query<Listing>.EQ(x => x.AppId, appId)),
-                new UpdateBuilder<Listing>().Set(x => x.EditorsRank, editorsRank), UpdateFlags.Multi);
+                updateBuilder.Combine(metadataUpdater), UpdateFlags.Multi);
         }
-   }
+    }
 }
