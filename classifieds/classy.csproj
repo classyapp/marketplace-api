@@ -135,6 +135,7 @@
     <Compile Include="DTO\Request\DeleteTranslation.cs" />
     <Compile Include="DTO\Request\GetProfileTranslation.cs" />
     <Compile Include="DTO\Request\ImportPorductCatalogRequest.cs" />
+    <Compile Include="DTO\Request\JobsStatusRequest.cs" />
     <Compile Include="DTO\Request\PasswordResetRequest.cs" />
     <Compile Include="DTO\Request\PostComment.cs" />
     <Compile Include="DTO\Request\PostCommentForCollection.cs" />
@@ -200,6 +201,7 @@
     <Compile Include="Extentions\EnumerableExtensions.cs" />
     <Compile Include="Extentions\ImageExtensions.cs" />
     <Compile Include="Extentions\IndexerExtensions.cs" />
+    <Compile Include="Extentions\JobViewExtensions.cs" />
     <Compile Include="Extentions\LocalizationListResourceViewExtenstions.cs" />
     <Compile Include="Extentions\CommentViewExtensions.cs" />
     <Compile Include="Extentions\ContactInfoViewExtensions.cs" />

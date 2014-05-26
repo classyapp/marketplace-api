@@ -236,6 +236,9 @@ namespace classy
                 // Products
                 .Add<ImportPorductCatalogRequest>("/product/uploadcatalog", "POST")
 
+                // Job
+                .Add<JobsStatusRequest>("/jobs/{ProfileId}", "GET")
+
                 // Reviews
                 .Add<PostReviewForListing>("/listing/{ListingId}/reviews/new", "POST")
                 .Add<PostReviewForProfile>("/profile/{RevieweeProfileId}/reviews/new", "POST")

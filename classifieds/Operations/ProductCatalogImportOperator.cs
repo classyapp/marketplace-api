@@ -30,8 +30,8 @@ namespace classy.Operations
 
         private void ReportError(Exception ex, Job job, IJobRepository jobRepo, int savedProducts, int errors)
         {
-            job.ImportErrors.Add(ex.Message);
-            job.ProgressInfo = savedProducts + " products saved, " + errors + " errors encountered";
+            job.Succeeded = savedProducts;
+            job.Failed = errors;
             jobRepo.Save(job);
         }
 
@@ -122,7 +122,7 @@ namespace classy.Operations
 
                                     try
                                     {
-                                        job.ProgressInfo = ++numProductsSaved + " products saved, " + numErrors + " errors encountered";
+                                        job.Succeeded = ++numProductsSaved;
                                         _jobRepository.Save(job);
                                     }
                                     catch (Exception ex)
@@ -382,7 +382,7 @@ namespace classy.Operations
 
                         try
                         {
-                            job.ProgressInfo = ++numProductsSaved + " products saved, " + numErrors + " errors encountered";
+                            job.Succeeded = ++numProductsSaved;
                             _jobRepository.Save(job);
 
                             job.Status = "Finished";

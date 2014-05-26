@@ -8,6 +8,7 @@ using Classy.Models.Request;
 using Classy.Models.Response;
 using Classy.Repository;
 using ServiceStack.Messaging;
+using classy.Extentions;
 
 namespace classy.Manager
 {
@@ -40,6 +41,7 @@ namespace classy.Manager
                 ProfileId = profileId,
                 Type = Job.JobType.ImportProductsCatalog,
                 Status = "Not Started",
+                CreatedAt = DateTime.UtcNow,
                 Attachments = new MediaFile[] { new MediaFile {
                     ContentType = contentType,
                     Key = fileKey,
@@ -65,6 +67,12 @@ namespace classy.Manager
             {
                 _context = value;
             }
+        }
+
+
+        public IList<JobView> GetJobsStatus(string appId, string profileId)
+        {
+            return _jobsRepository.GetByProfileId(appId, profileId).ToJobViewList();
         }
     }
 }
