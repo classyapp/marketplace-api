@@ -1,8 +1,5 @@
-﻿using Classy.Models;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Web;
+﻿using System.Collections.Generic;
+using Classy.Models.Attributes;
 
 namespace Classy.Models
 {
@@ -13,6 +10,7 @@ namespace Classy.Models
         Rejected = 3
     }
 
+    [MongoCollection(Name = "proxyclaims")]
     public class ProxyClaim : BaseObject
     {
         public string ProfileId { get; set; }

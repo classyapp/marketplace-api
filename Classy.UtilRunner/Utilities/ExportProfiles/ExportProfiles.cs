@@ -1,30 +1,28 @@
 ﻿using Classy.Models;
+using Classy.Repository.Infrastructure;
 using Funq;
 using MongoDB.Driver;
 using MongoDB.Driver.Builders;
 using System;
-using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
 
 namespace Classy.UtilRunner.Utilities.ExportProfiles
 {
     public class ExportProfiles : IUtility
     {
-        private const int BatchSize = 100;
         private readonly MongoCollection<Profile> _profiles;
 
         public ExportProfiles(Container container)
         {
-            var mongoDatabase = container.Resolve<MongoDatabase>();
-            _profiles = mongoDatabase.GetCollection<Profile>("profiles");
+            var mongoDatabase = container.Resolve<MongoDatabaseProvider>();
+            _profiles = mongoDatabase.GetCollection<Profile>();
         }
 
         public StatusCode Run(string[] args)
         {
-            if (args == null || args.Count() == 0) return StatusCode.MissingArguments;
+            if (args == null || !args.Any()) return StatusCode.MissingArguments;
 
             var startTime = DateTime.Now;
 

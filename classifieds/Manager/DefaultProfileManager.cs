@@ -154,6 +154,12 @@ namespace classy.Manager
             ProfileRepository.Save(follower);
         }
 
+        public List<ProfileView> GetProfilesByIds(string[] profileIds, string appId, string culture)
+        {
+            var profiles = ProfileRepository.GetByIds(appId, profileIds, culture);
+            return profiles.Select(x => x.ToProfileView()).ToList();
+        }
+
         public ProfileView GetProfileById(
             string appId,
             string profileId,
@@ -258,7 +264,6 @@ namespace classy.Manager
             IList<string> coverPhotos)
         {
             var profile = GetVerifiedProfile(appId, profileId);
-            var rankInc = 0;
 
             // update language ranking if default culture is sent
             if (!string.IsNullOrEmpty(profile.DefaultCulture) && profile.Languages == null)
@@ -270,11 +275,6 @@ namespace classy.Manager
             // copy seller info
             if (fields.HasFlag(ProfileUpdateFields.ProfessionalInfo))
             {
-                if (profile.ProfessionalInfo != null)
-                {
-                    // increase rank if company contact info fields have been entered for the first time
-                    if (profile.ProfessionalInfo.CompanyContactInfo == null && professionalInfo.CompanyContactInfo != null) rankInc++;
-                }
                 profile.ProfessionalInfo = professionalInfo;
                 TryGeocoding(profile.ProfessionalInfo);
             }
@@ -282,9 +282,6 @@ namespace classy.Manager
             // copy metadata 
             if (fields.HasFlag(ProfileUpdateFields.Metadata))
             {
-                // increase rank if metadata fields have been entered for the first time
-                if (profile.Metadata == null || (metadata.Count > profile.Metadata.Count)) rankInc++;
-
                 if (profile.Metadata != null)
                 {
                     foreach (var attribute in metadata)
@@ -301,9 +298,6 @@ namespace classy.Manager
             // image 
             if (fields.HasFlag(ProfileUpdateFields.ProfileImage))
             {
-                // increase rank if profile image fields is uploaded for the first time
-                if (profile.Avatar == null) rankInc++;
-
                 var avatarKey = string.Concat("profile_img_", profile.Id, "_", Guid.NewGuid().ToString());
                 StorageRepository.SaveFile(avatarKey, profileImage, profileImageContentType, true, null);
                 profile.Avatar = new MediaFile
@@ -318,8 +312,6 @@ namespace classy.Manager
             // cover photos
             if (fields.HasFlag(ProfileUpdateFields.CoverPhotos))
             {
-                if (profile.CoverPhotos == null) rankInc++;
-
                 profile.CoverPhotos = coverPhotos;
             }
 
@@ -328,7 +320,6 @@ namespace classy.Manager
                 profile.DefaultCulture = defaultCulture;
             }
 
-            profile.Rank += rankInc;
             ProfileRepository.Save(profile);
             _profileIndexer.Index(profile, appId);
 
@@ -415,7 +406,6 @@ namespace classy.Manager
             // TODO
 
             // save the new profile and delete the proxy
-            profile.Rank += rankInc;
             ProfileRepository.Save(profile);
             _profileIndexer.Index(profile, appId);
             ProfileRepository.Delete(proxyProfile.Id);
@@ -558,11 +548,6 @@ namespace classy.Manager
             string profileId)
         {
             var review = GetVerifiedReview(appId, reviewId);
-            if (review.Score > 3)
-            {
-                ProfileRepository.IncreaseCounter(appId, profileId, ProfileCounters.Rank, 1);
-                _profileIndexer.Increment(profileId, appId, p => p.Rank);
-            }
             ReviewRepository.Publish(appId, reviewId);
             review.IsPublished = true;
             return review.TranslateTo<ReviewView>();

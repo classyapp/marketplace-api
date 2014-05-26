@@ -1,4 +1,5 @@
-﻿using ServiceStack.ServiceInterface;
+﻿using classy.DTO.Request;
+using ServiceStack.ServiceInterface;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -53,7 +54,7 @@ namespace classy.Services
             }
         }
 
-        public object Get(GetListingsByProfileId request)
+       public object Get(GetListingsByProfileId request)
        { 
             try
             {
@@ -119,6 +120,23 @@ namespace classy.Services
                     Request.Files);
 
                 return new HttpResult(listing, HttpStatusCode.OK);
+            }
+            catch (KeyNotFoundException kex)
+            {
+                return new HttpError(HttpStatusCode.NotFound, kex.Message);
+            }
+        }
+
+        public object Post(EditMultipleListings request)
+        {
+            try
+            {
+                var session = SessionAs<CustomUserSession>();
+                ListingManager.SecurityContext = session.ToSecurityContext();
+
+                ListingManager.EditMultipleListings(request.ListingIds, request.EditorsRank, request.Metadata, request.Environment.AppId);
+
+                return new HttpResult(HttpStatusCode.OK);
             }
             catch (KeyNotFoundException kex)
             {

@@ -1,6 +1,6 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
-using Amazon.DynamoDBv2;
 using Classy.Interfaces.Search;
 using Classy.Models.Search;
 using Nest;
@@ -17,41 +17,60 @@ namespace classy.Manager.Search
             _searchClientFactory = searchClientFactory;
         }
 
-        public void Index(ListingIndexDto[] listingDtos, string appId)
+        private List<ListingIndexDto> GetBoostedResults(string category, string appId)
         {
             var client = _searchClientFactory.GetClient(IndexName, appId);
-            client.IndexMany(listingDtos);
+
+            var descriptor = new SearchDescriptor<ListingIndexDto>()
+                .Query(q => q.Term(t => t.BoostedCategories, category));
+
+            var request = client.Serializer.Serialize(descriptor);
+
+            var response = client.Search<ListingIndexDto>(_ => descriptor);
+
+            return response.Documents.ToList();
         }
 
         public SearchResults<ListingIndexDto> Search(string query, string appId, int amount = 25, int page = 1)
         {
+            // This elasticsearch query currently uses 'script_score' in the 'function_score' method
+            // When NEST starts supporting 'field_value_factor', then we should convert this query
+            // to use that, since it should be much faster in performance.
+            // http://www.elasticsearch.org/guide/en/elasticsearch/reference/current/mapping-boost-field.html
+            // https://github.com/elasticsearch/elasticsearch/pull/5519
+
+            var boosted = GetBoostedResults(query, appId);
+
             var client = _searchClientFactory.GetClient(IndexName, appId);
 
-            var searchDescriptor = new SearchDescriptor<ListingIndexDto>()
-                .Query(q => q.CustomFiltersScore(
-                    c => c.Query(cq => cq.QueryString(
-                        qs => qs.OnFields(f => f.Metadata, f => f.Title, f => f.Content, f => f.Keywords).Query(query))
-                    ).Filters(
-                        f => f.Filter(
-                            ff => ff.NumericRange(fn => fn.GreaterOrEquals(1).OnField(aa => aa.FlagCount)))
-                            .Boost(0.5f),
-                        f => f.Filter(
-                            ff => ff.Exists(e => e.FavoriteCount))
-                            .Script("1.0 + (doc['favoriteCount'].value * 2)")
-                    ).ScoreMode(ScoreMode.multiply)
-                )
-            );
+            // parameter factors should be from global settings (and able to change easily)
+            var script = "_score + (doc['favoriteCount'].value / 10)" +
+                         " + (doc['viewCount'].value / 100)" +
+                         " - (doc['flagCount'].value / 3)";
 
-            searchDescriptor
+            var descriptor = new SearchDescriptor<ListingIndexDto>()
+                .Query(q => q.FunctionScore(
+                    fs => fs.Query(
+                        qq => q.QueryString(
+                            qs => qs.OnFields(f => f.Metadata, f => f.Title, f => f.Content, f => f.Keywords)
+                                .Query(query)))
+                        .Functions(
+                            ff => ff.ScriptScore(
+                                ss => ss.Script(script)
+                                )
+                        )
+                    ))
+                .SortDescending(x => x.EditorRank)
+                .SortDescending("_score");
+            
+            descriptor
                 .Size(amount)
-                .From(amount*(page - 1));
+                .From(amount * (page - 1));
             
             // find a better way (than precompiler flags) to log if we have problems...
-            var request = client.Serializer.Serialize(searchDescriptor);
+            var request = client.Serializer.Serialize(descriptor);
 
-            var response = client.Search<ListingIndexDto>(_ => searchDescriptor);
-            
-            //queryDescriptor.Filtered(q => q.Filter(f => f.Range(t => t.Greater(0))));
+            var response = client.Search<ListingIndexDto>(_ => descriptor);
 
             return new SearchResults<ListingIndexDto> {
                 Results = response.Documents.ToList(),

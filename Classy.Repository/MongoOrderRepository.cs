@@ -1,10 +1,10 @@
 ﻿using Classy.Models;
+using Classy.Repository.Infrastructure;
 using MongoDB.Driver;
 using MongoDB.Driver.Builders;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Web;
 
 namespace Classy.Repository
 {
@@ -12,9 +12,9 @@ namespace Classy.Repository
     {
         private MongoCollection<Order> OrdersCollection;
 
-        public MongoOrderRepository(MongoDatabase db)
+        public MongoOrderRepository(MongoDatabaseProvider db)
         {
-            OrdersCollection = db.GetCollection<Order>("orders");
+            OrdersCollection = db.GetCollection<Order>();
         }
 
         public string Save(Order order)

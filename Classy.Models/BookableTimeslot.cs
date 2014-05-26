@@ -1,9 +1,7 @@
-﻿using MongoDB.Bson.Serialization.Attributes;
-using MongoDB.Bson.Serialization.IdGenerators;
+﻿using Classy.Models.Attributes;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 
 namespace Classy.Models
 {
@@ -25,6 +23,7 @@ namespace Classy.Models
         }
     }
 
+    [MongoCollection(Name = "bookings")]
     public class BookedTimeslot : BaseObject
     {
         public string ListingId { get; set; }

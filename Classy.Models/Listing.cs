@@ -1,11 +1,11 @@
 ﻿using System.Collections.Generic;
+using Classy.Models.Attributes;
 using MongoDB.Bson.Serialization.Attributes;
 
 namespace Classy.Models
 {
-    /// <summary>
-    /// a <see cref="Listing"/> is the basic unit of the marketplace
-    /// </summary>
+    [MongoCollection(Name = "classifieds")]
+    [BsonIgnoreExtraElements]
     public class Listing : BaseObject, ITranslatable<Listing>
     {
         public Listing()
@@ -78,10 +78,9 @@ namespace Classy.Models
         /// the number of times the listing has been added to a collection
         /// </summary>
         public int AddToCollectionCount { get; set; }
-        /// <summary>
-        /// 
-        /// </summary>
         public int DisplayOrder { get; set; }
+
+        public int EditorsRank { get; set; }
 
         /// <summary>
         /// contact info for the listing. use to override contact info of the listing owner <see cref="Profile"/>
@@ -108,7 +107,6 @@ namespace Classy.Models
 
         public IList<string> Categories { get; set; }
 
-        // Errors
         [BsonIgnoreIfNull]
         public string Errors { get; set; }
 

@@ -1,5 +1,4 @@
 ﻿using Nest;
-using Newtonsoft.Json;
 
 namespace Classy.Models.Search
 {
@@ -11,7 +10,9 @@ namespace Classy.Models.Search
         [ElasticProperty(Type = FieldType.geo_point)]
         public GPSLocation Location { get; set; } // from ContatInfo
 
-        public int Rank { get; set; }
+        [ElasticProperty(Index = FieldIndexOption.not_analyzed)]
+        public string Country { get; set; } // country code for fast filtering
+
         public int FollowerCount { get; set; }
         public int FollowingCount { get; set; }
         public int ListingCount { get; set; }
@@ -24,7 +25,9 @@ namespace Classy.Models.Search
         public string[] Metadata { get; set; }
         
         // ProfessionalInfo
-        public string ComnpanyName { get; set; }
+        public string CompanyName { get; set; }
+        [ElasticProperty(Index = FieldIndexOption.analyzed, OmitNorms = true, SearchAnalyzer = "standard", IndexAnalyzer = "suggest_analyzer")]
+        public string AnalyzedCompanyName { get; set; }
         public bool IsVendor { get; set; }
     }
 }

@@ -124,11 +124,13 @@ namespace classy.Services
                     request.CoverPhotos);
 
                 // update email on user auth if needed
-                if (!session.Permissions.Contains("admin") &&
-                    ((profile.IsProfessional && (session.Email != profile.ProfessionalInfo.CompanyContactInfo.Email)) ||
-                    (!profile.IsProfessional && (session.Email != profile.ContactInfo.Email))))
+                if (((profile.IsProfessional && request.Fields.HasFlag(ProfileUpdateFields.ProfessionalInfo) && (session.Email != profile.ProfessionalInfo.CompanyContactInfo.Email)) ||
+                    (!profile.IsProfessional && request.Fields.HasFlag(ProfileUpdateFields.ContactInfo) && (session.Email != profile.ContactInfo.Email))))
                 {
-                    UserAuthRepository.UpdateUserEmail(request.Environment.AppId, profile.Id, profile.ProfessionalInfo.CompanyContactInfo.Email);
+                    var email = profile.IsProfessional
+                        ? profile.ProfessionalInfo.CompanyContactInfo.Email
+                        : profile.ContactInfo.Email;
+                    UserAuthRepository.UpdateUserEmail(request.Environment.AppId, profile.Id, email);
                 }
 
                 return new HttpResult(profile, HttpStatusCode.OK);

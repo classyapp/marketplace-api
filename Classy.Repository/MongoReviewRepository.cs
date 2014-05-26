@@ -1,12 +1,9 @@
-﻿using MongoDB.Bson;
+﻿using Classy.Repository.Infrastructure;
 using MongoDB.Driver;
-using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Web;
 using MongoDB.Driver.Builders;
 using Classy.Models;
-using System.IO;
 
 namespace Classy.Repository
 {
@@ -14,9 +11,9 @@ namespace Classy.Repository
     {
         private MongoCollection<Review> ReviewsCollection;
 
-        public MongoReviewRepository(MongoDatabase db)
+        public MongoReviewRepository(MongoDatabaseProvider db)
         {
-            ReviewsCollection = db.GetCollection<Review>("reviews");
+            ReviewsCollection = db.GetCollection<Review>();
         }
 
         public string Save(Review review)

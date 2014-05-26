@@ -1,10 +1,10 @@
-﻿using Amazon.OpsWorks.Model;
-using classy.Cache;
+﻿using classy.Cache;
 using Classy.Interfaces.Search;
 using classy.Manager;
 using classy.Manager.Search;
 using Classy.Models;
 using Classy.Repository;
+using Classy.Repository.Infrastructure;
 using MongoDB.Driver;
 using ServiceStack.Messaging;
 using ServiceStack.Redis;
@@ -33,6 +33,8 @@ namespace classy.Extensions
             container.Register<ISearchClientFactory>(_ => new SearchClientFactory());
             container.Register<IListingSearchProvider>(
                 c => new ListingSearchProvider(c.TryResolve<ISearchClientFactory>()));
+            container.Register<IProfileSearchProvider>(
+                c => new ProfileSearchProvider(c.TryResolve<ISearchClientFactory>()));
 
             container.Register<IIndexer<Listing>>(x =>
                 new ListingIndexer(x.TryResolve<ISearchClientFactory>(), x.TryResolve<IAppManager>()));
@@ -54,7 +56,7 @@ namespace classy.Extensions
             });
 
             // register mongodb repositories
-            container.Register<MongoDatabase>(c =>
+            container.Register(c =>
             {
                 var connectionString = GetConnectionString("MONGO");
                 var client = new MongoClient(connectionString);
@@ -63,10 +65,11 @@ namespace classy.Extensions
                 var db = server.GetDatabase(databaseName);
                 return db;
             });
-            container.Register<ITripleStore>(c => new MongoTripleStore(c.Resolve<MongoDatabase>()));
-            container.Register<IListingRepository>(c => new MongoListingRepository(c.Resolve<MongoDatabase>()));
-            container.Register<ICommentRepository>(c => new MongoCommentRepository(c.Resolve<MongoDatabase>()));
-            container.Register<IReviewRepository>(c => new MongoReviewRepository(c.Resolve<MongoDatabase>()));
+            container.Register(c => new MongoDatabaseProvider(c.TryResolve<MongoDatabase>()));
+            container.Register<ITripleStore>(c => new MongoTripleStore(c.Resolve<MongoDatabaseProvider>()));
+            container.Register<IListingRepository>(c => new MongoListingRepository(c.Resolve<MongoDatabaseProvider>()));
+            container.Register<ICommentRepository>(c => new MongoCommentRepository(c.Resolve<MongoDatabaseProvider>()));
+            container.Register<IReviewRepository>(c => new MongoReviewRepository(c.Resolve<MongoDatabaseProvider>()));
             container.Register<Amazon.S3.IAmazonS3>(c =>
             {
                 var config = new Amazon.S3.AmazonS3Config()
@@ -79,103 +82,32 @@ namespace classy.Extensions
                 return s3Client;
             });
             container.Register<IStorageRepository>(c => new AmazonS3StorageRepository(c.Resolve<Amazon.S3.IAmazonS3>(), ConfigurationManager.AppSettings["S3BucketName"]));
-            container.Register<IProfileRepository>(c => new MongoProfileRepository(c.Resolve<MongoDatabase>()));
-            container.Register<IBookingRepository>(c => new MongoBookingRepository(c.Resolve<MongoDatabase>()));
-            container.Register<ITransactionRepository>(c => new MongoTransactionRepository(c.Resolve<MongoDatabase>()));
-            container.Register<IOrderRepository>(c => new MongoOrderRepository(c.Resolve<MongoDatabase>()));
-            container.Register<ICollectionRepository>(c => new MongoCollectionRepository(c.Resolve<MongoDatabase>()));
-            container.Register<ILocalizationRepository>(c => new MongoLocalizationProvider(c.Resolve<MongoDatabase>()));
-            container.Register<ICurrencyRepository>(c => new StubCurrencyRepository());
-            container.Register<IJobRepository>(c => new MongoJobRepository(c.Resolve<MongoDatabase>()));
-            container.Register<IAppManager>(c =>
-                new DefaultAppManager(c.TryResolve<MongoDatabase>(), c.TryResolve<ICache<Classy.Models.App>>()));
-            container.Register<ICurrencyManager>(c =>
-                new CurrencyManager(
-                    c.TryResolve<ICurrencyRepository>()));
-            container.Register<IEmailManager>(c =>
-                new MandrillEmailManager(c.TryResolve<IAppManager>()));
-            container.Register<IPaymentGateway>(c =>
-                new TranzilaPaymentGateway(
-                    c.TryResolve<ITransactionRepository>()));
-            container.Register<IBookingManager>(c =>
-                new DefaultBookingManager(
-                    c.TryResolve<IListingRepository>(),
-                    c.TryResolve<IBookingRepository>(),
-                    c.TryResolve<IPaymentGateway>(),
-                    c.TryResolve<ITripleStore>()));
-            container.Register<IOrderManager>(c =>
-                new DefaultOrderManager(
-                    c.TryResolve<IListingRepository>(),
-                    c.TryResolve<IProfileRepository>(),
-                    c.TryResolve<IOrderRepository>(),
-                    c.TryResolve<ITransactionRepository>(),
-                    c.TryResolve<IPaymentGateway>(),
-                    c.TryResolve<ITripleStore>(),
-                    c.TryResolve<ITaxCalculator>(),
-                    c.TryResolve<IShippingCalculator>()));
-            container.Register<IListingManager>(c =>
-                new DefaultListingManager(
-                    c.TryResolve<IAppManager>(),
-                    c.TryResolve<IListingRepository>(),
-                    c.TryResolve<ICommentRepository>(),
-                    c.TryResolve<IProfileRepository>(),
-                    c.TryResolve<ICollectionRepository>(),
-                    c.TryResolve<ITripleStore>(),
-                    c.TryResolve<IStorageRepository>(),
-                    c.TryResolve<IIndexer<Listing>>(),
-                    c.TryResolve<IIndexer<Profile>>(),
-                    c.TryResolve<ICurrencyManager>()));
-            container.Register<IProfileManager>(c =>
-                new DefaultProfileManager(
-                    c.TryResolve<IAppManager>(),
-                    c.TryResolve<ILocalizationManager>(),
-                    c.TryResolve<IProfileRepository>(),
-                    c.TryResolve<IListingRepository>(),
-                    c.TryResolve<IReviewRepository>(),
-                    c.TryResolve<ICollectionRepository>(),
-                    c.TryResolve<ITripleStore>(),
-                    c.TryResolve<IStorageRepository>(),
-                    c.TryResolve<IIndexer<Profile>>(),
-                    c.TryResolve<ICurrencyManager>()));
-            container.Register<IReviewManager>(c =>
-                new DefaultProfileManager(
-                    c.TryResolve<IAppManager>(),
-                    c.TryResolve<ILocalizationManager>(),
-                    c.TryResolve<IProfileRepository>(),
-                    c.TryResolve<IListingRepository>(),
-                    c.TryResolve<IReviewRepository>(),
-                    c.TryResolve<ICollectionRepository>(),
-                    c.TryResolve<ITripleStore>(),
-                    c.TryResolve<IStorageRepository>(),
-                    c.TryResolve<IIndexer<Profile>>(),
-                    c.TryResolve<ICurrencyManager>()));
-            container.Register<ICollectionManager>(c =>
-                new DefaultListingManager(
-                    c.TryResolve<IAppManager>(),
-                    c.TryResolve<IListingRepository>(),
-                    c.TryResolve<ICommentRepository>(),
-                    c.TryResolve<IProfileRepository>(),
-                    c.TryResolve<ICollectionRepository>(),
-                    c.TryResolve<ITripleStore>(),
-                    c.TryResolve<IStorageRepository>(),
-                    c.TryResolve<IIndexer<Listing>>(),
-                    c.TryResolve<IIndexer<Profile>>(),
-                    c.TryResolve<ICurrencyManager>()));
-            container.Register<IAnalyticsManager>(c =>
-                new DefaultAnalyticsManager(
-                    c.TryResolve<ITripleStore>()));
-            container.Register<ILocalizationManager>(c =>
-                new DefaultLocalizationManager(
-                    c.TryResolve<ILocalizationRepository>(),
-                    c.TryResolve<IProfileRepository>()));
-            container.Register<IThumbnailManager>(c =>
-                new DefaultThumbnailManager(
-                    c.TryResolve<IStorageRepository>()));
-            container.Register<IJobManager>(c =>
-                new DefaultJobManager(
-                    c.TryResolve<IJobRepository>(),
-                    c.TryResolve<IStorageRepository>(),
-                    c.TryResolve<IMessageQueueClient>()));
+            container.Register<IProfileRepository>(c => new MongoProfileRepository(c.Resolve<MongoDatabaseProvider>()));
+            container.Register<IBookingRepository>(c => new MongoBookingRepository(c.Resolve<MongoDatabaseProvider>()));
+            container.Register<ITransactionRepository>(c => new MongoTransactionRepository(c.Resolve<MongoDatabaseProvider>()));
+            container.Register<IOrderRepository>(c => new MongoOrderRepository(c.Resolve<MongoDatabaseProvider>()));
+            container.Register<ICollectionRepository>(c => new MongoCollectionRepository(c.Resolve<MongoDatabaseProvider>()));
+            container.Register<ILocalizationRepository>(c => new MongoLocalizationProvider(c.Resolve<MongoDatabaseProvider>()));
+
+            container.RegisterAutoWiredAs<DefaultAppManager, IAppManager>();
+            container.RegisterAutoWiredAs<MandrillEmailManager, IEmailManager>();
+            container.RegisterAutoWiredAs<TranzilaPaymentGateway, IPaymentGateway>();
+            container.RegisterAutoWiredAs<DefaultBookingManager, IBookingManager>();
+            container.RegisterAutoWiredAs<DefaultOrderManager, IOrderManager>();
+
+            container.RegisterAutoWiredAs<KeywordsRepository, IKeywordsRepository>();
+            container.RegisterAutoWiredAs<DefaultListingManager, IListingManager>();
+
+            container.RegisterAutoWiredAs<DefaultProfileManager, IProfileManager>();
+            container.RegisterAutoWiredAs<DefaultProfileManager, IReviewManager>();
+
+            container.RegisterAutoWiredAs<DefaultListingManager, ICollectionManager>();
+
+            container.RegisterAutoWiredAs<DefaultAnalyticsManager, IAnalyticsManager>();
+
+            container.RegisterAutoWiredAs<DefaultLocalizationManager, ILocalizationManager>();
+            container.RegisterAutoWiredAs<DefaultThumbnailManager, IThumbnailManager>();
+            container.RegisterAutoWiredAs<SearchSuggestionsProvider, ISearchSuggestionsProvider>();
         }
     }
 }

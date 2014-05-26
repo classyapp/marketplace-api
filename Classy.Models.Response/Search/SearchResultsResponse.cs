@@ -13,4 +13,10 @@ namespace Classy.Models.Response.Search
             Total = total;
         }
     }
+
+    public class FreeSearchResultsResponse
+    {
+        public SearchResultsResponse<ListingView> ListingsResults { get; set; }
+        public SearchResultsResponse<ProfileView> ProfilesResults { get; set; } 
+    }
 }

@@ -36,7 +36,8 @@ namespace Classy.UtilRunner
             if (!input.IsNullOrEmpty() && !input.ToLower().StartsWith("y"))
                 return;
 
-            Console.WriteLine("Starting to run utility '{0}' :: {1}", utilityName, DateTime.Now.TimeOfDay);
+            var startTime = DateTime.Now;
+            Console.WriteLine("Starting to run utility '{0}' :: {1}", utilityName, startTime.TimeOfDay);
             var status = StatusCode.Failure;
             try
             {
@@ -47,6 +48,7 @@ namespace Classy.UtilRunner
                 Console.WriteLine("Error while running utility :: " + ex.Message);
             }
             Console.WriteLine("Ended with status {0} :: {1}", status, DateTime.Now);
+            Console.WriteLine("Time elapsed :: {0} seconds", (DateTime.Now - startTime).TotalSeconds);
             Console.ReadKey(); // add option not to wait for input too
         }
 

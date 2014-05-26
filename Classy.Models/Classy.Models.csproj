@@ -76,6 +76,7 @@
   <ItemGroup>
     <Compile Include="APIModel.cs" />
     <Compile Include="App.cs" />
+    <Compile Include="Attributes\MongoCollectionAttribute.cs" />
     <Compile Include="Collection.cs" />
     <Compile Include="ContactInfo.cs" />
     <Compile Include="CurrencyListItem.cs" />
@@ -84,6 +85,8 @@
     <Compile Include="IncludedListing.cs" />
     <Compile Include="ITranslatable.cs" />
     <Compile Include="Job.cs" />
+    <Compile Include="Keywords\Keyword.cs" />
+    <Compile Include="Keywords\KeywordIndexDto.cs" />
     <Compile Include="LocalizationListResource.cs" />
     <Compile Include="LocalizationResource.cs" />
     <Compile Include="Profile.cs" />

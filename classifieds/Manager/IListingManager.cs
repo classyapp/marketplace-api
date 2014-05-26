@@ -242,5 +242,7 @@ namespace classy.Manager
         void DeleteTranslation(string appId, string listingId, string cultureCode);
 
         ListingMoreInfoView GetListingMoreInfo(string appId, string listingId, Dictionary<string, string[]> metadata, Dictionary<string, string[]> query, Location location, string culture);
+        
+        void EditMultipleListings(string[] listingIds, int? editorsRank, Dictionary<string, string> metadata, string appId);
     }
 }

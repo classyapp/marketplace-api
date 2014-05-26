@@ -1,4 +1,5 @@
 ﻿using Classy.Models;
+using Classy.Repository.Infrastructure;
 using MongoDB.Bson;
 using MongoDB.Driver;
 using MongoDB.Driver.Builders;
@@ -13,9 +14,9 @@ namespace Classy.Repository
     {
         private MongoCollection<Transaction> TransactionsCollection;
 
-        public MongoTransactionRepository(MongoDatabase db)
+        public MongoTransactionRepository(MongoDatabaseProvider db)
         {
-            TransactionsCollection = db.GetCollection<Transaction>("transactions");
+            TransactionsCollection = db.GetCollection<Transaction>();
         }
     
         public string Save(Transaction transaction)

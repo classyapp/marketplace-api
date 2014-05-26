@@ -1,9 +1,5 @@
 ﻿using MongoDB.Bson.Serialization.Attributes;
 using ServiceStack.FluentValidation;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 
 namespace Classy.Models
 {
@@ -13,11 +9,9 @@ namespace Classy.Models
         public double? Latitude { get; set; }
     }
 
+    [BsonIgnoreExtraElements]
     public class Location
     {
-        public double? Longitude { get; set; }
-        public double? Latitude { get; set; }
-
         public Coords Coords { get; set; }
         public PhysicalAddress Address { get; set; }
     }

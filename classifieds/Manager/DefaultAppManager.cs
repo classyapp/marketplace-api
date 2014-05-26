@@ -1,6 +1,6 @@
-using System.Collections.Generic;
 using classy.Cache;
 using Classy.Models;
+using Classy.Repository.Infrastructure;
 using MongoDB.Driver;
 
 namespace classy.Manager
@@ -10,9 +10,9 @@ namespace classy.Manager
         private readonly MongoCollection<App> _appCollection;
         private readonly ICache<App> _appCache;
 
-        public DefaultAppManager(MongoDatabase db, ICache<App> appCache)
+        public DefaultAppManager(MongoDatabaseProvider db, ICache<App> appCache)
         {
-            _appCollection = db.GetCollection<App>("apps");
+            _appCollection = db.GetCollection<App>();
             _appCache = appCache;
         }
 
