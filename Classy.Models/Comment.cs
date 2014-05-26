@@ -1,12 +1,8 @@
-﻿using ServiceStack.FluentValidation;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text.RegularExpressions;
-using System.Web;
+﻿using Classy.Models.Attributes;
 
 namespace Classy.Models
 {
+    [MongoCollection(Name = "comments")]
     public class Comment : BaseObject
     {
         public string ObjectId { get; set; }

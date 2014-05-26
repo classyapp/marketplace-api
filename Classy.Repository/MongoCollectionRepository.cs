@@ -1,14 +1,10 @@
-﻿using MongoDB.Bson;
-using MongoDB.Bson.Serialization;
+﻿using Classy.Repository.Infrastructure;
 using MongoDB.Driver;
-using MongoDB.Driver.Linq;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Web;
 using MongoDB.Driver.Builders;
 using Classy.Models;
-using System.IO;
 
 namespace Classy.Repository
 {
@@ -18,9 +14,9 @@ namespace Classy.Repository
 
         private MongoCollection<Collection> CollectionsCollection;
 
-        public MongoCollectionRepository(MongoDatabase db)
+        public MongoCollectionRepository(MongoDatabaseProvider db)
         {
-            CollectionsCollection = db.GetCollection<Collection>("collections");
+            CollectionsCollection = db.GetCollection<Collection>();
         }
 
         #endregion 

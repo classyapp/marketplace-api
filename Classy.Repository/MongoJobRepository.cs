@@ -1,9 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Classy.Models;
+﻿using Classy.Models;
+using Classy.Repository.Infrastructure;
 using MongoDB.Driver;
 using MongoDB.Driver.Builders;
 
@@ -13,9 +9,9 @@ namespace Classy.Repository
     {
         private MongoCollection<Job> JobsCollection;
 
-        public MongoJobRepository(MongoDatabase db)
+        public MongoJobRepository(MongoDatabaseProvider db)
         {
-            JobsCollection = db.GetCollection<Job>("jobs");
+            JobsCollection = db.GetCollection<Job>();
         }
 
         public Job GetById(string appId, string jobId)

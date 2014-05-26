@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using Classy.Models.Attributes;
 using MongoDB.Bson.Serialization.Attributes;
 
 namespace Classy.Models
@@ -7,6 +8,7 @@ namespace Classy.Models
     /// <summary>
     /// Custom User DataModel for harvesting UserAuth info into your own DB table
     /// </summary>   
+    [MongoCollection(Name = "profiles")]
     [BsonIgnoreExtraElements]
     public class Profile : BaseObject, ITranslatable<Profile>
     {

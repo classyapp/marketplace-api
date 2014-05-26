@@ -1,10 +1,10 @@
 ﻿using System.Collections.Generic;
-using System.Text.RegularExpressions;
 using classy.DTO.Response;
 using classy.Extentions;
 using Classy.Interfaces.Search;
 using Classy.Models.Keywords;
 using Classy.Models.Search;
+using Classy.Repository.Infrastructure;
 using MongoDB.Bson;
 using MongoDB.Driver;
 using MongoDB.Driver.Builders;
@@ -26,10 +26,10 @@ namespace classy.Manager.Search
         private const string ListingsIndexName = "listings";
         private const string ProfilesIndexName = "profiles";
 
-        public SearchSuggestionsProvider(ISearchClientFactory searchClientFactory, MongoDatabase db)
+        public SearchSuggestionsProvider(ISearchClientFactory searchClientFactory, MongoDatabaseProvider db)
         {
             _searchClientFactory = searchClientFactory;
-            _keywordsCollection = db.GetCollection<Keyword>("keywords");
+            _keywordsCollection = db.GetCollection<Keyword>();
         }
 
         public List<SearchSuggestion> GetListingsSuggestions(string q, string appId)

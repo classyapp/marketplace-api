@@ -1,5 +1,8 @@
-﻿namespace Classy.Models.Keywords
+﻿using Classy.Models.Attributes;
+
+namespace Classy.Models.Keywords
 {
+    [MongoCollection(Name = "keywords")]
     public class Keyword : BaseObject
     {
         public string Name { get; set; }

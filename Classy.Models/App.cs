@@ -1,9 +1,10 @@
+using Classy.Models.Attributes;
 using MongoDB.Bson.Serialization.Attributes;
 using System.Collections.Generic;
-using MongoDB.Bson.Serialization.Attributes;
 
 namespace Classy.Models
 {
+    [MongoCollection(Name = "apps")]
     [BsonIgnoreExtraElements]
     public class App : BaseObject, ITranslatable<App>
     {

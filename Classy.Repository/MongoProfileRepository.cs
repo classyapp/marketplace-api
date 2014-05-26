@@ -1,4 +1,5 @@
 ﻿using Classy.Models;
+using Classy.Repository.Infrastructure;
 using MongoDB.Bson;
 using MongoDB.Driver;
 using MongoDB.Driver.Builders;
@@ -15,10 +16,10 @@ namespace Classy.Repository
         private MongoCollection<Profile> ProfilesCollection;
         private MongoCollection<ProxyClaim> ProxyClaimsCollection;
 
-        public MongoProfileRepository(MongoDatabase db)
+        public MongoProfileRepository(MongoDatabaseProvider db)
         {
-            ProfilesCollection = db.GetCollection<Profile>("profiles");
-            ProxyClaimsCollection = db.GetCollection<ProxyClaim>("proxyclaims");
+            ProfilesCollection = db.GetCollection<Profile>();
+            ProxyClaimsCollection = db.GetCollection<ProxyClaim>();
         }
 
         public string Save(Profile profile)

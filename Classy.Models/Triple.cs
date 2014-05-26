@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Web;
+using Classy.Models.Attributes;
 
 namespace Classy.Models
 {
@@ -28,6 +29,7 @@ namespace Classy.Models
         public const string COMMENT_ON_COLLECTION = "comment-collection";
     }
 
+    [MongoCollection(Name = "triples")]
     public class Triple : BaseObject
     {
         public string ObjectId { get; set; }

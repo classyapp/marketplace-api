@@ -1,10 +1,9 @@
 ﻿using Classy.Models;
+using Classy.Repository.Infrastructure;
 using MongoDB.Driver;
 using MongoDB.Driver.Builders;
-using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Web;
 
 namespace Classy.Repository
 {
@@ -12,9 +11,9 @@ namespace Classy.Repository
     {
         private MongoCollection<Triple> TripleCollection;
 
-        public MongoTripleStore(MongoDatabase db)
+        public MongoTripleStore(MongoDatabaseProvider db)
         {
-            TripleCollection = db.GetCollection<Triple>("triples");
+            TripleCollection = db.GetCollection<Triple>();
         }
 
         public Triple LogActivity(string appId, string subjectObjectId, string predicate, string objectObjectId, ref int count)

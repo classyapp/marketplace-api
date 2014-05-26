@@ -1,4 +1,5 @@
 ﻿using Classy.Models.Keywords;
+using Classy.Repository.Infrastructure;
 using MongoDB.Driver;
 using MongoDB.Driver.Builders;
 
@@ -8,9 +9,9 @@ namespace Classy.Repository
     {
         private readonly MongoCollection<Keyword> KeywordsCollection;
 
-        public KeywordsRepository(MongoDatabase db)
+        public KeywordsRepository(MongoDatabaseProvider db)
         {
-            KeywordsCollection = db.GetCollection<Keyword>("keywords");
+            KeywordsCollection = db.GetCollection<Keyword>();
         }
 
         // TODO: make this method thread safe!

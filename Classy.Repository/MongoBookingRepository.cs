@@ -1,11 +1,10 @@
 ﻿using Classy.Models;
-using MongoDB.Bson;
+using Classy.Repository.Infrastructure;
 using MongoDB.Driver;
 using MongoDB.Driver.Builders;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 
 namespace Classy.Repository
 {
@@ -13,9 +12,9 @@ namespace Classy.Repository
     {
         private MongoCollection<BookedTimeslot> BookingsCollection;
 
-        public MongoBookingRepository(MongoDatabase db)
+        public MongoBookingRepository(MongoDatabaseProvider db)
         {
-            BookingsCollection = db.GetCollection<BookedTimeslot>("bookings");
+            BookingsCollection = db.GetCollection<BookedTimeslot>();
         }
     
         public string Save(BookedTimeslot timeslot, int maxDoubleBookings)

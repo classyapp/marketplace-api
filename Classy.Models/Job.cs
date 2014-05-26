@@ -1,11 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Collections.Generic;
+using Classy.Models.Attributes;
 
 namespace Classy.Models
 {
+    [MongoCollection(Name = "jobs")]
     public class Job : BaseObject
     {
         public class JobType

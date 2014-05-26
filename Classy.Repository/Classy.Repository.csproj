@@ -65,6 +65,7 @@
     <Compile Include="IJobRepository.cs" />
     <Compile Include="IKeywordsRepository.cs" />
     <Compile Include="ILocalizationRepository.cs" />
+    <Compile Include="Infrastructure\MongoDatabaseProvider.cs" />
     <Compile Include="KeywordsRepository.cs" />
     <Compile Include="MongoCollectionRepository.cs" />
     <Compile Include="ICollectionRepository.cs" />

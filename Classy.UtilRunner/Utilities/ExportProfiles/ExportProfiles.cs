@@ -1,4 +1,5 @@
 ﻿using Classy.Models;
+using Classy.Repository.Infrastructure;
 using Funq;
 using MongoDB.Driver;
 using MongoDB.Driver.Builders;
@@ -15,8 +16,8 @@ namespace Classy.UtilRunner.Utilities.ExportProfiles
 
         public ExportProfiles(Container container)
         {
-            var mongoDatabase = container.Resolve<MongoDatabase>();
-            _profiles = mongoDatabase.GetCollection<Profile>("profiles");
+            var mongoDatabase = container.Resolve<MongoDatabaseProvider>();
+            _profiles = mongoDatabase.GetCollection<Profile>();
         }
 
         public StatusCode Run(string[] args)

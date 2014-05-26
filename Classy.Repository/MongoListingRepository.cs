@@ -1,4 +1,5 @@
-﻿using MongoDB.Bson;
+﻿using Classy.Repository.Infrastructure;
+using MongoDB.Bson;
 using MongoDB.Driver;
 using System;
 using System.Collections.Generic;
@@ -11,11 +12,11 @@ namespace Classy.Repository
 {
     public class MongoListingRepository : IListingRepository
     {
-        private MongoCollection<Listing> ListingsCollection;
+        private readonly MongoCollection<Listing> ListingsCollection;
 
-        public MongoListingRepository(MongoDatabase db)
+        public MongoListingRepository(MongoDatabaseProvider db)
         {
-            ListingsCollection = db.GetCollection<Listing>("classifieds");
+            ListingsCollection = db.GetCollection<Listing>();
         }
 
         public Listing GetById(string listingId, string appId, bool includeDrafts, string culture)
