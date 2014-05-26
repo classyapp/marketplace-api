@@ -22,7 +22,7 @@ namespace classy.Extentions
                 Status = from.Status,
                 Succeeded = from.Succeeded,
                 Failed = from.Failed,
-                CreatedAt = from.CreatedAt,
+                CreatedAt = from.Created,
                 UpdatedAt = from.UpdatedAt
             };
         }

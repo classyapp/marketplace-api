@@ -88,6 +88,8 @@ namespace classy.Extensions
             container.Register<IOrderRepository>(c => new MongoOrderRepository(c.Resolve<MongoDatabaseProvider>()));
             container.Register<ICollectionRepository>(c => new MongoCollectionRepository(c.Resolve<MongoDatabaseProvider>()));
             container.Register<ILocalizationRepository>(c => new MongoLocalizationProvider(c.Resolve<MongoDatabaseProvider>()));
+            container.Register<IJobRepository>(c => new MongoJobRepository(c.Resolve<MongoDatabaseProvider>()));
+            container.Register<ICurrencyRepository>(c => new StubCurrencyRepository());
 
             container.RegisterAutoWiredAs<DefaultAppManager, IAppManager>();
             container.RegisterAutoWiredAs<MandrillEmailManager, IEmailManager>();
@@ -104,6 +106,9 @@ namespace classy.Extensions
             container.RegisterAutoWiredAs<DefaultListingManager, ICollectionManager>();
 
             container.RegisterAutoWiredAs<DefaultAnalyticsManager, IAnalyticsManager>();
+
+            container.RegisterAutoWiredAs<DefaultJobManager, IJobManager>();
+            container.RegisterAutoWiredAs<CurrencyManager, ICurrencyManager>();
 
             container.RegisterAutoWiredAs<DefaultLocalizationManager, ILocalizationManager>();
             container.RegisterAutoWiredAs<DefaultThumbnailManager, IThumbnailManager>();
