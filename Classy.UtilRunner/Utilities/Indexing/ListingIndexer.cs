@@ -6,9 +6,7 @@ using Classy.Interfaces.Search;
 using Classy.Models;
 using Classy.Models.Search;
 using Funq;
-using MongoDB.Bson.Serialization;
 using MongoDB.Driver;
-using Nest;
 
 namespace Classy.UtilRunner.Utilities.Indexing
 {
@@ -114,6 +112,7 @@ namespace Classy.UtilRunner.Utilities.Indexing
                         Content = listing.Content,
                         FavoriteCount = listing.FavoriteCount,
                         FlagCount = listing.FlagCount,
+                        EditorRank = listing.EditorsRank,
                         Keywords =
                             listing.SearchableKeywords != null ? listing.SearchableKeywords.Union(listing.Hashtags).ToArray() : listing.Hashtags.EmptyIfNull().ToArray(),
                         ImageUrl = 
