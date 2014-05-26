@@ -590,6 +590,11 @@ namespace classy.Manager
                 if (includeListings)
                 {
                     collectionView.Listings = ListingRepository.GetById(listingIds, appId, includeDrafts, culture).ToListingViewList(culture);
+                    var profiles = ProfileRepository.GetByIds(appId, collectionView.Listings.Select(x => x.ProfileId).ToArray(), culture);
+                    foreach (var l in collectionView.Listings)
+                    {
+                        l.Profile = profiles.Single(x => x.Id == l.ProfileId).ToProfileView();
+                    }
                 }
                 if (increaseViewCounter)
                 {
