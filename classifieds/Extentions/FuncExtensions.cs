@@ -86,6 +86,7 @@ namespace classy.Extensions
             container.Register<ICollectionRepository>(c => new MongoCollectionRepository(c.Resolve<MongoDatabase>()));
             container.Register<ILocalizationRepository>(c => new MongoLocalizationProvider(c.Resolve<MongoDatabase>()));
             container.Register<ICurrencyRepository>(c => new StubCurrencyRepository());
+            container.Register<IJobRepository>(c => new MongoJobRepository(c.Resolve<MongoDatabase>()));
             container.Register<IAppManager>(c =>
                 new DefaultAppManager(c.TryResolve<MongoDatabase>(), c.TryResolve<ICache<Classy.Models.App>>()));
             container.Register<ICurrencyManager>(c =>
@@ -134,7 +135,8 @@ namespace classy.Extensions
                     c.TryResolve<ICollectionRepository>(),
                     c.TryResolve<ITripleStore>(),
                     c.TryResolve<IStorageRepository>(),
-                    c.TryResolve<IIndexer<Profile>>()));
+                    c.TryResolve<IIndexer<Profile>>(),
+                    c.TryResolve<ICurrencyManager>()));
             container.Register<IReviewManager>(c =>
                 new DefaultProfileManager(
                     c.TryResolve<IAppManager>(),
@@ -145,7 +147,8 @@ namespace classy.Extensions
                     c.TryResolve<ICollectionRepository>(),
                     c.TryResolve<ITripleStore>(),
                     c.TryResolve<IStorageRepository>(),
-                    c.TryResolve<IIndexer<Profile>>()));
+                    c.TryResolve<IIndexer<Profile>>(),
+                    c.TryResolve<ICurrencyManager>()));
             container.Register<ICollectionManager>(c =>
                 new DefaultListingManager(
                     c.TryResolve<IAppManager>(),
@@ -168,6 +171,11 @@ namespace classy.Extensions
             container.Register<IThumbnailManager>(c =>
                 new DefaultThumbnailManager(
                     c.TryResolve<IStorageRepository>()));
+            container.Register<IJobManager>(c =>
+                new DefaultJobManager(
+                    c.TryResolve<IJobRepository>(),
+                    c.TryResolve<IStorageRepository>(),
+                    c.TryResolve<IMessageQueueClient>()));
         }
     }
 }
