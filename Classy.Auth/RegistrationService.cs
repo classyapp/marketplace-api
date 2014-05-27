@@ -10,6 +10,7 @@ using ServiceStack.ServiceInterface.ServiceModel;
 using ServiceStack.ServiceInterface.Validation;
 using ServiceStack.WebHost.Endpoints;
 using ServiceStack.ServiceInterface;
+using ServiceStack.CacheAccess;
 
 namespace Classy.Auth
 {
@@ -68,23 +69,28 @@ namespace Classy.Auth
     public class RegistrationValidator : AbstractValidator<Registration>
     {
         public IUserAuthRepository UserAuthRepo { get; set; }
+        public ICacheClient CacheClient { get; set; }
 
         public RegistrationValidator()
         {
+            var sessionKey = SessionFeature.GetSessionKey();
+            var session = new CustomUserSession { Environment = new Models.Env { AppId = "v1.0" } }; 
+                //CacheClient.Get<CustomUserSession>(sessionKey); 
+
             RuleSet(ApplyTo.Post, () =>
             {
                 RuleFor(x => x.Password).NotEmpty();
                 RuleFor(x => x.UserName).NotEmpty().When(x => x.Email.IsNullOrEmpty());
                 RuleFor(x => x.Email).NotEmpty().EmailAddress().When(x => x.UserName.IsNullOrEmpty());
                 RuleFor(x => x.UserName)
-                    .Must(x => UserAuthRepo.GetUserAuthByUserName(x, x) == null)
+                    .Must(x => UserAuthRepo.GetUserAuthByUserName(session.Environment.AppId, x) == null)
                     .WithErrorCode("Register_UsernameAlreadyExists")
                     .When(x => !x.UserName.IsNullOrEmpty());
                 RuleFor(x => x.UserName)
                     .Matches(@"^(?=[A-Za-z0-9])(?!.*[._]{2})[A-Za-z0-9._s]{3,15}$")
                     .WithErrorCode("Register_InvalidUsername");
                 RuleFor(x => x.Email)
-                    .Must(x => x.IsNullOrEmpty() || UserAuthRepo.GetUserAuthByUserName(x, x) == null)
+                    .Must(x => x.IsNullOrEmpty() || UserAuthRepo.GetUserAuthByUserName(session.Environment.AppId, x) == null)
                     .WithErrorCode("Register_EmailAlreadyExists")
                     .When(x => !x.Email.IsNullOrEmpty());
             });
