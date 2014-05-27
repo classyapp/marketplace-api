@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Web;
+using Classy.Models.Attributes;
 
 namespace Classy.Models
 {
@@ -12,6 +12,7 @@ namespace Classy.Models
         public string GatewayRefId { get; set; }
     }
 
+    [MongoCollection(Name = "transactions")]
     public class Transaction : BaseObject
     {
         public double Amount { get; set; }

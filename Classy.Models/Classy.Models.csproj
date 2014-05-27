@@ -40,11 +40,19 @@
     <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="Elasticsearch.Net, Version=1.0.0.0, Culture=neutral, PublicKeyToken=96c599bbe3e70f5d, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\packages\Elasticsearch.Net.1.0.0-beta1\lib\Elasticsearch.Net.dll</HintPath>
+    </Reference>
     <Reference Include="MongoDB.Bson">
       <HintPath>..\lib\MongoDB.Bson.dll</HintPath>
     </Reference>
     <Reference Include="MongoDB.Driver">
       <HintPath>..\lib\MongoDB.Driver.dll</HintPath>
+    </Reference>
+    <Reference Include="Nest, Version=1.0.0.0, Culture=neutral, PublicKeyToken=96c599bbe3e70f5d, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\packages\NEST.1.0.0-beta1\lib\Nest.dll</HintPath>
     </Reference>
     <Reference Include="Newtonsoft.Json">
       <HintPath>..\packages\Newtonsoft.Json.6.0.1\lib\net45\Newtonsoft.Json.dll</HintPath>
@@ -68,15 +76,23 @@
   <ItemGroup>
     <Compile Include="APIModel.cs" />
     <Compile Include="App.cs" />
+    <Compile Include="Attributes\MongoCollectionAttribute.cs" />
     <Compile Include="Collection.cs" />
     <Compile Include="ContactInfo.cs" />
+    <Compile Include="CurrencyListItem.cs" />
     <Compile Include="Env.cs" />
     <Compile Include="GPSLocation.cs" />
     <Compile Include="IncludedListing.cs" />
     <Compile Include="ITranslatable.cs" />
+    <Compile Include="Job.cs" />
+    <Compile Include="Keywords\Keyword.cs" />
+    <Compile Include="Keywords\KeywordIndexDto.cs" />
     <Compile Include="LocalizationListResource.cs" />
     <Compile Include="LocalizationResource.cs" />
     <Compile Include="Profile.cs" />
+    <Compile Include="Search\ListingIndexDto.cs" />
+    <Compile Include="Search\ProfileIndexDto.cs" />
+    <Compile Include="Search\SearchResults.cs" />
     <Compile Include="Translation.cs" />
     <Compile Include="ProxyClaim.cs" />
     <Compile Include="ProfessionalInfo.cs" />
@@ -104,6 +120,7 @@
   <ItemGroup>
     <None Include="packages.config" />
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

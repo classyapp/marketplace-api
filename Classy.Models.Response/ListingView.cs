@@ -14,6 +14,8 @@ namespace Classy.Models.Response
         public string ProfileId { get; set; }
         public string Title { get; set; }
         public string Content { get; set; }
+        public IList<string> Categories { get; set; }
+        public IList<string> FeaturedCategories { get; set; } 
         public string ListingType { get; set; }
         public IList<MediaFileView> ExternalMedia { get; set; }
         public LocationView Location { get; set; }
@@ -25,6 +27,7 @@ namespace Classy.Models.Response
         public int PurchaseCount { get; set; }
         public int AddToCollectionCount { get; set; }
         public int DisplayOrder { get; set; }
+        public int EditorsRank { get; set; }
         public bool IsPublished { get; set; }
         //
         public IList<CommentView> Comments { get; set; }
@@ -45,6 +48,7 @@ namespace Classy.Models.Response
         //
         public IList<string> Hashtags { get; set; }
         public IDictionary<string, IList<string>> TranslatedKeywords { get; set; }
+        public IList<string> SearchableKeywords { get; set; }
         //
         public ProfileView Profile { get; set; }
         public IList<ProfileView> FavoritedBy { get; set; }

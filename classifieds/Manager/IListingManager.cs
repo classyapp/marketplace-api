@@ -2,16 +2,14 @@
 using Classy.Models.Request;
 using Classy.Models.Response;
 using ServiceStack.ServiceHost;
-using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace classy.Manager
 {
     public interface IListingManager : IManager
     {
+        IList<ListingView> GetListingsByIds(string[] listingIds, string appId, bool includeDrafts, string culture);
+
         /// <summary>
         /// 
         /// </summary>
@@ -244,5 +242,7 @@ namespace classy.Manager
         void DeleteTranslation(string appId, string listingId, string cultureCode);
 
         ListingMoreInfoView GetListingMoreInfo(string appId, string listingId, Dictionary<string, string[]> metadata, Location location, string culture);
+
+        void EditMultipleListings(string[] listingIds, int? editorsRank, Dictionary<string, string> metadata, string appId);
     }
 }

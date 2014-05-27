@@ -1,11 +1,9 @@
 ﻿using Classy.Models;
+using Classy.Repository.Infrastructure;
 using MongoDB.Driver;
 using MongoDB.Driver.Builders;
-using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Classy.Repository
 {
@@ -14,10 +12,10 @@ namespace Classy.Repository
         private MongoCollection<LocalizationResource> ResourcesCollection;
         private MongoCollection<LocalizationListResource> ListResourcesCollection;
 
-        public MongoLocalizationProvider(MongoDatabase db)
+        public MongoLocalizationProvider(MongoDatabaseProvider db)
         {
-            ResourcesCollection = db.GetCollection<LocalizationResource>("resources");
-            ListResourcesCollection = db.GetCollection<LocalizationListResource>("listresources");
+            ResourcesCollection = db.GetCollection<LocalizationResource>();
+            ListResourcesCollection = db.GetCollection<LocalizationListResource>();
         }
     
         public LocalizationResource GetResourceByKey(string appId, string key)

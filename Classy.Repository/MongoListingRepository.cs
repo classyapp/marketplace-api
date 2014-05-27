@@ -1,25 +1,22 @@
-﻿using MongoDB.Bson;
-using MongoDB.Bson.Serialization;
+﻿using Classy.Repository.Infrastructure;
+using MongoDB.Bson;
 using MongoDB.Driver;
-using MongoDB.Driver.Linq;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Web;
 using MongoDB.Driver.Builders;
 using Classy.Models;
-using System.IO;
 using System.Text.RegularExpressions;
 
 namespace Classy.Repository
 {
     public class MongoListingRepository : IListingRepository
     {
-        private MongoCollection<Listing> ListingsCollection;
+        private readonly MongoCollection<Listing> ListingsCollection;
 
-        public MongoListingRepository(MongoDatabase db)
+        public MongoListingRepository(MongoDatabaseProvider db)
         {
-            ListingsCollection = db.GetCollection<Listing>("classifieds");
+            ListingsCollection = db.GetCollection<Listing>();
         }
 
         public Listing GetById(string listingId, string appId, bool includeDrafts, string culture)
@@ -99,6 +96,7 @@ namespace Classy.Repository
                     update.Set(x => x.SearchableKeywords, listing.TranslatedKeywords.SelectMany(s => s.Value));
                 else
                     update.Set(x => x.SearchableKeywords, null);
+              
 
                 ListingsCollection.FindAndModify(query, null, update);
             }
@@ -254,7 +252,10 @@ namespace Classy.Repository
         
         {
             // set sort order
-            var sortOrder = SortBy<Listing>.Descending(x => x.DisplayOrder).Descending(x => x.FavoriteCount);
+            var sortOrder = SortBy<Listing>
+                .Descending(x => x.EditorsRank)
+                .Descending(x => x.DisplayOrder)
+                .Descending(x => x.FavoriteCount);
 
             // app id
             var queries = new List<IMongoQuery>() {
@@ -305,11 +306,11 @@ namespace Classy.Repository
             // price range
             if (priceMin.HasValue)
             {
-                queries.Add(Query<Listing>.GTE(x => x.PricingInfo.Price, priceMin));
+                queries.Add(Query.ElemMatch("PricingInfo.PurchaseOptions", Query.GTE("Price", priceMin)));
             }
             if (priceMax.HasValue)
             {
-                queries.Add(Query<Listing>.LTE(x => x.PricingInfo.Price, priceMax));
+                queries.Add(Query.ElemMatch("PricingInfo.PurchaseOptions", Query.LTE("Price", priceMax)));
             }
 
             // geo
@@ -362,5 +363,20 @@ namespace Classy.Repository
                 ListingsCollection.Save(listing);
             }
         }
-   }
+
+        public void EditMultipleListings(string[] ids, int? editorsRank, string appId, Dictionary<string, string> metadata)
+        {
+            var updateBuilder = new UpdateBuilder<Listing>();
+            if (editorsRank.HasValue)
+                updateBuilder.Set(x => x.EditorsRank, editorsRank);
+
+            var metadataUpdater = new UpdateBuilder();
+            foreach (var listingInfo in metadata)
+                metadataUpdater.Set("Metadata." + listingInfo.Key, new BsonString(listingInfo.Value));
+
+            ListingsCollection.Update(
+                Query.And(Query<Listing>.In(x => x.Id, ids), Query<Listing>.EQ(x => x.AppId, appId)),
+                updateBuilder.Combine(metadataUpdater), UpdateFlags.Multi);
+        }
+    }
 }

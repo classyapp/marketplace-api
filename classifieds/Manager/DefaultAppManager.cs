@@ -1,37 +1,31 @@
-﻿using Classy.Models;
-using System;
-using System.Collections.Generic;
-using System.Drawing;
-using System.Linq;
-using System.Web;
+using classy.Cache;
+using Classy.Models;
+using Classy.Repository.Infrastructure;
+using MongoDB.Driver;
 
 namespace classy.Manager
 {
     public class DefaultAppManager : IAppManager
     {
+        private readonly MongoCollection<App> _appCollection;
+        private readonly ICache<App> _appCache;
+
+        public DefaultAppManager(MongoDatabaseProvider db, ICache<App> appCache)
+        {
+            _appCollection = db.GetCollection<App>();
+            _appCache = appCache;
+        }
+
         public App GetAppById(string appId)
         {
-            return new App
-            {
-                AppId = appId,
-                EnableProxyProfiles = true,
-                ProxyClaimNeedsVerification = true,
-                AllowUnmoderatedComments = true,
-                AllowUnmoderatedReviews = true,
-                DefaultProfileImage = "//d107oye3n9eb07.cloudfront.net/profile_img_69064",
-                PagesCount = 5,
-                PageSize = 12,
-                DefaultCountry = "FR",
-                DefaultCulture = "en",
-                GPSLocationCookieName = "classy.env.gps_location",
-                GPSOriginCookieName = "classy.env.gps_origin",
-                CountryCookieName = "classy.env.country",
-                CultureCookieName = "classy.env.culture",
-                Hostname = "www.homelab.com",
-                MandrilAPIKey = "ndg42WcyRHVLtLbvGqBjUA",
-                ImageReducedSize = 1600,
-                DefaultFromEmailAddress = "team@homelab.com"
-            };
+            var cache = _appCache.Get(appId);
+            if (cache != null)
+                return cache;
+
+            var app = _appCollection.FindOne(MongoDB.Driver.Builders.Query<App>.EQ(x => x.AppId, appId));
+            _appCache.Add(appId, app);
+
+            return app;
         }
     }
 }

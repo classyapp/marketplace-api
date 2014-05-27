@@ -118,6 +118,7 @@ namespace Classy.Auth
             for (int i = 0; i < result.Length; i++)
             {
                 sBuilder.Append(result[i].ToString("x2"));
+
             }
 
             // Return the hexadecimal string. 

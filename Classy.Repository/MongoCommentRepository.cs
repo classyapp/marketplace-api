@@ -1,12 +1,10 @@
-﻿using MongoDB.Bson;
+﻿using Classy.Repository.Infrastructure;
+using MongoDB.Bson;
 using MongoDB.Driver;
-using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Web;
 using MongoDB.Driver.Builders;
 using Classy.Models;
-using System.IO;
 
 namespace Classy.Repository
 {
@@ -14,9 +12,9 @@ namespace Classy.Repository
     {
         private MongoCollection<Comment> CommentsCollection;
 
-        public MongoCommentRepository(MongoDatabase db)
+        public MongoCommentRepository(MongoDatabaseProvider db)
         {
-            CommentsCollection = db.GetCollection<Comment>("comments");
+            CommentsCollection = db.GetCollection<Comment>();
         }
 
         public string Save(Comment comment)

@@ -6,8 +6,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Web;
 using ServiceStack.Common;
-using StackExchange.DataExplorer.Helpers;
-using MarkdownSharp;
 
 namespace classy.Manager
 {

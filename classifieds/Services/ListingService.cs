@@ -1,61 +1,30 @@
-﻿using ServiceStack.Common;
+﻿using classy.DTO.Request;
 using ServiceStack.ServiceInterface;
-using ServiceStack.ServiceHost;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Web;
 using ServiceStack.Common.Web;
 using System.Net;
-using ServiceStack.ServiceInterface.Validation;
-using ServiceStack.FluentValidation;
 using Classy.Models;
 using Classy.Models.Response;
 using Classy.Models.Request;
 using Classy.Auth;
-using System.IO;
 using classy.Manager;
-using Classy.Repository;
-using System.Security.Cryptography;
-using System.Text;
 using Classy.Interfaces.Managers;
 
 namespace classy.Services
 {
-    public class ListingService : ServiceStack.ServiceInterface.Service
+    public class ListingService : Service
     {
         public IBookingManager BookingManager { get; set; }
         public IOrderManager OrderManager { get; set; }
         public IListingManager ListingManager { get; set; }
         public IProfileManager ProfileManager { get; set; }
-        public IReviewManager ReviewManager { get; set; }
-        public ICollectionManager CollectionManager { get; set; }
         public IAnalyticsManager AnalyticsManager { get; set; }
         public ILocalizationManager LocalizationManager { get; set; }
         public IThumbnailManager ThumbnailManager { get; set; }
         public IEmailManager EmailManager { get; set; }
         public IAppManager AppManager { get; set; }
-        public IUserAuthRepository UserAuthRepository { get; set; }
-
-        [CustomAuthenticate]
-        public object Post(CreateProfileProxy request)
-        {
-            var session = SessionAs<CustomUserSession>();
-            var profile = ProfileManager.CreateProfileProxy(
-                request.Environment.AppId,
-                session.UserAuthId,
-                request.BatchId,
-                request.ProfessionalInfo,
-                request.Metadata);
-
-            return new HttpResult(profile, HttpStatusCode.OK);
-        }
-
-        public object Get(GetAppSettings request)
-        {
-            var app = AppManager.GetAppById(request.Environment.AppId);
-            return new HttpResult(app.TranslateTo<AppView>(), HttpStatusCode.OK);
-        }
 
         public object Get(GetListingById request)
         {
@@ -84,7 +53,7 @@ namespace classy.Services
             }
         }
 
-        public object Get(GetListingsByProfileId request)
+       public object Get(GetListingsByProfileId request)
        { 
             try
             {
@@ -104,30 +73,6 @@ namespace classy.Services
             }
         }
 
-        public object Get(SearchListings request)
-        {
-            return Post(request);
-        }
-
-        public object Post(SearchListings request)
-        {
-            var listingViews = ListingManager.SearchListings(
-                request.Environment.AppId,
-                request.Tags,
-                request.ListingTypes,
-                request.Metadata,
-                request.PriceMin,
-                request.PriceMax,
-                request.Location ?? request.Environment.GetDefaultLocation(AppManager.GetAppById(request.Environment.AppId).DefaultCountry),
-                request.IncludeComments,
-                request.FormatCommentsAsHtml,
-                request.Page,
-                AppManager.GetAppById(request.Environment.AppId).PageSize,
-                request.Environment.CultureCode);
-
-            return new HttpResult(listingViews, HttpStatusCode.OK);
-        }
-
         // create new listing
         [CustomAuthenticate]
         public object Post(PostListing request)
@@ -145,7 +90,7 @@ namespace classy.Services
                 request.ContactInfo ?? session.GetDefaultContactInfo(AppManager.GetAppById(request.Environment.AppId).DefaultCountry),
                 request.SchedulingTemplate,
                 request.Metadata);
-
+            
             return new HttpResult
             {
                 StatusCode = HttpStatusCode.Created,
@@ -171,6 +116,23 @@ namespace classy.Services
                     Request.Files);
 
                 return new HttpResult(listing, HttpStatusCode.OK);
+            }
+            catch (KeyNotFoundException kex)
+            {
+                return new HttpError(HttpStatusCode.NotFound, kex.Message);
+            }
+        }
+
+        public object Post(EditMultipleListings request)
+        {
+            try
+            {
+                var session = SessionAs<CustomUserSession>();
+                ListingManager.SecurityContext = session.ToSecurityContext();
+
+                ListingManager.EditMultipleListings(request.ListingIds, request.EditorsRank, request.Metadata, request.Environment.AppId);
+
+                return new HttpResult(HttpStatusCode.OK);
             }
             catch (KeyNotFoundException kex)
             {
@@ -272,56 +234,6 @@ namespace classy.Services
             }
         }
 
-        // add comment to post
-        [CustomAuthenticate]
-        public object Post(PostCommentForListing request)
-        {
-            try
-            {
-                var session = SessionAs<CustomUserSession>();
-                CommentView comment = null;
-
-                ListingManager.SecurityContext = session.ToSecurityContext();
-                comment = ListingManager.AddCommentToListing(
-                    request.Environment.AppId,
-                    request.ListingId,
-                    request.Content,
-                    request.FormatAsHtml);
-
-                comment.Profile = ProfileManager.GetProfileById(request.Environment.AppId, comment.ProfileId, null, false, false, false, false, false, false, false, request.Environment.CultureCode);
-
-                return new HttpResult(comment, HttpStatusCode.OK);
-            }
-            catch (KeyNotFoundException kex)
-            {
-                return new HttpError(HttpStatusCode.NotFound, kex.Message);
-            }
-        }
-
-        // add comment to post
-        [CustomAuthenticate]
-        public object Post(PostCommentForCollection request)
-        {
-            try
-            {
-                var session = SessionAs<CustomUserSession>();
-                CommentView comment = null;
-
-                CollectionManager.SecurityContext = session.ToSecurityContext();
-                comment = CollectionManager.AddCommentToCollection(
-                    request.Environment.AppId,
-                    request.CollectionId,
-                    request.Content,
-                    request.FormatAsHtml);
-
-                return new HttpResult(comment, HttpStatusCode.OK);
-            }
-            catch (KeyNotFoundException kex)
-            {
-                return new HttpError(HttpStatusCode.NotFound, kex.Message);
-            }
-        }
-
         // favorite a listing
         [CustomAuthenticate]
         public object Post(FavoriteListing request)
@@ -384,285 +296,6 @@ namespace classy.Services
             {
                 return new HttpError(HttpStatusCode.NotFound, kex.Message);
             }
-        }
-
-        // follow a profile
-        [CustomAuthenticate]
-        public object Post(FollowProfile request)
-        {
-            try
-            {
-                var session = SessionAs<CustomUserSession>();
-
-                ProfileManager.FollowProfile(
-                    request.Environment.AppId,
-                    session.UserAuthId,
-                    request.FolloweeProfileId);
-
-                return new HttpResult(HttpStatusCode.OK);
-            }
-            catch (KeyNotFoundException kex)
-            {
-                return new HttpError(HttpStatusCode.NotFound, kex.Message);
-            }
-        }
-
-        // unfollow a profile
-        [CustomAuthenticate]
-        public object Delete(FollowProfile request)
-        {
-            try
-            {
-                var session = SessionAs<CustomUserSession>();
-
-                ProfileManager.UnfollowProfile(
-                    request.Environment.AppId,
-                    session.UserAuthId,
-                    request.FolloweeProfileId);
-
-                return new HttpResult(HttpStatusCode.OK);
-            }
-            catch (KeyNotFoundException kex)
-            {
-                return new HttpError(HttpStatusCode.NotFound, kex.Message);
-            }
-        }
-
-        // submit proxy claim
-        [CustomAuthenticate]
-        public object Post(ClaimProxyProfile request)
-        {
-            try
-            {
-                var session = SessionAs<CustomUserSession>();
-
-                var claim = ProfileManager.SubmitProxyClaim(
-                    request.Environment.AppId,
-                    session.UserAuthId,
-                    request.ProxyProfileId,
-                    request.ProfessionalInfo,
-                    request.Metadata,
-                    request.DefaultCulture);
-
-                return new HttpResult(claim, HttpStatusCode.OK);
-            }
-            catch (KeyNotFoundException kex)
-            {
-                return new HttpError(HttpStatusCode.NotFound, kex.Message);
-            }
-        }
-
-        // approve proxy claim
-        [CustomAuthenticate]
-        public object Post(ApproveProxyClaim request)
-        {
-            try
-            {
-                var claim = ProfileManager.ApproveProxyClaim(
-                    request.Environment.AppId,
-                    request.ClaimId);
-
-                return new HttpResult(claim, HttpStatusCode.OK);
-            }
-            catch (KeyNotFoundException kex)
-            {
-                return new HttpError(HttpStatusCode.NotFound, kex.Message);
-            }
-        }
-
-        // reject proxy claim
-        [CustomAuthenticate]
-        public object Post(RejectProxyClaim request)
-        {
-            try
-            {
-                var claim = ProfileManager.RejectProxyClaim(
-                    request.Environment.AppId,
-                    request.ClaimId);
-
-                return new HttpResult(claim, HttpStatusCode.OK);
-            }
-            catch (KeyNotFoundException kex)
-            {
-                return new HttpError(HttpStatusCode.NotFound, kex.Message);
-            }
-        }
-
-        // get profile form session
-        [CustomAuthenticate]
-        public object Get(GetAutenticatedProfile request)
-        {
-            var session = SessionAs<CustomUserSession>();
-            if (!session.IsAuthenticated) return new HttpError(HttpStatusCode.Unauthorized, "No Session");
-            else
-            {
-                var profile = ProfileManager.GetProfileById(
-                    request.Environment.AppId,
-                    session.UserAuthId,
-                    session.UserAuthId,
-                    true,
-                    true,
-                    false,
-                    false,
-                    false,
-                    true,
-                    false,
-                    request.Environment.CultureCode);
-                return new HttpResult(profile);
-            }
-        }
-
-        // get profile
-        public object Get(GetProfileById request)
-        {
-            try
-            {
-                var session = SessionAs<CustomUserSession>();
-
-                var profile = ProfileManager.GetProfileById(
-                    request.Environment.AppId,
-                    request.ProfileId,
-                    session.UserAuthId,
-                    request.IncludeFollowedByProfiles,
-                    request.IncludeFollowingProfiles,
-                    request.IncludeReviews,
-                    request.IncludeListings,
-                    request.IncludeCollections,
-                    request.IncludeFavorites,
-                    request.LogImpression,
-                    request.Environment.CultureCode);
-
-                return new HttpResult(profile, HttpStatusCode.OK);
-            }
-            catch (KeyNotFoundException kex)
-            {
-                return new HttpError(HttpStatusCode.NotFound, kex.Message);
-            }
-        }
-
-        [CustomAuthenticate]
-        public object Put(UpdateProfile request)
-        {
-            try
-            {
-                var session = SessionAs<CustomUserSession>();
-
-                if (session.UserAuthId != request.ProfileId &&
-                    !session.Permissions.Contains("admin")) throw new UnauthorizedAccessException("not yours to update");
-
-                if (request.Fields.HasFlag(ProfileUpdateFields.SetPassword))
-                {
-                    IUserAuthRepository authRepository = GetAppHost().TryResolve<IUserAuthRepository>();
-                    UserAuth userAuth = authRepository.GetUserAuth(request.Environment.AppId, request.ProfileId);
-                    authRepository.UpdateUserAuth(userAuth, userAuth, request.Password);
-                }
-
-                byte[] imageData = null;
-                string imageContentType = null;
-                if (request.Fields.HasFlag(ProfileUpdateFields.ProfileImage) && Request.Files.Length == 1)
-                {
-                    var reader = new BinaryReader(Request.Files[0].InputStream);
-                    imageData = new byte[Request.Files[0].InputStream.Length];
-                    reader.Read(imageData, 0, imageData.Length);
-                    imageContentType = Request.Files[0].ContentType;
-                }
-
-                var profile = ProfileManager.UpdateProfile(
-                    request.Environment.AppId,
-                    request.ProfileId,
-                    request.ContactInfo ?? session.GetDefaultContactInfo(AppManager.GetAppById(request.Environment.AppId).DefaultCountry),
-                    request.ProfessionalInfo,
-                    request.Metadata,
-                    request.Fields,
-                    imageData,
-                    imageContentType,
-                    string.IsNullOrEmpty(request.DefaultCulture) ? request.Environment.CultureCode : request.DefaultCulture,
-                    request.CoverPhotos);
-
-                // update email on user auth if needed
-                if (((profile.IsProfessional && request.Fields.HasFlag(ProfileUpdateFields.ProfessionalInfo) && (session.Email != profile.ProfessionalInfo.CompanyContactInfo.Email)) ||
-                    (!profile.IsProfessional && request.Fields.HasFlag(ProfileUpdateFields.ContactInfo) && (session.Email != profile.ContactInfo.Email))))
-                {
-                    var email = profile.IsProfessional
-                        ? profile.ProfessionalInfo.CompanyContactInfo.Email
-                        : profile.ContactInfo.Email;
-                    UserAuthRepository.UpdateUserEmail(request.Environment.AppId, profile.Id, email);
-                }
-
-                return new HttpResult(profile, HttpStatusCode.OK);
-            }
-            catch (KeyNotFoundException kex)
-            {
-                return new HttpError(HttpStatusCode.NotFound, kex.Message);
-            }
-        }
-
-        [CustomAuthenticate]
-        public object Post(SetProfileTranslation request)
-        {
-            try
-            {
-                var session = SessionAs<CustomUserSession>();
-                ProfileManager.SecurityContext = session.ToSecurityContext();
-                ProfileManager.SetTranslation(
-                    request.Environment.AppId,
-                    request.ProfileId,
-                    new ProfileTranslation
-                    {
-                        Culture = request.CultureCode,
-                        CompanyName = request.CompanyName,
-                        Metadata = request.Metadata
-                    });
-
-                return new HttpResult(new { ObjectId = request.ProfileId, Culture = request.CultureCode }, HttpStatusCode.OK);
-            }
-            catch (KeyNotFoundException kex)
-            {
-                return new HttpError(HttpStatusCode.NotFound, kex.Message);
-            }
-        }
-
-        [CustomAuthenticate]
-        public object Delete(DeleteProfileTranslation request)
-        {
-            try
-            {
-                var session = SessionAs<CustomUserSession>();
-                ProfileManager.SecurityContext = session.ToSecurityContext();
-                ProfileManager.DeleteTranslation(
-                    request.Environment.AppId,
-                    request.ProfileId,
-                    request.CultureCode);
-
-                return new HttpResult(new { ObjectId = request.ProfileId, Culture = request.CultureCode }, HttpStatusCode.OK);
-            }
-            catch (KeyNotFoundException kex)
-            {
-                return new HttpError(HttpStatusCode.NotFound, kex.Message);
-            }
-        }
-
-        // search profiles
-        public object Get(SearchProfiles request)
-        {
-            return Post(request);
-        }
-
-        public object Post(SearchProfiles request)
-        {
-            var profiles = ProfileManager.SearchProfiles(
-                request.Environment.AppId,
-                request.DisplayName,
-                request.Category,
-                request.Location ?? request.Environment.GetDefaultLocation(AppManager.GetAppById(request.Environment.AppId).DefaultCountry),
-                request.Metadata,
-                request.ProfessionalsOnly,
-                request.IgnoreLocation,
-                request.Page,
-                AppManager.GetAppById(request.Environment.AppId).PageSize,
-                request.Environment.CultureCode);
-
-            return new HttpResult(profiles, HttpStatusCode.OK);
         }
 
         // book timelost within listing
@@ -924,142 +557,6 @@ namespace classy.Services
             }
         }
 
-        // post a review for listing
-        [CustomAuthenticate]
-        public object Post(PostReviewForListing request)
-        {
-            try
-            {
-                var session = SessionAs<CustomUserSession>();
-                var review = ReviewManager.PostReviewForListing(
-                    request.Environment.AppId,
-                    session.UserAuthId,
-                    request.ListingId,
-                    request.Content,
-                    request.Score,
-                    request.SubCriteria);
-                return new HttpResult(review, HttpStatusCode.OK);
-            }
-            catch (KeyNotFoundException kex)
-            {
-                return new HttpError(HttpStatusCode.NotFound, kex.Message);
-            }
-        }
-
-        // post a review for profile
-        [CustomAuthenticate]
-        public object Post(PostReviewForProfile request)
-        {
-            try
-            {
-                var session = SessionAs<CustomUserSession>();
-                var review = ReviewManager.PostReviewForProfile(
-                    request.Environment.AppId,
-                    session.UserAuthId,
-                    request.RevieweeProfileId,
-                    request.Content,
-                    request.Score,
-                    request.SubCriteria,
-                    request.Metadata,
-                    request.NewProfessionalContactInfo,
-                    request.NewProfessionalMetadata);
-                var response = new PostReviewResponse
-                {
-                    Review = review.TranslateTo<ReviewView>()
-                };
-                if (request.ReturnRevieweeProfile)
-                    response.RevieweeProfile = ProfileManager.GetProfileById(
-                        request.Environment.AppId,
-                        request.RevieweeProfileId,
-                        null,
-                        false,
-                        false,
-                        false,
-                        false,
-                        false,
-                        false,
-                        false,
-                        request.Environment.CultureCode);
-                if (request.ReturnReviewerProfile)
-                    response.ReviewerProfile = ProfileManager.GetProfileById(
-                        request.Environment.AppId,
-                        session.UserAuthId,
-                        null,
-                        false,
-                        false,
-                        false,
-                        false,
-                        false,
-                        false,
-                        false,
-                        request.Environment.CultureCode);
-                return new HttpResult(response, HttpStatusCode.OK);
-            }
-            catch (KeyNotFoundException kex)
-            {
-                return new HttpError(HttpStatusCode.NotFound, kex.Message);
-            }
-        }
-
-        // get a list of reviews for profile
-        [CustomAuthenticate]
-        public object Get(GetReviewsByProfileId request)
-        {
-            try
-            {
-                var reviews = ReviewManager.GetReviews(
-                    request.Environment.AppId,
-                    request.ProfileId,
-                    request.IncludeDrafts,
-                    request.IncludeOnlyDrafts);
-
-                return new HttpResult(reviews, HttpStatusCode.OK);
-            }
-            catch (KeyNotFoundException kex)
-            {
-                return new HttpError(HttpStatusCode.NotFound, kex.Message);
-            }
-        }
-
-        // publish a review
-        [CustomAuthenticate]
-        public object Post(PublishOrDeleteReview request)
-        {
-            try
-            {
-                var session = SessionAs<CustomUserSession>();
-                var review = ReviewManager.PublishReview(
-                    request.Environment.AppId,
-                    request.ReviewId,
-                    session.UserAuthId);
-
-                return new HttpResult(review, HttpStatusCode.OK);
-            }
-            catch (KeyNotFoundException kex)
-            {
-                return new HttpError(HttpStatusCode.NotFound, kex.Message);
-            }
-        }
-
-        // delete a review
-        public object Delete(PublishOrDeleteReview request)
-        {
-            try
-            {
-                var session = SessionAs<CustomUserSession>();
-                var review = ReviewManager.DeleteReview(
-                    request.Environment.AppId,
-                    request.ReviewId,
-                    session.UserAuthId);
-
-                return new HttpResult(review, HttpStatusCode.OK);
-            }
-            catch (KeyNotFoundException kex)
-            {
-                return new HttpError(HttpStatusCode.NotFound, kex.Message);
-            }
-        }
-
         // 
         // POST: /stats/push
         // log an activity 
@@ -1071,295 +568,7 @@ namespace classy.Services
             return new HttpResult(tripleView, HttpStatusCode.OK);
         }
 
-        //
-        // POST: /collection/new
-        // create a new collection
-        [CustomAuthenticate]
-        public object Post(CreateCollection request)
-        {
-            try
-            {
-                var session = SessionAs<CustomUserSession>();
-                CollectionManager.SecurityContext = session.ToSecurityContext();
-
-                var collection = CollectionManager.CreateCollection(
-                    request.Environment.AppId,
-                    request.ProfileId,
-                    request.Type,
-                    request.Title,
-                    request.Content,
-                    request.IsPublic,
-                    request.IncludedListings,
-                    request.Collaborators,
-                    request.PermittedViewers);
-                return new HttpResult(collection, HttpStatusCode.OK);
-            }
-            catch (KeyNotFoundException kex)
-            {
-                return new HttpError(HttpStatusCode.NotFound, kex.Message);
-            }
-        }
-
-        //
-        // POST: /collection/{CollectionId}/listings
-        // add listings to a collection
-        [CustomAuthenticate]
-        public object Post(AddListingsToCollection request)
-        {
-            try
-            {
-                var session = SessionAs<CustomUserSession>();
-                CollectionManager.SecurityContext = session.ToSecurityContext();
-
-                var collection = CollectionManager.AddListingsToCollection(
-                    request.Environment.AppId,
-                    request.CollectionId,
-                    request.IncludedListings,
-                    request.Environment.CultureCode);
-                return new HttpResult(collection, HttpStatusCode.OK);
-            }
-            catch (KeyNotFoundException kex)
-            {
-                return new HttpError(HttpStatusCode.NotFound, kex.Message);
-            }
-        }
-
-        //
-        // POST: /collection/{CollectionId}/listings
-        // add listings to a collection
-        [CustomAuthenticate]
-        public object Post(RemoveListingFromCollection request)
-        {
-            try
-            {
-                var session = SessionAs<CustomUserSession>();
-                CollectionManager.RemoveListingsFromCollection(
-                    request.Environment.AppId,
-                    session.UserAuthId,
-                    request.CollectionId,
-                    request.ListingIds);
-                return new HttpResult(request, HttpStatusCode.OK);
-            }
-            catch (KeyNotFoundException kex)
-            {
-                return new HttpError(HttpStatusCode.NotFound, kex.Message);
-            }
-        }
-
-        //
-        // PUT: /collection/{CollectionId}
-        // update collection
-        [CustomAuthenticate]
-        public object Put(UpdateCollection request)
-        {
-            try
-            {
-                var session = SessionAs<CustomUserSession>();
-                CollectionManager.SecurityContext = session.ToSecurityContext();
-                var collection = CollectionManager.UpdateCollection(
-                    request.Environment.AppId,
-                    request.CollectionId,
-                    request.Title,
-                    request.Content,
-                    request.IncludedListings,
-                    request.Environment.CultureCode);
-                return new HttpResult(collection, HttpStatusCode.OK);
-            }
-            catch (KeyNotFoundException kex)
-            {
-                return new HttpError(HttpStatusCode.NotFound, kex.Message);
-            }
-        }
-
-        //
-        // DELETE: /collection/{CollectionId}
-        // delete collection
-        [CustomAuthenticate]
-        public object Delete(DeleteCollection request)
-        {
-            try
-            {
-                var session = SessionAs<CustomUserSession>();
-                CollectionManager.SecurityContext = session.ToSecurityContext();
-                CollectionManager.DeleteCollection(
-                    request.Environment.AppId,
-                    request.CollectionId);
-                return new HttpResult(true, HttpStatusCode.OK);
-            }
-            catch (KeyNotFoundException kex)
-            {
-                return new HttpError(HttpStatusCode.NotFound, kex.Message);
-            }
-        }
-
-        //
-        // POST: /collection/{CollectionId}/cover
-        // set collection cover photos
-        public object Post(SetCollectionCoverPhotos request)
-        {
-            try
-            {
-                var session = SessionAs<CustomUserSession>();
-                CollectionManager.SecurityContext = session.ToSecurityContext();
-
-                var collection = CollectionManager.UpdateCollectionCover(
-                    request.Environment.AppId,
-                    request.CollectionId,
-                    request.Keys,
-                    request.Environment.CultureCode);
-                return new HttpResult(collection, HttpStatusCode.OK);
-            }
-            catch (KeyNotFoundException kex)
-            {
-                return new HttpError(HttpStatusCode.NotFound, kex.Message);
-            }
-        }
-
-        //
-        // POST: /collection/{CollectionId}/submit
-        // add listings to a collection
-        [CustomAuthenticate]
-        public object Post(SubmitCollectionForEditorialApproval request)
-        {
-            try
-            {
-                var collection = CollectionManager.SubmitCollectionForEditorialApproval(
-                    request.Environment.AppId,
-                    request.CollectionId);
-                return new HttpResult(collection, HttpStatusCode.OK);
-            }
-            catch (KeyNotFoundException kex)
-            {
-                return new HttpError(HttpStatusCode.NotFound, kex.Message);
-            }
-        }
-
-        //
-        // GET: /collection/list/approved
-        // get a list of approved collections
-        public object Get(GetApprovedCollections request)
-        {
-            var collections = CollectionManager.GetApprovedCollections(
-                request.Environment.AppId,
-                request.Categories,
-                request.MaxCollections,
-                request.Environment.CultureCode);
-            return new HttpResult(collections, HttpStatusCode.OK);
-        }
-
-        //
-        // GET: /collection/{CollectionId}
-        // get collection by id
-        public object Get(GetCollectionById request)
-        {
-            try
-            {
-                var session = SessionAs<CustomUserSession>();
-                CollectionManager.SecurityContext = session.ToSecurityContext();
-
-                var collection = CollectionManager.GetCollectionById(
-                    request.Environment.AppId,
-                    request.CollectionId,
-                    request.IncludeProfile,
-                    request.IncludeListings,
-                    request.IncludeDrafts,
-                    request.IncreaseViewCounter,
-                    request.IncreaseViewCounterOnListings,
-                    request.IncludeComments,
-                    request.FormatCommentsAsHtml,
-                    request.IncludeCommenterProfiles,
-                    request.Environment.CultureCode);
-                return new HttpResult(collection, HttpStatusCode.OK);
-            }
-            catch (KeyNotFoundException kex)
-            {
-                return new HttpError(HttpStatusCode.NotFound, kex.Message);
-            }
-        }
-
-        //
-        // GET: /profile/{ProfileId}/collection/list
-        // get collections by profile id
-        public object Get(GetCollectionByProfileId request)
-        {
-            try
-            {
-                var collection = CollectionManager.GetCollectionsByProfileId(
-                    request.Environment.AppId,
-                    request.ProfileId,
-                    request.CollectionType,
-                    request.Environment.CultureCode);
-                return new HttpResult(collection, HttpStatusCode.OK);
-            }
-            catch (KeyNotFoundException kex)
-            {
-                return new HttpError(HttpStatusCode.NotFound, kex.Message);
-            }
-        }
-
-        //
-        // GET: /resource/{Key}
-        // get resource by key
-        public object Get(GetResourceByKey request)
-        {
-            var resource = LocalizationManager.GetResourceByKey(request.Environment.AppId, request.Key, request.ProcessMarkdown);
-            return new HttpResult(resource, HttpStatusCode.OK);
-        }
-
-        //
-        // GET: /resource/all
-        // get all available resources for an app
-        [CustomAuthenticate]
-        [CustomRequiredPermission("cms")]
-        public object Get(GetResourcesForApp request)
-        {
-            var resourceKeys = LocalizationManager.GetResourcesForApp(request.Environment.AppId);
-            return new HttpResult(resourceKeys, HttpStatusCode.OK);
-        }
-
-        //
-        // GET: /resource/list/{Key}
-        // get resource by key
-        public object Get(GetListResourceByKey request)
-        {
-            var resource = LocalizationManager.GetListResourceByKey(request.Environment.AppId, request.Key);
-            return new HttpResult(resource, HttpStatusCode.OK);
-        }
-
-        //
-        // POST: /resource/{Key}
-        // set resource values
-        [CustomAuthenticate]
-        [CustomRequiredPermission("cms")]
-        public object Post(SetResourceValues request)
-        {
-            var resource = LocalizationManager.SetResourceValues(request.Environment.AppId, request.Key, request.Values);
-            return new HttpResult(resource, HttpStatusCode.OK);
-        }
-
-        //
-        // POST: /resource
-        // create new resource
-        [CustomAuthenticate]
-        [CustomRequiredPermission("cms")]
-        public object Post(CreateNewResource request)
-        {
-            var resource = LocalizationManager.CreateResource(request.Environment.AppId, request.Key, request.Values, request.Description);
-            return new HttpResult(resource, HttpStatusCode.OK);
-        }
-
-        //
-        // POST: /resource/list/{Key}
-        // set resource values
-        [CustomAuthenticate]
-        [CustomRequiredPermission("cms")]
-        public object Post(SetResourceListValues request)
-        {
-            var listResource = LocalizationManager.SetListResourceValues(request.Environment.AppId, request.Key, request.ListItems);
-            return new HttpResult(listResource, HttpStatusCode.OK);
-        }
-
-        //
+                //
         //GET: /profile/facebook/friends
         // get a list of the user's facebook friends
         [CustomAuthenticate]
@@ -1391,12 +600,6 @@ namespace classy.Services
         public object Get(GetThumbnail request)
         {
             return new HttpResult(ThumbnailManager.CreateThumbnail(request.ImageKey, request.Width, request.Height), "image/jpeg");
-        }
-
-        [CustomAuthenticate]
-        public object Get(GetProfileTranslation request)
-        {
-            return new HttpResult(ProfileManager.GetTranslation(request.Environment.AppId, request.ProfileId, request.CultureCode), HttpStatusCode.OK);
         }
 
         [CustomAuthenticate]
@@ -1446,52 +649,6 @@ namespace classy.Services
         }
 
         [CustomAuthenticate]
-        public object Get(GetCollectionTranslation request)
-        {
-            return new HttpResult(CollectionManager.GetCollectionTranslation(request.Environment.AppId, request.CollectionId, request.CultureCode), HttpStatusCode.OK);
-        }
-
-        [CustomAuthenticate]
-        public object Post(SetCollectionTranslation request)
-        {
-            try
-            {
-                var session = SessionAs<CustomUserSession>();
-                CollectionManager.SecurityContext = session.ToSecurityContext();
-                CollectionManager.SetCollectionTranslation(
-                    request.Environment.AppId,
-                    request.CollectionId,
-                    new CollectionTranslation { Culture = request.CultureCode, Metadata = new Dictionary<string, string>(), Title = request.Title, Content = request.Content });
-
-                return new HttpResult(new { ObjectId = request.CollectionId, Culture = request.CultureCode }, HttpStatusCode.OK);
-            }
-            catch (KeyNotFoundException kex)
-            {
-                return new HttpError(HttpStatusCode.NotFound, kex.Message);
-            }
-        }
-
-        [CustomAuthenticate]
-        public object Delete(DeleteCollectionTranslation request)
-        {
-            try
-            {
-                var session = SessionAs<CustomUserSession>();
-                CollectionManager.SecurityContext = session.ToSecurityContext();
-                CollectionManager.DeleteCollectionTranslation(
-                    request.Environment.AppId,
-                    request.CollectionId,
-                    request.CultureCode);
-
-                return new HttpResult(new { ObjectId = request.CollectionId, Culture = request.CultureCode }, HttpStatusCode.OK);
-            }
-            catch (KeyNotFoundException kex)
-            {
-                return new HttpError(HttpStatusCode.NotFound, kex.Message);
-            }
-        }
-
-        [CustomAuthenticate]
         public object Post(SendEmailRequest request)
         {
             try
@@ -1512,76 +669,7 @@ namespace classy.Services
                 return new HttpError(HttpStatusCode.NotFound, kex.Message);
             }
         }
-
-        public object Post(ForgotPasswordRequest request)
-        {
-            IUserAuthRepository authRepo = ResolveService<IUserAuthRepository>();
-            UserAuth userAuth = authRepo.GetUserAuthByUserName(request.Environment.AppId, request.Email);
-
-            if (userAuth != null)
-            {
-                // create hash
-                if (userAuth.Meta == null)
-                {
-                    userAuth.Meta = new Dictionary<string, string>();
-                }
-
-                MD5 md5 = System.Security.Cryptography.MD5.Create();
-                byte[] inputBytes = System.Text.Encoding.ASCII.GetBytes(Guid.NewGuid().ToString());
-                byte[] hash = md5.ComputeHash(inputBytes);
-                StringBuilder sb = new StringBuilder();
-                for (int i = 0; i < hash.Length; i++)
-                {
-                    sb.Append(hash[i].ToString("X2"));
-                }
-                userAuth.Meta["ResetPasswordHash"] = sb.ToString();
-                authRepo.SaveUserAuth(userAuth);
-
-                // Send Email
-                string subject = "ForgotPassword_ResetEmailSubject";
-                string body = "ForgotPassword_ResetEmailBody";
-                var subjectRes = LocalizationManager.GetResourceByKey(request.Environment.AppId, "ForgotPassword_ResetEmailSubject", true);
-                var bodyRes = LocalizationManager.GetResourceByKey(request.Environment.AppId, "ForgotPassword_ResetEmailBody", true);
-                EmailManager.SendHtmlMessage(
-                    AppManager.GetAppById(request.Environment.AppId).MandrilAPIKey,
-                    null, new string[] { userAuth.Email },
-                    subjectRes == null ? subject : subjectRes.Values[request.Environment.CultureCode],
-                    bodyRes == null ? body : string.Format(bodyRes.Values[request.Environment.CultureCode], string.Format("http://{0}/reset/{1}", AppManager.GetAppById(request.Environment.AppId).Hostname, sb.ToString())),
-                    "reset_password_template",
-                    null
-                    );
-                return new HttpResult(new { }, HttpStatusCode.OK);
-
-            }
-            return new HttpError("Email not found");
-        }
-
-        public object Get(VerifyPasswordResetRequest request)
-        {
-            IUserAuthRepository authRepo = ResolveService<IUserAuthRepository>();
-            UserAuth userAuth = authRepo.GetUserAuthByResetHash(request.Environment.AppId, request.Hash);
-
-            if (userAuth != null)
-            {
-                return new HttpResult(new { }, HttpStatusCode.OK);
-            }
-            return new HttpError("Invalid hash");
-        }
-
-        public object Post(PasswordResetRequest request)
-        {
-            IUserAuthRepository authRepo = ResolveService<IUserAuthRepository>();
-            UserAuth userAuth = authRepo.GetUserAuthByResetHash(request.Environment.AppId, request.Hash);
-
-            if (userAuth != null)
-            {
-                authRepo.ResetUserPassword(userAuth, request.Password);
-
-                return new HttpResult(new { }, HttpStatusCode.OK);
-            }
-            return new HttpError("Invalid hash");
-        }
-
+        
         public object Get(GetCitiesByCountry request)
         {
             return LocalizationManager.GetCitiesByCountry(request.Environment.AppId, request.CountryCode);

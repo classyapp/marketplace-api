@@ -1,16 +1,18 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+﻿using System.Collections.Generic;
+using MongoDB.Bson.Serialization.Attributes;
 
 namespace Classy.Models
 {
+    [BsonIgnoreExtraElements]
     public class PurchaseOption
     {
-        public string VariantKey { get; set; } // Size, Color, Model, etc.
-        public string VariantValue { get; set; } // S, M, L, Red, Blue, Pink/Crimson, etc.
+        public string Title{ get; set; }
+        public Dictionary<string, string> VariantProperties { get; set; } // Key: Size, Color, Model, etc. Value: Smal, Medium, Large, etc.
         public string SKU { get; set; }
         public double Price { get; set; }
         public double Quantity { get; set; }
+        public double? CompareAtPrice { get; set; }
+        public MediaFile[] MediaFiles { get; set; }
+        public string DefaultImage { get; set; }
     }
 }

@@ -1,17 +1,15 @@
-﻿using MongoDB.Bson.Serialization.Attributes;
-using MongoDB.Bson.Serialization.IdGenerators;
-using System;
+﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Web;
-using Classy.Models;
-using ServiceStack.Common;
+using Classy.Models.Attributes;
+using MongoDB.Bson.Serialization.Attributes;
 
 namespace Classy.Models
 {
     /// <summary>
     /// Custom User DataModel for harvesting UserAuth info into your own DB table
     /// </summary>   
+    [MongoCollection(Name = "profiles")]
+    [BsonIgnoreExtraElements]
     public class Profile : BaseObject, ITranslatable<Profile>
     {
         public static readonly string EmailHashMetadata = "EmailHash";
@@ -53,6 +51,7 @@ namespace Classy.Models
         /// A collection of media files' keys to be used in creating the collage
         /// </summary>
         public IList<string> CoverPhotos { get; set; }
+
 
         //
         public bool IsProfessional {

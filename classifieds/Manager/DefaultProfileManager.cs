@@ -1,20 +1,16 @@
-﻿using Classy.Models;
+﻿using Classy.Interfaces.Search;
+using Classy.Models;
 using Classy.Models.Response;
 using Classy.Repository;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Web;
 using ServiceStack.Common;
-using Classy.Auth;
 using Classy.Models.Request;
 using ServiceStack.Text;
-using ServiceStack.ServiceClient.Web;
-using System.IO;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using classy.Extentions;
-using System.Collections.ObjectModel;
 
 namespace classy.Manager
 {
@@ -28,6 +24,7 @@ namespace classy.Manager
         private ICollectionRepository CollectionRepository;
         private ITripleStore TripleStore;
         private IStorageRepository StorageRepository;
+        private readonly IIndexer<Profile> _profileIndexer;
 
         public DefaultProfileManager(
             IAppManager appManager,
@@ -37,7 +34,7 @@ namespace classy.Manager
             IReviewRepository reviewRepository,
             ICollectionRepository collectionRepository,
             ITripleStore tripleStore,
-            IStorageRepository storageRepository)
+            IStorageRepository storageRepository, IIndexer<Profile> profileIndexer)
         {
             AppManager = appManager;
             LocalizationManager = localizationManager;
@@ -47,6 +44,7 @@ namespace classy.Manager
             CollectionRepository = collectionRepository;
             TripleStore = tripleStore;
             StorageRepository = storageRepository;
+            _profileIndexer = profileIndexer;
         }
 
         public ManagerSecurityContext SecurityContext { get; set; }
@@ -150,6 +148,12 @@ namespace classy.Manager
             ProfileRepository.Save(follower);
         }
 
+        public List<ProfileView> GetProfilesByIds(string[] profileIds, string appId, string culture)
+        {
+            var profiles = ProfileRepository.GetByIds(appId, profileIds, culture);
+            return profiles.Select(x => x.ToProfileView()).ToList();
+        }
+
         public ProfileView GetProfileById(
             string appId,
             string profileId,
@@ -165,6 +169,9 @@ namespace classy.Manager
         {
             var profile = ProfileRepository.GetById(appId, profileId, logImpression, culture);
             if (profile == null) throw new KeyNotFoundException("invalid profile id");
+
+            if (logImpression)
+                _profileIndexer.Increment(profileId, appId, p => p.ViewCount);
 
             var profileView = profile.ToProfileView();
 
@@ -251,7 +258,6 @@ namespace classy.Manager
             IList<string> coverPhotos)
         {
             var profile = GetVerifiedProfile(appId, profileId);
-            var rankInc = 0;
 
             // update language ranking if default culture is sent
             if (!string.IsNullOrEmpty(profile.DefaultCulture) && profile.Languages == null)
@@ -263,11 +269,6 @@ namespace classy.Manager
             // copy seller info
             if (fields.HasFlag(ProfileUpdateFields.ProfessionalInfo))
             {
-                if (profile.ProfessionalInfo != null)
-                {
-                    // increase rank if company contact info fields have been entered for the first time
-                    if (profile.ProfessionalInfo.CompanyContactInfo == null && professionalInfo.CompanyContactInfo != null) rankInc++;
-                }
                 profile.ProfessionalInfo = professionalInfo;
                 TryGeocoding(profile.ProfessionalInfo);
             }
@@ -275,9 +276,6 @@ namespace classy.Manager
             // copy metadata 
             if (fields.HasFlag(ProfileUpdateFields.Metadata))
             {
-                // increase rank if metadata fields have been entered for the first time
-                if (profile.Metadata == null || (metadata.Count > profile.Metadata.Count)) rankInc++;
-
                 if (profile.Metadata != null)
                 {
                     foreach (var attribute in metadata)
@@ -294,9 +292,6 @@ namespace classy.Manager
             // image 
             if (fields.HasFlag(ProfileUpdateFields.ProfileImage))
             {
-                // increase rank if profile image fields is uploaded for the first time
-                if (profile.Avatar == null) rankInc++;
-
                 var avatarKey = string.Concat("profile_img_", profile.Id, "_", Guid.NewGuid().ToString());
                 StorageRepository.SaveFile(avatarKey, profileImage, profileImageContentType, true, null);
                 profile.Avatar = new MediaFile
@@ -311,8 +306,6 @@ namespace classy.Manager
             // cover photos
             if (fields.HasFlag(ProfileUpdateFields.CoverPhotos))
             {
-                if (profile.CoverPhotos == null) rankInc++;
-
                 profile.CoverPhotos = coverPhotos;
             }
 
@@ -321,8 +314,9 @@ namespace classy.Manager
                 profile.DefaultCulture = defaultCulture;
             }
 
-            profile.Rank += rankInc;
             ProfileRepository.Save(profile);
+            _profileIndexer.Index(profile, appId);
+
             return profile.ToProfileView();
         }
 
@@ -406,9 +400,10 @@ namespace classy.Manager
             // TODO
 
             // save the new profile and delete the proxy
-            profile.Rank += rankInc;
             ProfileRepository.Save(profile);
+            _profileIndexer.Index(profile, appId);
             ProfileRepository.Delete(proxyProfile.Id);
+            _profileIndexer.RemoveFromIndex(proxyProfile, appId);
 
             // update claim status
             claim.Status = ProxyClaimStatus.Approved;
@@ -470,6 +465,7 @@ namespace classy.Manager
                 ((revieweeProfile.ReviewAverageScore * revieweeProfile.ReviewCount) + score) / (++revieweeProfile.ReviewCount);
 
             ProfileRepository.Save(revieweeProfile);
+            _profileIndexer.Index(revieweeProfile, appId);
 
             // return
             return review.TranslateTo<ReviewView>();
@@ -534,6 +530,7 @@ namespace classy.Manager
                 }
             }
             ProfileRepository.Save(revieweeProfile);
+            _profileIndexer.Index(revieweeProfile, appId);
 
             // return
             return review.TranslateTo<ReviewView>();
@@ -545,7 +542,6 @@ namespace classy.Manager
             string profileId)
         {
             var review = GetVerifiedReview(appId, reviewId);
-            if (review.Score > 3) ProfileRepository.IncreaseCounter(appId, profileId, ProfileCounters.Rank, 1);
             ReviewRepository.Publish(appId, reviewId);
             review.IsPublished = true;
             return review.TranslateTo<ReviewView>();

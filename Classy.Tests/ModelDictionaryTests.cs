@@ -1,8 +1,7 @@
-﻿using System;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
-using classy.Extentions;
+﻿using classy.Extentions;
 using System.Collections.ObjectModel;
 using System.Collections.Generic;
+using NUnit.Framework;
 
 namespace Classy.Tests
 {
@@ -12,12 +11,12 @@ namespace Classy.Tests
         public int MyInt { get; set; }
         public ViewModel MyChild { get; set; }
     }
-    [TestClass]
+    [TestFixture]
     public class ModelDictionaryTests
     {
         ViewModel _viewModel;
 
-        [TestInitialize]
+        [SetUp]
         public void Init()
         {
             _viewModel = new ViewModel()
@@ -32,28 +31,28 @@ namespace Classy.Tests
             };
         }
 
-        [TestMethod]
+        [Test]
         public void IncludeStringPropertyRetainsString()
         {
             ReadOnlyDictionary<string, object> dict = (ReadOnlyDictionary<string, object>)_viewModel.ToAPIModel().Include(x => x.MyString);
             Assert.AreEqual(_viewModel.MyString, dict["MyString"]);
         }
 
-        [TestMethod]
+        [Test]
         public void IncludeDoesNotRetainNotIncludedString()
         {
             ReadOnlyDictionary<string, object> dict = (ReadOnlyDictionary<string, object>)_viewModel.ToAPIModel().Include(x => x.MyInt);
             Assert.IsFalse(dict.ContainsKey("MyString"));
         }
 
-        [TestMethod]
+        [Test]
         public void IncludeChildObjectRetainsObject()
         {
             ReadOnlyDictionary<string, object> dict = (ReadOnlyDictionary<string, object>)_viewModel.ToAPIModel().Include(x => x.MyChild);
             Assert.AreEqual(_viewModel.MyChild, dict["MyChild"]);
         }
 
-        [TestMethod]
+        [Test]
         public void SpecifyingSubPropertiesEnsuresOnlyThosePropertiesAreSet()
         {
             ReadOnlyDictionary<string, object> dict = (ReadOnlyDictionary<string, object>)_viewModel.ToAPIModel().Include(x => x.MyChild.MyInt);
@@ -62,7 +61,7 @@ namespace Classy.Tests
             Assert.IsFalse(propertyDict.ContainsKey("MyString"));
         }
 
-        [TestMethod]
+        [Test]
         public void DeserializingSerializedObjectResultsInSameData()
         {
             var dict = _viewModel.ToAPIModel().Include(x => x.MyString);

@@ -1,8 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using Classy.Models.Attributes;
 
 namespace Classy.Models
 {
@@ -16,6 +14,7 @@ namespace Classy.Models
     /// <summary>
     /// represents a collection of listings curated by a user, with the ability to collaborate with other users
     /// </summary>
+    [MongoCollection(Name = "collections")]
     public class Collection : BaseObject, ITranslatable<Collection>
     {
         public Collection()
