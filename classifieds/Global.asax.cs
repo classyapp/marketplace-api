@@ -238,6 +238,7 @@ namespace classy
 
                 // Job
                 .Add<JobsStatusRequest>("/jobs/{ProfileId}", "GET")
+                .Add<JobErrorsRequest>("/job/{JobId}/errors", "GET")
 
                 // Reviews
                 .Add<PostReviewForListing>("/listing/{ListingId}/reviews/new", "POST")

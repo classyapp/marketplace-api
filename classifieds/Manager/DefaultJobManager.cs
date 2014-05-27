@@ -74,5 +74,10 @@ namespace classy.Manager
         {
             return _jobsRepository.GetByProfileId(appId, profileId).ToJobViewList();
         }
+
+        public string GetJobErrors(string appId, string jobId)
+        {
+            return string.Join("\r\n", _jobsRepository.GetById(appId, jobId).Errors);
+        }
     }
 }
