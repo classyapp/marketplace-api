@@ -33,6 +33,7 @@ namespace classy.Manager.Search
                     continue;
 
                 profilesToIndex.Add(new ProfileIndexDto {
+                    Id = entity.Id,
                     CommentCount = entity.CommentCount,
                     CompanyName = entity.ProfessionalInfo.CompanyName,
                     FollowerCount = entity.FollowerCount,
