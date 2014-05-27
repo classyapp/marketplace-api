@@ -102,6 +102,7 @@ namespace Classy.Auth
             userSession.FirstName = tokens.FirstName ?? userSession.FirstName;
             userSession.LastName = tokens.LastName ?? userSession.LastName;
             userSession.PrimaryEmail = tokens.Email ?? userSession.PrimaryEmail ?? userSession.Email;
+            userSession.Email = tokens.Email ?? userSession.PrimaryEmail ?? userSession.Email;
         }
     }
 
