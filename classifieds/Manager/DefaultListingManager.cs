@@ -645,7 +645,18 @@ namespace classy.Manager
                 {
                     if (collection.CoverPhotos == null || collection.CoverPhotos.Count == 0)
                     {
-                        collection.CoverPhotos = ListingRepository.GetById(collection.IncludedListings.Select(l => l.Id).Skip(Math.Max(0, collection.IncludedListings.Count - 4)).ToArray(), appId, false, null).Select(l => l.ExternalMedia[0].Key).ToArray();
+                        collection.CoverPhotos = ListingRepository
+                            .GetById(collection.IncludedListings
+                                .Select(l => l.Id)
+                                .Skip(Math.Max(0, collection.IncludedListings.Count - 4))
+                                .ToArray(), 
+                            appId, false, null)
+                                .Select(l =>
+                                {
+                                    if (l.ExternalMedia.IsNullOrEmpty())
+                                        return null;
+                                    return l.ExternalMedia[0].Key;
+                                }).ToArray();
                     }
                 }
 
