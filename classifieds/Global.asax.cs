@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Web;
 using classy.DTO.Request;
+using classy.DTO.Request.LogActivity;
 using classy.DTO.Request.Search;
 using classy.Extensions;
 using classy.Services;
@@ -242,6 +243,9 @@ namespace classy
 
                 // Email
                 .Add<SendEmailRequest>("/email", "POST")
+
+                // Log Activity
+                .Add<LogActivityRequest>("/log-activity/log", "POST")
             ;
         }
     }
