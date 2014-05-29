@@ -26,6 +26,27 @@ namespace classy.Services
         public IEmailManager EmailManager { get; set; }
         public IAppManager AppManager { get; set; }
 
+        public object Post(GetListingsById request)
+        {
+            try
+            {
+                var session = SessionAs<CustomUserSession>();
+                ListingManager.SecurityContext = session.ToSecurityContext();
+
+                var listingsView = ListingManager.GetListingsByIds(
+                    request.ListingIds,
+                    request.Environment.AppId,
+                    false,
+                    request.Environment.CultureCode);
+
+                return new HttpResult(listingsView, HttpStatusCode.OK);
+            }
+            catch (KeyNotFoundException kex)
+            {
+                return new HttpError(HttpStatusCode.NotFound, kex.Message);
+            }
+        }
+
         public object Get(GetListingById request)
         {
             try
@@ -234,7 +255,7 @@ namespace classy.Services
             }
         }
 
-        // favorite a listing
+        // favorite a listing 
         [CustomAuthenticate]
         public object Post(FavoriteListing request)
         {

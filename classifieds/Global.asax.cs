@@ -138,6 +138,7 @@ namespace classy
                 // Listings
                 .Add<EditMultipleListings>("/listings/edit-multiple", "POST")
                 .Add<GetListingById>("/listing/{ListingId}", "GET") // get listing by id, update listing
+                .Add<GetListingsById>("/listing/get-multiple", "POST")
                 .Add<DeleteListing>("/listing/{ListingId}", "DELETE") // delete listing by id, update listing
                 .Add<PostListing>("/listing/new", "POST") // post new listing
                 .Add<AddExternalMedia>("/listing/{ListingId}/media", "POST") // add media files and associate with listing
