@@ -10,13 +10,14 @@ using ServiceStack.WebHost.Endpoints;
 using System;
 using System.Collections.Generic;
 using System.Configuration;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
 namespace Classy.Tests
 {
-    //[TestFixture]
+    [TestFixture]
     public class CatalogImportTests
     {
 
@@ -25,7 +26,7 @@ namespace Classy.Tests
 
         }
        
-       // [Test]
+        [Test]
         public void TestImport()
         {
             try
@@ -54,6 +55,7 @@ namespace Classy.Tests
             }
             catch (WebServiceException ex)
             {
+                Trace.WriteLine(ex.Message);
                 Assert.Fail(ex.Message);
             }
         }

@@ -270,6 +270,9 @@
     <Compile Include="DTO\Request\Search\SearchProfilesRequest.cs" />
     <Compile Include="Services\SearchService.cs" />
     <Compile Include="DTO\Request\Search\SearchSuggestionsRequest.cs" />
+    <Compile Include="Operations\WebClientWithTimeout.cs">
+      <SubType>Component</SubType>
+    </Compile>
   </ItemGroup>
   <ItemGroup>
     <Content Include="packages.config" />

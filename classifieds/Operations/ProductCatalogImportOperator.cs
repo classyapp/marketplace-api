@@ -8,6 +8,7 @@ using Classy.Models;
 using Classy.Repository;
 using Classy.Interfaces.Managers;
 using System.Net;
+using Classy.Operations;
 
 namespace classy.Operations
 {
@@ -299,6 +300,7 @@ namespace classy.Operations
                     // persist last product.
                     if (activeListing != null)
                     {
+                        job.Status = "Finished";
                         persistListing(job, numProductsSaved, activeListing);
                     }
                 }
@@ -308,6 +310,8 @@ namespace classy.Operations
                     ReportError(lastProductLines, job, _jobRepository, numProductsSaved, numErrors);
 
                 }
+
+
             }
         }
 
@@ -326,11 +330,12 @@ namespace classy.Operations
                     mf.Url = dataLine[i];
                     tmpList.Add(mf);
 
-                    var client = new WebClient();
+                    var client = new WebClientWithTimeout();
                     byte[] img = null;
 
                     try
                     {
+                        
                         img = client.DownloadData(mf.Url);
                     }
                     catch (Exception)
