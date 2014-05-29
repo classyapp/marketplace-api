@@ -333,9 +333,9 @@
           <AutoAssignPort>True</AutoAssignPort>
           <DevelopmentServerPort>59966</DevelopmentServerPort>
           <DevelopmentServerVPath>/</DevelopmentServerVPath>
-          <IISUrl>http://localhost:8008</IISUrl>
+          <IISUrl>http://www.thisisclassy.com:8008</IISUrl>
           <OverrideIISAppRootUrl>True</OverrideIISAppRootUrl>
-          <IISAppRootUrl>http://localhost:8008</IISAppRootUrl>
+          <IISAppRootUrl>http://www.thisisclassy.com:8008</IISAppRootUrl>
           <NTLMAuthentication>False</NTLMAuthentication>
           <UseCustomServer>False</UseCustomServer>
           <CustomServerUrl>
