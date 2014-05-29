@@ -58,6 +58,7 @@ namespace Classy.UtilRunner.Utilities.Indexing
                         ListingCount= professional.ListingCount,
                         Location= GetGpsLocation(professional),
                         Country = GetCountry(professional),
+                        Rank = professional.Rank,
                         Metadata = professional.Metadata.Select(x => x.Value).ToArray(),
                         ReviewAverageScore= professional.ReviewAverageScore,
                         ReviewCount= professional.ReviewCount,
