@@ -10,6 +10,7 @@ namespace Classy.Models.Request
     {
         public string ListingId { get; set; }
         public Dictionary<string, string[]> Metadata { get; set; }
+        public Dictionary<string, string[]> Query { get; set; }
     }
 
     public class GetListingMoreInfoValidator : AbstractValidator<GetListingMoreInfo>

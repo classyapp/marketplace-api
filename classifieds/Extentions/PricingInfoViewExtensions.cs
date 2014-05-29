@@ -10,7 +10,7 @@ namespace classy
 {
     public static class PricingInfoViewExtentions
     {
-        public static PricingInfoView ToPricingInfoView(this PricingInfo from)
+        public static PricingInfoView ToPricingInfoView(this PricingInfo from, double adjustRate)
         {
             var to = from.TranslateTo<PricingInfoView>();
             if (from.PurchaseOptions != null)
@@ -18,7 +18,14 @@ namespace classy
                 if (to.PurchaseOptions == null) to.PurchaseOptions = new List<PurchaseOptionView>();
                 foreach (var o in from.PurchaseOptions)
                 {
-                    to.PurchaseOptions.Add(o.TranslateTo<PurchaseOptionView>());
+                    var v = o.TranslateTo<PurchaseOptionView>();
+                    v.Price *= adjustRate;
+                    if (v.CompareAtPrice.HasValue) { v.CompareAtPrice *= adjustRate; }
+                    if (o.MediaFiles != null)
+                    {
+                        v.MediaFiles = o.MediaFiles.Select(m => m.TranslateTo<MediaFileView>()).ToArray();
+                    }
+                    to.PurchaseOptions.Add(v);
                 }
             }
             return to;

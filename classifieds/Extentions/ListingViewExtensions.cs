@@ -5,19 +5,20 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Web;
 using ServiceStack.Common;
+using Classy.Interfaces.Managers;
 
 namespace classy
 {
     public static class ListingTranslateExtensions
     {
-        public static ListingView ToListingView(this Listing from)
+        public static ListingView ToListingView(this Listing from, ICurrencyManager currencyManager, string currencyCode)
         {
             var to = from.TranslateTo<ListingView>();
             if (from.ExternalMedia != null) to.ExternalMedia = from.ExternalMedia.ToMediaFileList();
             to.HasPricingInfo = from.PricingInfo != null;
             if (to.HasPricingInfo)
             {
-                to.PricingInfo = from.PricingInfo.ToPricingInfoView();
+                to.PricingInfo = from.PricingInfo.ToPricingInfoView(currencyManager.GetRate(from.PricingInfo.CurrencyCode, currencyCode, 0.035));
             }
             to.HasContactInfo = from.ContactInfo != null;
             if (to.HasContactInfo)
@@ -38,12 +39,12 @@ namespace classy
             return to;
         }
 
-        public static IList<ListingView> ToListingViewList(this IList<Listing> from, string culture)
+        public static IList<ListingView> ToListingViewList(this IList<Listing> from, string culture, ICurrencyManager currencyManager, string currencyCode)
         {
             var to = new List<ListingView>();
             foreach (var l in from)
             {
-                to.Add(l.Translate(culture).ToListingView());
+                to.Add(l.Translate(culture).ToListingView(currencyManager, currencyCode));
             }
             return to;
         }

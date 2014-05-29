@@ -15,6 +15,9 @@ using ServiceStack.ServiceInterface;
 using ServiceStack.ServiceInterface.Admin;
 using ServiceStack.ServiceInterface.Validation;
 using ServiceStack.WebHost.Endpoints;
+using classy.Operations;
+using Classy.Repository;
+using Classy.Interfaces.Managers;
 
 namespace classy
 {
@@ -85,6 +88,19 @@ namespace classy
             //    operation.PerformOperation(m.GetBody());
             //    return true;
             //});
+
+            container.Register<ProductCatalogImportOperator>(c => new ProductCatalogImportOperator(
+                c.TryResolve<IStorageRepository>(),
+                c.TryResolve<IListingRepository>(),
+                c.TryResolve<IJobRepository>(),
+                c.TryResolve<ICurrencyManager>(),
+                c.TryResolve<IProfileRepository>()));
+            mqServer.RegisterHandler<ImportProductCatalogJob>(m =>
+                {
+                    var operation = container.TryResolve<ProductCatalogImportOperator>();
+                    operation.PerformOperation(m.GetBody());
+                    return true;
+                });
 
             mqServer.Start();
         }
@@ -219,6 +235,10 @@ namespace classy
 
                 // Products
                 .Add<ImportPorductCatalogRequest>("/product/uploadcatalog", "POST")
+
+                // Job
+                .Add<JobsStatusRequest>("/jobs/{ProfileId}", "GET")
+                .Add<JobErrorsRequest>("/job/{JobId}/errors", "GET")
 
                 // Reviews
                 .Add<PostReviewForListing>("/listing/{ListingId}/reviews/new", "POST")

@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using Classy.Models.Attributes;
 
 namespace Classy.Models
@@ -16,5 +17,15 @@ namespace Classy.Models
         public string Status { get; set; }
         public MediaFile[] Attachments { get; set; }
         public Dictionary<string, object> Properties { get; set; }
+        public int Succeeded { get; set; }
+        public int Failed { get; set; }
+        public DateTime CreatedAt { get; set; }
+        public DateTime? UpdatedAt { get; set; }
+        public List<string> Errors { get; set; }
+
+        public Job()
+        {
+            Errors = new List<string>();
+        }
     }
 }
