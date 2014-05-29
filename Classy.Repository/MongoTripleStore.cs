@@ -38,6 +38,7 @@ namespace Classy.Repository
             if (existingTriple != null)
             {
                 triple.Count = ++existingTriple.Count;
+                count = triple.Count;
             }
 
             TripleCollection.Save(triple);
