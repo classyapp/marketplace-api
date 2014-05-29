@@ -293,6 +293,7 @@ namespace Classy.CatalogImportWorker
                     if (activeListing != null)
                     {
                         job.Status = "Finished";
+                        _jobRepository.Save(job);
                         persistListing(job, numProductsSaved, activeListing);
                     }
                 }
