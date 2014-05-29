@@ -3,7 +3,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Classy.Interfaces.Managers;
 using Classy.Models;
+using Classy.Repository;
 using Classy.Repository.Infrastructure;
 using MongoDB.Driver.Builders;
 
@@ -32,10 +34,20 @@ namespace Classy.CatalogImportWorker
                         .FirstOrDefault();
 
                     // Import Code goes here
-                    System.Diagnostics.Trace.WriteLine(string.Format("Running import for Profile {0} - Job {1}", job.ProfileId, job.Id));
-
-                    if (job == null)
+                    if (job != null)
+                    {
+                        new CatalogImportProcessor(
+                            _container.Resolve<IStorageRepository>(),
+                            _container.Resolve<IListingRepository>(),
+                            _container.Resolve<IJobRepository>(),
+                            _container.Resolve<ICurrencyManager>(),
+                            _container.Resolve<IProfileRepository>()
+                            ).Process(job);
+                    }
+                    else
+                    {
                         System.Threading.Thread.Sleep(5000);
+                    }
                 }
                 catch (Exception ex)
                 {
