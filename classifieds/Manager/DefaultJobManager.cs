@@ -33,7 +33,7 @@ namespace classy.Manager
         public JobView ScheduleCatalogImport(string appId, string profileId, bool overwriteListings, bool updateImages, byte[] catalog, string contentType, int catalogFormat)
         {
             string fileKey = Guid.NewGuid().ToString();
-            _storageRepository.SaveFile(fileKey, catalog, contentType);
+            //_storageRepository.SaveFile(fileKey, catalog, contentType);
 
             Job job = new Job
             {
