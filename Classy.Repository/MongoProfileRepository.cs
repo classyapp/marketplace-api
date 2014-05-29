@@ -97,6 +97,7 @@ namespace Classy.Repository
             if (counters.HasFlag(ProfileCounters.Following)) update.Inc(x => x.FollowingCount, value);
             if (counters.HasFlag(ProfileCounters.Comments)) update.Inc(x => x.CommentCount, value);
             if (counters.HasFlag(ProfileCounters.Reviews)) update.Inc(x => x.ReviewCount, value);
+            if (counters.HasFlag(ProfileCounters.Rank)) update.Inc(x => x.Rank, value);
             ProfilesCollection.Update(query, update);
         }
 
