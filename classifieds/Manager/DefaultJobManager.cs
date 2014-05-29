@@ -52,7 +52,7 @@ namespace classy.Manager
 
             _jobsRepository.Save(job);
             var queueRequest = new ImportProductCatalogJob(job.Id, appId);
-            _messageQueueClient.Publish<ImportProductCatalogJob>(queueRequest);
+            //_messageQueueClient.Publish<ImportProductCatalogJob>(queueRequest);
 
             return new JobView { JobId = job.Id, Status = job.Status };
         }
