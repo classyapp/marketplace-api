@@ -16,8 +16,9 @@ namespace Classy.CatalogImportWorker
             Funq.Container _container = new Funq.Container();
             _container.WireUp();
 
-            // get Jobs repository
-            IJobRepository _jobRepository = _container.Resolve<IJobRepository>();
+            // import jobs
+            Importer importer = new Importer(_container);
+            importer.Run();
         }
     }
 }
