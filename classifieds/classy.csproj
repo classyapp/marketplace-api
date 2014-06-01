@@ -131,10 +131,12 @@
     <Compile Include="DTO\Request\GetCollectionTranslation.cs" />
     <Compile Include="DTO\Request\GetIncludedListingTranslation.cs" />
     <Compile Include="DTO\Request\GetListingMoreInfo.cs" />
+    <Compile Include="DTO\Request\GetListingsById.cs" />
     <Compile Include="DTO\Request\GetListingTranslation.cs" />
     <Compile Include="DTO\Request\DeleteTranslation.cs" />
     <Compile Include="DTO\Request\GetProfileTranslation.cs" />
     <Compile Include="DTO\Request\ImportPorductCatalogRequest.cs" />
+    <Compile Include="DTO\Request\LogActivity\LogActivityRequest.cs" />
     <Compile Include="DTO\Request\PasswordResetRequest.cs" />
     <Compile Include="DTO\Request\PostComment.cs" />
     <Compile Include="DTO\Request\PostCommentForCollection.cs" />
@@ -328,9 +330,9 @@
           <AutoAssignPort>True</AutoAssignPort>
           <DevelopmentServerPort>59966</DevelopmentServerPort>
           <DevelopmentServerVPath>/</DevelopmentServerVPath>
-          <IISUrl>http://www.thisisclassy.com:8008</IISUrl>
+          <IISUrl>http://localhost:8008</IISUrl>
           <OverrideIISAppRootUrl>True</OverrideIISAppRootUrl>
-          <IISAppRootUrl>http://www.thisisclassy.com:8008</IISAppRootUrl>
+          <IISAppRootUrl>http://localhost:8008</IISAppRootUrl>
           <NTLMAuthentication>False</NTLMAuthentication>
           <UseCustomServer>False</UseCustomServer>
           <CustomServerUrl>
