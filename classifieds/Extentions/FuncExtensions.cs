@@ -126,6 +126,7 @@ namespace classy.Extensions
                     c.TryResolve<IStorageRepository>(),
                     c.TryResolve<IIndexer<Listing>>(),
                     c.TryResolve<IIndexer<Profile>>(),
+                    c.TryResolve<ICurrencyManager>(),
                     c.TryResolve<IKeywordsRepository>()));
             container.Register<IProfileManager>(c =>
                 new DefaultProfileManager(
@@ -137,7 +138,8 @@ namespace classy.Extensions
                     c.TryResolve<ICollectionRepository>(),
                     c.TryResolve<ITripleStore>(),
                     c.TryResolve<IStorageRepository>(),
-                    c.TryResolve<IIndexer<Profile>>()));
+                    c.TryResolve<IIndexer<Profile>>(),
+                    c.TryResolve<ICurrencyManager>()));
             container.Register<IReviewManager>(c =>
                 new DefaultProfileManager(
                     c.TryResolve<IAppManager>(),
@@ -148,7 +150,8 @@ namespace classy.Extensions
                     c.TryResolve<ICollectionRepository>(),
                     c.TryResolve<ITripleStore>(),
                     c.TryResolve<IStorageRepository>(),
-                    c.TryResolve<IIndexer<Profile>>()));
+                    c.TryResolve<IIndexer<Profile>>(),
+                    c.TryResolve<ICurrencyManager>()));
             container.Register<ICollectionManager>(c =>
                 new DefaultListingManager(
                     c.TryResolve<IAppManager>(),
@@ -160,6 +163,7 @@ namespace classy.Extensions
                     c.TryResolve<IStorageRepository>(),
                     c.TryResolve<IIndexer<Listing>>(),
                     c.TryResolve<IIndexer<Profile>>(),
+                    c.TryResolve<ICurrencyManager>(),
                     c.TryResolve<IKeywordsRepository>()));
             container.Register<IAnalyticsManager>(c =>
                 new DefaultAnalyticsManager(
