@@ -259,6 +259,7 @@
     <Compile Include="Services\CollectionService.cs" />
     <Compile Include="Services\CommentsService.cs" />
     <Compile Include="Services\ListingService.cs" />
+    <Compile Include="Services\LogActivityService.cs" />
     <Compile Include="Services\PasswordService.cs" />
     <Compile Include="Services\ProductService.cs" />
     <Compile Include="Services\ProfileService.cs" />

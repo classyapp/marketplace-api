@@ -374,21 +374,24 @@ namespace classy.Manager
             }
 
             // update the keywords collection in the db
-            var oldKeywords = listing.TranslatedKeywords.EmptyIfNull().SelectMany(x => x.Value).ToList();
-            foreach (var newKeywordLang in editorKeywords.EmptyIfNull())
+            if (fields.Has(ListingUpdateFields.EditorKeywords))
             {
-                foreach (var newKeyword in newKeywordLang.Value)
+                var oldKeywords = listing.TranslatedKeywords.EmptyIfNull().SelectMany(x => x.Value).ToList();
+                foreach (var newKeywordLang in editorKeywords.EmptyIfNull())
                 {
-                    if (oldKeywords.Contains(newKeyword))
-                        continue;
-                    _keywordsRepository.IncrementCount(newKeyword, newKeywordLang.Key, appId, 1, true);
+                    foreach (var newKeyword in newKeywordLang.Value)
+                    {
+                        if (oldKeywords.Contains(newKeyword))
+                            continue;
+                        _keywordsRepository.IncrementCount(newKeyword, newKeywordLang.Key, appId, 1, true);
+                    }
                 }
+
+                listing.TranslatedKeywords = editorKeywords;
+                listing.SearchableKeywords = editorKeywords.EmptyIfNull().SelectMany(x => x.Value).Union(listing.Hashtags).ToArray();
             }
 
-            listing.TranslatedKeywords = editorKeywords;
-            listing.SearchableKeywords = editorKeywords.EmptyIfNull().SelectMany(x => x.Value).Union(listing.Hashtags).ToArray();
             ListingRepository.Update(listing);
-
             _listingIndexer.Index(listing, appId);
 
             // return
