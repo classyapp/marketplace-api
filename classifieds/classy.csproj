@@ -137,6 +137,8 @@
     <Compile Include="DTO\Request\GetProfileTranslation.cs" />
     <Compile Include="DTO\Request\ImportPorductCatalogRequest.cs" />
     <Compile Include="DTO\Request\LogActivity\LogActivityRequest.cs" />
+    <Compile Include="DTO\Request\JobErrorsRequest.cs" />
+    <Compile Include="DTO\Request\JobsStatusRequest.cs" />
     <Compile Include="DTO\Request\PasswordResetRequest.cs" />
     <Compile Include="DTO\Request\PostComment.cs" />
     <Compile Include="DTO\Request\PostCommentForCollection.cs" />
@@ -202,6 +204,7 @@
     <Compile Include="Extentions\EnumerableExtensions.cs" />
     <Compile Include="Extentions\ImageExtensions.cs" />
     <Compile Include="Extentions\IndexerExtensions.cs" />
+    <Compile Include="Extentions\JobViewExtensions.cs" />
     <Compile Include="Extentions\LocalizationListResourceViewExtenstions.cs" />
     <Compile Include="Extentions\CommentViewExtensions.cs" />
     <Compile Include="Extentions\ContactInfoViewExtensions.cs" />
@@ -224,6 +227,7 @@
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
     <Compile Include="HtmlUtilities.cs" />
+    <Compile Include="Manager\CurrencyManager.cs" />
     <Compile Include="Manager\DefaultAnalyticsManager.cs" />
     <Compile Include="Manager\DefaultJobManager.cs" />
     <Compile Include="Manager\IAnalyticsManager.cs" />
@@ -249,6 +253,7 @@
     <Compile Include="Manager\Search\ListingSearchProvider.cs" />
     <Compile Include="Manager\Search\ProfileSearchProvider.cs" />
     <Compile Include="Manager\Search\SearchClientFactory.cs" />
+    <Compile Include="Manager\StubCurrencyRepository.cs" />
     <Compile Include="DTO\Response\SearchSuggestion.cs" />
     <Compile Include="Manager\Search\SearchSuggestionsProvider.cs" />
     <Compile Include="Operations\ImportProductCatalogJob.cs" />

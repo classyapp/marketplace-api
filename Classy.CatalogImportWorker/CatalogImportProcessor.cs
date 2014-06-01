@@ -1,4 +1,4 @@
-﻿using System;
+﻿﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
@@ -9,9 +9,9 @@ using Classy.Repository;
 using Classy.Interfaces.Managers;
 using System.Net;
 
-namespace classy.Operations
+namespace Classy.CatalogImportWorker
 {
-    public class ProductCatalogImportOperator : IOperator<ImportProductCatalogJob>
+    public class CatalogImportProcessor
     {
         public enum Columns
         {
@@ -62,7 +62,7 @@ namespace classy.Operations
         private readonly IProfileRepository _profileRepository; // Profiles.
         private bool reportLastProductAsError = false;
 
-        public ProductCatalogImportOperator(IStorageRepository storageRepo, IListingRepository listingRepo, IJobRepository jobRepo, ICurrencyManager currencyManager, IProfileRepository profileRepository)
+        public CatalogImportProcessor(IStorageRepository storageRepo, IListingRepository listingRepo, IJobRepository jobRepo, ICurrencyManager currencyManager, IProfileRepository profileRepository)
         {
             _storageRepository = storageRepo;
             _listingRepository = listingRepo;
@@ -94,10 +94,8 @@ namespace classy.Operations
             jobRepo.Save(job);
         }
 
-        public void PerformOperation(ImportProductCatalogJob request)
+        public void Process(Job job)
         {
-
-            var job = _jobRepository.GetById(request.AppId, request.JobId);
             bool overwriteListings;
             int catalogFormat;
             bool updateImages;
@@ -123,23 +121,23 @@ namespace classy.Operations
             {
                 Stream file = _storageRepository.GetFile(job.Attachments[0].Key);
                 StreamReader reader = new StreamReader(file);
-                int lineNum = 0;
+                string[] dataLines = reader.ReadToEnd().Split(new string[] { Environment.NewLine }, StringSplitOptions.RemoveEmptyEntries);
+                reader.Dispose();
                 Listing activeListing = null;
                 bool skipToNextParent = false;
                 Dictionary<string, string> variantProperties = new Dictionary<string, string>();
 
-                string defaultCulture = _profileRepository.GetById(request.AppId, job.ProfileId, false, null).DefaultCulture;
-
+                string defaultCulture = _profileRepository.GetById(job.AppId, job.ProfileId, false, null).DefaultCulture;
 
                 job.Status = "Executing";
                 job.Failed = 0;
                 job.Succeeded = 0;
 
-                while (!reader.EndOfStream)
+                for (int lineNum = 0; lineNum < dataLines.Length; lineNum++)
                 {
                     try
                     {
-                        string currLine = reader.ReadLine();
+                        string currLine = dataLines[lineNum];
 
                         if (lineNum != 0)
                         {
@@ -166,8 +164,8 @@ namespace classy.Operations
 
                                 lastProductLines = new List<string>();
                                 lastProductLines.Add(currLine);
-                                
-                                
+
+
                                 // persist the last listing and create a new one.
                                 if (activeListing != null)
                                 {
@@ -187,7 +185,7 @@ namespace classy.Operations
                                                                (int)Columns.Quantity_11, 
                                                                (int)Columns.Price_12, 
                                                                (int)Columns.Image_27});
-                           
+
 
                                 currListing = new Listing();
                                 purchaseOptions = SetupNewListing(job, currencyCode, defaultCulture, currListing, purchaseOptions);
@@ -228,9 +226,6 @@ namespace classy.Operations
                                 lastProductLines.Add(currLine);
 
                                 // verifications
-
-
-
                                 if (skipToNextParent)
                                 {
                                     lastProductLines.Add(currLine);
@@ -281,8 +276,6 @@ namespace classy.Operations
                                 activeListing.PricingInfo.PurchaseOptions = purchaseOptions;
                             }
                         }
-
-                        lineNum++;
                     }
                     catch (Exception exx)
                     {
@@ -299,6 +292,8 @@ namespace classy.Operations
                     // persist last product.
                     if (activeListing != null)
                     {
+                        job.Status = "Finished";
+                        _jobRepository.Save(job);
                         persistListing(job, numProductsSaved, activeListing);
                     }
                 }
@@ -306,7 +301,6 @@ namespace classy.Operations
                 {
                     lastProductLines[lastProductLines.Count - 1] = lastProductLines[lastProductLines.Count - 1] + "; <" + ex.Message + ">";
                     ReportError(lastProductLines, job, _jobRepository, numProductsSaved, numErrors);
-
                 }
             }
         }
@@ -326,11 +320,12 @@ namespace classy.Operations
                     mf.Url = dataLine[i];
                     tmpList.Add(mf);
 
-                    var client = new WebClient();
+                    var client = new WebClientWithTimeout();
                     byte[] img = null;
 
                     try
                     {
+
                         img = client.DownloadData(mf.Url);
                     }
                     catch (Exception)

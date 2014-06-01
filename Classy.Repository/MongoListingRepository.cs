@@ -246,7 +246,8 @@ namespace Classy.Repository
             throw new NotImplementedException();
         }
 
-        public IList<Listing> Search(string[] tags, string[] listingTypes, IDictionary<string, string[]> metadata, 
+        public IList<Listing> Search(string[] tags, string[] listingTypes, IDictionary<string, string[]> metadata,
+            IDictionary<string, string[]> objectQuery, 
             double? priceMin, double? priceMax, Location location, string appId,
             bool includeDrafts, bool increaseViewCounter, int page, int pageSize, ref long count, string culture)
         
@@ -261,6 +262,18 @@ namespace Classy.Repository
             var queries = new List<IMongoQuery>() {
                 Query<Listing>.EQ(x => x.AppId, appId)
             };
+
+            // object query
+            if (objectQuery != null)
+            {
+                foreach (var key in objectQuery.Keys)
+                {
+                    if (objectQuery[key].Length == 1)
+                        queries.Add(Query.EQ(key, objectQuery[key][0]));
+                    else
+                        queries.Add(Query.In(key, objectQuery[key].Select(v => new BsonString(v))));
+                }
+            }
 
             // listing types
             if (listingTypes != null && listingTypes.Count() > 0)

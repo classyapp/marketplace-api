@@ -11,5 +11,6 @@ namespace Classy.Repository
     {
         Job GetById(string appId, string jobId);
         void Save(Job job);
+        IEnumerable<Job> GetByProfileId(string appId, string profileId);
     }
 }

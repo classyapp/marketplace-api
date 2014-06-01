@@ -1,4 +1,6 @@
-﻿using Classy.Models;
+﻿using System;
+using System.Collections.Generic;
+using Classy.Models;
 using Classy.Repository.Infrastructure;
 using MongoDB.Driver;
 using MongoDB.Driver.Builders;
@@ -21,7 +23,17 @@ namespace Classy.Repository
 
         public void Save(Models.Job job)
         {
+            if (!string.IsNullOrEmpty(job.Id))
+            {
+                job.UpdatedAt = DateTime.UtcNow;
+            }
             JobsCollection.Save(job);
+        }
+
+
+        public IEnumerable<Job> GetByProfileId(string appId, string profileId)
+        {
+            return JobsCollection.Find(Query.And(Query.EQ("AppId", appId), Query.EQ("ProfileId", profileId)));
         }
     }
 }

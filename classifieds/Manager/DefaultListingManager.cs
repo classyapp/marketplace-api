@@ -10,6 +10,7 @@ using ServiceStack.ServiceHost;
 using System.IO;
 using Classy.Models.Request;
 using classy.Extentions;
+using Classy.Interfaces.Managers;
 
 namespace classy.Manager
 {
@@ -24,6 +25,7 @@ namespace classy.Manager
         private readonly IAppManager AppManager;
         private readonly IIndexer<Listing> _listingIndexer;
         private readonly IIndexer<Profile> _profileIndexer;
+        private readonly ICurrencyManager _currencyManager;
         private readonly IKeywordsRepository _keywordsRepository;
 
         public DefaultListingManager(
@@ -33,7 +35,11 @@ namespace classy.Manager
             IProfileRepository profileRepository,
             ICollectionRepository collectionRepository,
             ITripleStore tripleStore,
-            IStorageRepository storageRepository, IIndexer<Listing> listingIndexer, IIndexer<Profile> profileIndexer, IKeywordsRepository keywordsRepository)
+            IStorageRepository storageRepository, 
+            IIndexer<Listing> listingIndexer, 
+            IIndexer<Profile> profileIndexer,
+            ICurrencyManager currencyManager,
+            IKeywordsRepository keywordsRepository)
         {
             AppManager = appManager;
             ListingRepository = listingRepository;
@@ -44,16 +50,18 @@ namespace classy.Manager
             StorageRepository = storageRepository;
             _listingIndexer = listingIndexer;
             _profileIndexer = profileIndexer;
+            _currencyManager = currencyManager;
             _keywordsRepository = keywordsRepository;
         }
 
+        public Env Environment { get; set; }
         public ManagerSecurityContext SecurityContext { get; set; }
 
         public IList<ListingView> GetListingsByIds(string[] listingIds, string appId, bool includeDrafts, string culture)
         {
             var listings = ListingRepository.GetById(listingIds, appId, includeDrafts, null);
 
-            return listings.Select(x => x.ToListingView()).ToList();
+            return listings.Select(x => x.ToListingView(_currencyManager, Environment.CurrencyCode)).ToList();
         }
 
         public ListingView GetListingById(
@@ -72,7 +80,7 @@ namespace classy.Manager
             // TODO: cache listings
             var listing = GetVerifiedListing(appId, listingId);
             listing.Translate(culture);
-            var listingView = listing.ToListingView();
+            var listingView = listing.ToListingView(_currencyManager, Environment.CurrencyCode);
 
             if (logImpression)
             {
@@ -146,7 +154,7 @@ namespace classy.Manager
             var listingViews = new List<ListingView>();
             foreach (var c in listings)
             {
-                var view = c.Translate(culture).ToListingView();
+                var view = c.Translate(culture).ToListingView(_currencyManager, Environment.CurrencyCode);
                 if (includeComments)
                 {
                     view.Comments = comments.Where(x => x.ObjectId == view.Id).ToCommentViewList();
@@ -173,13 +181,13 @@ namespace classy.Manager
             long count = 0;
 
             // TODO: cache listings
-            var listings = ListingRepository.Search(tags, listingTypes, metadata, priceMin, priceMax, location, appId, false, false, page, pageSize, ref count, culture);
+            var listings = ListingRepository.Search(tags, listingTypes, metadata, null, priceMin, priceMax, location, appId, false, false, page, pageSize, ref count, culture);
             var comments = includeComments ?
                 CommentRepository.GetByListingIds(listings.Select(x => x.Id).AsEnumerable(), formatCommentsAsHtml) : null;
             var listingViews = new List<ListingView>();
             foreach (var c in listings)
             {
-                var view = c.Translate(culture).ToListingView();
+                var view = c.Translate(culture).ToListingView(_currencyManager, Environment.CurrencyCode);
                 if (includeComments)
                 {
                     view.Comments = comments.Where(x => x.ObjectId == view.Id).ToCommentViewList();
@@ -225,7 +233,7 @@ namespace classy.Manager
             }
             listing.ExternalMedia.Union(mediaFiles);
 
-            return listing.ToListingView();
+            return listing.ToListingView(_currencyManager, Environment.CurrencyCode);
         }
 
         public ListingView DeleteExternalMediaFromListing(
@@ -243,7 +251,7 @@ namespace classy.Manager
 
                 listing.ExternalMedia.Remove(file);
             }
-            return listing.ToListingView();
+            return listing.ToListingView(_currencyManager, Environment.CurrencyCode);
         }
 
         public ListingView PublishListing(
@@ -264,7 +272,7 @@ namespace classy.Manager
 
             _listingIndexer.Index(listing, appId);
 
-            return listing.ToListingView();
+            return listing.ToListingView(_currencyManager, Environment.CurrencyCode);
         }
 
         public ListingView SaveListing(
@@ -331,7 +339,7 @@ namespace classy.Manager
             }
 
             // return
-            return listing.ToListingView();
+            return listing.ToListingView(_currencyManager, Environment.CurrencyCode);
         }
 
         public ListingView UpdateListing(
@@ -395,7 +403,7 @@ namespace classy.Manager
             _listingIndexer.Index(listing, appId);
 
             // return
-            return listing.ToListingView();
+            return listing.ToListingView(_currencyManager, Environment.CurrencyCode);
         }
 
         public string DeleteListing(string appId, string listingId)
@@ -444,6 +452,10 @@ namespace classy.Manager
             ProfileRepository.IncreaseCounter(appId, SecurityContext.AuthenticatedProfileId, ProfileCounters.Comments, 1);
             _profileIndexer.Increment(SecurityContext.AuthenticatedProfileId, appId, l => l.CommentCount);
 
+            // increase rank of listing owner
+            ProfileRepository.IncreaseCounter(appId, listing.ProfileId, ProfileCounters.Rank, 1);
+            _profileIndexer.Increment(SecurityContext.AuthenticatedProfileId, appId, l => l.Rank);
+
             // add hashtags to listing if the comment is by the listing owner
             if (SecurityContext.AuthenticatedProfileId == listing.ProfileId || SecurityContext.IsAdmin)
             {
@@ -459,6 +471,10 @@ namespace classy.Manager
             {
                 var mentionedProfile = ProfileRepository.GetByUsername(appId, mentionedUsername.TrimStart('@'), false, null);
                 TripleStore.LogActivity(appId, SecurityContext.AuthenticatedProfileId, ActivityPredicate.MENTION_PROFILE, mentionedProfile.Id, ref count);
+
+                // increase rank of mentioned profile
+                ProfileRepository.IncreaseCounter(appId, mentionedProfile.Id, ProfileCounters.Rank, 1);
+                _profileIndexer.Increment(mentionedProfile.Id, appId, p => p.Rank);
             }
 
             // format as html
@@ -471,6 +487,8 @@ namespace classy.Manager
             string appId,
             string listingId)
         {
+            var listing = GetVerifiedListing(appId, listingId);
+
             int count = 0;
             TripleStore.LogActivity(appId, SecurityContext.AuthenticatedProfileId, ActivityPredicate.FAVORITE_LISTING, listingId, ref count);
             if (count == 1)
@@ -479,6 +497,9 @@ namespace classy.Manager
                 if (SecurityContext.IsAdmin) listingCounters |= ListingCounters.DisplayOrder;
                 ListingRepository.IncreaseCounter(listingId, appId, listingCounters, 1);
                 _listingIndexer.Increment(listingId, appId, l => l.FavoriteCount);
+
+                ProfileRepository.IncreaseCounter(appId, listing.ProfileId, ProfileCounters.Rank, 1);
+                _profileIndexer.Increment(listing.ProfileId, appId, p => p.Rank);
             }
         }
 
@@ -486,12 +507,17 @@ namespace classy.Manager
             string appId,
             string listingId)
         {
+            var listing = GetVerifiedListing(appId, listingId);
+
             int count = 0;
             TripleStore.ResetActivity(appId, SecurityContext.AuthenticatedProfileId, ActivityPredicate.FAVORITE_LISTING, listingId);
             if (count == 0)
             {
                 ListingRepository.IncreaseCounter(listingId, appId, ListingCounters.Favorites, -1);
                 _listingIndexer.Increment(listingId, appId, p => p.FavoriteCount, -1);
+
+                ProfileRepository.IncreaseCounter(appId, listing.ProfileId, ProfileCounters.Rank, -1);
+                _profileIndexer.Increment(listing.ProfileId, appId, p => p.Rank, -1);
             }
         }
 
@@ -500,11 +526,16 @@ namespace classy.Manager
             string listingId,
             FlagReason FlagReason)
         {
+            var listing = GetVerifiedListing(appId, listingId);
+
             switch (FlagReason)
             {
                 case FlagReason.Inapropriate:
                     ListingRepository.IncreaseCounter(listingId, appId, ListingCounters.Flags, 1);
                     _listingIndexer.Increment(listingId, appId, l => l.FlagCount);
+
+                    ProfileRepository.IncreaseCounter(appId, SecurityContext.AuthenticatedProfileId, ProfileCounters.Rank, -3);
+                    _profileIndexer.Increment(SecurityContext.AuthenticatedProfileId, appId, p => p.Rank, -3);
                     break;
                 case FlagReason.Dislike:
                 default:
@@ -555,6 +586,9 @@ namespace classy.Manager
                     {
                         ListingRepository.IncreaseCounter(listing.Id, appId, ListingCounters.AddToCollection, 1);
                         _listingIndexer.Increment(listing.Id, appId, l => l.AddToCollectionCount);
+
+                        ProfileRepository.IncreaseCounter(appId, profileId, ProfileCounters.Rank, 1);
+                        _profileIndexer.Increment(profileId, appId, p => p.Rank);
                     }
                 }
 
@@ -592,7 +626,12 @@ namespace classy.Manager
                 }
                 if (includeListings)
                 {
-                    collectionView.Listings = ListingRepository.GetById(listingIds, appId, includeDrafts, culture).ToListingViewList(culture);
+                    collectionView.Listings = ListingRepository.GetById(listingIds, appId, includeDrafts, culture).ToListingViewList(culture, _currencyManager, Environment.CurrencyCode);
+                    var profiles = ProfileRepository.GetByIds(appId, collectionView.Listings.Select(x => x.ProfileId).ToArray(), culture);
+                    foreach (var l in collectionView.Listings)
+                    {
+                        l.Profile = profiles.Single(x => x.Id == l.ProfileId).ToProfileView();
+                    }
                 }
                 if (increaseViewCounter)
                 {
@@ -763,7 +802,7 @@ namespace classy.Manager
 
                 CollectionRepository.Update(collection);
                 var collectionView = collection.ToCollectionView();
-                collectionView.Listings = ListingRepository.GetById(collection.IncludedListings.Select(l => l.Id).ToArray(), appId, false, culture).ToListingViewList(culture);
+                collectionView.Listings = ListingRepository.GetById(collection.IncludedListings.Select(l => l.Id).ToArray(), appId, false, culture).ToListingViewList(culture, _currencyManager, Environment.CurrencyCode);
                 return collectionView;
             }
             catch (Exception)
@@ -810,6 +849,10 @@ namespace classy.Manager
             // increase comment count for profile of commenter
             ProfileRepository.IncreaseCounter(appId, SecurityContext.AuthenticatedProfileId, ProfileCounters.Comments, 1);
             _profileIndexer.Increment(SecurityContext.AuthenticatedProfileId, appId, p => p.CommentCount);
+
+            // increase rank of listing owner
+            ProfileRepository.IncreaseCounter(appId, collection.ProfileId, ProfileCounters.Rank, 1);
+            _profileIndexer.Increment(collection.ProfileId, appId, p => p.Rank);
             
             // add hashtags to listing if the comment is by the listing owner
             if (SecurityContext.AuthenticatedProfileId == collection.ProfileId || SecurityContext.IsAdmin)
@@ -826,6 +869,10 @@ namespace classy.Manager
             {
                 var mentionedProfile = ProfileRepository.GetByUsername(appId, mentionedUsername.TrimStart('@'), false, null);
                 TripleStore.LogActivity(appId, SecurityContext.AuthenticatedProfileId, ActivityPredicate.MENTION_PROFILE, mentionedProfile.Id, ref count);
+
+                // increase rank of mentioned profile
+                ProfileRepository.IncreaseCounter(appId, mentionedProfile.Id, ProfileCounters.Rank, 1);
+                _profileIndexer.Increment(mentionedProfile.Id, appId, p => p.Rank);
             }
 
             // format as html
@@ -848,7 +895,7 @@ namespace classy.Manager
 
                 CollectionRepository.Update(collection);
                 var collectionView = collection.Translate(culture).ToCollectionView();
-                collectionView.Listings = ListingRepository.GetById(collection.IncludedListings.Select(l => l.Id).ToArray(), appId, false, culture).ToListingViewList(culture);
+                collectionView.Listings = ListingRepository.GetById(collection.IncludedListings.Select(l => l.Id).ToArray(), appId, false, culture).ToListingViewList(culture, _currencyManager, Environment.CurrencyCode);
                 return collectionView;
             }
             catch (Exception)
@@ -1030,7 +1077,7 @@ namespace classy.Manager
         }
 
 
-        public ListingMoreInfoView GetListingMoreInfo(string appId, string listingId, Dictionary<string, string[]> metadata, Location location, string culture)
+        public ListingMoreInfoView GetListingMoreInfo(string appId, string listingId, Dictionary<string, string[]> metadata, Dictionary<string, string[]> query, Location location, string culture)
         {
             ListingMoreInfoView data = new ListingMoreInfoView();
 
@@ -1041,16 +1088,16 @@ namespace classy.Manager
             if (originalCollection != null)
             {
                 data.CollectionType = originalCollection.Type.ToLowerInvariant();
-                data.CollectionLisitngs = ListingRepository.GetById(originalCollection.IncludedListings.Select(l => l.Id).ToArray(), appId, false, culture).ToListingViewList(culture);
+                data.CollectionLisitngs = ListingRepository.GetById(originalCollection.IncludedListings.Select(l => l.Id).ToArray(), appId, false, culture).ToListingViewList(culture, _currencyManager, Environment.CurrencyCode);
             }
 
             // Search by metadata provided
-            if (metadata != null)
+            if (metadata != null || query != null)
             {
                 long count = 0;
                 data.SearchResults = ListingRepository.Search(null, new string[] { listing.ListingType }, 
-                    metadata, 
-                    null, null, location, appId, false, false, 0, 0, ref count, culture).ToListingViewList(culture);
+                    metadata, query,
+                    null, null, location, appId, false, false, 0, 0, ref count, culture).ToListingViewList(culture, _currencyManager, Environment.CurrencyCode);
                 if (data.SearchResults != null)
                 {
                     data.SearchResults.Remove(data.SearchResults.First(wl => wl.Id == listingId));

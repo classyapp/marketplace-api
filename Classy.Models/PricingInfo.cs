@@ -12,6 +12,8 @@ namespace Classy.Models
         // Product configurations - at least one
         public IList<PurchaseOption> PurchaseOptions { get; set; }
 
+        public string CurrencyCode { get; set; }
+
         // TODO: make this a list of shipping options? 
         //public int? DomesticRadius { get; set; }
         //public decimal? DomesticShippingPrice { get; set; }

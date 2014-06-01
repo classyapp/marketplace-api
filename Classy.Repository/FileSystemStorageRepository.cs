@@ -47,5 +47,11 @@ namespace Classy.Repository
             FileStream stream = new FileStream(GetPathFromKey(key), FileMode.Open);
             return stream;
         }
+
+
+        public void SaveFileSync(string key, byte[] content, string contentType)
+        {
+            throw new NotImplementedException();
+        }
     }
 }
