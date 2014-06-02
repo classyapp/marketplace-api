@@ -136,6 +136,7 @@
     <Compile Include="DTO\Request\DeleteTranslation.cs" />
     <Compile Include="DTO\Request\GetProfileTranslation.cs" />
     <Compile Include="DTO\Request\ImportPorductCatalogRequest.cs" />
+    <Compile Include="DTO\Request\LogActivity\GetUserActivityRequest.cs" />
     <Compile Include="DTO\Request\LogActivity\LogActivityRequest.cs" />
     <Compile Include="DTO\Request\JobErrorsRequest.cs" />
     <Compile Include="DTO\Request\JobsStatusRequest.cs" />

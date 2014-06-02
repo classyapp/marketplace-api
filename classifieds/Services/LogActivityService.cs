@@ -13,9 +13,16 @@ namespace classy.Services
         public object Post(LogActivityRequest request)
         {
             int count = 0;
-            var triple = TripleStore.LogActivity(request.Environment.AppId, request.SubjectId, request.Predicate, request.ObjectId, ref count);
+            var triple = TripleStore.LogActivity(request.Environment.AppId, request.SubjectId, request.Predicate, request.ObjectId, request.Metadata, ref count);
 
             return new HttpResult(triple, HttpStatusCode.OK);
+        }
+
+        public object Get(GetLogActivityRequest request)
+        {
+            var activity = TripleStore.GetLogActivity(request.Environment.AppId, request.SubjectId, request.Predicate,
+                request.ObjectId);
+            return new HttpResult(activity, HttpStatusCode.OK);
         }
     }
 }

@@ -35,6 +35,7 @@ namespace Classy.Models
         public string ObjectId { get; set; }
         public string Predicate { get; set; }
         public string SubjectId { get; set; }
+        public Dictionary<string, string> Metadata { get; set; }
         public int Count { get; set; }
     }
 }

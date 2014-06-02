@@ -266,6 +266,7 @@ namespace classy
 
                 // Log Activity
                 .Add<LogActivityRequest>("/log-activity/log", "POST")
+                .Add<GetLogActivityRequest>("/log-activity/log", "GET")
             ;
         }
     }

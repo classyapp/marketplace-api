@@ -91,7 +91,7 @@ namespace classy.Manager
 
                 // log the purchase activity
                 int count = 0;
-                TripleStore.LogActivity(appId, profileId, ActivityPredicate.PURCHASE_LISTING, listingId, ref count);
+                TripleStore.LogActivity(appId, profileId, ActivityPredicate.PURCHASE_LISTING, listingId, null, ref count);
 
                 // increase purchase counter
                 ListingRepository.IncreaseCounter(listingId, appId, ListingCounters.Purchases, quantity);

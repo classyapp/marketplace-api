@@ -120,7 +120,7 @@ namespace classy.Manager
 
             // save triple
             int count = 0;
-            TripleStore.LogActivity(appId, follower.Id, ActivityPredicate.FOLLOW_PROFILE, followee.Id, ref count);
+            TripleStore.LogActivity(appId, follower.Id, ActivityPredicate.FOLLOW_PROFILE, followee.Id, null, ref count);
             if (count == 1)
             {
                 // increase follower count
@@ -243,7 +243,7 @@ namespace classy.Manager
             if (logImpression)
             {
                 int count = 1;
-                TripleStore.LogActivity(appId, requestedByProfileId.IsNullOrEmpty() ? "guest" : requestedByProfileId, ActivityPredicate.VIEW_PROFILE, profileId, ref count);
+                TripleStore.LogActivity(appId, requestedByProfileId.IsNullOrEmpty() ? "guest" : requestedByProfileId, ActivityPredicate.VIEW_PROFILE, profileId, null, ref count);
             }
 
             // TODO: if requested by someone other than the profile owner, remove all non-public data!!
@@ -482,7 +482,7 @@ namespace classy.Manager
 
             // log activity
             int count = 1;
-            TripleStore.LogActivity(appId, reviewerProfileId, ActivityPredicate.REVIEW_PROFILE, listing.Id, ref count);
+            TripleStore.LogActivity(appId, reviewerProfileId, ActivityPredicate.REVIEW_PROFILE, listing.Id, null, ref count);
             if (count > 1) throw new ApplicationException("this user already submitted a review for this listing");
 
             // increase the review count for the merchant, and the average score + avg score for all sub criteria
@@ -518,7 +518,7 @@ namespace classy.Manager
 
             // log activity
             int count = 1;
-            TripleStore.LogActivity(appId, reviewerProfileId, ActivityPredicate.REVIEW_PROFILE, revieweeProfileId, ref count);
+            TripleStore.LogActivity(appId, reviewerProfileId, ActivityPredicate.REVIEW_PROFILE, revieweeProfileId, null, ref count);
             if (count > 1) throw new ArgumentException("AlreadyReviewed");
 
             // save the review
