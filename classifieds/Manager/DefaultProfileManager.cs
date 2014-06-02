@@ -224,7 +224,13 @@ namespace classy.Manager
                         c.Listings = ListingRepository.GetById(c.IncludedListings.Select(l => l.Id).ToArray(), appId, false, culture).ToListingViewList(culture, _currencyManager, Environment.CurrencyCode);
                         if (c.CoverPhotos == null || c.CoverPhotos.Count == 0)
                         {
-                            c.CoverPhotos = ListingRepository.GetById(c.IncludedListings.Select(l => l.Id).Skip(Math.Max(0, c.IncludedListings.Count - 4)).ToArray(), appId, false, null).Select(l => l.ExternalMedia[0].Key).ToArray();
+                            c.CoverPhotos = ListingRepository
+                                .GetById(
+                                    c.IncludedListings.Select(l => l.Id)
+                                    .Skip(Math.Max(0, c.IncludedListings.Count - 4))
+                                    .ToArray(), appId, false, null)
+                                .Select(l => l.ExternalMedia.IsNullOrEmpty() ? "" : l.ExternalMedia[0].Key)
+                                .ToArray();
                         }
                     }
                     else
