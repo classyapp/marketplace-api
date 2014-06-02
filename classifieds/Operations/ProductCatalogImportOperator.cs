@@ -258,7 +258,7 @@ namespace classy.Operations
                                 purchaseOption.Depth = dataLine[22];
                                 purchaseOption.Height = dataLine[23];
 
-                                purchaseOption.VariantProperties = variantProperties;
+                                purchaseOption.VariantProperties = new Dictionary<string,string>();
                                 FillVariantProperties(dataLine, purchaseOption);
                                 FillPOFields(currencyCode, dataLine, purchaseOption);
                             }
@@ -307,6 +307,11 @@ namespace classy.Operations
                     lastProductLines[lastProductLines.Count - 1] = lastProductLines[lastProductLines.Count - 1] + "; <" + ex.Message + ">";
                     ReportError(lastProductLines, job, _jobRepository, numProductsSaved, numErrors);
 
+                }
+                finally 
+                {
+                    job.Status = "Finished";
+                    _jobRepository.Save(job);
                 }
             }
         }

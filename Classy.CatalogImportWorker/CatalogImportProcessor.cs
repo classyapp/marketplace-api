@@ -188,6 +188,7 @@ namespace Classy.CatalogImportWorker
 
 
                                 currListing = new Listing();
+                                currListing.Metadata.Add("JobId", job.Id);
                                 purchaseOptions = SetupNewListing(job, currencyCode, defaultCulture, currListing, purchaseOptions);
 
                                 variants = dataLine[4].Split(',');
@@ -437,6 +438,7 @@ namespace Classy.CatalogImportWorker
             currListing.ProfileId = job.ProfileId;
             currListing.AppId = job.AppId;
             currListing.ListingType = "Product";
+
             return purchaseOptions;
         }
 

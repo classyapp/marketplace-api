@@ -34,8 +34,9 @@ namespace Classy.Repository
         {
             // get listing
             var query = Query<Comment>.EQ(x => x.ObjectId, listingId);
+            var sort = SortBy<Comment>.Descending(x => x.Created);
 
-            var results = CommentsCollection.Find(query);
+            var results = CommentsCollection.Find(query).SetSortOrder(sort);
             if (results == null) return new List<Comment>();
 
             var comments = results.ToList();
@@ -52,8 +53,9 @@ namespace Classy.Repository
         {
             // get listing
             var query = Query.In("ListingId", new BsonArray(listingIds));
+            var sort = SortBy<Comment>.Ascending(x => x.ObjectId).Descending(x => x.Created);
 
-            var results = CommentsCollection.Find(query);
+            var results = CommentsCollection.Find(query).SetSortOrder(sort);
             if (results == null) return new List<Comment>();
 
             var comments = results.ToList();
