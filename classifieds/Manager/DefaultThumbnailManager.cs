@@ -82,12 +82,12 @@ namespace classy.Manager
                 }
 
                 // Check that we are not upscaling
-                //if (newWidth < source.Width && newHeight < source.Height)
-                //{
-                //    memoryStream = new MemoryStream();
-                //    source.Save(memoryStream, ImageFormat.Jpeg);
-                //    return memoryStream;
-                //}
+                if (newWidth > source.Width && newHeight > source.Height)
+                {
+                    memoryStream = new MemoryStream();
+                    source.Save(memoryStream, ImageFormat.Jpeg);
+                    return memoryStream;
+                }
 
                 using (Bitmap bitmap = new Bitmap(newWidth, newHeight))
                 {
