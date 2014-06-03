@@ -124,7 +124,7 @@ namespace classy.Manager
             if (logImpression)
             {
                 int count = 1;
-                TripleStore.LogActivity(appId, SecurityContext.IsAuthenticated ? SecurityContext.AuthenticatedProfileId : "guest", ActivityPredicate.VIEW_LISTING, listing.Id, ref count);
+                TripleStore.LogActivity(appId, SecurityContext.IsAuthenticated ? SecurityContext.AuthenticatedProfileId : "guest", ActivityPredicate.VIEW_LISTING, listing.Id, null, ref count);
             }
 
             return listingView;
@@ -382,21 +382,24 @@ namespace classy.Manager
             }
 
             // update the keywords collection in the db
-            var oldKeywords = listing.TranslatedKeywords.EmptyIfNull().SelectMany(x => x.Value).ToList();
-            foreach (var newKeywordLang in editorKeywords.EmptyIfNull())
+            if (fields.Has(ListingUpdateFields.EditorKeywords))
             {
-                foreach (var newKeyword in newKeywordLang.Value)
+                var oldKeywords = listing.TranslatedKeywords.EmptyIfNull().SelectMany(x => x.Value).ToList();
+                foreach (var newKeywordLang in editorKeywords.EmptyIfNull())
                 {
-                    if (oldKeywords.Contains(newKeyword))
-                        continue;
-                    _keywordsRepository.IncrementCount(newKeyword, newKeywordLang.Key, appId, 1, true);
+                    foreach (var newKeyword in newKeywordLang.Value)
+                    {
+                        if (oldKeywords.Contains(newKeyword))
+                            continue;
+                        _keywordsRepository.IncrementCount(newKeyword, newKeywordLang.Key, appId, 1, true);
+                    }
                 }
+
+                listing.TranslatedKeywords = editorKeywords;
+                listing.SearchableKeywords = editorKeywords.EmptyIfNull().SelectMany(x => x.Value).Union(listing.Hashtags).ToArray();
             }
 
-            listing.TranslatedKeywords = editorKeywords;
-            listing.SearchableKeywords = editorKeywords.EmptyIfNull().SelectMany(x => x.Value).Union(listing.Hashtags).ToArray();
             ListingRepository.Update(listing);
-
             _listingIndexer.Index(listing, appId);
 
             // return
@@ -461,13 +464,13 @@ namespace classy.Manager
 
             // log a comment activity
             int count = 0;
-            TripleStore.LogActivity(appId, SecurityContext.AuthenticatedProfileId, ActivityPredicate.COMMENT_ON_LISTING, listingId, ref count);
+            TripleStore.LogActivity(appId, SecurityContext.AuthenticatedProfileId, ActivityPredicate.COMMENT_ON_LISTING, listingId, null, ref count);
 
             // save mentions
             foreach (var mentionedUsername in comment.Content.ExtractUsernames())
             {
                 var mentionedProfile = ProfileRepository.GetByUsername(appId, mentionedUsername.TrimStart('@'), false, null);
-                TripleStore.LogActivity(appId, SecurityContext.AuthenticatedProfileId, ActivityPredicate.MENTION_PROFILE, mentionedProfile.Id, ref count);
+                TripleStore.LogActivity(appId, SecurityContext.AuthenticatedProfileId, ActivityPredicate.MENTION_PROFILE, mentionedProfile.Id, null, ref count);
 
                 // increase rank of mentioned profile
                 ProfileRepository.IncreaseCounter(appId, mentionedProfile.Id, ProfileCounters.Rank, 1);
@@ -487,7 +490,7 @@ namespace classy.Manager
             var listing = GetVerifiedListing(appId, listingId);
 
             int count = 0;
-            TripleStore.LogActivity(appId, SecurityContext.AuthenticatedProfileId, ActivityPredicate.FAVORITE_LISTING, listingId, ref count);
+            TripleStore.LogActivity(appId, SecurityContext.AuthenticatedProfileId, ActivityPredicate.FAVORITE_LISTING, listingId, null, ref count);
             if (count == 1)
             {
                 var listingCounters = ListingCounters.Favorites;
@@ -537,7 +540,7 @@ namespace classy.Manager
                 case FlagReason.Dislike:
                 default:
                     int count = 0;
-                    TripleStore.LogActivity(appId, SecurityContext.AuthenticatedProfileId, ActivityPredicate.FLAG_LISTING, listingId, ref count);
+                    TripleStore.LogActivity(appId, SecurityContext.AuthenticatedProfileId, ActivityPredicate.FLAG_LISTING, listingId, null, ref count);
                     break;
             }
         }
@@ -578,7 +581,7 @@ namespace classy.Manager
                 int count = 0;
                 foreach (var listing in includedListings)
                 {
-                    TripleStore.LogActivity(appId, profileId, ActivityPredicate.ADD_LISTING_TO_COLLECTION, listing.Id, ref count);
+                    TripleStore.LogActivity(appId, profileId, ActivityPredicate.ADD_LISTING_TO_COLLECTION, listing.Id, null, ref count);
                     if (count == 1)
                     {
                         ListingRepository.IncreaseCounter(listing.Id, appId, ListingCounters.AddToCollection, 1);
@@ -633,7 +636,7 @@ namespace classy.Manager
                 if (increaseViewCounter)
                 {
                     int count = 0;
-                    TripleStore.LogActivity(appId, SecurityContext.AuthenticatedProfileId, ActivityPredicate.VIEW_COLLECTION, collectionId, ref count);
+                    TripleStore.LogActivity(appId, SecurityContext.AuthenticatedProfileId, ActivityPredicate.VIEW_COLLECTION, collectionId, null, ref count);
                     //CollectionRepository.IncreaseCounter(appId, collectionId);
                     if (increaseViewCounterOnListings)
                     {
@@ -684,7 +687,18 @@ namespace classy.Manager
                 {
                     if (collection.CoverPhotos == null || collection.CoverPhotos.Count == 0)
                     {
-                        collection.CoverPhotos = ListingRepository.GetById(collection.IncludedListings.Select(l => l.Id).Skip(Math.Max(0, collection.IncludedListings.Count - 4)).ToArray(), appId, false, null).Select(l => l.ExternalMedia[0].Key).ToArray();
+                        collection.CoverPhotos = ListingRepository
+                            .GetById(collection.IncludedListings
+                                .Select(l => l.Id)
+                                .Skip(Math.Max(0, collection.IncludedListings.Count - 4))
+                                .ToArray(), 
+                            appId, false, null)
+                                .Select(l =>
+                                {
+                                    if (l.ExternalMedia.IsNullOrEmpty())
+                                        return null;
+                                    return l.ExternalMedia[0].Key;
+                                }).ToArray();
                     }
                 }
 
@@ -716,7 +730,7 @@ namespace classy.Manager
                     if (!collection.IncludedListings.Any(i => i.Id == listing.Id))
                     {
                         changed = true;
-                        TripleStore.LogActivity(appId, SecurityContext.AuthenticatedProfileId, ActivityPredicate.ADD_LISTING_TO_COLLECTION, listing.Id, ref count);
+                        TripleStore.LogActivity(appId, SecurityContext.AuthenticatedProfileId, ActivityPredicate.ADD_LISTING_TO_COLLECTION, listing.Id, null, ref count);
                         collection.IncludedListings.Add(new Classy.Models.IncludedListing { Id = listing.Id, Comments = listing.Comments, ListingType = listing.ListingType });
                         ListingRepository.IncreaseCounter(listing.Id, appId, ListingCounters.AddToCollection, 1);
                         _listingIndexer.Increment(listing.Id, appId, l => l.AddToCollectionCount);
@@ -848,13 +862,13 @@ namespace classy.Manager
 
             // log a comment activity
             int count = 0;
-            TripleStore.LogActivity(appId, SecurityContext.AuthenticatedProfileId, ActivityPredicate.COMMENT_ON_COLLECTION, collectionId, ref count);
+            TripleStore.LogActivity(appId, SecurityContext.AuthenticatedProfileId, ActivityPredicate.COMMENT_ON_COLLECTION, collectionId, null, ref count);
 
             // save mentions
             foreach (var mentionedUsername in comment.Content.ExtractUsernames())
             {
                 var mentionedProfile = ProfileRepository.GetByUsername(appId, mentionedUsername.TrimStart('@'), false, null);
-                TripleStore.LogActivity(appId, SecurityContext.AuthenticatedProfileId, ActivityPredicate.MENTION_PROFILE, mentionedProfile.Id, ref count);
+                TripleStore.LogActivity(appId, SecurityContext.AuthenticatedProfileId, ActivityPredicate.MENTION_PROFILE, mentionedProfile.Id, null, ref count);
 
                 // increase rank of mentioned profile
                 ProfileRepository.IncreaseCounter(appId, mentionedProfile.Id, ProfileCounters.Rank, 1);

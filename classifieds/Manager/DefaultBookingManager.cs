@@ -68,7 +68,7 @@ namespace classy.Manager
 
                 // log the booking activity
                 int count = 1;
-                TripleStore.LogActivity(appId, profileId, ActivityPredicate.BOOK_LISTING, listingId, ref count);
+                TripleStore.LogActivity(appId, profileId, ActivityPredicate.BOOK_LISTING, listingId, null, ref count);
 
                 // return the transaction
                 return bookedTimeslot;

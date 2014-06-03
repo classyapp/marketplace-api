@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Web;
 using classy.DTO.Request;
+using classy.DTO.Request.LogActivity;
 using classy.DTO.Request.Search;
 using classy.Extensions;
 using classy.Services;
@@ -154,6 +155,7 @@ namespace classy
                 // Listings
                 .Add<EditMultipleListings>("/listings/edit-multiple", "POST")
                 .Add<GetListingById>("/listing/{ListingId}", "GET") // get listing by id, update listing
+                .Add<GetListingsById>("/listing/get-multiple", "POST")
                 .Add<DeleteListing>("/listing/{ListingId}", "DELETE") // delete listing by id, update listing
                 .Add<PostListing>("/listing/new", "POST") // post new listing
                 .Add<AddExternalMedia>("/listing/{ListingId}/media", "POST") // add media files and associate with listing
@@ -261,6 +263,10 @@ namespace classy
 
                 // Email
                 .Add<SendEmailRequest>("/email", "POST")
+
+                // Log Activity
+                .Add<LogActivityRequest>("/log-activity/log", "POST")
+                .Add<GetLogActivityRequest>("/log-activity/log", "GET")
             ;
         }
     }

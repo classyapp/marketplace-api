@@ -24,7 +24,7 @@ namespace classy.Manager
             string objectId)
         {
             int count = 0;
-            var triple = TripleStore.LogActivity(appId, subjectId, predicate, objectId, ref count);
+            var triple = TripleStore.LogActivity(appId, subjectId, predicate, objectId, null, ref count);
             return triple.TranslateTo<TripleView>();
         }
     }
