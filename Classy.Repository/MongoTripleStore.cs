@@ -16,7 +16,7 @@ namespace Classy.Repository
             TripleCollection = db.GetCollection<Triple>();
         }
 
-        public Triple LogActivity(string appId, string subjectObjectId, string predicate, string objectObjectId, ref int count)
+        public Triple LogActivity(string appId, string subjectObjectId, string predicate, string objectObjectId, Dictionary<string, string> metadata, ref int count)
         {
             count = 1;
             var triple = new Triple
@@ -25,6 +25,7 @@ namespace Classy.Repository
                 SubjectId = subjectObjectId,
                 Predicate = predicate.ToString(),
                 ObjectId = objectObjectId,
+                Metadata = metadata,
                 Count = count
             };
 
@@ -37,11 +38,24 @@ namespace Classy.Repository
             var existingTriple = TripleCollection.FindOne(query);
             if (existingTriple != null)
             {
+                triple.Id = existingTriple.Id;
                 triple.Count = ++existingTriple.Count;
+                count = triple.Count;
             }
 
             TripleCollection.Save(triple);
             return triple;
+        }
+
+        public Triple GetLogActivity(string appId, string subjectId, string predicate, string objectId)
+        {
+            var query = Query.And(new IMongoQuery[] {
+                Query<Triple>.EQ(x => x.AppId, appId),
+                Query<Triple>.EQ(x => x.SubjectId, subjectId),
+                Query<Triple>.EQ(x => x.Predicate, predicate.ToString()),
+                Query<Triple>.EQ(x => x.ObjectId, objectId)
+            });
+            return TripleCollection.FindOne(query);
         }
 
         public void DeleteActivity(string appId, string subjectObjectId, string predicate, string objectObjectId, ref int count)

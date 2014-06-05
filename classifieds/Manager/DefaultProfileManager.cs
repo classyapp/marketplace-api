@@ -11,6 +11,7 @@ using ServiceStack.Text;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using classy.Extentions;
+using Classy.Interfaces.Managers;
 
 namespace classy.Manager
 {
@@ -25,6 +26,7 @@ namespace classy.Manager
         private ITripleStore TripleStore;
         private IStorageRepository StorageRepository;
         private readonly IIndexer<Profile> _profileIndexer;
+        private readonly ICurrencyManager _currencyManager;
 
         public DefaultProfileManager(
             IAppManager appManager,
@@ -34,7 +36,9 @@ namespace classy.Manager
             IReviewRepository reviewRepository,
             ICollectionRepository collectionRepository,
             ITripleStore tripleStore,
-            IStorageRepository storageRepository, IIndexer<Profile> profileIndexer)
+            IStorageRepository storageRepository, 
+            IIndexer<Profile> profileIndexer,
+            ICurrencyManager currencyManager)
         {
             AppManager = appManager;
             LocalizationManager = localizationManager;
@@ -45,9 +49,11 @@ namespace classy.Manager
             TripleStore = tripleStore;
             StorageRepository = storageRepository;
             _profileIndexer = profileIndexer;
+            _currencyManager = currencyManager;
         }
 
         public ManagerSecurityContext SecurityContext { get; set; }
+        public Classy.Models.Env Environment { get; set; }
 
         public ProfileView CreateProfileProxy(
             string appId,
@@ -114,7 +120,7 @@ namespace classy.Manager
 
             // save triple
             int count = 0;
-            TripleStore.LogActivity(appId, follower.Id, ActivityPredicate.FOLLOW_PROFILE, followee.Id, ref count);
+            TripleStore.LogActivity(appId, follower.Id, ActivityPredicate.FOLLOW_PROFILE, followee.Id, null, ref count);
             if (count == 1)
             {
                 // increase follower count
@@ -204,7 +210,7 @@ namespace classy.Manager
             if (includeListings)
             {
                 var listings = ListingRepository.GetByProfileId(appId, profileId, false, culture);
-                profileView.Listings = listings.ToListingViewList(culture);
+                profileView.Listings = listings.ToListingViewList(culture, _currencyManager, Environment.CurrencyCode);
             }
 
             if (includeCollections)
@@ -215,10 +221,16 @@ namespace classy.Manager
                 {
                     if (c.IncludedListings != null)
                     {
-                        c.Listings = ListingRepository.GetById(c.IncludedListings.Select(l => l.Id).ToArray(), appId, false, culture).ToListingViewList(culture);
+                        c.Listings = ListingRepository.GetById(c.IncludedListings.Select(l => l.Id).ToArray(), appId, false, culture).ToListingViewList(culture, _currencyManager, Environment.CurrencyCode);
                         if (c.CoverPhotos == null || c.CoverPhotos.Count == 0)
                         {
-                            c.CoverPhotos = ListingRepository.GetById(c.IncludedListings.Select(l => l.Id).Skip(Math.Max(0, c.IncludedListings.Count - 4)).ToArray(), appId, false, null).Select(l => l.ExternalMedia[0].Key).ToArray();
+                            c.CoverPhotos = ListingRepository
+                                .GetById(
+                                    c.IncludedListings.Select(l => l.Id)
+                                    .Skip(Math.Max(0, c.IncludedListings.Count - 4))
+                                    .ToArray(), appId, false, null)
+                                .Select(l => l.ExternalMedia.IsNullOrEmpty() ? "" : l.ExternalMedia[0].Key)
+                                .ToArray();
                         }
                     }
                     else
@@ -237,7 +249,7 @@ namespace classy.Manager
             if (logImpression)
             {
                 int count = 1;
-                TripleStore.LogActivity(appId, requestedByProfileId.IsNullOrEmpty() ? "guest" : requestedByProfileId, ActivityPredicate.VIEW_PROFILE, profileId, ref count);
+                TripleStore.LogActivity(appId, requestedByProfileId.IsNullOrEmpty() ? "guest" : requestedByProfileId, ActivityPredicate.VIEW_PROFILE, profileId, null, ref count);
             }
 
             // TODO: if requested by someone other than the profile owner, remove all non-public data!!
@@ -476,7 +488,7 @@ namespace classy.Manager
 
             // log activity
             int count = 1;
-            TripleStore.LogActivity(appId, reviewerProfileId, ActivityPredicate.REVIEW_PROFILE, listing.Id, ref count);
+            TripleStore.LogActivity(appId, reviewerProfileId, ActivityPredicate.REVIEW_PROFILE, listing.Id, null, ref count);
             if (count > 1) throw new ApplicationException("this user already submitted a review for this listing");
 
             // increase the review count for the merchant, and the average score + avg score for all sub criteria
@@ -512,7 +524,7 @@ namespace classy.Manager
 
             // log activity
             int count = 1;
-            TripleStore.LogActivity(appId, reviewerProfileId, ActivityPredicate.REVIEW_PROFILE, revieweeProfileId, ref count);
+            TripleStore.LogActivity(appId, reviewerProfileId, ActivityPredicate.REVIEW_PROFILE, revieweeProfileId, null, ref count);
             if (count > 1) throw new ArgumentException("AlreadyReviewed");
 
             // save the review

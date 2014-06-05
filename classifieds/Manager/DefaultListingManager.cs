@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using Classy.Interfaces.Search;
@@ -10,6 +10,7 @@ using ServiceStack.ServiceHost;
 using System.IO;
 using Classy.Models.Request;
 using classy.Extentions;
+using Classy.Interfaces.Managers;
 
 namespace classy.Manager
 {
@@ -24,6 +25,7 @@ namespace classy.Manager
         private readonly IAppManager AppManager;
         private readonly IIndexer<Listing> _listingIndexer;
         private readonly IIndexer<Profile> _profileIndexer;
+        private readonly ICurrencyManager _currencyManager;
         private readonly IKeywordsRepository _keywordsRepository;
 
         public DefaultListingManager(
@@ -33,7 +35,11 @@ namespace classy.Manager
             IProfileRepository profileRepository,
             ICollectionRepository collectionRepository,
             ITripleStore tripleStore,
-            IStorageRepository storageRepository, IIndexer<Listing> listingIndexer, IIndexer<Profile> profileIndexer, IKeywordsRepository keywordsRepository)
+            IStorageRepository storageRepository, 
+            IIndexer<Listing> listingIndexer, 
+            IIndexer<Profile> profileIndexer,
+            ICurrencyManager currencyManager,
+            IKeywordsRepository keywordsRepository)
         {
             AppManager = appManager;
             ListingRepository = listingRepository;
@@ -44,16 +50,18 @@ namespace classy.Manager
             StorageRepository = storageRepository;
             _listingIndexer = listingIndexer;
             _profileIndexer = profileIndexer;
+            _currencyManager = currencyManager;
             _keywordsRepository = keywordsRepository;
         }
 
+        public Env Environment { get; set; }
         public ManagerSecurityContext SecurityContext { get; set; }
 
         public IList<ListingView> GetListingsByIds(string[] listingIds, string appId, bool includeDrafts, string culture)
         {
             var listings = ListingRepository.GetById(listingIds, appId, includeDrafts, null);
 
-            return listings.Select(x => x.ToListingView()).ToList();
+            return listings.Select(x => x.ToListingView(_currencyManager, Environment.CurrencyCode)).ToList();
         }
 
         public ListingView GetListingById(
@@ -72,7 +80,7 @@ namespace classy.Manager
             // TODO: cache listings
             var listing = GetVerifiedListing(appId, listingId);
             listing.Translate(culture);
-            var listingView = listing.ToListingView();
+            var listingView = listing.ToListingView(_currencyManager, Environment.CurrencyCode);
 
             if (logImpression)
             {
@@ -116,7 +124,7 @@ namespace classy.Manager
             if (logImpression)
             {
                 int count = 1;
-                TripleStore.LogActivity(appId, SecurityContext.IsAuthenticated ? SecurityContext.AuthenticatedProfileId : "guest", ActivityPredicate.VIEW_LISTING, listing.Id, ref count);
+                TripleStore.LogActivity(appId, SecurityContext.IsAuthenticated ? SecurityContext.AuthenticatedProfileId : "guest", ActivityPredicate.VIEW_LISTING, listing.Id, null, ref count);
             }
 
             return listingView;
@@ -146,7 +154,7 @@ namespace classy.Manager
             var listingViews = new List<ListingView>();
             foreach (var c in listings)
             {
-                var view = c.Translate(culture).ToListingView();
+                var view = c.Translate(culture).ToListingView(_currencyManager, Environment.CurrencyCode);
                 if (includeComments)
                 {
                     view.Comments = comments.Where(x => x.ObjectId == view.Id).ToCommentViewList();
@@ -173,13 +181,13 @@ namespace classy.Manager
             long count = 0;
 
             // TODO: cache listings
-            var listings = ListingRepository.Search(tags, listingTypes, metadata, priceMin, priceMax, location, appId, false, false, page, pageSize, ref count, culture);
+            var listings = ListingRepository.Search(tags, listingTypes, metadata, null, priceMin, priceMax, location, appId, false, false, page, pageSize, ref count, culture);
             var comments = includeComments ?
                 CommentRepository.GetByListingIds(listings.Select(x => x.Id).AsEnumerable(), formatCommentsAsHtml) : null;
             var listingViews = new List<ListingView>();
             foreach (var c in listings)
             {
-                var view = c.Translate(culture).ToListingView();
+                var view = c.Translate(culture).ToListingView(_currencyManager, Environment.CurrencyCode);
                 if (includeComments)
                 {
                     view.Comments = comments.Where(x => x.ObjectId == view.Id).ToCommentViewList();
@@ -225,7 +233,7 @@ namespace classy.Manager
             }
             listing.ExternalMedia.Union(mediaFiles);
 
-            return listing.ToListingView();
+            return listing.ToListingView(_currencyManager, Environment.CurrencyCode);
         }
 
         public ListingView DeleteExternalMediaFromListing(
@@ -243,7 +251,7 @@ namespace classy.Manager
 
                 listing.ExternalMedia.Remove(file);
             }
-            return listing.ToListingView();
+            return listing.ToListingView(_currencyManager, Environment.CurrencyCode);
         }
 
         public ListingView PublishListing(
@@ -264,7 +272,7 @@ namespace classy.Manager
 
             _listingIndexer.Index(listing, appId);
 
-            return listing.ToListingView();
+            return listing.ToListingView(_currencyManager, Environment.CurrencyCode);
         }
 
         public ListingView SaveListing(
@@ -331,7 +339,7 @@ namespace classy.Manager
             }
 
             // return
-            return listing.ToListingView();
+            return listing.ToListingView(_currencyManager, Environment.CurrencyCode);
         }
 
         public ListingView UpdateListing(
@@ -374,25 +382,28 @@ namespace classy.Manager
             }
 
             // update the keywords collection in the db
-            var oldKeywords = listing.TranslatedKeywords.EmptyIfNull().SelectMany(x => x.Value).ToList();
-            foreach (var newKeywordLang in editorKeywords.EmptyIfNull())
+            if (fields.Has(ListingUpdateFields.EditorKeywords))
             {
-                foreach (var newKeyword in newKeywordLang.Value)
+                var oldKeywords = listing.TranslatedKeywords.EmptyIfNull().SelectMany(x => x.Value).ToList();
+                foreach (var newKeywordLang in editorKeywords.EmptyIfNull())
                 {
-                    if (oldKeywords.Contains(newKeyword))
-                        continue;
-                    _keywordsRepository.IncrementCount(newKeyword, newKeywordLang.Key, appId, 1, true);
+                    foreach (var newKeyword in newKeywordLang.Value)
+                    {
+                        if (oldKeywords.Contains(newKeyword))
+                            continue;
+                        _keywordsRepository.IncrementCount(newKeyword, newKeywordLang.Key, appId, 1, true);
+                    }
                 }
+
+                listing.TranslatedKeywords = editorKeywords;
+                listing.SearchableKeywords = editorKeywords.EmptyIfNull().SelectMany(x => x.Value).Union(listing.Hashtags).ToArray();
             }
 
-            listing.TranslatedKeywords = editorKeywords;
-            listing.SearchableKeywords = editorKeywords.EmptyIfNull().SelectMany(x => x.Value).Union(listing.Hashtags).ToArray();
             ListingRepository.Update(listing);
-
             _listingIndexer.Index(listing, appId);
 
             // return
-            return listing.ToListingView();
+            return listing.ToListingView(_currencyManager, Environment.CurrencyCode);
         }
 
         public string DeleteListing(string appId, string listingId)
@@ -453,13 +464,13 @@ namespace classy.Manager
 
             // log a comment activity
             int count = 0;
-            TripleStore.LogActivity(appId, SecurityContext.AuthenticatedProfileId, ActivityPredicate.COMMENT_ON_LISTING, listingId, ref count);
+            TripleStore.LogActivity(appId, SecurityContext.AuthenticatedProfileId, ActivityPredicate.COMMENT_ON_LISTING, listingId, null, ref count);
 
             // save mentions
             foreach (var mentionedUsername in comment.Content.ExtractUsernames())
             {
                 var mentionedProfile = ProfileRepository.GetByUsername(appId, mentionedUsername.TrimStart('@'), false, null);
-                TripleStore.LogActivity(appId, SecurityContext.AuthenticatedProfileId, ActivityPredicate.MENTION_PROFILE, mentionedProfile.Id, ref count);
+                TripleStore.LogActivity(appId, SecurityContext.AuthenticatedProfileId, ActivityPredicate.MENTION_PROFILE, mentionedProfile.Id, null, ref count);
 
                 // increase rank of mentioned profile
                 ProfileRepository.IncreaseCounter(appId, mentionedProfile.Id, ProfileCounters.Rank, 1);
@@ -479,7 +490,7 @@ namespace classy.Manager
             var listing = GetVerifiedListing(appId, listingId);
 
             int count = 0;
-            TripleStore.LogActivity(appId, SecurityContext.AuthenticatedProfileId, ActivityPredicate.FAVORITE_LISTING, listingId, ref count);
+            TripleStore.LogActivity(appId, SecurityContext.AuthenticatedProfileId, ActivityPredicate.FAVORITE_LISTING, listingId, null, ref count);
             if (count == 1)
             {
                 var listingCounters = ListingCounters.Favorites;
@@ -529,7 +540,7 @@ namespace classy.Manager
                 case FlagReason.Dislike:
                 default:
                     int count = 0;
-                    TripleStore.LogActivity(appId, SecurityContext.AuthenticatedProfileId, ActivityPredicate.FLAG_LISTING, listingId, ref count);
+                    TripleStore.LogActivity(appId, SecurityContext.AuthenticatedProfileId, ActivityPredicate.FLAG_LISTING, listingId, null, ref count);
                     break;
             }
         }
@@ -570,7 +581,7 @@ namespace classy.Manager
                 int count = 0;
                 foreach (var listing in includedListings)
                 {
-                    TripleStore.LogActivity(appId, profileId, ActivityPredicate.ADD_LISTING_TO_COLLECTION, listing.Id, ref count);
+                    TripleStore.LogActivity(appId, profileId, ActivityPredicate.ADD_LISTING_TO_COLLECTION, listing.Id, null, ref count);
                     if (count == 1)
                     {
                         ListingRepository.IncreaseCounter(listing.Id, appId, ListingCounters.AddToCollection, 1);
@@ -615,7 +626,7 @@ namespace classy.Manager
                 }
                 if (includeListings)
                 {
-                    collectionView.Listings = ListingRepository.GetById(listingIds, appId, includeDrafts, culture).ToListingViewList(culture);
+                    collectionView.Listings = ListingRepository.GetById(listingIds, appId, includeDrafts, culture).ToListingViewList(culture, _currencyManager, Environment.CurrencyCode);
                     var profiles = ProfileRepository.GetByIds(appId, collectionView.Listings.Select(x => x.ProfileId).ToArray(), culture);
                     foreach (var l in collectionView.Listings)
                     {
@@ -625,7 +636,7 @@ namespace classy.Manager
                 if (increaseViewCounter)
                 {
                     int count = 0;
-                    TripleStore.LogActivity(appId, SecurityContext.AuthenticatedProfileId, ActivityPredicate.VIEW_COLLECTION, collectionId, ref count);
+                    TripleStore.LogActivity(appId, SecurityContext.AuthenticatedProfileId, ActivityPredicate.VIEW_COLLECTION, collectionId, null, ref count);
                     //CollectionRepository.IncreaseCounter(appId, collectionId);
                     if (increaseViewCounterOnListings)
                     {
@@ -676,7 +687,18 @@ namespace classy.Manager
                 {
                     if (collection.CoverPhotos == null || collection.CoverPhotos.Count == 0)
                     {
-                        collection.CoverPhotos = ListingRepository.GetById(collection.IncludedListings.Select(l => l.Id).Skip(Math.Max(0, collection.IncludedListings.Count - 4)).ToArray(), appId, false, null).Select(l => l.ExternalMedia[0].Key).ToArray();
+                        collection.CoverPhotos = ListingRepository
+                            .GetById(collection.IncludedListings
+                                .Select(l => l.Id)
+                                .Skip(Math.Max(0, collection.IncludedListings.Count - 4))
+                                .ToArray(), 
+                            appId, false, null)
+                                .Select(l =>
+                                {
+                                    if (l.ExternalMedia.IsNullOrEmpty())
+                                        return null;
+                                    return l.ExternalMedia[0].Key;
+                                }).ToArray();
                     }
                 }
 
@@ -708,7 +730,7 @@ namespace classy.Manager
                     if (!collection.IncludedListings.Any(i => i.Id == listing.Id))
                     {
                         changed = true;
-                        TripleStore.LogActivity(appId, SecurityContext.AuthenticatedProfileId, ActivityPredicate.ADD_LISTING_TO_COLLECTION, listing.Id, ref count);
+                        TripleStore.LogActivity(appId, SecurityContext.AuthenticatedProfileId, ActivityPredicate.ADD_LISTING_TO_COLLECTION, listing.Id, null, ref count);
                         collection.IncludedListings.Add(new Classy.Models.IncludedListing { Id = listing.Id, Comments = listing.Comments, ListingType = listing.ListingType });
                         ListingRepository.IncreaseCounter(listing.Id, appId, ListingCounters.AddToCollection, 1);
                         _listingIndexer.Increment(listing.Id, appId, l => l.AddToCollectionCount);
@@ -780,7 +802,7 @@ namespace classy.Manager
 
                 CollectionRepository.Update(collection);
                 var collectionView = collection.ToCollectionView();
-                collectionView.Listings = ListingRepository.GetById(collection.IncludedListings.Select(l => l.Id).ToArray(), appId, false, culture).ToListingViewList(culture);
+                collectionView.Listings = ListingRepository.GetById(collection.IncludedListings.Select(l => l.Id).ToArray(), appId, false, culture).ToListingViewList(culture, _currencyManager, Environment.CurrencyCode);
                 return collectionView;
             }
             catch (Exception)
@@ -840,13 +862,13 @@ namespace classy.Manager
 
             // log a comment activity
             int count = 0;
-            TripleStore.LogActivity(appId, SecurityContext.AuthenticatedProfileId, ActivityPredicate.COMMENT_ON_COLLECTION, collectionId, ref count);
+            TripleStore.LogActivity(appId, SecurityContext.AuthenticatedProfileId, ActivityPredicate.COMMENT_ON_COLLECTION, collectionId, null, ref count);
 
             // save mentions
             foreach (var mentionedUsername in comment.Content.ExtractUsernames())
             {
                 var mentionedProfile = ProfileRepository.GetByUsername(appId, mentionedUsername.TrimStart('@'), false, null);
-                TripleStore.LogActivity(appId, SecurityContext.AuthenticatedProfileId, ActivityPredicate.MENTION_PROFILE, mentionedProfile.Id, ref count);
+                TripleStore.LogActivity(appId, SecurityContext.AuthenticatedProfileId, ActivityPredicate.MENTION_PROFILE, mentionedProfile.Id, null, ref count);
 
                 // increase rank of mentioned profile
                 ProfileRepository.IncreaseCounter(appId, mentionedProfile.Id, ProfileCounters.Rank, 1);
@@ -873,7 +895,7 @@ namespace classy.Manager
 
                 CollectionRepository.Update(collection);
                 var collectionView = collection.Translate(culture).ToCollectionView();
-                collectionView.Listings = ListingRepository.GetById(collection.IncludedListings.Select(l => l.Id).ToArray(), appId, false, culture).ToListingViewList(culture);
+                collectionView.Listings = ListingRepository.GetById(collection.IncludedListings.Select(l => l.Id).ToArray(), appId, false, culture).ToListingViewList(culture, _currencyManager, Environment.CurrencyCode);
                 return collectionView;
             }
             catch (Exception)
@@ -1055,7 +1077,7 @@ namespace classy.Manager
         }
 
 
-        public ListingMoreInfoView GetListingMoreInfo(string appId, string listingId, Dictionary<string, string[]> metadata, Location location, string culture)
+        public ListingMoreInfoView GetListingMoreInfo(string appId, string listingId, Dictionary<string, string[]> metadata, Dictionary<string, string[]> query, Location location, string culture)
         {
             ListingMoreInfoView data = new ListingMoreInfoView();
 
@@ -1066,16 +1088,16 @@ namespace classy.Manager
             if (originalCollection != null)
             {
                 data.CollectionType = originalCollection.Type.ToLowerInvariant();
-                data.CollectionLisitngs = ListingRepository.GetById(originalCollection.IncludedListings.Select(l => l.Id).ToArray(), appId, false, culture).ToListingViewList(culture);
+                data.CollectionLisitngs = ListingRepository.GetById(originalCollection.IncludedListings.Select(l => l.Id).ToArray(), appId, false, culture).ToListingViewList(culture, _currencyManager, Environment.CurrencyCode);
             }
 
             // Search by metadata provided
-            if (metadata != null)
+            if (metadata != null || query != null)
             {
                 long count = 0;
                 data.SearchResults = ListingRepository.Search(null, new string[] { listing.ListingType }, 
-                    metadata, 
-                    null, null, location, appId, false, false, 0, 0, ref count, culture).ToListingViewList(culture);
+                    metadata, query,
+                    null, null, location, appId, false, false, 0, 0, ref count, culture).ToListingViewList(culture, _currencyManager, Environment.CurrencyCode);
                 if (data.SearchResults != null)
                 {
                     data.SearchResults.Remove(data.SearchResults.First(wl => wl.Id == listingId));

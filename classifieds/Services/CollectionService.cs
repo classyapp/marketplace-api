@@ -23,6 +23,7 @@ namespace classy.Services
             {
                 var session = SessionAs<CustomUserSession>();
                 CollectionManager.SecurityContext = session.ToSecurityContext();
+                CollectionManager.Environment = request.Environment;
 
                 var collection = CollectionManager.CreateCollection(
                     request.Environment.AppId,
@@ -52,6 +53,7 @@ namespace classy.Services
             {
                 var session = SessionAs<CustomUserSession>();
                 CollectionManager.SecurityContext = session.ToSecurityContext();
+                CollectionManager.Environment = request.Environment;
 
                 var collection = CollectionManager.AddListingsToCollection(
                     request.Environment.AppId,
@@ -75,6 +77,7 @@ namespace classy.Services
             try
             {
                 var session = SessionAs<CustomUserSession>();
+                CollectionManager.Environment = request.Environment;
                 CollectionManager.RemoveListingsFromCollection(
                     request.Environment.AppId,
                     session.UserAuthId,
@@ -98,6 +101,7 @@ namespace classy.Services
             {
                 var session = SessionAs<CustomUserSession>();
                 CollectionManager.SecurityContext = session.ToSecurityContext();
+                CollectionManager.Environment = request.Environment;
                 var collection = CollectionManager.UpdateCollection(
                     request.Environment.AppId,
                     request.CollectionId,
@@ -123,6 +127,7 @@ namespace classy.Services
             {
                 var session = SessionAs<CustomUserSession>();
                 CollectionManager.SecurityContext = session.ToSecurityContext();
+                CollectionManager.Environment = request.Environment;
                 CollectionManager.DeleteCollection(
                     request.Environment.AppId,
                     request.CollectionId);
@@ -143,6 +148,7 @@ namespace classy.Services
             {
                 var session = SessionAs<CustomUserSession>();
                 CollectionManager.SecurityContext = session.ToSecurityContext();
+                CollectionManager.Environment = request.Environment;
 
                 var collection = CollectionManager.UpdateCollectionCover(
                     request.Environment.AppId,
@@ -165,6 +171,7 @@ namespace classy.Services
         {
             try
             {
+                CollectionManager.Environment = request.Environment;
                 var collection = CollectionManager.SubmitCollectionForEditorialApproval(
                     request.Environment.AppId,
                     request.CollectionId);
@@ -181,6 +188,7 @@ namespace classy.Services
         // get a list of approved collections
         public object Get(GetApprovedCollections request)
         {
+            CollectionManager.Environment = request.Environment;
             var collections = CollectionManager.GetApprovedCollections(
                 request.Environment.AppId,
                 request.Categories,
@@ -198,6 +206,7 @@ namespace classy.Services
             {
                 var session = SessionAs<CustomUserSession>();
                 CollectionManager.SecurityContext = session.ToSecurityContext();
+                CollectionManager.Environment = request.Environment;
 
                 var collection = CollectionManager.GetCollectionById(
                     request.Environment.AppId,
@@ -226,6 +235,7 @@ namespace classy.Services
         {
             try
             {
+                CollectionManager.Environment = request.Environment;
                 var collection = CollectionManager.GetCollectionsByProfileId(
                     request.Environment.AppId,
                     request.ProfileId,
@@ -242,6 +252,7 @@ namespace classy.Services
         [CustomAuthenticate]
         public object Get(GetCollectionTranslation request)
         {
+            CollectionManager.Environment = request.Environment;
             return new HttpResult(CollectionManager.GetCollectionTranslation(request.Environment.AppId, request.CollectionId, request.CultureCode), HttpStatusCode.OK);
         }
 
@@ -252,6 +263,7 @@ namespace classy.Services
             {
                 var session = SessionAs<CustomUserSession>();
                 CollectionManager.SecurityContext = session.ToSecurityContext();
+                CollectionManager.Environment = request.Environment;
                 CollectionManager.SetCollectionTranslation(
                     request.Environment.AppId,
                     request.CollectionId,
@@ -272,6 +284,7 @@ namespace classy.Services
             {
                 var session = SessionAs<CustomUserSession>();
                 CollectionManager.SecurityContext = session.ToSecurityContext();
+                CollectionManager.Environment = request.Environment;
                 CollectionManager.DeleteCollectionTranslation(
                     request.Environment.AppId,
                     request.CollectionId,

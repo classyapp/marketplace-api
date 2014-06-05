@@ -1,4 +1,4 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 using MongoDB.Bson.Serialization.Attributes;
 
 namespace Classy.Models
@@ -14,5 +14,11 @@ namespace Classy.Models
         public double? CompareAtPrice { get; set; }
         public MediaFile[] MediaFiles { get; set; }
         public string DefaultImage { get; set; }
+        public string ProductUrl { get; set; }
+        public double NeutralPrice { get; set; }
+        public string Height { get; set; }
+        public string Width { get; set; }
+        public string Depth { get; set; }
+
     }
 }
