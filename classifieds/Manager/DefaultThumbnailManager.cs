@@ -7,7 +7,9 @@ using System.IO;
 using System.Linq;
 using System.Web;
 using Amazon.S3;
+using classy.Extentions;
 using Classy.Repository;
+using ServiceStack.Text;
 
 namespace classy.Manager
 {
@@ -49,6 +51,45 @@ namespace classy.Manager
             catch (Exception ex)
             {
                 throw ex;
+            }
+        }
+
+        public Stream CreateCollage(string[] imageKeys)
+        {
+            if (imageKeys == null || imageKeys.Length <= 1 || imageKeys.Length >= 5)
+                throw new ArgumentException("CreateCollage can accept between 2 to 4 images");
+
+            var imageCount = imageKeys.Length;
+            var imageStreams = imageKeys.Select(x => StorageRepository.GetFile(x + "_reduced")).ToArray();
+            var images = imageStreams.Select(Image.FromStream).ToArray();
+            var smallestWidth = images.Min(x => x.Width);
+            var smallestHeight = images.Min(x => x.Height);
+
+            if (imageCount == 4)
+            {
+                var imageSize = Math.Min(smallestWidth, smallestHeight);
+                var newImages = imageStreams.Select(x =>
+                {
+                    var byteArray = x.ReadFully().Rescale(imageSize);
+                    using (var stream = new MemoryStream(byteArray))
+                        return Image.FromStream(stream);
+                }).ToArray();
+                var newImageSize = (imageSize * 2) + 10;
+                var newImage = new Bitmap(newImageSize, newImageSize, PixelFormat.DontCare);
+                var graphics = Graphics.FromImage(newImage);
+                graphics.FillRectangle(Brushes.White, 0, 0, newImageSize, newImageSize);
+
+                graphics.DrawImage(newImages[0], 0, 0, imageSize, imageSize);
+                //graphics.DrawImage();
+                //graphics.DrawImage();
+                //graphics.DrawImage();
+
+                newImage.Save("collage", ImageFormat.Jpeg);
+            }
+            else
+            {
+                // we have 2 or 3 images
+
             }
         }
 
