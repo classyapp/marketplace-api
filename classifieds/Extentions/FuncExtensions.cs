@@ -91,6 +91,7 @@ namespace classy.Extensions
             container.Register<ICollectionRepository>(c => new MongoCollectionRepository(c.Resolve<MongoDatabaseProvider>()));
             container.Register<ILocalizationRepository>(c => new MongoLocalizationProvider(c.Resolve<MongoDatabaseProvider>()));
             container.Register<IJobRepository>(c => new MongoJobRepository(c.Resolve<MongoDatabaseProvider>()));
+            container.Register<ICurrencyRepository>(c => new StubCurrencyRepository());
             container.Register<IAppManager>(c =>
                 new DefaultAppManager(c.TryResolve<MongoDatabaseProvider>(), c.TryResolve<ICache<Classy.Models.App>>()));
             container.Register<IEmailManager>(c =>
