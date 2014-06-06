@@ -79,28 +79,28 @@ namespace Classy.CatalogImportWorker
         public void Process(Job job)
         {
             // delete all products with images
-            var _products = _listingRepository.GetByProfileId(job.AppId, "172", true, null);
-            foreach (var _listing in _products)
-            {
-                if (_listing.ExternalMedia != null)
-                {
-                    foreach (var f in _listing.ExternalMedia)
-                    {
-                        _storageRepository.DeleteFile(f.Key);
-                    }
-                }
-                if (_listing.ListingType == "Product" && _listing.PricingInfo.PurchaseOptions != null)
-                {
-                    foreach (var po in _listing.PricingInfo.PurchaseOptions)
-                    {
-                        foreach (var f in _listing.ExternalMedia)
-                        {
-                            _storageRepository.DeleteFile(f.Key);
-                        }
-                    }
-                }
-                _listingRepository.Delete(_listing.Id, _listing.AppId);
-            }
+            //var _products = _listingRepository.GetByProfileId(job.AppId, "172", true, null);
+            //foreach (var _listing in _products)
+            //{
+            //    if (_listing.ExternalMedia != null)
+            //    {
+            //        foreach (var f in _listing.ExternalMedia)
+            //        {
+            //            _storageRepository.DeleteFile(f.Key);
+            //        }
+            //    }
+            //    if (_listing.ListingType == "Product" && _listing.PricingInfo.PurchaseOptions != null)
+            //    {
+            //        foreach (var po in _listing.PricingInfo.PurchaseOptions)
+            //        {
+            //            foreach (var f in _listing.ExternalMedia)
+            //            {
+            //                _storageRepository.DeleteFile(f.Key);
+            //            }
+            //        }
+            //    }
+            //    _listingRepository.Delete(_listing.Id, _listing.AppId);
+            //}
 
             // Get CSV from job
             List<List<string>> productsData = GetProductsData(job);
