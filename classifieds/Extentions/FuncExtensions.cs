@@ -182,6 +182,10 @@ namespace classy.Extensions
                 new DefaultJobManager(
                     c.TryResolve<IJobRepository>(),
                     c.TryResolve<IStorageRepository>()));
+            container.Register<ICurrencyManager>(c =>
+                new CurrencyManager(
+                    c.TryResolve<ICurrencyRepository>()
+                    ));
         }
     }
 }
