@@ -90,6 +90,7 @@ namespace classy.Extensions
             container.Register<IOrderRepository>(c => new MongoOrderRepository(c.Resolve<MongoDatabaseProvider>()));
             container.Register<ICollectionRepository>(c => new MongoCollectionRepository(c.Resolve<MongoDatabaseProvider>()));
             container.Register<ILocalizationRepository>(c => new MongoLocalizationProvider(c.Resolve<MongoDatabaseProvider>()));
+            container.Register<IJobRepository>(c => new MongoJobRepository(c.Resolve<MongoDatabaseProvider>()));
             container.Register<IAppManager>(c =>
                 new DefaultAppManager(c.TryResolve<MongoDatabaseProvider>(), c.TryResolve<ICache<Classy.Models.App>>()));
             container.Register<IEmailManager>(c =>
@@ -177,6 +178,10 @@ namespace classy.Extensions
                     c.TryResolve<IStorageRepository>()));
             container.Register<ISearchSuggestionsProvider>(c =>
                 new SearchSuggestionsProvider(c.TryResolve<ISearchClientFactory>(), c.TryResolve<MongoDatabaseProvider>()));
+            container.Register<IJobManager>(c =>
+                new DefaultJobManager(
+                    c.TryResolve<IJobRepository>(),
+                    c.TryResolve<IStorageRepository>()));
         }
     }
 }
