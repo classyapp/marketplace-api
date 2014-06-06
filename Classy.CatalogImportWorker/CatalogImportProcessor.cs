@@ -360,6 +360,7 @@ namespace Classy.CatalogImportWorker
 
                 for (int i = 0; i < productData.Count; i++)
                 {
+                    productFields = productData[i].Split(';');
                     if (i == 0) // Base product data
                     {
                         listing.PricingInfo.BaseOption.SKU = productFields[(int)Columns.SKU_0];
@@ -394,11 +395,11 @@ namespace Classy.CatalogImportWorker
                         // Variants
                         option.VariantProperties = new Dictionary<string, string>();
                         if (productFields[(int)Columns.VariationTheme_4].Contains("color"))
-                            option.VariantProperties.Add("color", productFields[(int)Columns.Color_18]);
+                            option.VariantProperties.Add("Color", productFields[(int)Columns.Color_18]);
                         if (productFields[(int)Columns.VariationTheme_4].Contains("design"))
-                            option.VariantProperties.Add("design", productFields[(int)Columns.Design_20]);
+                            option.VariantProperties.Add("Design", productFields[(int)Columns.Design_20]);
                         if (productFields[(int)Columns.VariationTheme_4].Contains("size"))
-                            option.VariantProperties.Add("size", productFields[(int)Columns.Size_19]);
+                            option.VariantProperties.Add("Size", productFields[(int)Columns.Size_19]);
 
                         // Images
                         List<MediaFile> mediaFiles = new List<MediaFile>();
