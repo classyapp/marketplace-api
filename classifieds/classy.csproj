@@ -257,9 +257,6 @@
     <Compile Include="Manager\StubCurrencyRepository.cs" />
     <Compile Include="DTO\Response\SearchSuggestion.cs" />
     <Compile Include="Manager\Search\SearchSuggestionsProvider.cs" />
-    <Compile Include="Operations\ImportProductCatalogJob.cs" />
-    <Compile Include="Operations\IOperator.cs" />
-    <Compile Include="Operations\ProductCatalogImportOperator.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Services\AppService.cs" />
     <Compile Include="Services\CollectionService.cs" />
@@ -312,6 +309,7 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Manager\Keywords\" />
+    <Folder Include="Operations\" />
   </ItemGroup>
   <PropertyGroup>
     <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">10.0</VisualStudioVersion>

@@ -13,6 +13,7 @@ namespace classy
         public static PricingInfoView ToPricingInfoView(this PricingInfo from, double adjustRate)
         {
             var to = from.TranslateTo<PricingInfoView>();
+            to.BaseOption = from.BaseOption.TranslateTo<PurchaseOptionView>();
             if (from.PurchaseOptions != null)
             {
                 if (to.PurchaseOptions == null) to.PurchaseOptions = new List<PurchaseOptionView>();

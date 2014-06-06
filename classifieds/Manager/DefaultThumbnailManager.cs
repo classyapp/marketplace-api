@@ -89,6 +89,8 @@ namespace classy.Manager
                     return memoryStream;
                 }
 
+                // check if only 
+
                 using (Bitmap bitmap = new Bitmap(newWidth, newHeight))
                 {
                     Graphics g = Graphics.FromImage((Image)bitmap);
