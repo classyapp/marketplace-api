@@ -30,6 +30,7 @@ namespace Classy.CatalogImportWorker
             {
                 try
                 {
+                    System.Diagnostics.Trace.WriteLine("Checking for pending jobs.");
                     // get next job
                     Job job = _jobsCollection.Find(Query.And(Query<Job>.EQ(j => j.AppId, "v1.0"), Query<Job>.EQ(j => j.Status, "Not Started"))).OrderBy(j => j.Created)
                         .FirstOrDefault();
@@ -37,6 +38,7 @@ namespace Classy.CatalogImportWorker
                     // Import Code goes here
                     if (job != null)
                     {
+                        System.Diagnostics.Trace.WriteLine(string.Format("Processing job: {0}.", job.Id));
                         new CatalogImportProcessor(
                             _container.Resolve<IStorageRepository>(),
                             _container.Resolve<IListingRepository>(),
@@ -48,6 +50,7 @@ namespace Classy.CatalogImportWorker
                     }
                     else
                     {
+                        System.Diagnostics.Trace.WriteLine("No pending jobs found.");
                         System.Threading.Thread.Sleep(5000);
                     }
                 }
