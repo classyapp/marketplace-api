@@ -35,17 +35,6 @@
     <Reference Include="AWSSDK">
       <HintPath>..\packages\AWSSDK.2.0.4.1\lib\net45\AWSSDK.dll</HintPath>
     </Reference>
-    <Reference Include="Classy.Models, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\RubymineProjects\marketplace-api\classifieds\bin\Classy.Models.dll</HintPath>
-    </Reference>
-    <Reference Include="Classy.Models.Response">
-      <HintPath>..\..\RubymineProjects\marketplace-api\classifieds\bin\Classy.Models.Response.dll</HintPath>
-    </Reference>
-    <Reference Include="Classy.Repository, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\RubymineProjects\marketplace-api\classifieds\bin\Classy.Repository.dll</HintPath>
-    </Reference>
     <Reference Include="MongoDB.Bson">
       <HintPath>..\packages\mongocsharpdriver.1.8.3\lib\net35\MongoDB.Bson.dll</HintPath>
     </Reference>
@@ -69,6 +58,20 @@
   <ItemGroup>
     <None Include="App.config" />
     <None Include="packages.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Classy.Models.Response\Classy.Models.Response.csproj">
+      <Project>{7dba45e3-cb30-4f3c-9577-27e955dd3f49}</Project>
+      <Name>Classy.Models.Response</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Classy.Models\Classy.Models.csproj">
+      <Project>{ac13df42-51bb-4798-a0ab-9b2776b4844f}</Project>
+      <Name>Classy.Models</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Classy.Repository\Classy.Repository.csproj">
+      <Project>{8bb8c610-ffdb-49de-af0c-0e4cb37e4b1e}</Project>
+      <Name>Classy.Repository</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
