@@ -79,18 +79,20 @@ namespace classy.Manager
                 }).ToArray();
                 var newImageSize = (imageSize * 2) + 10;
 
-                var newImage = new Bitmap(newImageSize, newImageSize, PixelFormat.DontCare);
-                var graphics = Graphics.FromImage(newImage);
-                graphics.FillRectangle(Brushes.White, 0, 0, newImageSize, newImageSize);
+                using (var newImage = new Bitmap(newImageSize, newImageSize, PixelFormat.DontCare))
+                {
+                    var graphics = Graphics.FromImage(newImage);
+                    graphics.FillRectangle(Brushes.White, 0, 0, newImageSize, newImageSize);
 
-                graphics.DrawImage(newImages[0], 0, 0, imageSize, imageSize);
-                //graphics.DrawImage();
-                //graphics.DrawImage();
-                //graphics.DrawImage();
+                    graphics.DrawImage(newImages[0], 0, 0, imageSize, imageSize);
+                    //graphics.DrawImage();
+                    //graphics.DrawImage();
+                    //graphics.DrawImage();
 
-                var outputStream = new MemoryStream();
-                newImage.Save(outputStream, ImageFormat.Jpeg);
-                return outputStream;
+                    var outputStream = new MemoryStream();
+                    newImage.Save(outputStream, ImageFormat.Jpeg);
+                    return outputStream;
+                }
             }
             else if (imageCount == 3)
             {
@@ -103,7 +105,14 @@ namespace classy.Manager
                 var collageHeight = smallestHeight;
                 var collageWidth = collageHeight;
 
+                var newImages = imageStreams.Select(x =>
+                {
+                    x.ReadFully().RescaleToHeight(collageHeight);
+                    return Image.FromStream(x);
+                }).ToArray();
 
+                var collage = new Bitmap(collageWidth, collageHeight, PixelFormat.DontCare);
+                
             }
         }
 
@@ -113,8 +122,8 @@ namespace classy.Manager
             using (Image source = Image.FromStream(originalImage))
             {
                 // Resize the original
-                int newWidth = 0;
-                int newHeight = 0;
+                var newWidth = 0;
+                var newHeight = 0;
 
                 if (height == 0)
                 {
@@ -144,16 +153,16 @@ namespace classy.Manager
                     return memoryStream;
                 }
 
-                using (Bitmap bitmap = new Bitmap(newWidth, newHeight))
+                using (var bitmap = new Bitmap(newWidth, newHeight))
                 {
-                    Graphics g = Graphics.FromImage((Image)bitmap);
-                    g.InterpolationMode = InterpolationMode.HighQualityBicubic;
-
-                    g.DrawImage(source, 0, 0, newWidth, newHeight);
-                    g.Dispose();
+                    using (var g = Graphics.FromImage((Image) bitmap))
+                    {
+                        g.InterpolationMode = InterpolationMode.HighQualityBicubic;
+                        g.DrawImage(source, 0, 0, newWidth, newHeight);
+                    }
 
                     // Crop
-                    using (Bitmap thumbnail = bitmap.Clone(new Rectangle { X = (newWidth - width) / 2, Y = (newHeight - height) / 2, Width = width, Height = height }, PixelFormat.DontCare))
+                    using (var thumbnail = bitmap.Clone(new Rectangle { X = (newWidth - width) / 2, Y = (newHeight - height) / 2, Width = width, Height = height }, PixelFormat.DontCare))
                     {
                         memoryStream = new MemoryStream(width * height);
                         thumbnail.Save(memoryStream, ImageFormat.Jpeg);
