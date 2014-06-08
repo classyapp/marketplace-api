@@ -62,11 +62,14 @@ namespace classy.Manager
             var imageCount = imageKeys.Length;
             var imageStreams = imageKeys.Select(x => StorageRepository.GetFile(x + "_reduced")).ToArray();
             var images = imageStreams.Select(Image.FromStream).ToArray();
+
+            // get the smallest width & height in the bunch
             var smallestWidth = images.Min(x => x.Width);
             var smallestHeight = images.Min(x => x.Height);
 
             if (imageCount == 4)
             {
+                // create 4 squares in the size of the smallest image
                 var imageSize = Math.Min(smallestWidth, smallestHeight);
                 var newImages = imageStreams.Select(x =>
                 {
@@ -75,6 +78,7 @@ namespace classy.Manager
                         return Image.FromStream(stream);
                 }).ToArray();
                 var newImageSize = (imageSize * 2) + 10;
+
                 var newImage = new Bitmap(newImageSize, newImageSize, PixelFormat.DontCare);
                 var graphics = Graphics.FromImage(newImage);
                 graphics.FillRectangle(Brushes.White, 0, 0, newImageSize, newImageSize);
@@ -84,11 +88,21 @@ namespace classy.Manager
                 //graphics.DrawImage();
                 //graphics.DrawImage();
 
-                newImage.Save("collage", ImageFormat.Jpeg);
+                var outputStream = new MemoryStream();
+                newImage.Save(outputStream, ImageFormat.Jpeg);
+                return outputStream;
             }
-            else
+            else if (imageCount == 3)
             {
-                // we have 2 or 3 images
+                
+            }
+            else // this means there are only 2 images
+            {
+                // they both should be in the size of the smallest height and smallest width
+                // and place them side by side
+                var collageHeight = smallestHeight;
+                var collageWidth = collageHeight;
+
 
             }
         }
