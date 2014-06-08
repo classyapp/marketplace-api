@@ -7,6 +7,15 @@ namespace classy.Extentions
 {
     public static class ImageExtensions
     {
+        /// <summary>
+        /// This method rescales an image to a maximum given size.
+        /// The maximum size will be the constraint on the image's width
+        /// and the height will be resized according to the original scale of the image.
+        /// Note: this means the height can turn out to be smaller than the given maxSize.
+        /// </summary>
+        /// <param name="original">The image to resize represented as a byte array</param>
+        /// <param name="maxSize">Maximum width of image to resize to</param>
+        /// <returns>A byte array of the newly resized image</returns>
         public static byte[] Rescale(this byte[] original, int maxSize)
         {
             byte[] buffer = null;
