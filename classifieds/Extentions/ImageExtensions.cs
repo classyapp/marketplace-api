@@ -18,8 +18,6 @@ namespace classy.Extentions
         /// <returns>A byte array of the newly resized image</returns>
         public static byte[] Rescale(this byte[] original, int maxSize)
         {
-            byte[] buffer = null;
-
             using (var memoryStream = new MemoryStream(original))
             {
                 using (var image = Image.FromStream(memoryStream))
@@ -43,26 +41,52 @@ namespace classy.Extentions
                             graphics.PixelOffsetMode = PixelOffsetMode.HighQuality;
                             graphics.DrawImage(image, new Rectangle(0, 0, newWidth, newHeight));
 
-                            using (var reducedImage = new MemoryStream())
-                            {
-                                newImage.Save(reducedImage, ImageFormat.Jpeg);
-
-                                // TODO: what is this for ??? (we already saved the image)
-                                reducedImage.Seek(0, SeekOrigin.Begin);
-
-                                buffer = new byte[reducedImage.Length];
-                                reducedImage.Read(buffer, 0, buffer.Length);
-
-                                reducedImage.Close();
-                            }
+                            return ConvertImageToByteArray(newImage);
                         }
                     }
                 }
-
-                memoryStream.Close();
             }
+        }
 
-            return buffer;
+        public static byte[] RescaleToHeight(this byte[] original, int maxHeight)
+        {
+            using (var memoryStream = new MemoryStream(original))
+            {
+                using (var image = Image.FromStream(memoryStream))
+                {
+                    if (maxHeight > image.Height)
+                    {
+                        memoryStream.Close();
+                        return original;
+                    }
+
+                    var scale = (double)image.Width / (double)image.Height;
+                    var newHeight = maxHeight;
+                    var newWidth = (int)(newHeight * scale);
+                    
+                    using (var newImage = new Bitmap(newWidth, newHeight))
+                    {
+                        using (var graphics = Graphics.FromImage(newImage))
+                        {
+                            graphics.SmoothingMode = SmoothingMode.AntiAlias;
+                            graphics.InterpolationMode = InterpolationMode.HighQualityBicubic;
+                            graphics.PixelOffsetMode = PixelOffsetMode.HighQuality;
+                            graphics.DrawImage(image, new Rectangle(0, 0, newWidth, newHeight));
+
+                            return ConvertImageToByteArray(newImage);
+                        }
+                    }
+                }
+            }
+        }
+
+        private static byte[] ConvertImageToByteArray(Image image)
+        {
+            using (var ms = new MemoryStream())
+            {
+                image.Save(ms, ImageFormat.Jpeg);
+                return ms.ToArray();
+            }
         }
     }
 }
