@@ -9,9 +9,9 @@ namespace classy.Extentions
     {
         /// <summary>
         /// This method rescales an image to a maximum given size.
-        /// The maximum size will be the constraint on the image's width
-        /// and the height will be resized according to the original scale of the image.
-        /// Note: this means the height can turn out to be smaller than the given maxSize.
+        /// It maintains the scale of the image but makes the longer edge to a maximum
+        /// of the given max size.
+        /// Note: this means that one of the sides might be smaller th
         /// </summary>
         /// <param name="original">The image to resize represented as a byte array</param>
         /// <param name="maxSize">Maximum width of image to resize to</param>
@@ -80,13 +80,19 @@ namespace classy.Extentions
             }
         }
 
-        private static byte[] ConvertImageToByteArray(Image image)
+        public static byte[] ConvertImageToByteArray(Image image)
         {
             using (var ms = new MemoryStream())
             {
                 image.Save(ms, ImageFormat.Jpeg);
                 return ms.ToArray();
             }
+        }
+
+        public static Image ConvertBytesToImage(byte[] bytes)
+        {
+            using (var ms = new MemoryStream(bytes))
+                return Image.FromStream(ms);
         }
     }
 }

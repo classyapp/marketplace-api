@@ -135,6 +135,7 @@
     <Compile Include="DTO\Request\GetListingTranslation.cs" />
     <Compile Include="DTO\Request\DeleteTranslation.cs" />
     <Compile Include="DTO\Request\GetProfileTranslation.cs" />
+    <Compile Include="DTO\Request\Images\GetCollageRequest.cs" />
     <Compile Include="DTO\Request\ImportPorductCatalogRequest.cs" />
     <Compile Include="DTO\Request\LogActivity\GetUserActivityRequest.cs" />
     <Compile Include="DTO\Request\LogActivity\LogActivityRequest.cs" />
@@ -151,7 +152,7 @@
     <Compile Include="DTO\Request\GetGoogleContacts.cs" />
     <Compile Include="DTO\Request\GetListResourceByKey.cs" />
     <Compile Include="DTO\Request\GetResourcesForApp.cs" />
-    <Compile Include="DTO\Request\GetThumbnail.cs" />
+    <Compile Include="DTO\Request\Images\GetThumbnail.cs" />
     <Compile Include="DTO\Request\CreateNewResource.cs" />
     <Compile Include="DTO\Request\Search\FreeSearchRequest.cs" />
     <Compile Include="DTO\Request\Search\KeywordSuggestionRequest.cs" />

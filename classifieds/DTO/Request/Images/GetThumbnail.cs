@@ -1,10 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Web;
+﻿using Classy.Models;
 using ServiceStack.FluentValidation;
 
-namespace Classy.Models.Request
+namespace classy.DTO.Request.Images
 {
     public class GetThumbnail : BaseRequestDto
     {

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Web;
 using classy.DTO.Request;
+using classy.DTO.Request.Images;
 using classy.DTO.Request.LogActivity;
 using classy.DTO.Request.Search;
 using classy.Extensions;
@@ -151,6 +152,7 @@ namespace classy
 
                 // Thumbnails
                 .Add<GetThumbnail>("/thumbnail/{ImageKey}", "GET")
+                .Add<GetCollageRequest>("/thumbnail/collage", "POST")
 
                 // Listings
                 .Add<EditMultipleListings>("/listings/edit-multiple", "POST")

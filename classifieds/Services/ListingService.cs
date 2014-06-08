@@ -1,4 +1,5 @@
 ﻿using classy.DTO.Request;
+using classy.DTO.Request.Images;
 using ServiceStack.ServiceInterface;
 using System;
 using System.Collections.Generic;
@@ -632,6 +633,13 @@ namespace classy.Services
         public object Get(GetThumbnail request)
         {
             return new HttpResult(ThumbnailManager.CreateThumbnail(request.ImageKey, request.Width, request.Height), "image/jpeg");
+        }
+
+        [AddHeader(ContentType = "image/jpeg")]
+        public object Post(GetCollageRequest request)
+        {
+            var responseBytes = ThumbnailManager.CreateCollage(request.ImageKeys);
+            return new HttpResult(responseBytes, "image/jpeg");
         }
 
         [CustomAuthenticate]
