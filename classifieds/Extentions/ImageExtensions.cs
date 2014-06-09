@@ -33,48 +33,14 @@ namespace classy.Extentions
                     int newHeight = scale > 1 ? (int) (maxSize/scale) : maxSize;
 
                     using (var newImage = new Bitmap(newWidth, newHeight))
+                    using (var graphics = Graphics.FromImage(newImage))
                     {
-                        using (var graphics = Graphics.FromImage(newImage))
-                        {
-                            graphics.SmoothingMode = SmoothingMode.AntiAlias;
-                            graphics.InterpolationMode = InterpolationMode.HighQualityBicubic;
-                            graphics.PixelOffsetMode = PixelOffsetMode.HighQuality;
-                            graphics.DrawImage(image, new Rectangle(0, 0, newWidth, newHeight));
+                        graphics.SmoothingMode = SmoothingMode.AntiAlias;
+                        graphics.InterpolationMode = InterpolationMode.HighQualityBicubic;
+                        graphics.PixelOffsetMode = PixelOffsetMode.HighQuality;
+                        graphics.DrawImage(image, new Rectangle(0, 0, newWidth, newHeight));
 
-                            return ConvertImageToByteArray(newImage);
-                        }
-                    }
-                }
-            }
-        }
-
-        public static byte[] RescaleToHeight(this byte[] original, int maxHeight)
-        {
-            using (var memoryStream = new MemoryStream(original))
-            {
-                using (var image = Image.FromStream(memoryStream))
-                {
-                    if (maxHeight > image.Height)
-                    {
-                        memoryStream.Close();
-                        return original;
-                    }
-
-                    var scale = (double)image.Width / (double)image.Height;
-                    var newHeight = maxHeight;
-                    var newWidth = (int)(newHeight * scale);
-                    
-                    using (var newImage = new Bitmap(newWidth, newHeight))
-                    {
-                        using (var graphics = Graphics.FromImage(newImage))
-                        {
-                            graphics.SmoothingMode = SmoothingMode.AntiAlias;
-                            graphics.InterpolationMode = InterpolationMode.HighQualityBicubic;
-                            graphics.PixelOffsetMode = PixelOffsetMode.HighQuality;
-                            graphics.DrawImage(image, new Rectangle(0, 0, newWidth, newHeight));
-
-                            return ConvertImageToByteArray(newImage);
-                        }
+                        return ConvertImageToByteArray(newImage);
                     }
                 }
             }

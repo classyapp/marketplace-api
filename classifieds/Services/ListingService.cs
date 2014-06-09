@@ -636,6 +636,7 @@ namespace classy.Services
         }
 
         [AddHeader(ContentType = "image/jpeg")]
+        [AddHeader(CacheControl = "max-age: 315360000")]
         public object Get(GetCollageRequest request)
         {
             var responseBytes = ThumbnailManager.CreateCollage(request.ImageKeys);
