@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Web;
 using classy.DTO.Request;
+using classy.DTO.Request.Images;
 using classy.DTO.Request.LogActivity;
 using classy.DTO.Request.Search;
 using classy.Extensions;
@@ -136,6 +137,7 @@ namespace classy
                 .Add<PasswordResetRequest>("/auth/reset", "POST")
 
                 // Thumbnails
+                .Add<GetCollageRequest>("/collage", "GET")
                 .Add<GetThumbnail>("/thumbnail/{ImageKey}", "GET")
 
                 // Listings
