@@ -636,7 +636,7 @@ namespace classy.Services
         }
 
         [AddHeader(ContentType = "image/jpeg")]
-        public object Post(GetCollageRequest request)
+        public object Get(GetCollageRequest request)
         {
             var responseBytes = ThumbnailManager.CreateCollage(request.ImageKeys);
             return new HttpResult(responseBytes, "image/jpeg");

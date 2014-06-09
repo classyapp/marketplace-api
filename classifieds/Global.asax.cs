@@ -151,8 +151,8 @@ namespace classy
                 .Add<PasswordResetRequest>("/auth/reset", "POST")
 
                 // Thumbnails
+                .Add<GetCollageRequest>("/collage", "GET")
                 .Add<GetThumbnail>("/thumbnail/{ImageKey}", "GET")
-                .Add<GetCollageRequest>("/thumbnail/collage", "POST")
 
                 // Listings
                 .Add<EditMultipleListings>("/listings/edit-multiple", "POST")
