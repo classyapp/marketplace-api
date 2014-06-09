@@ -63,7 +63,7 @@ namespace classy.Manager
             if (imageKeys == null || imageKeys.Length <= 1 || imageKeys.Length >= 5)
                 throw new ArgumentException("CreateCollage can accept between 2 to 4 images");
 
-            const int collageSize = 600;
+            const int collageSize = 500;
             var borderSize = (int)Math.Ceiling(Decimal.Divide(collageSize, 80));
 
             var resizedImages = new List<byte[]>(4);
