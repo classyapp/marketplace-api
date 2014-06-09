@@ -34,6 +34,8 @@ namespace Classy.Models
         public IList<CurrencyListItem> SupportedCurrencies { get; set; }
         public IList<ListItem> SupportedCultures { get; set; }
         public IList<ListItem> SupportedCountries { get; set; }
+        public IList<ListItem> ProductCategories { get; set; }
+        public IList<ListItem> Styles { get; set; }
 
         public App Translate(string culture)
         {

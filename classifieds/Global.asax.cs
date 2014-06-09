@@ -17,7 +17,6 @@ using ServiceStack.ServiceInterface;
 using ServiceStack.ServiceInterface.Admin;
 using ServiceStack.ServiceInterface.Validation;
 using ServiceStack.WebHost.Endpoints;
-using classy.Operations;
 using Classy.Repository;
 using Classy.Interfaces.Managers;
 
@@ -79,7 +78,7 @@ namespace classy
 
         private void ConfigureOperators(Funq.Container container)
         {
-            var mqServer = container.TryResolve<ServiceStack.Messaging.IMessageService>();
+            //var mqServer = container.TryResolve<ServiceStack.Messaging.IMessageService>();
 
             //// example operator registration
             //// -----------------------------
@@ -91,20 +90,7 @@ namespace classy
             //    return true;
             //});
 
-            container.Register<ProductCatalogImportOperator>(c => new ProductCatalogImportOperator(
-                c.TryResolve<IStorageRepository>(),
-                c.TryResolve<IListingRepository>(),
-                c.TryResolve<IJobRepository>(),
-                c.TryResolve<ICurrencyManager>(),
-                c.TryResolve<IProfileRepository>()));
-            mqServer.RegisterHandler<ImportProductCatalogJob>(m =>
-                {
-                    var operation = container.TryResolve<ProductCatalogImportOperator>();
-                    operation.PerformOperation(m.GetBody());
-                    return true;
-                });
-
-            mqServer.Start();
+            //mqServer.Start();
         }
 
         private void ConfigureAuth(Funq.Container container)

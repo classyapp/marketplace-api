@@ -4,7 +4,7 @@ using System.Linq;
 using System.Web;
 using Classy.Repository;
 
-namespace classy.Manager
+namespace Classy.Repository
 {
     public class StubCurrencyRepository : ICurrencyRepository
     {
