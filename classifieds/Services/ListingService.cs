@@ -1,5 +1,4 @@
 ﻿using classy.DTO.Request;
-using classy.DTO.Request.Images;
 using ServiceStack.ServiceInterface;
 using System;
 using System.Collections.Generic;
@@ -23,7 +22,6 @@ namespace classy.Services
         public IProfileManager ProfileManager { get; set; }
         public IAnalyticsManager AnalyticsManager { get; set; }
         public ILocalizationManager LocalizationManager { get; set; }
-        public IThumbnailManager ThumbnailManager { get; set; }
         public IEmailManager EmailManager { get; set; }
         public IAppManager AppManager { get; set; }
 
@@ -626,21 +624,6 @@ namespace classy.Services
             }
             return new HttpResult(null, HttpStatusCode.OK);
 
-        }
-
-        [AddHeader(ContentType = "image/jpeg")]
-        [AddHeader(CacheControl = "max-age: 315360000")]
-        public object Get(GetThumbnail request)
-        {
-            return new HttpResult(ThumbnailManager.CreateThumbnail(request.ImageKey, request.Width, request.Height), "image/jpeg");
-        }
-
-        [AddHeader(ContentType = "image/jpeg")]
-        [AddHeader(CacheControl = "max-age: 315360000")]
-        public object Get(GetCollageRequest request)
-        {
-            var responseBytes = ThumbnailManager.CreateCollage(request.ImageKeys);
-            return new HttpResult(responseBytes, "image/jpeg");
         }
 
         [CustomAuthenticate]

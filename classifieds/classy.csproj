@@ -266,6 +266,7 @@
     <Compile Include="Services\AppService.cs" />
     <Compile Include="Services\CollectionService.cs" />
     <Compile Include="Services\CommentsService.cs" />
+    <Compile Include="Services\ImageService.cs" />
     <Compile Include="Services\ListingService.cs" />
     <Compile Include="Services\LogActivityService.cs" />
     <Compile Include="Services\PasswordService.cs" />
