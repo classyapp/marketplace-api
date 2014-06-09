@@ -29,18 +29,27 @@ namespace classy.Manager
                 Stream originalImage = null;
                 try
                 {
-                    originalImage = StorageRepository.GetFile(imageKey);
-                }
-                catch (AmazonS3Exception ex)
-                {
-                    originalImage = StorageRepository.GetFile(originKey);
-                }
+                    try
+                    {
+                        originalImage = StorageRepository.GetFile(imageKey);
+                    }
+                    catch (AmazonS3Exception ex)
+                    {
+                        originalImage = StorageRepository.GetFile(originKey);
+                    }
 
-                lock (originalImage)
+                    lock (originalImage)
+                    {
+                        return GenerateThumbnail(originalImage, width, height);
+                    }
+                }
+                finally
                 {
-                    originalImage.Close();
-                    originalImage.Dispose();
-                    return GenerateThumbnail(originalImage, width, height);
+                    if (originalImage != null)
+                    {
+                        originalImage.Close();
+                        originalImage.Dispose();
+                    }
                 }
             }
             catch (Exception ex)
