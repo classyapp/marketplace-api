@@ -53,7 +53,8 @@ namespace classy.Manager
             if (imageKeys == null || imageKeys.Length <= 1 || imageKeys.Length >= 5)
                 throw new ArgumentException("CreateCollage can accept between 2 to 4 images");
 
-            const int borderSize = 10;
+            const int collageSize = 600;
+            var borderSize = (int)Math.Ceiling(Decimal.Divide(collageSize, 80));
 
             byte[][] resizedImages;
             var imageCount = imageKeys.Length;
@@ -69,21 +70,22 @@ namespace classy.Manager
             if (imageCount == 4)
             {
                 // create 4 squares in the size of the smallest image
+                var imageSize = (collageSize - borderSize) / 2;
                 resizedImages = images.Select(x => 
                 {
                     using (var b = new Bitmap(x))
-                        return RescaleAndCrop(b, 400, 400);
+                        return RescaleAndCrop(b, imageSize, imageSize);
                 }).ToArray();
 
-                using (var newImage = new Bitmap(800 + borderSize, 800 + borderSize))
+                using (var newImage = new Bitmap(collageSize, collageSize))
                 using (var graphics = Graphics.FromImage(newImage))
                 {
-                    graphics.FillRectangle(Brushes.White, 0, 0, 800 + borderSize, 800 + borderSize);
+                    graphics.FillRectangle(Brushes.White, 0, 0, collageSize, collageSize);
 
-                    graphics.DrawImage(ImageExtensions.ConvertBytesToImage(resizedImages[0]), 0, 0, 400, 400);
-                    graphics.DrawImage(ImageExtensions.ConvertBytesToImage(resizedImages[1]), 400 + borderSize, 0, 400, 400);
-                    graphics.DrawImage(ImageExtensions.ConvertBytesToImage(resizedImages[2]), 0, 400 + borderSize, 400, 400);
-                    graphics.DrawImage(ImageExtensions.ConvertBytesToImage(resizedImages[3]), 400 + borderSize, 400 + borderSize, 400, 400);
+                    graphics.DrawImage(ImageExtensions.ConvertBytesToImage(resizedImages[0]), 0, 0, imageSize, imageSize);
+                    graphics.DrawImage(ImageExtensions.ConvertBytesToImage(resizedImages[1]), imageSize + borderSize, 0, imageSize, imageSize);
+                    graphics.DrawImage(ImageExtensions.ConvertBytesToImage(resizedImages[2]), 0, imageSize + borderSize, imageSize, imageSize);
+                    graphics.DrawImage(ImageExtensions.ConvertBytesToImage(resizedImages[3]), imageSize + borderSize, imageSize + borderSize, imageSize, imageSize);
 
                     using (var outputStream = new MemoryStream())
                     {
@@ -101,20 +103,21 @@ namespace classy.Manager
             // this means there are only 2 images
             // they both should be in the size of the smallest height and smallest width
             // and place them side by side
-
+            var imageWidth = (collageSize - borderSize) / 2;
+            var imageHeight = collageSize;
             resizedImages = images.Select(x =>
             {
                 using (var b = new Bitmap(x))
-                    return RescaleAndCrop(b, 400, 810);
+                    return RescaleAndCrop(b, imageWidth, imageHeight);
             }).ToArray();
 
-            using (var newImage = new Bitmap(800 + borderSize, 800 + borderSize))
+            using (var newImage = new Bitmap(collageSize, collageSize))
             using (var graphics = Graphics.FromImage(newImage))
             {
-                graphics.FillRectangle(Brushes.White, 0, 0, 800 + borderSize, 800 + borderSize);
+                graphics.FillRectangle(Brushes.White, 0, 0, collageSize, collageSize);
 
-                graphics.DrawImage(ImageExtensions.ConvertBytesToImage(resizedImages[0]), 0, 0, 400, 800 + borderSize);
-                graphics.DrawImage(ImageExtensions.ConvertBytesToImage(resizedImages[1]), 400 + borderSize, 0, 400, 800 + borderSize);
+                graphics.DrawImage(ImageExtensions.ConvertBytesToImage(resizedImages[0]), 0, 0, imageWidth, imageHeight);
+                graphics.DrawImage(ImageExtensions.ConvertBytesToImage(resizedImages[1]), imageWidth + borderSize, 0, imageWidth, imageHeight);
 
                 using (var outputStream = new MemoryStream())
                 {
@@ -122,8 +125,6 @@ namespace classy.Manager
                     return outputStream.ToArray();
                 }
             }
-
-            return null;
         }
 
         private byte[] GenerateThumbnail(Stream originalImage, int width, int height)
