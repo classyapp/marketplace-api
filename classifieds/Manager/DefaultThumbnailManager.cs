@@ -186,15 +186,17 @@ namespace classy.Manager
                 }
 
                 // Check that we are not upscaling
-                if (newWidth > source.Width && newHeight > source.Height)
-                {
-                    using (var memoryStream = new MemoryStream())
-                    {
-                        source.Save(memoryStream, ImageFormat.Jpeg);
-                        return memoryStream.ToArray();
-                    }
-                }
+                //if (newWidth > source.Width && newHeight > source.Height)
+                //{
+                //    using (var memoryStream = new MemoryStream())
+                //    {
+                //        source.Save(memoryStream, ImageFormat.Jpeg);
+                //        return memoryStream.ToArray();
+                //    }
+                //}
 
+                newWidth = Math.Min(newWidth, source.Width);
+                newHeight = Math.Min(newHeight, source.Height);
                 using (var bitmap = new Bitmap(newWidth, newHeight))
                 {
                     using (var g = Graphics.FromImage(bitmap))
@@ -203,7 +205,7 @@ namespace classy.Manager
                         g.DrawImage(source, 0, 0, newWidth, newHeight);
                     }
 
-                    return CropImage(bitmap, width, height);
+                    return CropImage(bitmap, Math.Min(width, newWidth), Math.Min(height, newHeight));
                 }
             }
         }
