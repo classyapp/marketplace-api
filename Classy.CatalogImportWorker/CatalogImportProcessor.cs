@@ -61,18 +61,21 @@ namespace Classy.CatalogImportWorker
         private readonly IJobRepository _jobRepository; // Jobs
         private readonly ICurrencyManager _currencyManager; // Currencies
         private readonly IProfileRepository _profileRepository; // Profiles
+        private readonly ILocalizationRepository _localizationRepository; // Localization
         private readonly IAppManager _appManager;
 
         private App _app;
+        private IList<ListItem> _styles;
 
         public CatalogImportProcessor(IStorageRepository storageRepo, IListingRepository listingRepo, IJobRepository jobRepo,
-            ICurrencyManager currencyManager, IProfileRepository profileRepository, IAppManager appManager)
+            ICurrencyManager currencyManager, IProfileRepository profileRepository, ILocalizationRepository localizationRepo, IAppManager appManager)
         {
             _storageRepository = storageRepo;
             _listingRepository = listingRepo;
             _jobRepository = jobRepo;
             _currencyManager = currencyManager;
             _profileRepository = profileRepository;
+            _localizationRepository = localizationRepo;
             _appManager = appManager;
         }
 
@@ -119,6 +122,7 @@ namespace Classy.CatalogImportWorker
             else
             {
                 _app = _appManager.GetAppById(job.AppId);
+                _styles = _localizationRepository.GetListResourceByKey(job.AppId, "room-styles").ListItems;
 
                 job.Status = "Executing";
                 _jobRepository.Save(job);
@@ -270,7 +274,8 @@ namespace Classy.CatalogImportWorker
         private void ValidateStyle(string productData)
         {
             string style = productData.Split(';')[(int)Columns.Style_10];
-            if (!_app.Styles.Any(st => st.Value == style))
+
+            if (!_styles.Any(st => st.Value == style))
                 throw new ImportException(string.Format("Invalid style: {0}", style), 0);
         }
 

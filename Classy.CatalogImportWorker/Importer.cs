@@ -45,6 +45,7 @@ namespace Classy.CatalogImportWorker
                             _container.Resolve<IJobRepository>(),
                             _container.Resolve<ICurrencyManager>(),
                             _container.Resolve<IProfileRepository>(),
+                            _container.Resolve<ILocalizationRepository>(),
                             _container.Resolve<IAppManager>()
                             ).Process(job);
                     }
