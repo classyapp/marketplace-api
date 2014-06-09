@@ -8,7 +8,6 @@ using System.Linq;
 using Amazon.S3;
 using classy.Extentions;
 using Classy.Repository;
-using Mandrill;
 
 namespace classy.Manager
 {
