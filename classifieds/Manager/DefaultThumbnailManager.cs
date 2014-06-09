@@ -55,6 +55,7 @@ namespace classy.Manager
 
             const int borderSize = 10;
 
+            byte[][] resizedImages;
             var imageCount = imageKeys.Length;
             var imageStreams = imageKeys.Select(x => StorageRepository.GetFile(x + "_reduced")).ToArray();
             var images = imageStreams.Select(Image.FromStream).ToArray();
@@ -68,7 +69,7 @@ namespace classy.Manager
             if (imageCount == 4)
             {
                 // create 4 squares in the size of the smallest image
-                var resizedImages = images.Select(x => 
+                resizedImages = images.Select(x => 
                 {
                     using (var b = new Bitmap(x))
                         return RescaleAndCrop(b, 400, 400);
@@ -89,7 +90,6 @@ namespace classy.Manager
                         newImage.Save(outputStream, ImageFormat.Jpeg);
                         return outputStream.ToArray();
                     }
-
                 }
             }
 
@@ -101,35 +101,28 @@ namespace classy.Manager
             // this means there are only 2 images
             // they both should be in the size of the smallest height and smallest width
             // and place them side by side
-            //var collageHeight = smallestHeight;
-            //var collageWidth = collageHeight;
-            //var imageWidth = (int) ((collageWidth/2) - (borderSize/2));
 
-            //newImages = imageStreams.Select(x =>
-            //{
-            //    var imageScaled = ReadFully(x).RescaleAndCrop(collageHeight);
-            //    using (var stream = new MemoryStream(imageScaled))
-            //    {
-            //        var newImage = new Bitmap(stream);
-            //        var croppedImage = CropImage(newImage, collageHeight, imageWidth);
-            //        return Image.FromStream(croppedImage);
-            //    }
-            //}).ToArray();
+            resizedImages = images.Select(x =>
+            {
+                using (var b = new Bitmap(x))
+                    return RescaleAndCrop(b, 400, 810);
+            }).ToArray();
 
-            //using (var collage = new Bitmap(collageWidth + borderSize, collageHeight, PixelFormat.DontCare))
-            //{
-            //    using (var g = Graphics.FromImage(collage))
-            //    {
-            //        g.FillRectangle(Brushes.White, 0, 0, collageWidth, collageHeight);
+            using (var newImage = new Bitmap(800 + borderSize, 800 + borderSize))
+            using (var graphics = Graphics.FromImage(newImage))
+            {
+                graphics.FillRectangle(Brushes.White, 0, 0, 800 + borderSize, 800 + borderSize);
 
-            //        g.DrawImage(newImages[0], 0, 0, newImages[0].Width, newImages[0].Height);
-            //        g.DrawImage(newImages[1], imageWidth + borderSize, 0, newImages[1].Width, newImages[1].Height);
+                graphics.DrawImage(ImageExtensions.ConvertBytesToImage(resizedImages[0]), 0, 0, 400, 800 + borderSize);
+                graphics.DrawImage(ImageExtensions.ConvertBytesToImage(resizedImages[1]), 400 + borderSize, 0, 400, 800 + borderSize);
 
-            //        var outputStream = new MemoryStream();
-            //        collage.Save(outputStream, ImageFormat.Jpeg);
-            //        return outputStream.ToArray();
-            //    }
-            //}
+                using (var outputStream = new MemoryStream())
+                {
+                    newImage.Save(outputStream, ImageFormat.Jpeg);
+                    return outputStream.ToArray();
+                }
+            }
+
             return null;
         }
 
@@ -201,15 +194,25 @@ namespace classy.Manager
 
         private byte[] RescaleAndCrop(Image image, int width, int height)
         {
-            var scale = (float)((float)image.Width/(float)image.Height);
+            int newHeight = 0, newWidth = 0;
+            var imageScale = (float) ((float) image.Width / (float) image.Height);
+            var newImageScale = (float)((float)width / (float)height);
 
-            var scaleSize = Math.Max(width, height);
-
-            var newWidth = (int) (scale > 1 ? scaleSize*scale : scaleSize);
-            var newHeight = (int) (scale > 1 ? scaleSize : (int)(newWidth/scale));
-
+            if (imageScale > newImageScale)
+            {
+                // resize the image according to the new image's height and the original image's scale
+                newHeight = height;
+                newWidth = (int)(height * imageScale);
+            }
+            else
+            {
+                // resize the image according to the new image's width and the original image's scale
+                newWidth = width;
+                newHeight = (int)(width / imageScale);
+            }
+            
             using (var scaledImage = new Bitmap(image, newWidth, newHeight))
-                return CropImage(scaledImage, 400, 400);
+                return CropImage(scaledImage, width, height);
         }
     }
 }
