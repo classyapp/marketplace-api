@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Drawing;
 using System.Drawing.Drawing2D;
 using System.Drawing.Imaging;
@@ -7,6 +8,7 @@ using System.Linq;
 using Amazon.S3;
 using classy.Extentions;
 using Classy.Repository;
+using Mandrill;
 
 namespace classy.Manager
 {
@@ -56,15 +58,12 @@ namespace classy.Manager
             const int collageSize = 600;
             var borderSize = (int)Math.Ceiling(Decimal.Divide(collageSize, 80));
 
-            byte[][] resizedImages;
+            var resizedImages = new List<byte[]>(4);
             var imageCount = imageKeys.Length;
-            var imageStreams = imageKeys.Select(x => StorageRepository.GetFile(x + "_reduced")).ToArray();
-            var images = imageStreams.Select(Image.FromStream).ToArray();
-            imageStreams.ForEach(x => 
-            {
-                if (x == null) return;
-                x.Close();
-                x.Dispose();
+            var images = new List<Image>(4);
+            imageKeys.ForEach(x => {
+                using (var stream = StorageRepository.GetFile(x + "_reduced"))
+                    images.Add(Image.FromStream(stream));
             });
             
             if (imageCount == 4)
@@ -75,7 +74,7 @@ namespace classy.Manager
                 {
                     using (var b = new Bitmap(x))
                         return RescaleAndCrop(b, imageSize, imageSize);
-                }).ToArray();
+                }).ToList();
 
                 using (var newImage = new Bitmap(collageSize, collageSize))
                 using (var graphics = Graphics.FromImage(newImage))
@@ -97,7 +96,30 @@ namespace classy.Manager
 
             if (imageCount == 3)
             {
-                return null;
+                var collageImageWidth = (collageSize - borderSize) / 2;
+                using (var b = new Bitmap(images[0]))
+                    resizedImages.Add(RescaleAndCrop(b, collageImageWidth, collageSize));
+                for (var i = 1; i <= 2; i++)
+                {
+                    using (var b = new Bitmap(images[i]))
+                        resizedImages.Add(RescaleAndCrop(b, collageImageWidth, collageImageWidth));
+                }
+
+                using (var newImage = new Bitmap(collageSize, collageSize))
+                using (var graphics = Graphics.FromImage(newImage))
+                {
+                    graphics.FillRectangle(Brushes.White, 0, 0, collageSize, collageSize);
+
+                    graphics.DrawImage(ImageExtensions.ConvertBytesToImage(resizedImages[0]), 0, 0, collageImageWidth, collageSize);
+                    graphics.DrawImage(ImageExtensions.ConvertBytesToImage(resizedImages[1]), collageImageWidth + borderSize, 0, collageImageWidth, collageImageWidth);
+                    graphics.DrawImage(ImageExtensions.ConvertBytesToImage(resizedImages[2]), collageImageWidth + borderSize, collageImageWidth + borderSize, collageImageWidth, collageImageWidth);
+
+                    using (var outputStream = new MemoryStream())
+                    {
+                        newImage.Save(outputStream, ImageFormat.Jpeg);
+                        return outputStream.ToArray();
+                    }
+                }
             }
 
             // this means there are only 2 images
@@ -109,7 +131,7 @@ namespace classy.Manager
             {
                 using (var b = new Bitmap(x))
                     return RescaleAndCrop(b, imageWidth, imageHeight);
-            }).ToArray();
+            }).ToList();
 
             using (var newImage = new Bitmap(collageSize, collageSize))
             using (var graphics = Graphics.FromImage(newImage))
@@ -184,12 +206,10 @@ namespace classy.Manager
             var imageHeight = imageToCrop.Height;
 
             using (var croppedImage = imageToCrop.Clone(new Rectangle { X = (imageWidth - newWidth) / 2, Y = (imageHeight - newHeight) / 2, Width = newWidth, Height = newHeight }, PixelFormat.DontCare))
+            using (var stream = new MemoryStream(newWidth*newHeight))
             {
-                using (var stream = new MemoryStream(newWidth*newHeight))
-                {
-                    croppedImage.Save(stream, ImageFormat.Jpeg);
-                    return stream.ToArray();
-                }
+                croppedImage.Save(stream, ImageFormat.Jpeg);
+                return stream.ToArray();
             }
         }
 
