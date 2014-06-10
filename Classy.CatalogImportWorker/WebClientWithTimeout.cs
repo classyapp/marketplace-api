@@ -9,12 +9,19 @@ namespace Classy.CatalogImportWorker
 {
     public class WebClientWithTimeout : WebClient
     {
+        private int _timeout = 0;
+
+        public WebClientWithTimeout(int timeout)
+        {
+            _timeout = timeout;
+        }
+
         protected override WebRequest GetWebRequest(Uri address)
         {
             var request = base.GetWebRequest(address);
             if (request != null)
             {
-                request.Timeout = 30000;
+                request.Timeout = _timeout;
             }
             return request;
         }

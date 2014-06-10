@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Web;
-using classy.Operations;
 using Classy.Models;
 using Classy.Models.Request;
 using Classy.Models.Response;

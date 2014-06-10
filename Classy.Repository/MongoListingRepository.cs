@@ -391,5 +391,11 @@ namespace Classy.Repository
                 Query.And(Query<Listing>.In(x => x.Id, ids), Query<Listing>.EQ(x => x.AppId, appId)),
                 updateBuilder.Combine(metadataUpdater), UpdateFlags.Multi);
         }
+
+
+        public Listing GetBySKU(string sku)
+        {
+            return ListingsCollection.FindOne(Query<Listing>.ElemMatch(x => x.PricingInfo.PurchaseOptions, y => y.EQ(p => p.SKU, sku)));
+        }
     }
 }

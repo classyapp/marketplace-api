@@ -44,5 +44,7 @@ namespace Classy.Repository
         void SetListingErrorForMediaFile(string key, string error);
 
         void EditMultipleListings(string[] ids, int? editorsRank, string appId, Dictionary<string, string> metadata);
+
+        Listing GetBySKU(string sku);
     }
 }

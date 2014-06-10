@@ -8,6 +8,7 @@ using Classy.Models;
 using Classy.Repository;
 using Classy.Interfaces.Managers;
 using System.Net;
+using System.Threading;
 
 namespace Classy.CatalogImportWorker
 {
@@ -57,449 +58,418 @@ namespace Classy.CatalogImportWorker
 
         private readonly IStorageRepository _storageRepository; // AWS
         private readonly IListingRepository _listingRepository; //MONGO
-        private readonly IJobRepository _jobRepository; // JOBS
+        private readonly IJobRepository _jobRepository; // Jobs
         private readonly ICurrencyManager _currencyManager; // Currencies
-        private readonly IProfileRepository _profileRepository; // Profiles.
-        private bool reportLastProductAsError = false;
+        private readonly IProfileRepository _profileRepository; // Profiles
+        private readonly ILocalizationRepository _localizationRepository; // Localization
+        private readonly IAppManager _appManager;
 
-        public CatalogImportProcessor(IStorageRepository storageRepo, IListingRepository listingRepo, IJobRepository jobRepo, ICurrencyManager currencyManager, IProfileRepository profileRepository)
+        private App _app;
+        private IList<ListItem> _styles;
+
+        public CatalogImportProcessor(IStorageRepository storageRepo, IListingRepository listingRepo, IJobRepository jobRepo,
+            ICurrencyManager currencyManager, IProfileRepository profileRepository, ILocalizationRepository localizationRepo, IAppManager appManager)
         {
             _storageRepository = storageRepo;
             _listingRepository = listingRepo;
             _jobRepository = jobRepo;
             _currencyManager = currencyManager;
             _profileRepository = profileRepository;
-        }
-
-        private void ReportError(List<string> lastProduct, Job job, IJobRepository jobRepo, int savedProducts, int errors)
-        {
-            job.Succeeded = savedProducts;
-            job.Failed = errors;
-
-            foreach (string productLine in lastProduct)
-            {
-                job.Errors.Add(productLine);
-            }
-
-            jobRepo.Save(job);
-        }
-
-        private void ReportError(Exception ex, Job job, IJobRepository jobRepo, int savedProducts, int errors)
-        {
-            job.Succeeded = savedProducts;
-            job.Failed = errors;
-
-            job.Errors.Add(ex.Message);
-
-            jobRepo.Save(job);
+            _localizationRepository = localizationRepo;
+            _appManager = appManager;
         }
 
         public void Process(Job job)
         {
-            bool overwriteListings;
-            int catalogFormat;
-            bool updateImages;
-            string currencyCode = null;
-            int numProductsSaved = 0;
-            int numErrors = 0;
-            List<string> lastProductLines = new List<string>();
+            // delete all products with images
+            //var _products = _listingRepository.GetByProfileId(job.AppId, "172", true, null);
+            //foreach (var _listing in _products)
+            //{
+            //    if (_listing.ExternalMedia != null)
+            //    {
+            //        foreach (var f in _listing.ExternalMedia)
+            //        {
+            //            _storageRepository.DeleteFile(f.Key);
+            //        }
+            //    }
+            //    if (_listing.ListingType == "Product" && _listing.PricingInfo.PurchaseOptions != null)
+            //    {
+            //        foreach (var po in _listing.PricingInfo.PurchaseOptions)
+            //        {
+            //            foreach (var f in _listing.ExternalMedia)
+            //            {
+            //                _storageRepository.DeleteFile(f.Key);
+            //            }
+            //        }
+            //    }
+            //    _listingRepository.Delete(_listing.Id, _listing.AppId);
+            //}
 
-            try
+            // Get CSV from job
+            List<List<string>> productsData = GetProductsData(job);
+            Profile profile = _profileRepository.GetById(job.AppId, job.ProfileId, false, null);
+            string currencCode = (string)job.Properties["CurrencyCode"];
+            Thread.CurrentThread.CurrentCulture = new System.Globalization.CultureInfo(profile.DefaultCulture);
+            Thread.CurrentThread.CurrentUICulture = new System.Globalization.CultureInfo(profile.DefaultCulture);
+
+            if (productsData == null)
             {
-                overwriteListings = (bool)job.Properties["OverwriteListings"];
-                updateImages = (bool)job.Properties["UpdateImages"];
-                catalogFormat = (int)job.Properties["CatalogFormat"];
-                currencyCode = (string)job.Properties["CurrencyCode"];
-            }
-            catch (Exception ex)
-            {
-                ++numErrors;
-                ReportError(new Exception("One of the required properties for the job is missing: " + ex.Message), job, _jobRepository, numProductsSaved, numErrors);
-            }
-
-            if (job.Attachments.Count() > 0)
-            {
-                Stream file = _storageRepository.GetFile(job.Attachments[0].Key);
-                StreamReader reader = new StreamReader(file);
-                string[] dataLines = reader.ReadToEnd().Split(new string[] { Environment.NewLine }, StringSplitOptions.RemoveEmptyEntries);
-                reader.Dispose();
-                Listing activeListing = null;
-                bool skipToNextParent = false;
-                Dictionary<string, string> variantProperties = new Dictionary<string, string>();
-
-                string defaultCulture = _profileRepository.GetById(job.AppId, job.ProfileId, false, null).DefaultCulture;
-
-                job.Status = "Executing";
-                job.Failed = 0;
-                job.Succeeded = 0;
-
-                for (int lineNum = 0; lineNum < dataLines.Length; lineNum++)
-                {
-                    try
-                    {
-                        string currLine = dataLines[lineNum];
-
-                        if (lineNum != 0)
-                        {
-
-                            // validations, update job, update database
-                            Trace.WriteLine(currLine);
-
-                            string[] dataLine = currLine.Split(';');
-
-                            Listing currListing = null;
-                            IList<PurchaseOption> purchaseOptions = null;
-                            PurchaseOption purchaseOption = null;
-
-                            string[] variants = null;
-
-                            if (dataLine[2].ToLower().Equals("parent") || dataLine[2].ToLower().Trim().Equals(""))
-                            {
-
-                                if (reportLastProductAsError)
-                                {
-                                    reportLastProductAsError = false;
-                                    ReportError(lastProductLines, job, _jobRepository, numProductsSaved, numErrors);
-                                }
-
-                                lastProductLines = new List<string>();
-                                lastProductLines.Add(currLine);
-
-
-                                // persist the last listing and create a new one.
-                                if (activeListing != null)
-                                {
-                                    numProductsSaved = persistListing(job, numProductsSaved, activeListing);
-                                    activeListing = null;
-                                }
-
-                                skipToNextParent = false;
-
-                                // verifications
-                                throwIfEmpty(dataLine, new int[] { (int)Columns.SKU_0, 
-                                                               (int)Columns.Title_6, 
-                                                               (int)Columns.ProductUrl_7, 
-                                                               (int)Columns.Description_8, 
-                                                               (int)Columns.Category_9,
-                                                               (int)Columns.Style_10,
-                                                               (int)Columns.Quantity_11, 
-                                                               (int)Columns.Price_12, 
-                                                               (int)Columns.Image_27});
-
-
-                                currListing = new Listing();
-                                currListing.Metadata.Add("JobId", job.Id);
-                                purchaseOptions = SetupNewListing(job, currencyCode, defaultCulture, currListing, purchaseOptions);
-
-                                variants = dataLine[4].Split(',');
-                                variantProperties = ExtractVariants(variantProperties, variants);
-
-                                FillParentFields(dataLine, currListing);
-
-
-                                // special treatment of childless listings
-                                if (dataLine[2].ToLower().Trim().Equals(""))
-                                {
-                                    purchaseOption = new PurchaseOption();
-
-                                    throwIfEmpty(dataLine, new int[] { (int)Columns.Width_21, (int)Columns.Depth_22, (int)Columns.Height_23 });
-
-                                    purchaseOption.Width = dataLine[21];
-                                    purchaseOption.Depth = dataLine[22];
-                                    purchaseOption.Height = dataLine[23];
-
-                                    if (dataLine[13].Length > 0)
-                                        purchaseOption.CompareAtPrice = Double.Parse(dataLine[13]);
-
-                                    purchaseOption.VariantProperties = new Dictionary<string, string>();
-                                    FillVariantProperties(dataLine, purchaseOption);
-
-                                    FillPOFields(currencyCode, dataLine, purchaseOption);
-                                    purchaseOptions.Add(purchaseOption);
-                                    currListing.PricingInfo.PurchaseOptions = purchaseOptions;
-                                }
-
-                            }
-
-                            else if (dataLine[2].ToLower().Equals("child"))
-                            {
-
-                                lastProductLines.Add(currLine);
-
-                                // verifications
-                                if (skipToNextParent)
-                                {
-                                    lastProductLines.Add(currLine);
-                                    continue;
-                                }
-                                else
-                                {
-                                    throwIfEmpty(dataLine, new int[] { (int)Columns.SKU_0, 
-                                                               (int)Columns.Title_6, 
-                                                               (int)Columns.ProductUrl_7, 
-                                                               (int)Columns.Description_8, 
-                                                               (int)Columns.Category_9,
-                                                               (int)Columns.Style_10,
-                                                               (int)Columns.Quantity_11, 
-                                                               (int)Columns.Price_12, 
-                                                               (int)Columns.Image_27});
-                                }
-
-                                purchaseOption = new PurchaseOption();
-                                purchaseOptions = activeListing.PricingInfo.PurchaseOptions;
-
-                                throwIfEmpty(dataLine, new int[] { (int)Columns.Width_21, (int)Columns.Depth_22, (int)Columns.Height_23 });
-
-                                purchaseOption.Width = dataLine[21];
-                                purchaseOption.Depth = dataLine[22];
-                                purchaseOption.Height = dataLine[23];
-
-                                purchaseOption.VariantProperties = variantProperties;
-                                FillVariantProperties(dataLine, purchaseOption);
-                                FillPOFields(currencyCode, dataLine, purchaseOption);
-                            }
-
-                            List<MediaFile> tmpList = new List<MediaFile>();
-                            UploadMediaFiles(lineNum, currLine, dataLine, tmpList);
-
-
-                            if (dataLine[2].ToLower().Equals("parent") || dataLine[2].Trim().Equals(""))
-                            {
-                                currListing.ExternalMedia = tmpList.ToArray();
-                                activeListing = currListing;
-
-
-                            }
-                            else if (dataLine[2].ToLower().Equals("child"))
-                            {
-                                purchaseOption.MediaFiles = tmpList.ToArray();
-                                purchaseOptions.Add(purchaseOption);
-                                activeListing.PricingInfo.PurchaseOptions = purchaseOptions;
-                            }
-                        }
-                    }
-                    catch (Exception exx)
-                    {
-                        skipToNextParent = true;
-                        ++numErrors;
-
-                        // log the error related to the current line.
-                        lastProductLines[lastProductLines.Count - 1] = lastProductLines[lastProductLines.Count - 1] + "; <" + exx.Message + ">";
-                        reportLastProductAsError = true;
-                    }
-                }
-                try
-                {
-                    // persist last product.
-                    if (activeListing != null)
-                    {
-                        job.Status = "Finished";
-                        _jobRepository.Save(job);
-                        persistListing(job, numProductsSaved, activeListing);
-                    }
-                }
-                catch (Exception ex)
-                {
-                    lastProductLines[lastProductLines.Count - 1] = lastProductLines[lastProductLines.Count - 1] + "; <" + ex.Message + ">";
-                    ReportError(lastProductLines, job, _jobRepository, numProductsSaved, numErrors);
-                }
-            }
-        }
-
-        private void UploadMediaFiles(int lineNum, string currLine, string[] dataLine, List<MediaFile> tmpList)
-        {
-            // Media files
-            for (int i = 27; i < 32; i++)
-            {
-                if (dataLine[i].Length > 0)
-                {
-                    // add media file
-                    MediaFile mf = new MediaFile();
-                    mf.Type = MediaFileType.File;
-                    mf.ContentType = "image/jpeg";
-                    mf.Key = Guid.NewGuid().ToString();
-                    mf.Url = dataLine[i];
-                    tmpList.Add(mf);
-
-                    var client = new WebClientWithTimeout();
-                    byte[] img = null;
-
-                    try
-                    {
-
-                        img = client.DownloadData(mf.Url);
-                    }
-                    catch (Exception)
-                    {
-                        client.Dispose();
-                        throw new Exception("Error downloading image: " + mf.Url + ", line # " + lineNum + " : " + currLine);
-                    }
-                    client.Dispose();
-
-                    try
-                    {
-                        _storageRepository.SaveFileSync(mf.Key, img, mf.ContentType);
-                    }
-                    catch (Exception)
-                    {
-                        throw new Exception("Error saving image: " + mf.Url + ", line# " + lineNum + " : " + currLine);
-                    }
-                }
-            }
-        }
-
-        private void FillPOFields(string currencyCode, string[] dataLine, PurchaseOption purchaseOption)
-        {
-            purchaseOption.Title = dataLine[6];
-
-            if (dataLine[7].Length > 0)
-                purchaseOption.ProductUrl = dataLine[7];
-
-            if (dataLine[0].Length > 0)
-                purchaseOption.SKU = dataLine[0];
-
-            if (dataLine[11].Length > 0)
-                purchaseOption.Quantity = int.Parse(dataLine[11]);
-            if (dataLine[12].Length > 0)
-                purchaseOption.Price = double.Parse(dataLine[12]);
-
-
-            purchaseOption.NeutralPrice = purchaseOption.Price * _currencyManager.GetRate(currencyCode, "USD", 0);
-        }
-
-        private static void FillVariantProperties(string[] dataLine, PurchaseOption purchaseOption)
-        {
-            if (dataLine[18].Length > 0)
-                purchaseOption.VariantProperties["Color"] = dataLine[18];
-            if (dataLine[19].Length > 0)
-                purchaseOption.VariantProperties["Size"] = dataLine[19];
-            if (dataLine[20].Length > 0)
-                purchaseOption.VariantProperties["Design"] = dataLine[20];
-        }
-
-        private static void FillParentFields(string[] dataLine, Listing currListing)
-        {
-            // only fill out the listing parent once.
-            if (dataLine[6].Length > 0)
-                currListing.Title = dataLine[6];
-
-            if (dataLine[8].Length > 0)
-                currListing.Content = dataLine[8];
-
-            string[] categories = dataLine[9].Split(',');
-
-
-            if (currListing.Categories == null)
-                currListing.Categories = new List<string>();
-
-            foreach (string cat in categories)
-                currListing.Categories.Add(cat);
-
-
-            if (currListing.Metadata == null)
-                currListing.Metadata = new Dictionary<string, string>();
-
-            if (dataLine[10].Length > 0)
-                currListing.Metadata.Add("Style", dataLine[10]);
-
-            if (dataLine[24].Length > 0)
-                currListing.Metadata.Add("Materials", dataLine[24]);
-
-            if (dataLine[25].Length > 0)
-                currListing.Metadata.Add("Manufacturer", dataLine[25]);
-
-            if (dataLine[26].Length > 0)
-                currListing.Metadata.Add("Designer", dataLine[26]);
-
-            if (dataLine[7].Length > 0)
-                currListing.Metadata.Add("ProductUrl", dataLine[7]);
-
-            string[] keywords = dataLine[36].Split(',');
-
-            if (currListing.SearchableKeywords == null)
-                currListing.SearchableKeywords = new List<string>();
-
-            foreach (string keyword in keywords)
-            {
-                if (keyword.Length > 0)
-                    currListing.SearchableKeywords.Add(keyword);
-            }
-        }
-
-        private static IList<PurchaseOption> SetupNewListing(Job job, string currencyCode, string defaultCulture, Listing currListing, IList<PurchaseOption> purchaseOptions)
-        {
-            currListing.PricingInfo = new PricingInfo();
-            currListing.PricingInfo.PurchaseOptions = new List<PurchaseOption>();
-            purchaseOptions = currListing.PricingInfo.PurchaseOptions;
-            currListing.PricingInfo.CurrencyCode = currencyCode;
-
-            currListing.DefaultCulture = defaultCulture;
-
-            currListing.ProfileId = job.ProfileId;
-            currListing.AppId = job.AppId;
-            currListing.ListingType = "Product";
-
-            return purchaseOptions;
-        }
-
-        private static Dictionary<string, string> ExtractVariants(Dictionary<string, string> variantProperties, string[] variants)
-        {
-            variantProperties = new Dictionary<string, string>();
-            foreach (string variation in variants)
-            {
-                switch (variation.ToLower())
-                {
-                    case "color":
-                        variantProperties.Add("Color", null);
-                        break;
-                    case "size":
-                        variantProperties.Add("Size", null);
-                        break;
-                    case "design":
-                        variantProperties.Add("Design", null);
-                        break;
-                    default:
-                        break;
-                }
-            }
-            return variantProperties;
-        }
-
-        private int persistListing(Job job, int numProductsSaved, Listing activeListing)
-        {
-
-            activeListing.IsPublished = true;
-            try
-            {
-                _listingRepository.Insert(activeListing);
-            }
-            catch (Exception ex)
-            {
-                throw new Exception("Error persisting listing: " + activeListing.Id + ". Error: " + ex.Message);
-            }
-
-            try
-            {
-                job.Succeeded = ++numProductsSaved;
+                job.Status = "Finished";
+                job.Errors = new List<string>();
+                job.Errors.Add("Invalid or missing products data.");
                 _jobRepository.Save(job);
             }
-            catch (Exception ex)
+            else
             {
-                throw new Exception("Error persisting job status, error was: " + ex.Message);
+                _app = _appManager.GetAppById(job.AppId);
+                _styles = _localizationRepository.GetListResourceByKey(job.AppId, "room-styles").ListItems;
+
+                job.Status = "Executing";
+                _jobRepository.Save(job);
+
+                foreach (var productData in productsData)
+                {
+                    try
+                    {
+                        // Validate data
+                        ValidateProductData(productData);
+
+                        // Build listing
+                        Listing product = BuildListing(productData, job, profile.DefaultCulture, currencCode);
+
+                        // Save images
+                        UploadProductImages(product);
+
+                        // Save listing
+                        _listingRepository.Insert(product);
+                        job.Succeeded++;
+                    }
+                    catch (ImportException ex)
+                    {
+                        productData[ex.Line] += string.Format(";{0}", ex.Message);
+                        job.Errors.AddRange(productData);
+                        job.Failed++;
+                    }
+                    finally
+                    {
+                        _jobRepository.Save(job);
+                    }
+                }
+                job.Status = "Finished";
+                _jobRepository.Save(job);
             }
-            return numProductsSaved;
         }
 
-        private void throwIfEmpty(string[] data, int[] index)
+        private List<List<string>> GetProductsData(Job job)
         {
-            List<string> missingFields = new List<string>();
-            foreach (var idx in index)
+            if (job.Attachments.Length == 0 || string.IsNullOrEmpty(job.Attachments[0].Key))
+                return null;
+
+            // Download csv
+            Stream stream = null;
+            string[] allLines = null;
+            try
             {
-                if (string.IsNullOrWhiteSpace(data[idx]))
-                    missingFields.Add(((Columns)idx).ToString().Split('_')[0]);
+                stream = _storageRepository.GetFile(job.Attachments[0].Key);
+                using (StreamReader rd = new StreamReader(stream))
+                {
+                    allLines = rd.ReadToEnd().Split(new string[] { Environment.NewLine }, StringSplitOptions.RemoveEmptyEntries);
+                }
             }
-            if (missingFields.Count > 0)
-                throw new Exception("Required field(s) " + string.Join(", ", missingFields.ToArray()) + " is missing a value!");
+            catch (Exception)
+            {
+                return null;
+            }
+            finally
+            {
+                if (stream != null)
+                {
+                    stream.Close();
+                    stream.Dispose();
+                }
+            }
+
+            if (allLines.Length <= 1)
+                return null;
+
+            List<List<string>> data = new List<List<string>>();
+            List<string> currentProduct = new List<string>();
+            for (int i = 1; i < allLines.Length; i++)
+            {
+                string[] lineData = allLines[i].Split(';');
+                if (string.IsNullOrWhiteSpace(lineData[(int)Columns.Parantage_2]) || lineData[(int)Columns.Parantage_2].Equals("Parent", StringComparison.InvariantCultureIgnoreCase))
+                {
+                    if (currentProduct.Count > 0)
+                    {
+                        data.Add(currentProduct);
+                        currentProduct = new List<string>();
+                    }
+                }
+                currentProduct.Add(allLines[i]);
+            }
+            data.Add(currentProduct);
+
+            return data;
+        }
+
+        private void ValidateProductData(List<string> productData)
+        {
+            if (productData.Count == 1) // Standalone Product
+            {
+                // validate mandatory fields
+                ValidateMandatoryFields(productData[0], new Columns[] { 
+                    Columns.SKU_0, Columns.Title_6, Columns.ProductUrl_7, Columns.Description_8, Columns.Category_9, Columns.Style_10, Columns.Quantity_11, 
+                    Columns.Price_12, Columns.Width_21, Columns.Depth_22, Columns.Height_23, Columns.Image_27
+                }, 0);
+                ValidateStyle(productData[0]);
+                ValidateCategories(productData[0]);
+            }
+            else
+            {
+                // validate parent mandatory fields
+                ValidateMandatoryFields(productData[0], new Columns[] { 
+                    Columns.SKU_0, Columns.Title_6, Columns.ProductUrl_7, Columns.Description_8, Columns.Category_9, Columns.Style_10, Columns.Image_27
+                }, 0);
+                ValidateStyle(productData[0]);
+                ValidateCategories(productData[0]);
+
+                Dictionary<string, int> variationKeys = new Dictionary<string, int>();
+                for (int i = 1; i < productData.Count; i++)
+                {
+                    ValidateMandatoryFields(productData[i], new Columns[] { 
+                        Columns.SKU_0, Columns.ParentSKU_1, Columns.VariationTheme_4, Columns.ProductUrl_7, Columns.Description_8, Columns.Quantity_11, 
+                        Columns.Price_12, Columns.Width_21, Columns.Depth_22, Columns.Height_23, Columns.Image_27
+                    }, i);
+
+                    // check variations are supplied
+                    string[] productFields = productData[i].Split(';');
+                    string[] variations = productFields[(int)Columns.VariationTheme_4].Split(',');
+                    List<string> values = new List<string>();
+                    CheckVariationField(i, productFields, variations, values, "Color", (int)Columns.Color_18);
+                    CheckVariationField(i, productFields, variations, values, "Design", (int)Columns.Design_20);
+                    CheckVariationField(i, productFields, variations, values, "Size", (int)Columns.Size_19);
+                    string variationKey = string.Join(";", values.ToArray());
+                    if (variationKeys.ContainsKey(variationKey))
+                    {
+                        throw new ImportException("Duplicate variation detected", i);
+                    }
+                    else
+                    {
+                        variationKeys.Add(variationKey, 0);
+                    }
+                }
+            }
+        }
+
+        private void ValidateCategories(string productData)
+        {
+            string[] categories = productData.Split(';')[(int)Columns.Category_9].Split(new string[] { "," }, StringSplitOptions.RemoveEmptyEntries);
+            foreach (var category in categories)
+            {
+                if (!_app.ProductCategories.Any(pc => pc.Value == category))
+                    throw new ImportException(string.Format("Invalid category: {0}", category), 0);
+            }
+        }
+
+        private void ValidateStyle(string productData)
+        {
+            string style = productData.Split(';')[(int)Columns.Style_10];
+
+            if (!_styles.Any(st => st.Value == style))
+                throw new ImportException(string.Format("Invalid style: {0}", style), 0);
+        }
+
+        private static void CheckVariationField(int lineIdx, string[] productFields, string[] variations, List<string> values, string variation, int fieldIdx)
+        {
+            if (variations.Any(v => v.Equals(variation, StringComparison.InvariantCultureIgnoreCase)))
+            {
+                values.Add(variation);
+                if (string.IsNullOrEmpty(productFields[fieldIdx]))
+                {
+                    throw new ImportException("Missing variation theme field: " + variation, lineIdx);
+                }
+                values.Add(productFields[fieldIdx]);
+            }
+        }
+
+        private void ValidateMandatoryFields(string data, Columns[] columns, int lineIdx)
+        {
+            foreach (var column in columns)
+            {
+                string[] lineData = data.Split(';');
+                if (string.IsNullOrWhiteSpace(lineData[(int)column]))
+                    throw new ImportException("One or more mandatory fields are missing", lineIdx);
+            }
+        }
+
+        private Listing BuildListing(List<string> productData, Job job, string culture, string currency)
+        {
+            Listing listing = new Listing();
+            listing.ListingType = "Product";
+            listing.AppId = job.AppId;
+            listing.ProfileId = job.ProfileId;
+            listing.DefaultCulture = culture;
+            listing.PricingInfo = new PricingInfo() { CurrencyCode = currency };
+            listing.IsPublished = true;
+            listing.Metadata.Add("JobId", job.Id);
+
+            string[] productFields = productData[0].Split(';');
+
+            listing.Title = productFields[(int)Columns.Title_6];
+            listing.Content = productFields[(int)Columns.Description_8];
+            listing.Categories = productFields[(int)Columns.Category_9].Split(new char[] { ',' }, StringSplitOptions.RemoveEmptyEntries);
+            //listing.SearchableKeywords = productFields[(int)Columns.Keywords_36].Split(new char[] { ',' }, StringSplitOptions.RemoveEmptyEntries);
+
+            listing.Metadata.Add("Style", productFields[(int)Columns.Style_10]);
+
+            if (!string.IsNullOrEmpty(productFields[(int)Columns.Materials_24]))
+                listing.Metadata.Add("Materials", productFields[(int)Columns.Materials_24]);
+            if (!string.IsNullOrEmpty(productFields[(int)Columns.Designer_26]))
+                listing.Metadata.Add("Designer", productFields[(int)Columns.Designer_26]);
+            if (!string.IsNullOrEmpty(productFields[(int)Columns.Manufacturer_25]))
+                listing.Metadata.Add("Manufacturer", productFields[(int)Columns.Manufacturer_25]);
+            if (!string.IsNullOrEmpty(productFields[(int)Columns.ProductUrl_7]))
+                listing.Metadata.Add("ProductUrl", productFields[(int)Columns.ProductUrl_7]);
+
+            // Images
+            for (int i = (int)Columns.Image_27; i <= (int)Columns.Image5_31; i++)
+            {
+                string url = productFields[i];
+                if (!string.IsNullOrWhiteSpace(url))
+                {
+                    listing.ExternalMedia.Add(new MediaFile { ContentType = "image/jpeg", Key = Guid.NewGuid().ToString(), Type = MediaFileType.Image, Url = url });
+                }
+            }
+
+            if (productData.Count == 1)
+            {
+                // Standalone product
+                listing.PricingInfo.BaseOption = new PurchaseOption();
+                listing.PricingInfo.BaseOption.SKU = productFields[(int)Columns.SKU_0];
+                listing.PricingInfo.BaseOption.Title = productFields[(int)Columns.Title_6];
+                listing.PricingInfo.BaseOption.ProductUrl = productFields[(int)Columns.ProductUrl_7];
+                listing.PricingInfo.BaseOption.Content = productFields[(int)Columns.Description_8];
+                listing.PricingInfo.BaseOption.Quantity = double.Parse(productFields[(int)Columns.Quantity_11]);
+                listing.PricingInfo.BaseOption.Price = double.Parse(productFields[(int)Columns.Price_12]);
+                if (!string.IsNullOrWhiteSpace(productFields[(int)Columns.MSRP_13]))
+                    listing.PricingInfo.BaseOption.CompareAtPrice = double.Parse(productFields[(int)Columns.MSRP_13]);
+                listing.PricingInfo.BaseOption.Width = productFields[(int)Columns.Width_21];
+                listing.PricingInfo.BaseOption.Depth = productFields[(int)Columns.Depth_22];
+                listing.PricingInfo.BaseOption.Height = productFields[(int)Columns.Height_23];
+                listing.PricingInfo.BaseOption.NeutralPrice = _currencyManager.GetRate(currency, "USD", 0) * listing.PricingInfo.BaseOption.Price;
+            }
+            else
+            {
+                listing.PricingInfo.PurchaseOptions = new List<PurchaseOption>();
+                listing.PricingInfo.BaseOption = new PurchaseOption();
+
+                for (int i = 0; i < productData.Count; i++)
+                {
+                    productFields = productData[i].Split(';');
+                    if (i == 0) // Base product data
+                    {
+                        listing.PricingInfo.BaseOption.SKU = productFields[(int)Columns.SKU_0];
+                        if (!string.IsNullOrWhiteSpace(productFields[(int)Columns.Price_12]))
+                            listing.PricingInfo.BaseOption.Price = double.Parse(productFields[(int)Columns.Price_12]);
+                        if (!string.IsNullOrWhiteSpace(productFields[(int)Columns.MSRP_13]))
+                            listing.PricingInfo.BaseOption.CompareAtPrice = double.Parse(productFields[(int)Columns.MSRP_13]);
+                        if (!string.IsNullOrWhiteSpace(productFields[(int)Columns.Width_21]))
+                            listing.PricingInfo.BaseOption.Width = productFields[(int)Columns.Width_21];
+                        if (!string.IsNullOrWhiteSpace(productFields[(int)Columns.Depth_22]))
+                            listing.PricingInfo.BaseOption.Depth = productFields[(int)Columns.Depth_22];
+                        if (!string.IsNullOrWhiteSpace(productFields[(int)Columns.Height_23]))
+                            listing.PricingInfo.BaseOption.Height = productFields[(int)Columns.Height_23];
+                        listing.PricingInfo.BaseOption.NeutralPrice = _currencyManager.GetRate(currency, "USD", 0) * listing.PricingInfo.BaseOption.Price;
+                    }
+                    else
+                    {
+                        PurchaseOption option = new PurchaseOption();
+                        option.SKU = productFields[(int)Columns.SKU_0];
+                        option.Title = productFields[(int)Columns.Title_6];
+                        option.ProductUrl = productFields[(int)Columns.ProductUrl_7];
+                        option.Content = productFields[(int)Columns.Description_8];
+                        option.Price = double.Parse(productFields[(int)Columns.Price_12]);
+                        if (!string.IsNullOrWhiteSpace(productFields[(int)Columns.MSRP_13]))
+                            option.CompareAtPrice = double.Parse(productFields[(int)Columns.MSRP_13]);
+                        option.Width = productFields[(int)Columns.Width_21];
+                        option.Depth = productFields[(int)Columns.Depth_22];
+                        option.Height = productFields[(int)Columns.Height_23];
+                        option.NeutralPrice = _currencyManager.GetRate(currency, "USD", 0) * listing.PricingInfo.BaseOption.Price;
+                        listing.PricingInfo.PurchaseOptions.Add(option);
+
+                        // Variants
+                        option.VariantProperties = new Dictionary<string, string>();
+                        if (productFields[(int)Columns.VariationTheme_4].Contains("color"))
+                            option.VariantProperties.Add("Color", productFields[(int)Columns.Color_18]);
+                        if (productFields[(int)Columns.VariationTheme_4].Contains("design"))
+                            option.VariantProperties.Add("Design", productFields[(int)Columns.Design_20]);
+                        if (productFields[(int)Columns.VariationTheme_4].Contains("size"))
+                            option.VariantProperties.Add("Size", productFields[(int)Columns.Size_19]);
+
+                        // Images
+                        List<MediaFile> mediaFiles = new List<MediaFile>();
+                        for (int j = (int)Columns.Image_27; j <= (int)Columns.Image5_31; j++)
+                        {
+                            string url = productFields[j];
+                            if (!string.IsNullOrWhiteSpace(url))
+                            {
+                                mediaFiles.Add(new MediaFile { ContentType = "image/jpeg", Key = Guid.NewGuid().ToString(), Type = MediaFileType.Image, Url = url });
+                            }
+                        }
+                        option.MediaFiles = mediaFiles.ToArray();
+                    }
+                }
+            }
+
+            return listing;
+        }
+
+        private void UploadProductImages(Listing product)
+        {
+            for (int i = 0; i < product.ExternalMedia.Count; i++)
+            {
+                SaveImageFromUrl(product.ExternalMedia[i].Url, product.ExternalMedia[i].Key, i);
+            }
+
+            // Upload variation images
+            if (product.PricingInfo.PurchaseOptions != null)
+            {
+                for (int i = 0; i < product.PricingInfo.PurchaseOptions.Count; i++)
+                {
+                    for (int j = 0; j < product.PricingInfo.PurchaseOptions[i].MediaFiles.Length; j++)
+                    {
+                        SaveImageFromUrl(product.PricingInfo.PurchaseOptions[i].MediaFiles[j].Url, product.PricingInfo.PurchaseOptions[i].MediaFiles[j].Key, i + 1);
+                    }
+                }
+            }
+        }
+
+        private void SaveImageFromUrl(string url, string key, int i)
+        {
+            WebClientWithTimeout wc = null;
+            byte[] content;
+            bool errorOccured = false;
+
+            try
+            {
+                wc = new WebClientWithTimeout(30000);
+                content = wc.DownloadData(url);
+                _storageRepository.SaveFileSync(key, content, "image/jpeg");
+                // Rescale??
+            }
+            catch (Exception)
+            {
+                errorOccured = true;
+            }
+            finally
+            {
+                wc.Dispose();
+            }
+
+            if (errorOccured)
+            {
+                throw new ImportException(string.Format("Error occured while trying to save image {0}", url), 0);
+            }
         }
     }
 }

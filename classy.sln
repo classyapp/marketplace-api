@@ -19,6 +19,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Classy.UtilRunner", "Classy
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Classy.CatalogImportWorker", "Classy.CatalogImportWorker\Classy.CatalogImportWorker.csproj", "{B54C4825-1967-4E5B-9107-00B8B9ACAFA0}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GenerateReducedImages", "GenerateReducedImages\GenerateReducedImages.csproj", "{1ED44584-9C48-4FBE-AF37-2C36EA19D545}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		AppHarbor|Any CPU = AppHarbor|Any CPU
@@ -80,6 +82,12 @@ Global
 		{B54C4825-1967-4E5B-9107-00B8B9ACAFA0}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{B54C4825-1967-4E5B-9107-00B8B9ACAFA0}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{B54C4825-1967-4E5B-9107-00B8B9ACAFA0}.Release|Any CPU.Build.0 = Release|Any CPU
+		{1ED44584-9C48-4FBE-AF37-2C36EA19D545}.AppHarbor|Any CPU.ActiveCfg = Release|Any CPU
+		{1ED44584-9C48-4FBE-AF37-2C36EA19D545}.AppHarbor|Any CPU.Build.0 = Release|Any CPU
+		{1ED44584-9C48-4FBE-AF37-2C36EA19D545}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1ED44584-9C48-4FBE-AF37-2C36EA19D545}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1ED44584-9C48-4FBE-AF37-2C36EA19D545}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1ED44584-9C48-4FBE-AF37-2C36EA19D545}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

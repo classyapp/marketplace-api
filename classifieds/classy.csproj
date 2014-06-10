@@ -135,6 +135,7 @@
     <Compile Include="DTO\Request\GetListingTranslation.cs" />
     <Compile Include="DTO\Request\DeleteTranslation.cs" />
     <Compile Include="DTO\Request\GetProfileTranslation.cs" />
+    <Compile Include="DTO\Request\Images\GetCollageRequest.cs" />
     <Compile Include="DTO\Request\ImportPorductCatalogRequest.cs" />
     <Compile Include="DTO\Request\LogActivity\GetUserActivityRequest.cs" />
     <Compile Include="DTO\Request\LogActivity\LogActivityRequest.cs" />
@@ -151,7 +152,7 @@
     <Compile Include="DTO\Request\GetGoogleContacts.cs" />
     <Compile Include="DTO\Request\GetListResourceByKey.cs" />
     <Compile Include="DTO\Request\GetResourcesForApp.cs" />
-    <Compile Include="DTO\Request\GetThumbnail.cs" />
+    <Compile Include="DTO\Request\Images\GetThumbnail.cs" />
     <Compile Include="DTO\Request\CreateNewResource.cs" />
     <Compile Include="DTO\Request\Search\FreeSearchRequest.cs" />
     <Compile Include="DTO\Request\Search\KeywordSuggestionRequest.cs" />
@@ -222,6 +223,7 @@
     <Compile Include="Extentions\ListingViewExtensions.cs" />
     <Compile Include="Extentions\ProfileViewExtentions.cs" />
     <Compile Include="DTO\Request\GetCollectionByProfileId.cs" />
+    <Compile Include="Extentions\StreamExtensions.cs" />
     <Compile Include="Extentions\StringExtensions.cs" />
     <Compile Include="Extentions\UserSessionExtensions.cs" />
     <Compile Include="Global.asax.cs">
@@ -254,16 +256,13 @@
     <Compile Include="Manager\Search\ListingSearchProvider.cs" />
     <Compile Include="Manager\Search\ProfileSearchProvider.cs" />
     <Compile Include="Manager\Search\SearchClientFactory.cs" />
-    <Compile Include="Manager\StubCurrencyRepository.cs" />
     <Compile Include="DTO\Response\SearchSuggestion.cs" />
     <Compile Include="Manager\Search\SearchSuggestionsProvider.cs" />
-    <Compile Include="Operations\ImportProductCatalogJob.cs" />
-    <Compile Include="Operations\IOperator.cs" />
-    <Compile Include="Operations\ProductCatalogImportOperator.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Services\AppService.cs" />
     <Compile Include="Services\CollectionService.cs" />
     <Compile Include="Services\CommentsService.cs" />
+    <Compile Include="Services\ImageService.cs" />
     <Compile Include="Services\ListingService.cs" />
     <Compile Include="Services\LogActivityService.cs" />
     <Compile Include="Services\PasswordService.cs" />
@@ -312,6 +311,7 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Manager\Keywords\" />
+    <Folder Include="Operations\" />
   </ItemGroup>
   <PropertyGroup>
     <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">10.0</VisualStudioVersion>
