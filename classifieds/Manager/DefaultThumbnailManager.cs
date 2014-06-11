@@ -58,18 +58,22 @@ namespace classy.Manager
             }
         }
 
-        public byte[] CreateCollage(string[] imageKeys)
+        public byte[] CreateCollage(string imageKeys)
         {
-            if (imageKeys == null || imageKeys.Length <= 1 || imageKeys.Length >= 5)
+            if (imageKeys.IsNullOrEmpty())
+                throw new ArgumentException("imageKeys cannot be null or empty");
+
+            var keys = imageKeys.Split(',');
+            if (keys.Length <= 1 || keys.Length >= 5)
                 throw new ArgumentException("CreateCollage can accept between 2 to 4 images");
 
-            const int collageSize = 600;
+            const int collageSize = 500;
             var borderSize = (int)Math.Ceiling(Decimal.Divide(collageSize, 80));
 
             var resizedImages = new List<byte[]>(4);
-            var imageCount = imageKeys.Length;
+            var imageCount = keys.Length;
             var images = new List<Image>(4);
-            imageKeys.ForEach(x => {
+            keys.ForEach(x => {
                 using (var stream = StorageRepository.GetFile(x + "_reduced"))
                     images.Add(Image.FromStream(stream));
             });

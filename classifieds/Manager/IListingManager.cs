@@ -8,7 +8,7 @@ namespace classy.Manager
 {
     public interface IListingManager : IManager
     {
-        IList<ListingView> GetListingsByIds(string[] listingIds, string appId, bool includeDrafts, string culture);
+        IList<ListingView> GetListingsByIds(string[] listingIds, string appId, bool includeDrafts, string culture, bool includeProfiles = false);
 
         /// <summary>
         /// 
@@ -75,6 +75,14 @@ namespace classy.Manager
             bool includeComments,
             bool formatCommentsAsHtml,
             int page,
+            int pageSize,
+            string culture);
+
+        SearchResultsView<ListingView> SearchUntaggedListings(
+            string appId,
+            string[] listingTypes,
+            int page,
+            string date,
             int pageSize,
             string culture);
 

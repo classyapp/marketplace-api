@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using System.Net;
+using classy.DTO.Request;
 using classy.DTO.Request.Search;
 using classy.DTO.Response;
 using Classy.Interfaces.Search;
@@ -88,6 +89,25 @@ namespace classy.Services
                 request.IncludeComments,
                 request.FormatCommentsAsHtml,
                 request.Page,
+                AppManager.GetAppById(request.Environment.AppId).PageSize,
+                request.Environment.CultureCode);
+
+            return new HttpResult(listingViews, HttpStatusCode.OK);
+        }
+
+        public object Get(SearchOrderedListings request)
+        {
+            return Post(request);
+        }
+
+        public object Post(SearchOrderedListings request)
+        {
+            ListingManager.Environment = request.Environment;
+            var listingViews = ListingManager.SearchUntaggedListings(
+                request.Environment.AppId,
+                request.ListingTypes,
+                request.Page,
+                request.Date,
                 AppManager.GetAppById(request.Environment.AppId).PageSize,
                 request.Environment.CultureCode);
 

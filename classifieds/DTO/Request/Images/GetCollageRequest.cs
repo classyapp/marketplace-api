@@ -6,7 +6,7 @@ namespace classy.DTO.Request.Images
 {
     public class GetCollageRequest : BaseRequestDto
     {
-        public string[] ImageKeys { get; set; }
+        public string ImageKeys { get; set; }
     }
 
     public class GetCollageRequestValidator : AbstractValidator<GetCollageRequest>

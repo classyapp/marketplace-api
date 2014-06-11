@@ -36,7 +36,8 @@ namespace classy.Services
                     request.ListingIds,
                     request.Environment.AppId,
                     false,
-                    request.Environment.CultureCode);
+                    request.Environment.CultureCode,
+                    request.includeProfiles);
 
                 return new HttpResult(listingsView, HttpStatusCode.OK);
             }
