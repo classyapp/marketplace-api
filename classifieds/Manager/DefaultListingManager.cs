@@ -197,6 +197,26 @@ namespace classy.Manager
             return new SearchResultsView<ListingView> { Results = listingViews, Count = count };
         }
 
+        public SearchResultsView<ListingView> SearchUntaggedListings(
+            string appId,
+            string[] listingTypes,
+            int page,
+            string date,
+            int pageSize,
+            string culture)
+        {
+            long count = 0;
+
+            var listings = ListingRepository.UntaggedSearch(appId, listingTypes, page, date, pageSize, culture, ref count);
+            var listingViews = new List<ListingView>();
+            foreach (var c in listings)
+            {
+                var view = c.Translate(culture).ToListingView(_currencyManager, Environment.CurrencyCode);
+                listingViews.Add(view);
+            }
+            return new SearchResultsView<ListingView> { Results = listingViews, Count = count };
+        }
+
         public ListingView AddExternalMediaToListing(
             string appId,
             string listingId,

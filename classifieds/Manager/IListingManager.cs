@@ -78,6 +78,14 @@ namespace classy.Manager
             int pageSize,
             string culture);
 
+        SearchResultsView<ListingView> SearchUntaggedListings(
+            string appId,
+            string[] listingTypes,
+            int page,
+            string date,
+            int pageSize,
+            string culture);
+
         /// <summary>
         /// 
         /// </summary>
