@@ -108,6 +108,7 @@ namespace classy.Services
                 null,
                 request.Title,
                 request.Content,
+                request.Categories,
                 request.ListingType,
                 request.Pricing,
                 request.ContactInfo ?? session.GetDefaultContactInfo(AppManager.GetAppById(request.Environment.AppId).DefaultCountry),

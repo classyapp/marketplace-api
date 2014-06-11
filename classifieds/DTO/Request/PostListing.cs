@@ -14,6 +14,7 @@ namespace Classy.Models.Request
         public string Content { get; set; }
         public string ListingType { get; set; }
         public Location Location { get; set; }
+        public string[] Categories { get; set; }
         public PricingInfo Pricing { get; set; }
         public ContactInfo ContactInfo { get; set; }
         public TimeslotSchedule SchedulingTemplate { get; set; }
@@ -35,6 +36,8 @@ namespace Classy.Models.Request
                 });
                 When(x => x.Pricing != null, () =>
                 {
+                    RuleFor(x => x.Categories).NotNull();
+                    RuleFor(x => x.Categories.Length).GreaterThan(0);
                     RuleFor(x => x.Pricing).SetValidator(new PricingInfoValidator())
                         .WithErrorCode("Invalid Pricing Information");
                 });
