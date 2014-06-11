@@ -57,11 +57,19 @@ namespace classy.Manager
         public Env Environment { get; set; }
         public ManagerSecurityContext SecurityContext { get; set; }
 
-        public IList<ListingView> GetListingsByIds(string[] listingIds, string appId, bool includeDrafts, string culture)
+        public IList<ListingView> GetListingsByIds(string[] listingIds, string appId, bool includeDrafts, string culture, bool includeProfiles = false)
         {
             var listings = ListingRepository.GetById(listingIds, appId, includeDrafts, null);
+            var listingViews = listings.Select(x => x.ToListingView(_currencyManager, Environment.CurrencyCode)).ToList();
 
-            return listings.Select(x => x.ToListingView(_currencyManager, Environment.CurrencyCode)).ToList();
+            if (includeProfiles)
+            {
+                var profileIds = listings.Select(x => x.ProfileId).ToArray();
+                var profiles = ProfileRepository.GetByIds(appId, profileIds, culture);
+                listingViews.ForEach(x => x.Profile = profiles.SingleOrDefault(s => s.Id == x.ProfileId).ToProfileView());
+            }
+
+            return listingViews;
         }
 
         public ListingView GetListingById(
@@ -192,6 +200,26 @@ namespace classy.Manager
                 {
                     view.Comments = comments.Where(x => x.ObjectId == view.Id).ToCommentViewList();
                 }
+                listingViews.Add(view);
+            }
+            return new SearchResultsView<ListingView> { Results = listingViews, Count = count };
+        }
+
+        public SearchResultsView<ListingView> SearchUntaggedListings(
+            string appId,
+            string[] listingTypes,
+            int page,
+            string date,
+            int pageSize,
+            string culture)
+        {
+            long count = 0;
+
+            var listings = ListingRepository.UntaggedSearch(appId, listingTypes, page, date, pageSize, culture, ref count);
+            var listingViews = new List<ListingView>();
+            foreach (var c in listings)
+            {
+                var view = c.Translate(culture).ToListingView(_currencyManager, Environment.CurrencyCode);
                 listingViews.Add(view);
             }
             return new SearchResultsView<ListingView> { Results = listingViews, Count = count };
