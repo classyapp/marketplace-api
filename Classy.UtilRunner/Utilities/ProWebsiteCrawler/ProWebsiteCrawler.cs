@@ -36,6 +36,7 @@ namespace Classy.UtilRunner.Utilities.ProWebsiteCrawler
         private readonly IListingRepository _listingRepo;
         private readonly ICollectionRepository _collectionRepo;
         private const string AppId = "v1.0";
+        private const string UserAgentString = "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_9_2) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/36.0.1944.0 Safari/537.36";
         private IDictionary<string, IList<ProfileImage>> ProfileImages;
         private IDictionary<string, string> Profiles;
 
@@ -58,7 +59,7 @@ namespace Classy.UtilRunner.Utilities.ProWebsiteCrawler
             crawlConfig.MaxConcurrentThreads = 10;
             crawlConfig.MaxPagesToCrawl = 100;
             crawlConfig.IsHttpRequestAutoRedirectsEnabled = false;
-            crawlConfig.UserAgentString = "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_9_2) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/36.0.1944.0 Safari/537.36";
+            crawlConfig.UserAgentString = UserAgentString;
 
             // query construction
             var skip = 0;
@@ -110,25 +111,26 @@ namespace Classy.UtilRunner.Utilities.ProWebsiteCrawler
                 e.CrawledPage.Uri.OriginalString.EndsWith(".gif"))
             {
                 var imgUrl = e.CrawledPage.Uri.OriginalString;
-                using (var client = new WebClient())
+                var req = WebRequest.CreateHttp(imgUrl);
+                req.ProtocolVersion = Version.Parse("1.0");
+                req.UserAgent = UserAgentString;
+                req.KeepAlive = true;
+                try
                 {
-                    try
+                    var response = req.GetResponse();
+                    var image = Image.FromStream(response.GetResponseStream());
+                    if (image.Width >= MinPixels && image.Height >= MinPixels)
                     {
-                        var imgStream = new MemoryStream(client.DownloadData(imgUrl));
-                        var image = Image.FromStream(imgStream);
-                        if (image.Width >= MinPixels && image.Height >= MinPixels)
+                        if (!ProfileImages[e.CrawledPage.Uri.Host].Any(x => x.Url == imgUrl))
                         {
-                            if (!ProfileImages[e.CrawledPage.Uri.Host].Any(x => x.Url == imgUrl))
-                            {
-                                Console.WriteLine("Found " + imgUrl + ": " + image.Width + "x" + image.Height);
-                                ProfileImages[e.CrawledPage.Uri.Host].Add(new ProfileImage { Image = image, Url = e.CrawledPage.Uri.ToString() });
-                            }
+                            Console.WriteLine("Found " + imgUrl + ": " + image.Width + "x" + image.Height);
+                            ProfileImages[e.CrawledPage.Uri.Host].Add(new ProfileImage { Image = image, Url = e.CrawledPage.Uri.ToString() });
                         }
                     }
-                    catch
-                    {
-                        Console.WriteLine("Skipping " + imgUrl + " due to exception");
-                    }
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine("Skipping " + imgUrl + " due to exception " + ex);
                 }
             }
             else
@@ -143,25 +145,26 @@ namespace Classy.UtilRunner.Utilities.ProWebsiteCrawler
                         if (img.Attributes.Contains("src"))
                         {
                             var imgUrl = ToAbsolute(img.Attributes["src"].Value, e.CrawledPage.Uri);
-                            using (var client = new WebClient())
+                            var req = WebRequest.CreateHttp(imgUrl);
+                            req.ProtocolVersion = Version.Parse("1.0");
+                            req.UserAgent = UserAgentString;
+                            req.KeepAlive = true;
+                            try
                             {
-                                try
+                                var response = req.GetResponse();
+                                var image = Image.FromStream(response.GetResponseStream());
+                                if (image.Width >= MinPixels && image.Height >= MinPixels)
                                 {
-                                    var imgStream = new MemoryStream(client.DownloadData(imgUrl));
-                                    var image = Image.FromStream(imgStream);
-                                    if (image.Width >= MinPixels && image.Height >= MinPixels)
+                                    if (!ProfileImages[e.CrawledPage.Uri.Host].Any(x => x.Url == imgUrl))
                                     {
-                                        if (!ProfileImages[e.CrawledPage.Uri.Host].Any(x => x.Url == imgUrl))
-                                        {
-                                            Console.WriteLine("Found " + imgUrl + ": " + image.Width + "x" + image.Height);
-                                            ProfileImages[e.CrawledPage.Uri.Host].Add(new ProfileImage { Image = image, Url = e.CrawledPage.Uri.ToString() });
-                                        }
+                                        Console.WriteLine("Found " + imgUrl + ": " + image.Width + "x" + image.Height);
+                                        ProfileImages[e.CrawledPage.Uri.Host].Add(new ProfileImage { Image = image, Url = e.CrawledPage.Uri.ToString() });
                                     }
                                 }
-                                catch
-                                {
-                                    Console.WriteLine("Skipping " + imgUrl + " due to exception");
-                                }
+                            }
+                            catch(Exception ex)
+                            {
+                                Console.WriteLine("Skipping " + imgUrl + " due to exception " + ex);
                             }
                         }
                     }
@@ -240,9 +243,9 @@ namespace Classy.UtilRunner.Utilities.ProWebsiteCrawler
 
                         Console.WriteLine("\t\t" + img.Image.Width + "x" + img.Image.Height);
                     }
-                    catch
+                    catch (Exception ex)
                     {
-                        Console.WriteLine("Skipping " + img.Url + " due to exception");
+                        Console.WriteLine("Skipping " + img.Url + " due to exception " + ex);
                     }
                 }
 
