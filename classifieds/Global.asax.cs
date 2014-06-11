@@ -9,16 +9,16 @@ using classy.Services;
 using Classy.Auth;
 using Classy.Models.Request;
 using MongoDB.Driver;
+using ServiceStack;
 using ServiceStack.Common;
 using ServiceStack.Common.Web;
 using ServiceStack.Configuration;
 using ServiceStack.ServiceHost;
 using ServiceStack.ServiceInterface;
 using ServiceStack.ServiceInterface.Admin;
+using ServiceStack.ServiceInterface.Cors;
 using ServiceStack.ServiceInterface.Validation;
 using ServiceStack.WebHost.Endpoints;
-using Classy.Repository;
-using Classy.Interfaces.Managers;
 
 namespace classy
 {
@@ -49,8 +49,6 @@ namespace classy
             });
         }
 
-
-
         public override void Configure(Funq.Container container)
         {
             //Enable Authentication and Registration
@@ -59,6 +57,17 @@ namespace classy
             // Validation
             Plugins.Add(new ValidationFeature());
             container.RegisterValidators(typeof(PostListing).Assembly);
+
+            Plugins.Add(new CorsFeature(
+                allowedOrigins: "http://local.homelab:8080",
+                allowedHeaders: "accept, x-classy-env")
+            );
+            PreRequestFilters.Add((httpReq, httpRes) =>
+            {
+                //Handles Request and closes Responses after emitting global HTTP Headers
+                if (httpReq.HttpMethod == "OPTIONS")
+                    httpRes.EndRequest(); //add a 'using ServiceStack;'
+            });
 
             // CORS
             //Plugins.Add(new CorsFeature(
@@ -210,7 +219,7 @@ namespace classy
 
                 // Profiles
                 .Add<GetAutenticatedProfile>("/profile", "GET")
-                .Add<GetProfileById>("/profile/{ProfileId}", "GET")
+                .Add<GetProfileById>("/profile/{ProfileId}", ApplyTo.Get | ApplyTo.Options)
                 .Add<UpdateProfile>("/profile/{ProfileId}", "PUT")
                 .Add<ClaimProxyProfile>("/profile/{ProxyProfileId}/claim", "POST")
                 .Add<ApproveProxyClaim>("/profile/{ClaimId}/approve", "POST")
