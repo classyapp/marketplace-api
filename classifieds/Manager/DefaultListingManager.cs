@@ -57,11 +57,19 @@ namespace classy.Manager
         public Env Environment { get; set; }
         public ManagerSecurityContext SecurityContext { get; set; }
 
-        public IList<ListingView> GetListingsByIds(string[] listingIds, string appId, bool includeDrafts, string culture)
+        public IList<ListingView> GetListingsByIds(string[] listingIds, string appId, bool includeDrafts, string culture, bool includeProfiles = false)
         {
             var listings = ListingRepository.GetById(listingIds, appId, includeDrafts, null);
+            var listingViews = listings.Select(x => x.ToListingView(_currencyManager, Environment.CurrencyCode)).ToList();
 
-            return listings.Select(x => x.ToListingView(_currencyManager, Environment.CurrencyCode)).ToList();
+            if (includeProfiles)
+            {
+                var profileIds = listings.Select(x => x.ProfileId).ToArray();
+                var profiles = ProfileRepository.GetByIds(appId, profileIds, culture);
+                listingViews.ForEach(x => x.Profile = profiles.SingleOrDefault(s => s.Id == x.ProfileId).ToProfileView());
+            }
+
+            return listingViews;
         }
 
         public ListingView GetListingById(
