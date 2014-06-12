@@ -63,7 +63,7 @@ namespace classy
             PreRequestFilters.Add((httpReq, httpRes) =>
             {
                 //Handles Request and closes Responses after emitting global HTTP Headers
-                var originWhitelist = new[] { "http://local.homelab:8080", "https://myhome-3.apphb.com/" };
+                var originWhitelist = new[] { "http://local.homelab:8080", "http://myhome-3.apphb.com", "https://myhome-3.apphb.com" };
 
                 httpRes.AddHeader(HttpHeaders.AllowMethods, "GET, POST, PUT, DELETE, OPTIONS");
                 httpRes.AddHeader(HttpHeaders.AllowHeaders, "accept, x-classy-env, content-type");
