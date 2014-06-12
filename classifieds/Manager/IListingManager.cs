@@ -8,7 +8,7 @@ namespace classy.Manager
 {
     public interface IListingManager : IManager
     {
-        IList<ListingView> GetListingsByIds(string[] listingIds, string appId, bool includeDrafts, string culture);
+        IList<ListingView> GetListingsByIds(string[] listingIds, string appId, bool includeDrafts, string culture, bool includeProfiles = false);
 
         /// <summary>
         /// 
@@ -104,6 +104,7 @@ namespace classy.Manager
             string listingId,
             string title,
             string content,
+            string[] categories,
             string listingType,
             PricingInfo pricingInfo,
             ContactInfo contactInfo,

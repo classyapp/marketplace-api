@@ -36,7 +36,8 @@ namespace classy.Services
                     request.ListingIds,
                     request.Environment.AppId,
                     false,
-                    request.Environment.CultureCode);
+                    request.Environment.CultureCode,
+                    request.includeProfiles);
 
                 return new HttpResult(listingsView, HttpStatusCode.OK);
             }
@@ -108,6 +109,7 @@ namespace classy.Services
                 null,
                 request.Title,
                 request.Content,
+                request.Categories,
                 request.ListingType,
                 request.Pricing,
                 request.ContactInfo ?? session.GetDefaultContactInfo(AppManager.GetAppById(request.Environment.AppId).DefaultCountry),

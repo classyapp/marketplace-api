@@ -265,6 +265,10 @@ namespace classy
                 // Log Activity
                 .Add<LogActivityRequest>("/log-activity/log", "POST")
                 .Add<GetLogActivityRequest>("/log-activity/log", "GET")
+
+                // Media Files
+                .Add<SaveTempMediaRequest>("/media", "POST")
+                .Add<DeleteTempMediaRequest>("/media", "DELETE")
             ;
         }
     }
