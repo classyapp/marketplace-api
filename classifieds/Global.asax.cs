@@ -219,7 +219,7 @@ namespace classy
 
                 // Profiles
                 .Add<GetAutenticatedProfile>("/profile", "GET")
-                .Add<GetProfileById>("/profile/{ProfileId}", "GET")
+                .Add<GetProfileById>("/profile/{ProfileId}", ApplyTo.Get | ApplyTo.Options)
                 .Add<UpdateProfile>("/profile/{ProfileId}", "PUT")
                 .Add<ClaimProxyProfile>("/profile/{ProxyProfileId}/claim", "POST")
                 .Add<ApproveProxyClaim>("/profile/{ClaimId}/approve", "POST")
