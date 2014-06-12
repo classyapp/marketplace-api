@@ -36,7 +36,7 @@ namespace Classy.UtilRunner.Utilities.ProWebsiteCrawler
         private readonly IListingRepository _listingRepo;
         private readonly ICollectionRepository _collectionRepo;
         private const string AppId = "v1.0";
-        private const string UserAgentString = "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_9_2) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/36.0.1944.0 Safari/537.36";
+        private const string UserAgentString = "Googlebot/2.1 (+http://www.googlebot.com/bot.html)";
         private IDictionary<string, IList<ProfileImage>> ProfileImages;
         private IDictionary<string, string> Profiles;
 
@@ -112,19 +112,22 @@ namespace Classy.UtilRunner.Utilities.ProWebsiteCrawler
             {
                 var imgUrl = e.CrawledPage.Uri.OriginalString;
                 var req = WebRequest.CreateHttp(imgUrl);
-                req.ProtocolVersion = Version.Parse("1.0");
+                req.ProtocolVersion = HttpVersion.Version10;
                 req.UserAgent = UserAgentString;
-                req.KeepAlive = true;
+                req.ServicePoint.ConnectionLimit = 1;
+                req.KeepAlive = false;
                 try
                 {
-                    var response = req.GetResponse();
-                    var image = Image.FromStream(response.GetResponseStream());
-                    if (image.Width >= MinPixels && image.Height >= MinPixels)
+                    using (var response = req.GetResponse())
                     {
-                        if (!ProfileImages[e.CrawledPage.Uri.Host].Any(x => x.Url == imgUrl))
+                        var image = Image.FromStream(response.GetResponseStream());
+                        if (image.Width >= MinPixels && image.Height >= MinPixels)
                         {
-                            Console.WriteLine("Found " + imgUrl + ": " + image.Width + "x" + image.Height);
-                            ProfileImages[e.CrawledPage.Uri.Host].Add(new ProfileImage { Image = image, Url = e.CrawledPage.Uri.ToString() });
+                            if (!ProfileImages[e.CrawledPage.Uri.Host].Any(x => x.Url == imgUrl))
+                            {
+                                Console.WriteLine("Found " + imgUrl + ": " + image.Width + "x" + image.Height);
+                                ProfileImages[e.CrawledPage.Uri.Host].Add(new ProfileImage { Image = image, Url = e.CrawledPage.Uri.ToString() });
+                            }
                         }
                     }
                 }
@@ -146,19 +149,21 @@ namespace Classy.UtilRunner.Utilities.ProWebsiteCrawler
                         {
                             var imgUrl = ToAbsolute(img.Attributes["src"].Value, e.CrawledPage.Uri);
                             var req = WebRequest.CreateHttp(imgUrl);
-                            req.ProtocolVersion = Version.Parse("1.0");
+                            req.ProtocolVersion = HttpVersion.Version10;
                             req.UserAgent = UserAgentString;
-                            req.KeepAlive = true;
+                            req.ServicePoint.ConnectionLimit = 1;
+                            req.KeepAlive = false;
                             try
                             {
-                                var response = req.GetResponse();
-                                var image = Image.FromStream(response.GetResponseStream());
-                                if (image.Width >= MinPixels && image.Height >= MinPixels)
-                                {
-                                    if (!ProfileImages[e.CrawledPage.Uri.Host].Any(x => x.Url == imgUrl))
+                                using (var response = req.GetResponse()) { 
+                                    var image = Image.FromStream(response.GetResponseStream());
+                                    if (image.Width >= MinPixels && image.Height >= MinPixels)
                                     {
-                                        Console.WriteLine("Found " + imgUrl + ": " + image.Width + "x" + image.Height);
-                                        ProfileImages[e.CrawledPage.Uri.Host].Add(new ProfileImage { Image = image, Url = e.CrawledPage.Uri.ToString() });
+                                        if (!ProfileImages[e.CrawledPage.Uri.Host].Any(x => x.Url == imgUrl))
+                                        {
+                                            Console.WriteLine("Found " + imgUrl + ": " + image.Width + "x" + image.Height);
+                                            ProfileImages[e.CrawledPage.Uri.Host].Add(new ProfileImage { Image = image, Url = e.CrawledPage.Uri.ToString() });
+                                        }
                                     }
                                 }
                             }
@@ -198,49 +203,51 @@ namespace Classy.UtilRunner.Utilities.ProWebsiteCrawler
 
                 // sort images
                 images.Sort((img1, img2) => Math.Max(img2.Image.Width, img2.Image.Height).CompareTo(Math.Max(img1.Image.Height, img1.Image.Width)));
-                foreach (var img in images.Take(images.Count > 10 ? 10 : images.Count))
+                foreach (var img in images.Take(images.Count > 16 ? 16 : images.Count))
                 {
                     try
                     {
                         // save media file
-                        var imgStream = new MemoryStream();
-                        img.Image.Save(imgStream, ImageFormat.Jpeg);
-                        var imgBytes = imgStream.ToArray();
-                        var key = Guid.NewGuid().ToString();
-                        _storage.SaveFile(key, imgBytes, "image/jpeg");
-                        var mediaFile = new MediaFile
+                        using (var imgStream = new MemoryStream())
                         {
-                            Key = key,
-                            Url = _storage.KeyToUrl(key),
-                            Type = MediaFileType.Image,
-                            ContentType = "image/jpeg"
-                        };
+                            img.Image.Save(imgStream, ImageFormat.Jpeg);
+                            var imgBytes = imgStream.ToArray();
+                            var key = Guid.NewGuid().ToString();
+                            _storage.SaveFile(key, imgBytes, "image/jpeg");
+                            var mediaFile = new MediaFile
+                            {
+                                Key = key,
+                                Url = _storage.KeyToUrl(key),
+                                Type = MediaFileType.Image,
+                                ContentType = "image/jpeg"
+                            };
+                            imgStream.Close();
 
-                        // create listing
-                        var listing = new Listing
-                        {
-                            AppId = AppId,
-                            ProfileId = profileId,
-                            IsPublished = true,
-                            ListingType = "Photo",
-                            Metadata = new Dictionary<string, string>
-                        {
-                            { "IsWebPhoto", "True" },
-                            { "CopyrightMessage", img.Url },
-                            { "Room", "other" },
-                            { "Style", "other" }
-                        },
-                            ExternalMedia = new List<MediaFile> { mediaFile }
-                        };
-                        var id = _listingRepo.Insert(listing);
+                            // create listing
+                            var listing = new Listing
+                            {
+                                AppId = AppId,
+                                ProfileId = profileId,
+                                IsPublished = true,
+                                ListingType = "Photo",
+                                Metadata = new Dictionary<string, string>
+                                {
+                                    { "IsWebPhoto", "True" },
+                                    { "CopyrightMessage", img.Url },
+                                    { "Room", "other" },
+                                    { "Style", "other" }
+                                },
+                                ExternalMedia = new List<MediaFile> { mediaFile }
+                            };
+                            var id = _listingRepo.Insert(listing);
 
-                        // add listing to collection
-                        collection.IncludedListings.Add(new IncludedListing
-                        {
-                            ListingType = "Photo",
-                            Id = id
-                        });
-
+                            // add listing to collection
+                            collection.IncludedListings.Add(new IncludedListing
+                            {
+                                ListingType = "Photo",
+                                Id = id
+                            });
+                        }
                         Console.WriteLine("\t\t" + img.Image.Width + "x" + img.Image.Height);
                     }
                     catch (Exception ex)
