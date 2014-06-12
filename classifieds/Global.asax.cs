@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Collections.ObjectModel;
+using System.Linq;
 using System.Web;
 using classy.DTO.Request;
 using classy.DTO.Request.Images;
@@ -9,16 +11,16 @@ using classy.Services;
 using Classy.Auth;
 using Classy.Models.Request;
 using MongoDB.Driver;
+using ServiceStack;
 using ServiceStack.Common;
 using ServiceStack.Common.Web;
 using ServiceStack.Configuration;
 using ServiceStack.ServiceHost;
 using ServiceStack.ServiceInterface;
 using ServiceStack.ServiceInterface.Admin;
+using ServiceStack.ServiceInterface.Cors;
 using ServiceStack.ServiceInterface.Validation;
 using ServiceStack.WebHost.Endpoints;
-using Classy.Repository;
-using Classy.Interfaces.Managers;
 
 namespace classy
 {
@@ -49,8 +51,6 @@ namespace classy
             });
         }
 
-
-
         public override void Configure(Funq.Container container)
         {
             //Enable Authentication and Registration
@@ -60,14 +60,23 @@ namespace classy
             Plugins.Add(new ValidationFeature());
             container.RegisterValidators(typeof(PostListing).Assembly);
 
-            // CORS
-            //Plugins.Add(new CorsFeature(
-            //    allowedOrigins: "http://www.thisisclassy.com",
-            //    allowedMethods: "GET, POST, PUT, DELETE, OPTIONS",
-            //    allowedHeaders: "Content-Type, X-ApiKey, Control-Type, Accept, Origin",
-            //    allowCredentials: true
-            //));
+            PreRequestFilters.Add((httpReq, httpRes) =>
+            {
+                //Handles Request and closes Responses after emitting global HTTP Headers
+                var originWhitelist = new[] { "http://local.homelab:8080", "https://myhome-3.apphb.com/" };
 
+                httpRes.AddHeader(HttpHeaders.AllowMethods, "GET, POST, PUT, DELETE, OPTIONS");
+                httpRes.AddHeader(HttpHeaders.AllowHeaders, "accept, x-classy-env, content-type");
+
+                var origin = httpReq.Headers.Get("Origin");
+                if (originWhitelist.Contains(origin))
+                    httpRes.AddHeader(HttpHeaders.AllowOrigin, origin);
+
+                if (httpReq.HttpMethod == "OPTIONS") {
+                    httpRes.EndRequest(); //add a 'using ServiceStack;'
+                }
+            });
+            
             container.WireUp();
 
             // configure service routes
