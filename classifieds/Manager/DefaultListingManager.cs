@@ -27,6 +27,7 @@ namespace classy.Manager
         private readonly IIndexer<Profile> _profileIndexer;
         private readonly ICurrencyManager _currencyManager;
         private readonly IKeywordsRepository _keywordsRepository;
+        private readonly ITempMediaFileRepository _tempMediaFileRepository;
 
         public DefaultListingManager(
             IAppManager appManager,
@@ -39,7 +40,8 @@ namespace classy.Manager
             IIndexer<Listing> listingIndexer, 
             IIndexer<Profile> profileIndexer,
             ICurrencyManager currencyManager,
-            IKeywordsRepository keywordsRepository)
+            IKeywordsRepository keywordsRepository,
+            ITempMediaFileRepository tempMediaFileRepository)
         {
             AppManager = appManager;
             ListingRepository = listingRepository;
@@ -52,6 +54,7 @@ namespace classy.Manager
             _profileIndexer = profileIndexer;
             _currencyManager = currencyManager;
             _keywordsRepository = keywordsRepository;
+            _tempMediaFileRepository = tempMediaFileRepository;
         }
 
         public Env Environment { get; set; }
@@ -308,6 +311,7 @@ namespace classy.Manager
             string listingId,
             string title,
             string content,
+            string[] categories,
             string listingType,
             PricingInfo pricingInfo,
             ContactInfo contactInfo,
@@ -339,7 +343,30 @@ namespace classy.Manager
                 listing.Hashtags = content.ExtractHashtags();
             }
 
-            if (pricingInfo != null) listing.PricingInfo = pricingInfo;
+            if (categories != null) listing.Categories = categories;
+            if (pricingInfo != null)
+            {
+                if (isNewListing)
+                {
+                    foreach (var image in pricingInfo.BaseOption.MediaFiles)
+                    {
+                        CopyFromTempImage(appId, image);
+                    }
+                    listing.ExternalMedia = pricingInfo.BaseOption.MediaFiles;
+
+                    if (pricingInfo.PurchaseOptions != null)
+                    {
+                        foreach (var po in pricingInfo.PurchaseOptions)
+                        {
+                            foreach (var image in po.MediaFiles)
+                            {
+                                CopyFromTempImage(appId, image);
+                            }
+                        }
+                    }
+                }
+                listing.PricingInfo = pricingInfo;
+            }
             if (contactInfo != null) listing.ContactInfo = contactInfo;
             if (timeslotSchedule != null) listing.SchedulingTemplate = timeslotSchedule;
             if (customAttributes != null)
@@ -368,6 +395,15 @@ namespace classy.Manager
 
             // return
             return listing.ToListingView(_currencyManager, Environment.CurrencyCode);
+        }
+
+        private void CopyFromTempImage(string appId, MediaFile image)
+        {
+            TempMediaFile tempFile = _tempMediaFileRepository.Get(appId, image.Key);
+            image.ContentType = tempFile.ContentType;
+            image.Type = tempFile.Type;
+            image.Url = tempFile.Url;
+            _tempMediaFileRepository.Delete(appId, tempFile.Id);
         }
 
         public ListingView UpdateListing(

@@ -104,6 +104,7 @@ namespace classy.Manager
             string listingId,
             string title,
             string content,
+            string[] categories,
             string listingType,
             PricingInfo pricingInfo,
             ContactInfo contactInfo,
