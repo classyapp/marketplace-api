@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Collections.ObjectModel;
+using System.Linq;
 using System.Web;
 using classy.DTO.Request;
 using classy.DTO.Request.Images;
@@ -58,25 +60,23 @@ namespace classy
             Plugins.Add(new ValidationFeature());
             container.RegisterValidators(typeof(PostListing).Assembly);
 
-            Plugins.Add(new CorsFeature(
-                allowedOrigins: "http://local.homelab:8080",
-                allowedHeaders: "accept, x-classy-env")
-            );
             PreRequestFilters.Add((httpReq, httpRes) =>
             {
                 //Handles Request and closes Responses after emitting global HTTP Headers
-                if (httpReq.HttpMethod == "OPTIONS")
+                var originWhitelist = new[] { "http://local.homelab:8080", "https://myhome-3.apphb.com/" };
+
+                httpRes.AddHeader(HttpHeaders.AllowMethods, "GET, POST, PUT, DELETE, OPTIONS");
+                httpRes.AddHeader(HttpHeaders.AllowHeaders, "accept, x-classy-env, content-type");
+
+                var origin = httpReq.Headers.Get("Origin");
+                if (originWhitelist.Contains(origin))
+                    httpRes.AddHeader(HttpHeaders.AllowOrigin, origin);
+
+                if (httpReq.HttpMethod == "OPTIONS") {
                     httpRes.EndRequest(); //add a 'using ServiceStack;'
+                }
             });
-
-            // CORS
-            //Plugins.Add(new CorsFeature(
-            //    allowedOrigins: "http://www.thisisclassy.com",
-            //    allowedMethods: "GET, POST, PUT, DELETE, OPTIONS",
-            //    allowedHeaders: "Content-Type, X-ApiKey, Control-Type, Accept, Origin",
-            //    allowCredentials: true
-            //));
-
+            
             container.WireUp();
 
             // configure service routes
