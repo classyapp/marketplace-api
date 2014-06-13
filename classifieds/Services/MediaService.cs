@@ -14,6 +14,7 @@ namespace classy.Services
     public class MediaService : Service
     {
         public ITempMediaFileManager TempMediaManager { get; set; }
+        public IListingManager ListingManager { get; set; }
 
         public object Post(SaveTempMediaRequest request)
         {
@@ -37,7 +38,14 @@ namespace classy.Services
 
         public object Delete(DeleteTempMediaRequest request)
         {
+            if (string.IsNullOrWhiteSpace(request.ListingId))
+            {
             TempMediaManager.DeleteTempFile(request.Environment.AppId, request.FileId);
+            }
+            else
+            {
+                ListingManager.DeleteExternalMediaFromListingById(request.Environment.AppId, request.ListingId, request.FileId);
+            }
 
             return new HttpResult
             {

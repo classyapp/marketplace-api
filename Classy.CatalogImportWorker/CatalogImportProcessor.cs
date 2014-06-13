@@ -108,7 +108,7 @@ namespace Classy.CatalogImportWorker
             // Get CSV from job
             List<List<string>> productsData = GetProductsData(job);
             Profile profile = _profileRepository.GetById(job.AppId, job.ProfileId, false, null);
-            string currencCode = (string)job.Properties["CurrencyCode"];
+            string currencyCode = (string)job.Properties["CurrencyCode"];
             Thread.CurrentThread.CurrentCulture = new System.Globalization.CultureInfo(profile.DefaultCulture);
             Thread.CurrentThread.CurrentUICulture = new System.Globalization.CultureInfo(profile.DefaultCulture);
 
@@ -135,7 +135,7 @@ namespace Classy.CatalogImportWorker
                         ValidateProductData(productData);
 
                         // Build listing
-                        Listing product = BuildListing(productData, job, profile.DefaultCulture, currencCode);
+                        Listing product = BuildListing(productData, job, profile.DefaultCulture, currencyCode);
 
                         // Save images
                         UploadProductImages(product);

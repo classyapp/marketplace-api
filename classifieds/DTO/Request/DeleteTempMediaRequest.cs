@@ -8,6 +8,7 @@ namespace Classy.Models.Request
 {
     public class DeleteTempMediaRequest  :BaseRequestDto
     {
+        public string ListingId { get; set; }
         public string FileId { get; set; }
     }
 

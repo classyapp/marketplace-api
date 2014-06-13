@@ -444,5 +444,21 @@ namespace Classy.Repository
         {
             return ListingsCollection.FindOne(Query<Listing>.ElemMatch(x => x.PricingInfo.PurchaseOptions, y => y.EQ(p => p.SKU, sku)));
         }
+
+
+        public void DeleteExternalMediaById(string listingId, string appId, string key)
+        {
+            ListingsCollection.Update(Query.And(
+                    Query<Listing>.EQ(x => x.Id, listingId),
+                    Query<Listing>.EQ(x => x.AppId, appId)), MongoDB.Driver.Builders.Update.Pull("ExternalMedia", Query.EQ("Key", key)));
+
+            ListingsCollection.Update(Query.And(
+                    Query<Listing>.EQ(x => x.Id, listingId),
+                    Query<Listing>.EQ(x => x.AppId, appId)), MongoDB.Driver.Builders.Update.Pull("PricingInfo.BaseOption.MediaFiles", Query.EQ("Key", key)));
+
+            ListingsCollection.Update(Query.And(
+                    Query<Listing>.EQ(x => x.Id, listingId),
+                    Query<Listing>.EQ(x => x.AppId, appId)), MongoDB.Driver.Builders.Update.Pull("PricingInfo.PurchaseOption.MediaFiles", Query.EQ("Key", key)));
+        }
     }
 }
