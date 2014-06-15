@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Web;
 using classy.DTO.Request;
+using classy.DTO.Request.Images;
 using classy.DTO.Request.LogActivity;
 using classy.DTO.Request.Search;
 using classy.Extensions;
@@ -16,7 +17,6 @@ using ServiceStack.ServiceInterface;
 using ServiceStack.ServiceInterface.Admin;
 using ServiceStack.ServiceInterface.Validation;
 using ServiceStack.WebHost.Endpoints;
-using classy.Operations;
 using Classy.Repository;
 using Classy.Interfaces.Managers;
 
@@ -78,7 +78,7 @@ namespace classy
 
         private void ConfigureOperators(Funq.Container container)
         {
-            var mqServer = container.TryResolve<ServiceStack.Messaging.IMessageService>();
+            //var mqServer = container.TryResolve<ServiceStack.Messaging.IMessageService>();
 
             //// example operator registration
             //// -----------------------------
@@ -90,20 +90,7 @@ namespace classy
             //    return true;
             //});
 
-            container.Register<ProductCatalogImportOperator>(c => new ProductCatalogImportOperator(
-                c.TryResolve<IStorageRepository>(),
-                c.TryResolve<IListingRepository>(),
-                c.TryResolve<IJobRepository>(),
-                c.TryResolve<ICurrencyManager>(),
-                c.TryResolve<IProfileRepository>()));
-            mqServer.RegisterHandler<ImportProductCatalogJob>(m =>
-                {
-                    var operation = container.TryResolve<ProductCatalogImportOperator>();
-                    operation.PerformOperation(m.GetBody());
-                    return true;
-                });
-
-            mqServer.Start();
+            //mqServer.Start();
         }
 
         private void ConfigureAuth(Funq.Container container)
@@ -150,6 +137,7 @@ namespace classy
                 .Add<PasswordResetRequest>("/auth/reset", "POST")
 
                 // Thumbnails
+                .Add<GetCollageRequest>("/collage", "GET")
                 .Add<GetThumbnail>("/thumbnail/{ImageKey}", "GET")
 
                 // Listings
@@ -163,6 +151,7 @@ namespace classy
                 .Add<PublishListing>("/listing/{ListingId}/publish", "POST") // publish a post to the public
                 .Add<UpdateListing>("/listing/{ListingId}", "PUT") // update listing
                 .Add<SearchListings>("/listing/search", ApplyTo.Get | ApplyTo.Post) // search listings by tag and/or metadata
+                .Add<SearchOrderedListings>("/listing/untagged/{date}", ApplyTo.Get | ApplyTo.Post)
                 .Add<SearchListings>("/tags/{tag}", "GET") // search with a nicer url for tag
                 .Add<GetListingsByProfileId>("/profile/{ProfileId}/listing/list", "GET") // get list of listing for profile
                 .Add<SetListingTranslation>("/listing/{ListingId}/translation", "POST")
@@ -267,6 +256,10 @@ namespace classy
                 // Log Activity
                 .Add<LogActivityRequest>("/log-activity/log", "POST")
                 .Add<GetLogActivityRequest>("/log-activity/log", "GET")
+
+                // Media Files
+                .Add<SaveTempMediaRequest>("/media", "POST")
+                .Add<DeleteTempMediaRequest>("/media", "DELETE")
             ;
         }
     }

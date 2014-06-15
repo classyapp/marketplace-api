@@ -28,8 +28,11 @@ namespace Classy.Repository
         IList<Listing> GetById(string[] listingId, string appId, bool includeDrafts, string culture);
         IList<Listing> GetByProfileId(string appId, string profileId, bool includeDrafts, string culture);
         IList<Listing> Search(string[] tags, string[] listingTypes, IDictionary<string, string[]> metadata, IDictionary<string, string[]> query, double? priceMin,
-            double? priceMax, Location location, string appId, bool includeDrafts, bool increaseViewCounter, 
+            double? priceMax, Location location, string appId, bool includeDrafts, bool increaseViewCounter,
             int page, int pageSize, ref long count, string culture);
+
+        IList<Listing> UntaggedSearch(string appId, string[] listingTypes, int page, string date, int pageSize,
+            string culture, ref long count);
         void AddExternalMedia(string listingId, string appId, IList<MediaFile> media);
         void UpdateExternalMedia(string listingId, string appId, MediaFile media);
         void DeleteExternalMedia(string listingId, string appId, string url);
@@ -44,5 +47,7 @@ namespace Classy.Repository
         void SetListingErrorForMediaFile(string key, string error);
 
         void EditMultipleListings(string[] ids, int? editorsRank, string appId, Dictionary<string, string> metadata);
+
+        Listing GetBySKU(string sku);
     }
 }

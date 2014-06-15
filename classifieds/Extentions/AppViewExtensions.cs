@@ -16,6 +16,7 @@ namespace classy
             to.SupportedCountries = from.SupportedCountries.Select(v => v.TranslateTo<ListItemView>()).ToList();
             to.SupportedCultures = from.SupportedCultures.Select(v => v.TranslateTo<ListItemView>()).ToList();
             to.SupportedCurrencies = from.SupportedCurrencies.Select(v => v.TranslateTo<CurrencyListItemView>()).ToList();
+            to.ProductCategories = from.ProductCategories.Select(v => v.TranslateTo<ListItemView>()).ToList();
             return to;
         }
     }

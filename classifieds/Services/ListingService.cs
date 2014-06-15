@@ -22,7 +22,6 @@ namespace classy.Services
         public IProfileManager ProfileManager { get; set; }
         public IAnalyticsManager AnalyticsManager { get; set; }
         public ILocalizationManager LocalizationManager { get; set; }
-        public IThumbnailManager ThumbnailManager { get; set; }
         public IEmailManager EmailManager { get; set; }
         public IAppManager AppManager { get; set; }
 
@@ -37,7 +36,8 @@ namespace classy.Services
                     request.ListingIds,
                     request.Environment.AppId,
                     false,
-                    request.Environment.CultureCode);
+                    request.Environment.CultureCode,
+                    request.includeProfiles);
 
                 return new HttpResult(listingsView, HttpStatusCode.OK);
             }
@@ -109,6 +109,7 @@ namespace classy.Services
                 null,
                 request.Title,
                 request.Content,
+                request.Categories,
                 request.ListingType,
                 request.Pricing,
                 request.ContactInfo ?? session.GetDefaultContactInfo(AppManager.GetAppById(request.Environment.AppId).DefaultCountry),
@@ -625,13 +626,6 @@ namespace classy.Services
             }
             return new HttpResult(null, HttpStatusCode.OK);
 
-        }
-
-        [AddHeader(ContentType = "image/jpeg")]
-        [AddHeader(CacheControl = "max-age: 315360000")]
-        public object Get(GetThumbnail request)
-        {
-            return new HttpResult(ThumbnailManager.CreateThumbnail(request.ImageKey, request.Width, request.Height), "image/jpeg");
         }
 
         [CustomAuthenticate]

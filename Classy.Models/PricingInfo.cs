@@ -13,6 +13,7 @@ namespace Classy.Models
         public IList<PurchaseOption> PurchaseOptions { get; set; }
 
         public string CurrencyCode { get; set; }
+        public PurchaseOption BaseOption { get; set; }
 
         // TODO: make this a list of shipping options? 
         //public int? DomesticRadius { get; set; }
@@ -31,7 +32,8 @@ namespace Classy.Models
     {
         public PricingInfoValidator()
         {
-            RuleFor(x => x.PurchaseOptions).NotEmpty();
+            RuleFor(x => x.BaseOption).NotNull();
+            RuleFor(x => x.CurrencyCode).NotEmpty();
         }
     }
 }

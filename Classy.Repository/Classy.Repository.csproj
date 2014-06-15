@@ -66,6 +66,7 @@
     <Compile Include="IJobRepository.cs" />
     <Compile Include="IKeywordsRepository.cs" />
     <Compile Include="ILocalizationRepository.cs" />
+    <Compile Include="ITempMediaFileRepository.cs" />
     <Compile Include="Infrastructure\MongoDatabaseProvider.cs" />
     <Compile Include="KeywordsRepository.cs" />
     <Compile Include="MongoCollectionRepository.cs" />
@@ -89,6 +90,7 @@
     <Compile Include="MongoJobRepository.cs" />
     <Compile Include="MongoListingRepository.cs" />
     <Compile Include="MongoLocalizationProvider.cs" />
+    <Compile Include="MongoTempMediaFileRepository.cs" />
     <Compile Include="MongoOrderRepository.cs" />
     <Compile Include="MongoProfileRepository.cs" />
     <Compile Include="MongoReviewRepository.cs" />
@@ -96,6 +98,7 @@
     <Compile Include="MongoTripleStore.cs" />
     <Compile Include="PaymentGatewayException.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="StubCurrencyRepository.cs" />
     <Compile Include="TranzilaPaymentGateway.cs" />
   </ItemGroup>
   <ItemGroup>

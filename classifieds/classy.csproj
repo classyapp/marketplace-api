@@ -125,6 +125,7 @@
     <Compile Include="DTO\Request\CancelSingleItemOrder.cs" />
     <Compile Include="DTO\Request\ClaimProxyProfile.cs" />
     <Compile Include="DTO\Request\AddListingToCollection.cs" />
+    <Compile Include="DTO\Request\DeleteTempMediaRequest.cs" />
     <Compile Include="DTO\Request\EditMultipleListings.cs" />
     <Compile Include="DTO\Request\ForgotPasswordRequest.cs" />
     <Compile Include="DTO\Request\GetCitiesByCountry.cs" />
@@ -135,6 +136,7 @@
     <Compile Include="DTO\Request\GetListingTranslation.cs" />
     <Compile Include="DTO\Request\DeleteTranslation.cs" />
     <Compile Include="DTO\Request\GetProfileTranslation.cs" />
+    <Compile Include="DTO\Request\Images\GetCollageRequest.cs" />
     <Compile Include="DTO\Request\ImportPorductCatalogRequest.cs" />
     <Compile Include="DTO\Request\LogActivity\GetUserActivityRequest.cs" />
     <Compile Include="DTO\Request\LogActivity\LogActivityRequest.cs" />
@@ -151,8 +153,10 @@
     <Compile Include="DTO\Request\GetGoogleContacts.cs" />
     <Compile Include="DTO\Request\GetListResourceByKey.cs" />
     <Compile Include="DTO\Request\GetResourcesForApp.cs" />
-    <Compile Include="DTO\Request\GetThumbnail.cs" />
+    <Compile Include="DTO\Request\Images\GetThumbnail.cs" />
     <Compile Include="DTO\Request\CreateNewResource.cs" />
+    <Compile Include="DTO\Request\SaveTempMediaRequest.cs" />
+    <Compile Include="DTO\Request\SearchOrderedListings.cs" />
     <Compile Include="DTO\Request\Search\FreeSearchRequest.cs" />
     <Compile Include="DTO\Request\Search\KeywordSuggestionRequest.cs" />
     <Compile Include="DTO\Request\UpdateListing.cs" />
@@ -200,6 +204,7 @@
     <Compile Include="DTO\Request\UpdateSingleItemOrder.cs" />
     <Compile Include="DTO\Request\VerifyEmailRequest.cs" />
     <Compile Include="DTO\Request\VerifyPasswordResetRequest.cs" />
+    <Compile Include="DTO\Response\SaveTempMediaResponse.cs" />
     <Compile Include="Extentions\AppViewExtensions.cs" />
     <Compile Include="Extentions\BulkedEnumerator.cs" />
     <Compile Include="Extentions\EnumerableExtensions.cs" />
@@ -222,6 +227,7 @@
     <Compile Include="Extentions\ListingViewExtensions.cs" />
     <Compile Include="Extentions\ProfileViewExtentions.cs" />
     <Compile Include="DTO\Request\GetCollectionByProfileId.cs" />
+    <Compile Include="Extentions\StreamExtensions.cs" />
     <Compile Include="Extentions\StringExtensions.cs" />
     <Compile Include="Extentions\UserSessionExtensions.cs" />
     <Compile Include="Global.asax.cs">
@@ -231,12 +237,14 @@
     <Compile Include="Manager\CurrencyManager.cs" />
     <Compile Include="Manager\DefaultAnalyticsManager.cs" />
     <Compile Include="Manager\DefaultJobManager.cs" />
+    <Compile Include="Manager\DefaultTempMediaFileManager.cs" />
     <Compile Include="Manager\IAnalyticsManager.cs" />
     <Compile Include="Manager\IBookingManager.cs" />
     <Compile Include="Manager\ICollectionManager.cs" />
     <Compile Include="Manager\IJobManager.cs" />
     <Compile Include="Manager\IListingManager.cs" />
     <Compile Include="Manager\IManager.cs" />
+    <Compile Include="Manager\ITempMediaFileManager.cs" />
     <Compile Include="Manager\IOrderManager.cs" />
     <Compile Include="Manager\IProfileManager.cs" />
     <Compile Include="Manager\IReviewManager.cs" />
@@ -254,18 +262,16 @@
     <Compile Include="Manager\Search\ListingSearchProvider.cs" />
     <Compile Include="Manager\Search\ProfileSearchProvider.cs" />
     <Compile Include="Manager\Search\SearchClientFactory.cs" />
-    <Compile Include="Manager\StubCurrencyRepository.cs" />
     <Compile Include="DTO\Response\SearchSuggestion.cs" />
     <Compile Include="Manager\Search\SearchSuggestionsProvider.cs" />
-    <Compile Include="Operations\ImportProductCatalogJob.cs" />
-    <Compile Include="Operations\IOperator.cs" />
-    <Compile Include="Operations\ProductCatalogImportOperator.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Services\AppService.cs" />
     <Compile Include="Services\CollectionService.cs" />
     <Compile Include="Services\CommentsService.cs" />
+    <Compile Include="Services\ImageService.cs" />
     <Compile Include="Services\ListingService.cs" />
     <Compile Include="Services\LogActivityService.cs" />
+    <Compile Include="Services\MediaService.cs" />
     <Compile Include="Services\PasswordService.cs" />
     <Compile Include="Services\ProductService.cs" />
     <Compile Include="Services\ProfileService.cs" />
@@ -312,6 +318,7 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Manager\Keywords\" />
+    <Folder Include="Operations\" />
   </ItemGroup>
   <PropertyGroup>
     <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">10.0</VisualStudioVersion>

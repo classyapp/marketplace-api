@@ -13,6 +13,8 @@ namespace classy
         public static PricingInfoView ToPricingInfoView(this PricingInfo from, double adjustRate)
         {
             var to = from.TranslateTo<PricingInfoView>();
+            to.BaseOption = from.BaseOption.TranslateTo<PurchaseOptionView>();
+            to.BaseOption.MediaFiles = from.BaseOption.MediaFiles.Select(m => m.TranslateTo<MediaFileView>()).ToArray();
             if (from.PurchaseOptions != null)
             {
                 if (to.PurchaseOptions == null) to.PurchaseOptions = new List<PurchaseOptionView>();
