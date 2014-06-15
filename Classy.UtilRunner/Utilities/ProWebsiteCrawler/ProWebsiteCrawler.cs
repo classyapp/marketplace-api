@@ -258,6 +258,10 @@ namespace Classy.UtilRunner.Utilities.ProWebsiteCrawler
 
                 // update collection
                 _collectionRepo.Update(collection);
+
+                // remove from memory
+                Profiles.Remove(host);
+                ProfileImages.Remove(host);
             }
         }
     }
