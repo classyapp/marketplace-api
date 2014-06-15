@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using classy.DTO.Request;
 using Classy.Models;
 
 namespace Classy.Repository
@@ -29,10 +30,8 @@ namespace Classy.Repository
         IList<Listing> GetByProfileId(string appId, string profileId, bool includeDrafts, string culture);
         IList<Listing> Search(string[] tags, string[] listingTypes, IDictionary<string, string[]> metadata, IDictionary<string, string[]> query, double? priceMin,
             double? priceMax, Location location, string appId, bool includeDrafts, bool increaseViewCounter,
-            int page, int pageSize, ref long count, string culture);
+            int page, int pageSize, ref long count, SortMethod sortMethod, string culture);
 
-        IList<Listing> UntaggedSearch(string appId, string[] listingTypes, int page, string date, int pageSize,
-            string culture, ref long count);
         void AddExternalMedia(string listingId, string appId, IList<MediaFile> media);
         void UpdateExternalMedia(string listingId, string appId, MediaFile media);
         void DeleteExternalMedia(string listingId, string appId, string url);

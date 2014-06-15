@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using classy.DTO.Request;
 using Classy.Interfaces.Search;
 using Classy.Models;
 using Classy.Models.Response;
@@ -187,12 +188,13 @@ namespace classy.Manager
             bool formatCommentsAsHtml,
             int page,
             int pageSize,
+            SortMethod sortMethod,
             string culture)
         {
             long count = 0;
 
             // TODO: cache listings
-            var listings = ListingRepository.Search(tags, listingTypes, metadata, null, priceMin, priceMax, location, appId, false, false, page, pageSize, ref count, culture);
+            var listings = ListingRepository.Search(tags, listingTypes, metadata, null, priceMin, priceMax, location, appId, false, false, page, pageSize, ref count, sortMethod, culture);
             var comments = includeComments ?
                 CommentRepository.GetByListingIds(listings.Select(x => x.Id).AsEnumerable(), formatCommentsAsHtml) : null;
             var listingViews = new List<ListingView>();
@@ -203,26 +205,6 @@ namespace classy.Manager
                 {
                     view.Comments = comments.Where(x => x.ObjectId == view.Id).ToCommentViewList();
                 }
-                listingViews.Add(view);
-            }
-            return new SearchResultsView<ListingView> { Results = listingViews, Count = count };
-        }
-
-        public SearchResultsView<ListingView> SearchUntaggedListings(
-            string appId,
-            string[] listingTypes,
-            int page,
-            string date,
-            int pageSize,
-            string culture)
-        {
-            long count = 0;
-
-            var listings = ListingRepository.UntaggedSearch(appId, listingTypes, page, date, pageSize, culture, ref count);
-            var listingViews = new List<ListingView>();
-            foreach (var c in listings)
-            {
-                var view = c.Translate(culture).ToListingView(_currencyManager, Environment.CurrencyCode);
                 listingViews.Add(view);
             }
             return new SearchResultsView<ListingView> { Results = listingViews, Count = count };
@@ -1161,7 +1143,7 @@ namespace classy.Manager
                 long count = 0;
                 data.SearchResults = ListingRepository.Search(null, new string[] { listing.ListingType }, 
                     metadata, query,
-                    null, null, location, appId, false, false, 0, 0, ref count, culture).ToListingViewList(culture, _currencyManager, Environment.CurrencyCode);
+                    null, null, location, appId, false, false, 0, 0, ref count, SortMethod.Popularity, culture).ToListingViewList(culture, _currencyManager, Environment.CurrencyCode);
                 if (data.SearchResults != null)
                 {
                     data.SearchResults.Remove(data.SearchResults.First(wl => wl.Id == listingId));

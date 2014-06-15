@@ -93,6 +93,7 @@
     <Compile Include="Search\ListingIndexDto.cs" />
     <Compile Include="Search\ProfileIndexDto.cs" />
     <Compile Include="Search\SearchResults.cs" />
+    <Compile Include="Search\SortMethod.cs" />
     <Compile Include="Translation.cs" />
     <Compile Include="ProxyClaim.cs" />
     <Compile Include="ProfessionalInfo.cs" />
