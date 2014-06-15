@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.ObjectModel;
 using System.Linq;
 using System.Web;
 using classy.DTO.Request;
@@ -18,7 +17,6 @@ using ServiceStack.Configuration;
 using ServiceStack.ServiceHost;
 using ServiceStack.ServiceInterface;
 using ServiceStack.ServiceInterface.Admin;
-using ServiceStack.ServiceInterface.Cors;
 using ServiceStack.ServiceInterface.Validation;
 using ServiceStack.WebHost.Endpoints;
 
@@ -184,7 +182,7 @@ namespace classy
                 //.Add<AddPermittedViewersToCollection>("/collection/{CollectionId}/viewer", "POST") // add view premissions to profiles
                 //.Add<RemovePermittedViewersFromCollection>("/collection/{CollectionId}/viewer", "DELETE") // remove view permissions
                 //.Add<UpdateCollection>("/collection/{CollectionId}", "PUT") // update collection details
-                .Add<GetCollectionById>("/collection/{CollectionId}", "GET") // get a collection by id
+                .Add<GetCollectionById>("/collection/{CollectionId}", ApplyTo.Get | ApplyTo.Options) // get a collection by id
                 .Add<GetCollectionByProfileId>("/profile/{ProfileId}/collection/list/{CollectionType}", "GET") // get a collection by id
                 .Add<GetCollectionTranslation>("/collection/{CollectionID}/translation/{CultureCode}", "GET")
                 .Add<SetCollectionTranslation>("/collection/{CollectionId}/translation/{CultureCode}", "POST")
@@ -219,7 +217,7 @@ namespace classy
 
                 // Profiles
                 .Add<GetAutenticatedProfile>("/profile", "GET")
-                .Add<GetProfileById>("/profile/{ProfileId}", "GET")
+                .Add<GetProfileById>("/profile/{ProfileId}", ApplyTo.Get | ApplyTo.Options)
                 .Add<UpdateProfile>("/profile/{ProfileId}", "PUT")
                 .Add<ClaimProxyProfile>("/profile/{ProxyProfileId}/claim", "POST")
                 .Add<ApproveProxyClaim>("/profile/{ClaimId}/approve", "POST")
@@ -252,7 +250,7 @@ namespace classy
 
                 // Localization
                 .Add<GetListResourceByKey>("/resource/list/{Key}", "GET")
-                .Add<GetResourceByKey>("/resource/{Key}", "GET")
+                .Add<GetResourceByKey>("/resource/{Key}",ApplyTo.Get | ApplyTo.Options)
                 .Add<GetResourcesForApp>("/resource/all", "GET")
                 .Add<CreateNewResource>("/resource", "POST")
                 .Add<SetResourceValues>("/resource/{Key}", "POST")
