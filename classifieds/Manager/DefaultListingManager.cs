@@ -412,7 +412,28 @@ namespace classy.Manager
                 var newTags = string.IsNullOrEmpty(content) ? new string[0] : content.ExtractHashtags();
                 listing.Hashtags = hashtags.EmptyIfNull().Union(newTags).ToList();
             }
-            if (fields.HasFlag(ListingUpdateFields.Pricing)) listing.PricingInfo = pricingInfo;
+            if (fields.HasFlag(ListingUpdateFields.Pricing))
+            {
+                // check / attach new photos
+                if (pricingInfo.BaseOption.MediaFiles != null)
+                {
+                    MediaFile[] files = pricingInfo.BaseOption.MediaFiles;
+                    foreach (var image in files)
+                    {
+                        CopyFromTempImage(appId, image);
+                    }
+                    // join the files
+                    List<MediaFile> allImages = new List<MediaFile>(listing.PricingInfo.BaseOption.MediaFiles);
+                    allImages.AddRange(files);
+                    pricingInfo.BaseOption.MediaFiles = allImages.ToArray();
+                    listing.ExternalMedia = pricingInfo.BaseOption.MediaFiles;
+                }
+                else
+                {
+                    pricingInfo.BaseOption.MediaFiles = listing.PricingInfo.BaseOption.MediaFiles;
+                }
+                listing.PricingInfo = pricingInfo;
+            }
             if (fields.HasFlag(ListingUpdateFields.ContactInfo)) listing.ContactInfo = contactInfo;
             if (fields.HasFlag(ListingUpdateFields.SchedulingTemplate)) listing.SchedulingTemplate = timeslotSchedule;
             if (fields.HasFlag(ListingUpdateFields.Metadata))
@@ -1180,6 +1201,20 @@ namespace classy.Manager
             catch (Exception)
             {
                 throw;
+            }
+        }
+
+        public void DeleteExternalMediaFromListingById(string appId, string listingId, string key)
+        {
+            var listing = GetVerifiedListing(appId, listingId, true, false);
+
+            MediaFile file = listing.ExternalMedia.SingleOrDefault(e => e.Key == key);
+            if (file != null)
+            {
+                ListingRepository.DeleteExternalMediaById(listingId, appId, key);
+                StorageRepository.DeleteFile(key);
+
+                listing.ExternalMedia.Remove(file);
             }
         }
     }

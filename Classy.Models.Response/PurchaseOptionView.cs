@@ -18,5 +18,6 @@ namespace Classy.Models.Response
         public string Height { get; set; }
         public string Width { get; set; }
         public string Depth { get; set; }
+        public string ProductUrl { get; set; }
     }
 }

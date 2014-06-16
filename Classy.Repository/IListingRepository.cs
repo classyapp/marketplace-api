@@ -35,6 +35,7 @@ namespace Classy.Repository
         void AddExternalMedia(string listingId, string appId, IList<MediaFile> media);
         void UpdateExternalMedia(string listingId, string appId, MediaFile media);
         void DeleteExternalMedia(string listingId, string appId, string url);
+        void DeleteExternalMediaById(string listingId, string appId, string key);
         void IncreaseCounter(string listingId, string appId, ListingCounters counters, int value);
         void IncreaseCounter(string[] listingId, string appId, ListingCounters counters, int value);
         void Publish(string listingId, string appId);
@@ -44,9 +45,7 @@ namespace Classy.Repository
         string Insert(Listing listing);
         void Update(Listing listing);
         void SetListingErrorForMediaFile(string key, string error);
-
         void EditMultipleListings(string[] ids, int? editorsRank, string appId, Dictionary<string, string> metadata);
-
         Listing GetBySKU(string sku);
     }
 }

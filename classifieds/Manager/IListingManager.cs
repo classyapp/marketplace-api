@@ -163,6 +163,11 @@ namespace classy.Manager
             string listingId,
             string url);
 
+        void DeleteExternalMediaFromListingById(
+            string appId, 
+            string listingId, 
+            string key);
+
         /// <summary>
         /// 
         /// </summary>
