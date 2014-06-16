@@ -430,6 +430,7 @@ namespace Classy.CatalogImportWorker
             {
                 SaveImageFromUrl(product.ExternalMedia[i].Url, product.ExternalMedia[i].Key, i);
             }
+            product.PricingInfo.BaseOption.MediaFiles = product.ExternalMedia.ToArray();
 
             // Upload variation images
             if (product.PricingInfo.PurchaseOptions != null)
