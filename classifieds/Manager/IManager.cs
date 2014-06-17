@@ -12,6 +12,7 @@ namespace classy.Manager
         public bool IsAuthenticated { get; set; }
         public string AuthenticatedProfileId { get; set; }
         public bool IsAdmin { get; set; }
+        public bool IsEditor { get; set; }
     }
 
     public interface IManager

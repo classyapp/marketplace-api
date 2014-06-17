@@ -78,9 +78,10 @@ namespace classy.Services
             {
                 var session = SessionAs<CustomUserSession>();
                 CollectionManager.Environment = request.Environment;
+                CollectionManager.SecurityContext = session.ToSecurityContext();
+
                 CollectionManager.RemoveListingsFromCollection(
                     request.Environment.AppId,
-                    session.UserAuthId,
                     request.CollectionId,
                     request.ListingIds);
                 return new HttpResult(request, HttpStatusCode.OK);

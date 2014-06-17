@@ -842,14 +842,14 @@ namespace classy.Manager
 
         public void RemoveListingsFromCollection(
             string appId,
-            string profileId,
             string collectionId,
             string[] listingIds)
         {
             try
             {
                 var collection = GetVerifiedCollection(appId, collectionId, null);
-                if (collection.ProfileId != profileId) throw new UnauthorizedAccessException();
+                if (collection.ProfileId != SecurityContext.AuthenticatedProfileId && 
+                    !(SecurityContext.IsEditor || SecurityContext.IsAdmin)) throw new UnauthorizedAccessException();
 
                 foreach (string listingId in listingIds)
                 {
@@ -859,7 +859,7 @@ namespace classy.Manager
                         collection.IncludedListings.Remove(listing);
 
                         int count = 0;
-                        TripleStore.DeleteActivity(appId, profileId, ActivityPredicate.ADD_LISTING_TO_COLLECTION, listing.Id, ref count);
+                        TripleStore.DeleteActivity(appId, SecurityContext.AuthenticatedProfileId, ActivityPredicate.ADD_LISTING_TO_COLLECTION, listing.Id, ref count);
 
                         // save
                         CollectionRepository.Update(collection);

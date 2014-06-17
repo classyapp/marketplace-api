@@ -57,8 +57,7 @@ namespace classy.Manager
         /// <param name="collectionId"></param>
         /// <param name="listingId"></param>
         void RemoveListingsFromCollection(
-            string appId, 
-            string profileId, 
+            string appId,  
             string collectionId, 
             string[] listingIds);
 
