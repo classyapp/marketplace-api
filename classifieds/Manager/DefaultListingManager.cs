@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using classy.DTO.Request;
@@ -1143,7 +1143,8 @@ namespace classy.Manager
         {
             Listing listing;
             listing = GetVerifiedListing(appId, listingId, includeDrafts);
-            if (SecurityContext.IsAuthenticated && listing.ProfileId != SecurityContext.AuthenticatedProfileId && !SecurityContext.IsAdmin) throw new UnauthorizedAccessException("not authorized");
+            if (SecurityContext.IsAuthenticated && listing.ProfileId != SecurityContext.AuthenticatedProfileId && !SecurityContext.IsAdmin) 
+                if (listing.ListingType != "Poll") throw new UnauthorizedAccessException("not authorized");
             return listing;
         }
 
