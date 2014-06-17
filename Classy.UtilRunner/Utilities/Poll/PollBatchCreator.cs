@@ -1,12 +1,16 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Configuration;
 using System.IO;
+using System.Linq;
+using System.Net;
 using Amazon.DataPipeline.Model;
 using Classy.Models;
 using Funq;
 using MongoDB.Bson;
 using MongoDB.Driver;
 using MongoDB.Driver.Builders;
+using MongoDB.Driver.Linq;
 
 namespace Classy.UtilRunner.Utilities.Poll
 {
@@ -24,6 +28,37 @@ namespace Classy.UtilRunner.Utilities.Poll
 
         public StatusCode Run(string[] args)
         {
+            var polls = _listings.Find(Query<Listing>.EQ(x => x.ListingType, "Poll"));
+
+            foreach (var poll in polls)
+            {
+                var imageKeys = new List<string>(3);
+                var j = 0;
+                while (poll.Metadata.ContainsKey("Listing_" + j))
+                {
+                    var listing = _listings.FindOne(Query<Listing>.EQ(x => x.Id, poll.Metadata["Listing_" + j]));
+                    imageKeys.Add(listing.ExternalMedia[0].Key);
+                    j++;
+                }
+
+                var url = "http://" + ConfigurationManager.AppSettings["CloudFrontDistributionUrl"]
+                    + "/collage?ImageKeys=" + string.Join(",", imageKeys) + "&format=json";
+
+                using (var client = new WebClient())
+                {
+                    try
+                    {
+                        var response = client.DownloadData(new Uri(url));
+                    }
+                    catch (Exception ex)
+                    {
+                        
+                    }
+                }
+            }
+
+            return StatusCode.Success;
+
             var rand = new Random(88);
 
             using (var reader = new StreamReader("C:\\Users\\Gilly\\Downloads\\polls.csv"))
