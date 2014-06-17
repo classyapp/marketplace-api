@@ -432,6 +432,30 @@ namespace classy.Manager
                 {
                     pricingInfo.BaseOption.MediaFiles = listing.PricingInfo.BaseOption.MediaFiles;
                 }
+
+                if (pricingInfo.PurchaseOptions != null)
+                {
+                    for (int i = 0; i < pricingInfo.PurchaseOptions.Count; i++)
+                    {
+                        var option = pricingInfo.PurchaseOptions[i];
+                        if (option.MediaFiles != null)
+                        {
+                            MediaFile[] files = option.MediaFiles;
+                            foreach (var image in files)
+                            {
+                                CopyFromTempImage(appId, image);
+                            }
+                            // join the files
+                            List<MediaFile> allImages = new List<MediaFile>(listing.PricingInfo.PurchaseOptions[i].MediaFiles);
+                            allImages.AddRange(files);
+                            option.MediaFiles = allImages.ToArray();
+                        }
+                        else
+                        {
+                            option.MediaFiles = listing.PricingInfo.PurchaseOptions[i].MediaFiles;
+                        }
+                    }
+                }
                 listing.PricingInfo = pricingInfo;
             }
             if (fields.HasFlag(ListingUpdateFields.ContactInfo)) listing.ContactInfo = contactInfo;
