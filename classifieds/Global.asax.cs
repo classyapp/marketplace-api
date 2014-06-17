@@ -149,7 +149,7 @@ namespace classy
 
                 // Listings
                 .Add<EditMultipleListings>("/listings/edit-multiple", "POST")
-                .Add<GetListingById>("/listing/{ListingId}", "GET") // get listing by id, update listing
+                .Add<GetListingById>("/listing/{ListingId}", ApplyTo.Get | ApplyTo.Options) // get listing by id, update listing
                 .Add<GetListingsById>("/listing/get-multiple", "POST")
                 .Add<DeleteListing>("/listing/{ListingId}", "DELETE") // delete listing by id, update listing
                 .Add<PostListing>("/listing/new", "POST") // post new listing
