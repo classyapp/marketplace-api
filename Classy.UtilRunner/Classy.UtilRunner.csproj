@@ -110,6 +110,7 @@
     <Compile Include="Utilities\Indexing\KeywordsIndexer.cs" />
     <Compile Include="Utilities\Indexing\ProfileIndexer.cs" />
     <Compile Include="Utilities\Indexing\ListingIndexer.cs" />
+    <Compile Include="Utilities\Poll\PollBatchCreator.cs" />
     <Compile Include="Utilities\ProWebsiteCrawler\ProWebsiteCrawler.cs" />
     <Compile Include="Utilities\SitemapBuilders\ArgumentHelper.cs" />
     <Compile Include="Utilities\SitemapBuilders\BaseSitemapGenerator.cs" />
@@ -145,6 +146,7 @@
       <Name>Classy.Repository</Name>
     </ProjectReference>
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
