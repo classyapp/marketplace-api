@@ -155,6 +155,7 @@ namespace classy.Manager
             bool includeComments,
             bool formatCommentsAsHtml,
             bool includeDrafts,
+            bool includeProfiles,
             string culture)
         {
             var profile = GetVerifiedProfile(appId, profileId, culture);
@@ -163,6 +164,7 @@ namespace classy.Manager
             var listings = ListingRepository.GetByProfileId(appId, profile.Id, includeDrafts, culture);
             var comments = includeComments ?
                 CommentRepository.GetByListingIds(listings.Select(x => x.Id).AsEnumerable(), formatCommentsAsHtml) : null;
+
             var listingViews = new List<ListingView>();
             foreach (var c in listings)
             {
@@ -173,6 +175,16 @@ namespace classy.Manager
                 }
                 listingViews.Add(view);
             }
+
+            if (includeProfiles)
+            {
+                var profiles = ProfileRepository.GetByIds(appId, listingViews.Select(x => x.ProfileId).ToArray(), culture);
+                listingViews.ForEach(listing =>
+                {
+                    listing.Profile = profiles.FirstOrDefault(x => x.Id == listing.ProfileId).ToProfileView();
+                });
+            }
+
             return listingViews;
         }
 

@@ -50,6 +50,7 @@ namespace classy.Manager
             bool includeComments,
             bool formatCommentsAsHtml,
             bool includeDrafts,
+            bool includeProfiles,
             string culture);
 
         /// <summary>
