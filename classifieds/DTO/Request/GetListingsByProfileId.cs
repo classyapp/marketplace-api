@@ -14,6 +14,7 @@ namespace Classy.Models.Request
         public bool IncludeComments { get; set; }
         public bool FormatCommentsAsHtml { get; set; }
         public bool IncludeDrafts { get; set; }
+        public bool IncludeProfiles { get; set; }
     }
 
     public class GetListingsByProfileIdValidator : AbstractValidator<GetListingsByProfileId>
