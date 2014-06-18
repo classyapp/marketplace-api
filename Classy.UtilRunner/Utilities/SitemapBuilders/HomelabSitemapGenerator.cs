@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Web;
+using classy.DTO.Request;
 using Classy.Models;
 using Classy.UtilRunner;
 using MongoDB.Driver;
@@ -94,6 +95,7 @@ namespace Classy.UtilRunner.Utilities.SitemapBuilders
                 false,
                 page,
                 pageSize,
+                SortMethod.Popularity,
                 "en");
             while (photos != null && photos.Results.Count > 0)
             {
@@ -129,6 +131,7 @@ namespace Classy.UtilRunner.Utilities.SitemapBuilders
                     false,
                     ++page,
                     pageSize,
+                    SortMethod.Popularity,
                     "en");
             }
 

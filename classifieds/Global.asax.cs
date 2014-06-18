@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using System.Web;
 using classy.DTO.Request;
 using classy.DTO.Request.Images;
@@ -9,6 +10,7 @@ using classy.Services;
 using Classy.Auth;
 using Classy.Models.Request;
 using MongoDB.Driver;
+using ServiceStack;
 using ServiceStack.Common;
 using ServiceStack.Common.Web;
 using ServiceStack.Configuration;
@@ -17,8 +19,6 @@ using ServiceStack.ServiceInterface;
 using ServiceStack.ServiceInterface.Admin;
 using ServiceStack.ServiceInterface.Validation;
 using ServiceStack.WebHost.Endpoints;
-using Classy.Repository;
-using Classy.Interfaces.Managers;
 
 namespace classy
 {
@@ -49,8 +49,6 @@ namespace classy
             });
         }
 
-
-
         public override void Configure(Funq.Container container)
         {
             //Enable Authentication and Registration
@@ -60,14 +58,23 @@ namespace classy
             Plugins.Add(new ValidationFeature());
             container.RegisterValidators(typeof(PostListing).Assembly);
 
-            // CORS
-            //Plugins.Add(new CorsFeature(
-            //    allowedOrigins: "http://www.thisisclassy.com",
-            //    allowedMethods: "GET, POST, PUT, DELETE, OPTIONS",
-            //    allowedHeaders: "Content-Type, X-ApiKey, Control-Type, Accept, Origin",
-            //    allowCredentials: true
-            //));
+            PreRequestFilters.Add((httpReq, httpRes) =>
+            {
+                //Handles Request and closes Responses after emitting global HTTP Headers
+                var originWhitelist = new[] { "http://local.homelab:8080", "http://myhome-3.apphb.com", "https://myhome-3.apphb.com" };
 
+                httpRes.AddHeader(HttpHeaders.AllowMethods, "GET, POST, PUT, DELETE, OPTIONS");
+                httpRes.AddHeader(HttpHeaders.AllowHeaders, "accept, x-classy-env, content-type");
+
+                var origin = httpReq.Headers.Get("Origin");
+                if (originWhitelist.Contains(origin))
+                    httpRes.AddHeader(HttpHeaders.AllowOrigin, origin);
+
+                if (httpReq.HttpMethod == "OPTIONS") {
+                    httpRes.EndRequest(); //add a 'using ServiceStack;'
+                }
+            });
+            
             container.WireUp();
 
             // configure service routes
@@ -142,7 +149,7 @@ namespace classy
 
                 // Listings
                 .Add<EditMultipleListings>("/listings/edit-multiple", "POST")
-                .Add<GetListingById>("/listing/{ListingId}", "GET") // get listing by id, update listing
+                .Add<GetListingById>("/listing/{ListingId}", ApplyTo.Get | ApplyTo.Options) // get listing by id, update listing
                 .Add<GetListingsById>("/listing/get-multiple", "POST")
                 .Add<DeleteListing>("/listing/{ListingId}", "DELETE") // delete listing by id, update listing
                 .Add<PostListing>("/listing/new", "POST") // post new listing
@@ -151,7 +158,6 @@ namespace classy
                 .Add<PublishListing>("/listing/{ListingId}/publish", "POST") // publish a post to the public
                 .Add<UpdateListing>("/listing/{ListingId}", "PUT") // update listing
                 .Add<SearchListings>("/listing/search", ApplyTo.Get | ApplyTo.Post) // search listings by tag and/or metadata
-                .Add<SearchOrderedListings>("/listing/untagged/{date}", ApplyTo.Get | ApplyTo.Post)
                 .Add<SearchListings>("/tags/{tag}", "GET") // search with a nicer url for tag
                 .Add<GetListingsByProfileId>("/profile/{ProfileId}/listing/list", "GET") // get list of listing for profile
                 .Add<SetListingTranslation>("/listing/{ListingId}/translation", "POST")
@@ -175,7 +181,7 @@ namespace classy
                 //.Add<AddPermittedViewersToCollection>("/collection/{CollectionId}/viewer", "POST") // add view premissions to profiles
                 //.Add<RemovePermittedViewersFromCollection>("/collection/{CollectionId}/viewer", "DELETE") // remove view permissions
                 //.Add<UpdateCollection>("/collection/{CollectionId}", "PUT") // update collection details
-                .Add<GetCollectionById>("/collection/{CollectionId}", "GET") // get a collection by id
+                .Add<GetCollectionById>("/collection/{CollectionId}", ApplyTo.Get | ApplyTo.Options) // get a collection by id
                 .Add<GetCollectionByProfileId>("/profile/{ProfileId}/collection/list/{CollectionType}", "GET") // get a collection by id
                 .Add<GetCollectionTranslation>("/collection/{CollectionID}/translation/{CultureCode}", "GET")
                 .Add<SetCollectionTranslation>("/collection/{CollectionId}/translation/{CultureCode}", "POST")
@@ -210,7 +216,7 @@ namespace classy
 
                 // Profiles
                 .Add<GetAutenticatedProfile>("/profile", "GET")
-                .Add<GetProfileById>("/profile/{ProfileId}", "GET")
+                .Add<GetProfileById>("/profile/{ProfileId}", ApplyTo.Get | ApplyTo.Options)
                 .Add<UpdateProfile>("/profile/{ProfileId}", "PUT")
                 .Add<ClaimProxyProfile>("/profile/{ProxyProfileId}/claim", "POST")
                 .Add<ApproveProxyClaim>("/profile/{ClaimId}/approve", "POST")
@@ -243,7 +249,7 @@ namespace classy
 
                 // Localization
                 .Add<GetListResourceByKey>("/resource/list/{Key}", "GET")
-                .Add<GetResourceByKey>("/resource/{Key}", "GET")
+                .Add<GetResourceByKey>("/resource/{Key}",ApplyTo.Get | ApplyTo.Options)
                 .Add<GetResourcesForApp>("/resource/all", "GET")
                 .Add<CreateNewResource>("/resource", "POST")
                 .Add<SetResourceValues>("/resource/{Key}", "POST")

@@ -156,7 +156,6 @@
     <Compile Include="DTO\Request\Images\GetThumbnail.cs" />
     <Compile Include="DTO\Request\CreateNewResource.cs" />
     <Compile Include="DTO\Request\SaveTempMediaRequest.cs" />
-    <Compile Include="DTO\Request\SearchOrderedListings.cs" />
     <Compile Include="DTO\Request\Search\FreeSearchRequest.cs" />
     <Compile Include="DTO\Request\Search\KeywordSuggestionRequest.cs" />
     <Compile Include="DTO\Request\UpdateListing.cs" />
