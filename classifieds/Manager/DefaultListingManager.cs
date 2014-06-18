@@ -1171,9 +1171,9 @@ namespace classy.Manager
 
         public ListingMoreInfoView GetListingMoreInfo(string appId, string listingId, Dictionary<string, string[]> metadata, Dictionary<string, string[]> query, Location location, string culture)
         {
-            ListingMoreInfoView data = new ListingMoreInfoView();
+            var data = new ListingMoreInfoView();
 
-            Listing listing = GetVerifiedListing(appId, listingId);
+            var listing = GetVerifiedListing(appId, listingId);
 
             // Get original collection
             Collection originalCollection = CollectionRepository.GetOriginalCollection(listing);
@@ -1197,10 +1197,13 @@ namespace classy.Manager
             }
             
             // Get more collections including this listing
-            IList<CollectionView> collections = GetCollectionsByListingId(appId, listing.Id, culture);
-            CollectionView currenctCollection = collections.FirstOrDefault(c => c.Id == originalCollection.Id);
-            if (currenctCollection != null)
-                collections.Remove(currenctCollection);
+            var collections = GetCollectionsByListingId(appId, listing.Id, culture);
+            if (originalCollection != null)
+            {
+                var currenctCollection = collections.FirstOrDefault(c => c.Id == originalCollection.Id);
+                if (currenctCollection != null)
+                    collections.Remove(currenctCollection);
+            }
 
             data.Collections = collections;
 
