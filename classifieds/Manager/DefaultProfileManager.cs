@@ -435,6 +435,12 @@ namespace classy.Manager
                 x.ProfileId = profile.Id;
                 ListingRepository.Update(x);
             });
+            var proxyCollections = CollectionRepository.GetByProfileId(appId, proxyProfile.Id, profile.DefaultCulture);
+            proxyCollections.ForEach(x =>
+            {
+                x.ProfileId = profile.Id;
+                CollectionRepository.Update(x);
+            });
 
             // save the new profile and delete the proxy
             profile.Rank += rankInc;
