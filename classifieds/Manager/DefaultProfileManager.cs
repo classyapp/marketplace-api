@@ -425,10 +425,22 @@ namespace classy.Manager
                 }
             }
             else profile.Metadata = claim.Metadata;
+
             // update reviews for proxy to be associated with profile
             // TODO
-            // update listings associated with proxy to be associated with profile
-            // TODO
+
+            var proxyListings = ListingRepository.GetByProfileId(appId, proxyProfile.Id, true, profile.DefaultCulture);
+            proxyListings.ForEach(x =>
+            {
+                x.ProfileId = profile.Id;
+                ListingRepository.Update(x);
+            });
+            var proxyCollections = CollectionRepository.GetByProfileId(appId, proxyProfile.Id, profile.DefaultCulture);
+            proxyCollections.ForEach(x =>
+            {
+                x.ProfileId = profile.Id;
+                CollectionRepository.Update(x);
+            });
 
             // save the new profile and delete the proxy
             profile.Rank += rankInc;
