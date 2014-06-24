@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
+using Classy.Models;
 
-namespace Classy.Models.Request
+namespace classy.DTO.Request
 {
     public class SearchListings : BaseRequestDto
     {
@@ -14,5 +15,6 @@ namespace Classy.Models.Request
         public bool FormatCommentsAsHtml { get; set; }
         public int Page { get; set; }
         public int? PageSize { get; set; }
+        public SortMethod SortMethod { get; set; }
     }
 }

@@ -86,6 +86,7 @@ namespace classy.Services
                     request.IncludeComments,
                     request.FormatCommentsAsHtml,
                     request.IncludeDrafts,
+                    request.IncludeProfiles,
                     request.Environment.CultureCode);
 
                 return new HttpResult(listingViews, HttpStatusCode.OK);

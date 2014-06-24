@@ -1,6 +1,7 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
+using classy.DTO.Request;
 using Classy.Interfaces.Search;
 using Classy.Models;
 using Classy.Models.Response;
@@ -154,6 +155,7 @@ namespace classy.Manager
             bool includeComments,
             bool formatCommentsAsHtml,
             bool includeDrafts,
+            bool includeProfiles,
             string culture)
         {
             var profile = GetVerifiedProfile(appId, profileId, culture);
@@ -162,6 +164,7 @@ namespace classy.Manager
             var listings = ListingRepository.GetByProfileId(appId, profile.Id, includeDrafts, culture);
             var comments = includeComments ?
                 CommentRepository.GetByListingIds(listings.Select(x => x.Id).AsEnumerable(), formatCommentsAsHtml) : null;
+
             var listingViews = new List<ListingView>();
             foreach (var c in listings)
             {
@@ -172,6 +175,16 @@ namespace classy.Manager
                 }
                 listingViews.Add(view);
             }
+
+            if (includeProfiles)
+            {
+                var profiles = ProfileRepository.GetByIds(appId, listingViews.Select(x => x.ProfileId).ToArray(), culture);
+                listingViews.ForEach(listing =>
+                {
+                    listing.Profile = profiles.FirstOrDefault(x => x.Id == listing.ProfileId).ToProfileView();
+                });
+            }
+
             return listingViews;
         }
 
@@ -187,12 +200,13 @@ namespace classy.Manager
             bool formatCommentsAsHtml,
             int page,
             int pageSize,
+            SortMethod sortMethod,
             string culture)
         {
             long count = 0;
 
             // TODO: cache listings
-            var listings = ListingRepository.Search(tags, listingTypes, metadata, null, priceMin, priceMax, location, appId, false, false, page, pageSize, ref count, culture);
+            var listings = ListingRepository.Search(tags, listingTypes, metadata, null, priceMin, priceMax, location, appId, false, false, page, pageSize, ref count, sortMethod, culture);
             var comments = includeComments ?
                 CommentRepository.GetByListingIds(listings.Select(x => x.Id).AsEnumerable(), formatCommentsAsHtml) : null;
             var listingViews = new List<ListingView>();
@@ -203,26 +217,6 @@ namespace classy.Manager
                 {
                     view.Comments = comments.Where(x => x.ObjectId == view.Id).ToCommentViewList();
                 }
-                listingViews.Add(view);
-            }
-            return new SearchResultsView<ListingView> { Results = listingViews, Count = count };
-        }
-
-        public SearchResultsView<ListingView> SearchUntaggedListings(
-            string appId,
-            string[] listingTypes,
-            int page,
-            string date,
-            int pageSize,
-            string culture)
-        {
-            long count = 0;
-
-            var listings = ListingRepository.UntaggedSearch(appId, listingTypes, page, date, pageSize, culture, ref count);
-            var listingViews = new List<ListingView>();
-            foreach (var c in listings)
-            {
-                var view = c.Translate(culture).ToListingView(_currencyManager, Environment.CurrencyCode);
                 listingViews.Add(view);
             }
             return new SearchResultsView<ListingView> { Results = listingViews, Count = count };
@@ -863,14 +857,14 @@ namespace classy.Manager
 
         public void RemoveListingsFromCollection(
             string appId,
-            string profileId,
             string collectionId,
             string[] listingIds)
         {
             try
             {
                 var collection = GetVerifiedCollection(appId, collectionId, null);
-                if (collection.ProfileId != profileId) throw new UnauthorizedAccessException();
+                if (collection.ProfileId != SecurityContext.AuthenticatedProfileId && 
+                    !(SecurityContext.IsEditor || SecurityContext.IsAdmin)) throw new UnauthorizedAccessException();
 
                 foreach (string listingId in listingIds)
                 {
@@ -880,7 +874,7 @@ namespace classy.Manager
                         collection.IncludedListings.Remove(listing);
 
                         int count = 0;
-                        TripleStore.DeleteActivity(appId, profileId, ActivityPredicate.ADD_LISTING_TO_COLLECTION, listing.Id, ref count);
+                        TripleStore.DeleteActivity(appId, SecurityContext.AuthenticatedProfileId, ActivityPredicate.ADD_LISTING_TO_COLLECTION, listing.Id, ref count);
 
                         // save
                         CollectionRepository.Update(collection);
@@ -1164,7 +1158,8 @@ namespace classy.Manager
         {
             Listing listing;
             listing = GetVerifiedListing(appId, listingId, includeDrafts);
-            if (SecurityContext.IsAuthenticated && listing.ProfileId != SecurityContext.AuthenticatedProfileId && !SecurityContext.IsAdmin) throw new UnauthorizedAccessException("not authorized");
+            if (SecurityContext.IsAuthenticated && listing.ProfileId != SecurityContext.AuthenticatedProfileId && !SecurityContext.IsAdmin) 
+                if (listing.ListingType != "Poll") throw new UnauthorizedAccessException("not authorized");
             return listing;
         }
 
@@ -1191,9 +1186,9 @@ namespace classy.Manager
 
         public ListingMoreInfoView GetListingMoreInfo(string appId, string listingId, Dictionary<string, string[]> metadata, Dictionary<string, string[]> query, Location location, string culture)
         {
-            ListingMoreInfoView data = new ListingMoreInfoView();
+            var data = new ListingMoreInfoView();
 
-            Listing listing = GetVerifiedListing(appId, listingId);
+            var listing = GetVerifiedListing(appId, listingId);
 
             // Get original collection
             Collection originalCollection = CollectionRepository.GetOriginalCollection(listing);
@@ -1209,7 +1204,7 @@ namespace classy.Manager
                 long count = 0;
                 data.SearchResults = ListingRepository.Search(null, new string[] { listing.ListingType }, 
                     metadata, query,
-                    null, null, location, appId, false, false, 0, 0, ref count, culture).ToListingViewList(culture, _currencyManager, Environment.CurrencyCode);
+                    null, null, location, appId, false, false, 0, 0, ref count, SortMethod.Popularity, culture).ToListingViewList(culture, _currencyManager, Environment.CurrencyCode);
                 if (data.SearchResults != null)
                 {
                     data.SearchResults.Remove(data.SearchResults.First(wl => wl.Id == listingId));
@@ -1217,10 +1212,13 @@ namespace classy.Manager
             }
             
             // Get more collections including this listing
-            IList<CollectionView> collections = GetCollectionsByListingId(appId, listing.Id, culture);
-            CollectionView currenctCollection = collections.FirstOrDefault(c => c.Id == originalCollection.Id);
-            if (currenctCollection != null)
-                collections.Remove(currenctCollection);
+            var collections = GetCollectionsByListingId(appId, listing.Id, culture);
+            if (originalCollection != null)
+            {
+                var currenctCollection = collections.FirstOrDefault(c => c.Id == originalCollection.Id);
+                if (currenctCollection != null)
+                    collections.Remove(currenctCollection);
+            }
 
             data.Collections = collections;
 

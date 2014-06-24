@@ -19,6 +19,7 @@ namespace classy
         {
             var securityContext = new ManagerSecurityContext();
             securityContext.IsAdmin = (session != null && session.Permissions != null) ? session.Permissions.Contains("admin") : false;
+            securityContext.IsEditor = (session != null && session.Permissions != null) ? session.Permissions.Contains("editor") : false;
             securityContext.IsAuthenticated = session.IsAuthenticated;
             securityContext.AuthenticatedProfileId = session.UserAuthId;
             return securityContext;

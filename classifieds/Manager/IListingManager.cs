@@ -1,4 +1,5 @@
-﻿using Classy.Models;
+﻿using classy.DTO.Request;
+using Classy.Models;
 using Classy.Models.Request;
 using Classy.Models.Response;
 using ServiceStack.ServiceHost;
@@ -49,6 +50,7 @@ namespace classy.Manager
             bool includeComments,
             bool formatCommentsAsHtml,
             bool includeDrafts,
+            bool includeProfiles,
             string culture);
 
         /// <summary>
@@ -76,14 +78,7 @@ namespace classy.Manager
             bool formatCommentsAsHtml,
             int page,
             int pageSize,
-            string culture);
-
-        SearchResultsView<ListingView> SearchUntaggedListings(
-            string appId,
-            string[] listingTypes,
-            int page,
-            string date,
-            int pageSize,
+            SortMethod sortMethod,
             string culture);
 
         /// <summary>

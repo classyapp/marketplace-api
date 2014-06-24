@@ -1,4 +1,5 @@
-﻿using Classy.Repository.Infrastructure;
+using classy.DTO.Request;
+using Classy.Repository.Infrastructure;
 using MongoDB.Bson;
 using MongoDB.Driver;
 using System;
@@ -246,64 +247,17 @@ namespace Classy.Repository
             throw new NotImplementedException();
         }
 
-        public IList<Listing> UntaggedSearch(string appId, string[] listingTypes, int page, string date, int pageSize, string culture, ref long count)
-        {
-            var queries = new List<IMongoQuery>() {
-                Query<Listing>.EQ(x => x.AppId, appId)
-            };
-            if (!string.IsNullOrEmpty(date) && date != "-")
-            {
-                var dateParts = date.Split('-');
-                var dateQuery = Query<Listing>.GTE(x => x.Created,
-                    new DateTime(Convert.ToInt32(dateParts[0]), Convert.ToInt32(dateParts[1]), Convert.ToInt32(dateParts[2])));
-                queries.Add(dateQuery);
-            }
-
-            var sortOrder = SortBy<Listing>.Descending(x => x.Created);
-            if (listingTypes != null && listingTypes.Any())
-            {
-                var listingTypesQueries = new List<IMongoQuery>();
-                foreach (var listingType in listingTypes)
-                {
-                    listingTypesQueries.Add(Query<Listing>.EQ(x => x.ListingType, listingType));
-                }
-                queries.Add(Query.Or(listingTypesQueries));
-            }
-            queries.Add(Query.EQ("Metadata.Room", "home-spaces"));
-
-            // add them all up
-            var query = Query.And(queries);
-            // now get the listings
-            MongoCursor<Listing> listings = null;
-            if (page <= 0)
-            {
-                listings = ListingsCollection.Find(query).SetSortOrder(sortOrder);
-                count = listings.Count();
-            }
-            else
-            {
-                listings = ListingsCollection.Find(query).SetSortOrder(sortOrder).SetSkip((page - 1) * pageSize).SetLimit(pageSize);
-                count = ListingsCollection.Count(query);
-            }
-
-            foreach (var listing in listings)
-            {
-                listing.Translate(culture);
-            }
-
-            return listings.ToList();
-        }
-
         public IList<Listing> Search(string[] tags, string[] listingTypes, IDictionary<string, string[]> metadata,
             IDictionary<string, string[]> objectQuery, 
             double? priceMin, double? priceMax, Location location, string appId,
-            bool includeDrafts, bool increaseViewCounter, int page, int pageSize, ref long count, string culture)
+            bool includeDrafts, bool increaseViewCounter, int page, int pageSize, ref long count, SortMethod sortMethod, string culture)
         {
             // set sort order
-            var sortOrder = SortBy<Listing>
-                .Descending(x => x.EditorsRank)
-                .Descending(x => x.DisplayOrder)
-                .Descending(x => x.FavoriteCount);
+            var sortOrder = sortMethod == SortMethod.Date
+                ? SortBy<Listing>.Descending(x => x.Created)
+                : SortBy<Listing>.Descending(x => x.EditorsRank)
+                    .Descending(x => x.DisplayOrder)
+                    .Descending(x => x.FavoriteCount);
 
             // app id
             var queries = new List<IMongoQuery>() {
