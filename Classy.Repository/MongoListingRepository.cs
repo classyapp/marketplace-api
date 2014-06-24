@@ -460,5 +460,41 @@ namespace Classy.Repository
                     Query<Listing>.EQ(x => x.Id, listingId),
                     Query<Listing>.EQ(x => x.AppId, appId)), MongoDB.Driver.Builders.Update.Pull("PricingInfo.PurchaseOption.MediaFiles", Query.EQ("Key", key)));
         }
+
+        public List<string> CheckDuplicateSKUs(string appId, string profileId, string listingId, string[] skus)
+        {
+            IMongoQuery query = null;
+            if (string.IsNullOrWhiteSpace(listingId))
+            {
+                query = Query.And(Query<Listing>.EQ(l => l.AppId, appId), Query<Listing>.EQ(l => l.ProfileId, profileId),
+                         Query.Or(Query<Listing>.In(l => l.PricingInfo.BaseOption.SKU, skus),
+                                  Query<Listing>.ElemMatch(l => l.PricingInfo.PurchaseOptions, po => po.In(i => i.SKU, skus))));
+            }
+            else
+            {
+                query = Query.And(Query<Listing>.EQ(l => l.AppId, appId), Query<Listing>.EQ(l => l.ProfileId, profileId), Query<Listing>.NE(l => l.Id, listingId),
+                                        Query.Or(Query<Listing>.In(l => l.PricingInfo.BaseOption.SKU, skus),
+                                                 Query<Listing>.ElemMatch(l => l.PricingInfo.PurchaseOptions, po => po.In(i => i.SKU, skus))));
+            }
+
+            var listings = ListingsCollection.Find(query);
+            if (listings.Count() > 0)
+            {
+                List<string> duplicates = new List<string>();
+
+                duplicates.AddRange(listings.Where(l => skus.Contains(l.PricingInfo.BaseOption.SKU)).Select(l => l.PricingInfo.BaseOption.SKU).ToArray());
+                foreach (var list in listings.Select(l => (l.PricingInfo.PurchaseOptions != null ? l.PricingInfo.PurchaseOptions.Select(po => po.SKU) : null)).ToArray())
+                {
+                    if (list != null)
+                    {
+                        duplicates.AddRange(list.Where(l => skus.Contains(l)));
+                    }
+                }
+
+                return duplicates;
+            }
+
+            return new List<string>();
+        }
     }
 }

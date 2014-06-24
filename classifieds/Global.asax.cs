@@ -159,6 +159,7 @@ namespace classy
                 .Add<GetListingTranslation>("/listing/{ListingId}/translation/{CultureCode}", "GET")
                 .Add<DeleteListingTranslation>("/listing/{ListingId}/translation/{CultureCode}", "DELETE")
                 .Add<GetListingMoreInfo>("/listing/{ListingId}/more", "POST")
+                .Add<CheckListingDuplicateSKUs>("/listing/sku/check", "POST")
 
                 // Collections
                 .Add<CreateCollection>("/collection/new", "POST") // create a new collection

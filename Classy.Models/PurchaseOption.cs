@@ -19,6 +19,6 @@ namespace Classy.Models
         public string Height { get; set; }
         public string Width { get; set; }
         public string Depth { get; set; }
-
+        public bool Available { get; set; }
     }
 }

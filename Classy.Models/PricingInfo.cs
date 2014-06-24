@@ -15,16 +15,29 @@ namespace Classy.Models
         public string CurrencyCode { get; set; }
         public PurchaseOption BaseOption { get; set; }
 
-        // TODO: make this a list of shipping options? 
-        //public int? DomesticRadius { get; set; }
-        //public decimal? DomesticShippingPrice { get; set; }
-        //public decimal? InternationalShippingPrice { get; set; }
-
         public double GetPriceForSKU(string sku)
         {
             var option = PurchaseOptions.SingleOrDefault(x => x.SKU == sku);
             if (option != null) return option.Price;
             throw new ApplicationException("invalid SKU");
+        }
+
+        public PurchaseOption FindByVariation(Dictionary<string, string> dictionary)
+        {
+            IEnumerable<PurchaseOption> options = null;
+            foreach (var key in dictionary.Keys)
+            {
+                if (options == null)
+                {
+                    options = this.PurchaseOptions.Where(po => po.VariantProperties.Contains(new KeyValuePair<string, string>(key, dictionary[key])));
+                }
+                else
+                {
+                    options = options.Where(po => po.VariantProperties.Contains(new KeyValuePair<string, string>(key, dictionary[key])));
+                }
+            }
+
+            return (options == null ? null : options.First());
         }
     }
 
