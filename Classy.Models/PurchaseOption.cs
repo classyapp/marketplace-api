@@ -20,5 +20,6 @@ namespace Classy.Models
         public string Width { get; set; }
         public string Depth { get; set; }
         public bool Available { get; set; }
+        public string UID { get; set; }
     }
 }
