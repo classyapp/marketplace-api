@@ -21,24 +21,6 @@ namespace Classy.Models
             if (option != null) return option.Price;
             throw new ApplicationException("invalid SKU");
         }
-
-        public PurchaseOption FindByVariation(Dictionary<string, string> dictionary)
-        {
-            IEnumerable<PurchaseOption> options = null;
-            foreach (var key in dictionary.Keys)
-            {
-                if (options == null)
-                {
-                    options = this.PurchaseOptions.Where(po => po.VariantProperties.Contains(new KeyValuePair<string, string>(key, dictionary[key])));
-                }
-                else
-                {
-                    options = options.Where(po => po.VariantProperties.Contains(new KeyValuePair<string, string>(key, dictionary[key])));
-                }
-            }
-
-            return (options == null ? null : options.First());
-        }
     }
 
     public class PricingInfoValidator : AbstractValidator<PricingInfo>
