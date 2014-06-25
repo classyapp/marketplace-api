@@ -253,5 +253,7 @@ namespace classy.Manager
         ListingMoreInfoView GetListingMoreInfo(string appId, string listingId, Dictionary<string, string[]> metadata, Dictionary<string, string[]> query, Location location, string culture);
         
         void EditMultipleListings(string[] listingIds, int? editorsRank, Dictionary<string, string> metadata, string appId);
+
+        List<string> CheckDuplicateSKUs(string appId, string profileId, string listingId, string[] skus);
     }
 }
