@@ -724,5 +724,12 @@ namespace classy.Services
 
             return new HttpResult(response, HttpStatusCode.OK);
         }
+
+        public object Post(CheckListingDuplicateSKUs request)
+        {
+            ListingManager.Environment = request.Environment;
+            var session = SessionAs<CustomUserSession>();
+            return ListingManager.CheckDuplicateSKUs(request.Environment.AppId, session.UserAuthId, request.ListingId, request.SKUs);
+        }
     }
 }

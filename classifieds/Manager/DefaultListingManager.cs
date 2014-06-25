@@ -394,10 +394,13 @@ namespace classy.Manager
         private void CopyFromTempImage(string appId, MediaFile image)
         {
             TempMediaFile tempFile = _tempMediaFileRepository.Get(appId, image.Key);
-            image.ContentType = tempFile.ContentType;
-            image.Type = tempFile.Type;
-            image.Url = tempFile.Url;
-            _tempMediaFileRepository.Delete(appId, tempFile.Id);
+            if (tempFile != null)
+            {
+                image.ContentType = tempFile.ContentType;
+                image.Type = tempFile.Type;
+                image.Url = tempFile.Url;
+                _tempMediaFileRepository.Delete(appId, tempFile.Id);
+            }
         }
 
         public ListingView UpdateListing(
@@ -458,13 +461,13 @@ namespace classy.Manager
                                 CopyFromTempImage(appId, image);
                             }
                             // join the files
-                            List<MediaFile> allImages = new List<MediaFile>(listing.PricingInfo.PurchaseOptions[i].MediaFiles);
+                            List<MediaFile> allImages = new List<MediaFile>(listing.PricingInfo.FindByVariation(option.VariantProperties).MediaFiles);
                             allImages.AddRange(files);
                             option.MediaFiles = allImages.ToArray();
                         }
                         else
                         {
-                            option.MediaFiles = listing.PricingInfo.PurchaseOptions[i].MediaFiles;
+                            option.MediaFiles = listing.PricingInfo.FindByVariation(option.VariantProperties).MediaFiles;
                         }
                     }
                 }
@@ -1256,6 +1259,11 @@ namespace classy.Manager
 
                 listing.ExternalMedia.Remove(file);
             }
+        }
+
+        public List<string> CheckDuplicateSKUs(string appId, string profileId, string listingId, string[] skus)
+        {
+            return ListingRepository.CheckDuplicateSKUs(appId, profileId, listingId,  skus);
         }
     }
 }
