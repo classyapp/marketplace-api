@@ -461,7 +461,15 @@ namespace classy.Manager
                                 CopyFromTempImage(appId, image);
                             }
                             // join the files
-                            List<MediaFile> allImages = new List<MediaFile>(listing.PricingInfo.FindByVariation(option.VariantProperties).MediaFiles);
+                            List<MediaFile> allImages = new List<MediaFile>();
+                            if (listing.PricingInfo.PurchaseOptions != null)
+                            {
+                                PurchaseOption po = listing.PricingInfo.FindByVariation(option.VariantProperties);
+                                if (po != null)
+                                {
+                                    allImages.AddRange(po.MediaFiles);
+                                }
+                            }
                             allImages.AddRange(files);
                             option.MediaFiles = allImages.ToArray();
                         }
