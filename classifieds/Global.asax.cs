@@ -64,7 +64,6 @@ namespace classy
                 var originWhitelist = new[] {
                     "http://local.homelab:8080",
                     "http://myhome-3.apphb.com",
-                    "https://myhome-3.apphb.com"
                     "https://myhome-3.apphb.com",
                     "http://www.homelab.com", 
                     "http://homelab.com",
