@@ -352,6 +352,7 @@ namespace classy.Manager
                     {
                         foreach (var po in pricingInfo.PurchaseOptions)
                         {
+                            if (string.IsNullOrWhiteSpace(po.UID)) { po.UID = Guid.NewGuid().ToString(); }
                             foreach (var image in po.MediaFiles)
                             {
                                 CopyFromTempImage(appId, image);
@@ -453,6 +454,7 @@ namespace classy.Manager
                     for (int i = 0; i < pricingInfo.PurchaseOptions.Count; i++)
                     {
                         var option = pricingInfo.PurchaseOptions[i];
+                        if (string.IsNullOrWhiteSpace(option.UID)) { option.UID = Guid.NewGuid().ToString(); }
                         if (option.MediaFiles != null)
                         {
                             MediaFile[] files = option.MediaFiles;
@@ -461,13 +463,25 @@ namespace classy.Manager
                                 CopyFromTempImage(appId, image);
                             }
                             // join the files
-                            List<MediaFile> allImages = new List<MediaFile>(listing.PricingInfo.FindByVariation(option.VariantProperties).MediaFiles);
+                            List<MediaFile> allImages = new List<MediaFile>();
+                            if (listing.PricingInfo.PurchaseOptions != null)
+                            {
+                                PurchaseOption po = listing.PricingInfo.PurchaseOptions.FirstOrDefault(p => p.UID == option.UID);
+                                if (po != null)
+                                {
+                                    allImages.AddRange(po.MediaFiles);
+                                }
+                            }
                             allImages.AddRange(files);
                             option.MediaFiles = allImages.ToArray();
                         }
                         else
                         {
-                            option.MediaFiles = listing.PricingInfo.FindByVariation(option.VariantProperties).MediaFiles;
+                            PurchaseOption po = listing.PricingInfo.PurchaseOptions.FirstOrDefault(p => p.UID == option.UID);
+                            if (po != null)
+                            {
+                                option.MediaFiles = po.MediaFiles;
+                            }
                         }
                     }
                 }

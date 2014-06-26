@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Linq;
 using System.Web;
 using classy.DTO.Request;
@@ -64,6 +64,7 @@ namespace classy
                 var originWhitelist = new[] {
                     "http://local.homelab:8080",
                     "http://myhome-3.apphb.com",
+                    "https://myhome-3.apphb.com"
                     "https://myhome-3.apphb.com",
                     "http://www.homelab.com", 
                     "http://homelab.com",
@@ -191,7 +192,7 @@ namespace classy
                 //.Add<RemovePermittedViewersFromCollection>("/collection/{CollectionId}/viewer", "DELETE") // remove view permissions
                 //.Add<UpdateCollection>("/collection/{CollectionId}", "PUT") // update collection details
                 .Add<GetCollectionById>("/collection/{CollectionId}", ApplyTo.Get | ApplyTo.Options) // get a collection by id
-                .Add<GetCollectionByProfileId>("/profile/{ProfileId}/collection/list/{CollectionType}", "GET") // get a collection by id
+                .Add<GetCollectionByProfileId>("/profile/{ProfileId}/collection/list/{CollectionType}", ApplyTo.Get | ApplyTo.Options) // get a collection by id
                 .Add<GetCollectionTranslation>("/collection/{CollectionID}/translation/{CultureCode}", "GET")
                 .Add<SetCollectionTranslation>("/collection/{CollectionId}/translation/{CultureCode}", "POST")
                 .Add<DeleteCollectionTranslation>("/collection/{CollectionID}/translation/{CultureCode}", "DELETE")

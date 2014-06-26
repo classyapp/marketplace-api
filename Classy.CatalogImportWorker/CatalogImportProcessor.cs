@@ -384,6 +384,7 @@ namespace Classy.CatalogImportWorker
                     else
                     {
                         PurchaseOption option = new PurchaseOption();
+                        option.UID = Guid.NewGuid().ToString();
                         option.SKU = productFields[(int)Columns.SKU_0];
                         option.Title = productFields[(int)Columns.Title_6];
                         option.ProductUrl = productFields[(int)Columns.ProductUrl_7];

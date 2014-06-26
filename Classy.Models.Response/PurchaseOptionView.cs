@@ -21,5 +21,6 @@ namespace Classy.Models.Response
         public string Depth { get; set; }
         public string ProductUrl { get; set; }
         public bool Available { get; set; }
+        public string UID { get; set; }
     }
 }
