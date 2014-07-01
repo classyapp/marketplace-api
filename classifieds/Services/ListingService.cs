@@ -65,7 +65,8 @@ namespace classy.Services
                     request.IncludeCommenterProfiles,
                     request.IncludeProfile,
                     request.IncludeFavoritedByProfiles,
-                    request.Environment.CultureCode);
+                    request.Environment.CultureCode,
+                    request.ForEdit);
 
                 return new HttpResult(listingView, HttpStatusCode.OK);
             }

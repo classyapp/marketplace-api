@@ -36,6 +36,19 @@ namespace classy.Manager
             bool includeFavoritedByProfiles,
             string culture);
 
+        ListingView GetListingById(
+            string appId,
+            string listingId,
+            bool logImpression,
+            bool includeDrafts,
+            bool includeComments,
+            bool formatCommentsAsHtml,
+            bool includeCommenterProfiles,
+            bool includeProfile,
+            bool includeFavoritedByProfiles,
+            string culture,
+            bool forEdit);
+
         /// <summary>
         /// 
         /// </summary>

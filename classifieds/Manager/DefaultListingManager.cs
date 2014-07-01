@@ -87,12 +87,30 @@ namespace classy.Manager
             bool includeProfile,
             bool includeFavoritedByProfiles,
             string culture)
+        {
+            return GetListingById(appId, listingId, logImpression, includeDrafts, includeComments, formatCommentsAsHtml, includeCommenterProfiles, includeProfile, includeFavoritedByProfiles, culture, false);
+        }
+
+        public ListingView GetListingById(
+            string appId,
+            string listingId,
+            bool logImpression,
+            bool includeDrafts,
+            bool includeComments,
+            bool formatCommentsAsHtml,
+            bool includeCommenterProfiles,
+            bool includeProfile,
+            bool includeFavoritedByProfiles,
+            string culture,
+            bool forEdit)
             // add parameter for editor's fields and only retrieve them when needed
         {
             // TODO: cache listings
             var listing = GetVerifiedListing(appId, listingId);
             listing.Translate(culture);
-            var listingView = listing.ToListingView(_currencyManager, Environment.CurrencyCode);
+            string currencyCode = Environment.CurrencyCode;
+            if (forEdit && listing.PricingInfo != null) currencyCode = listing.PricingInfo.CurrencyCode;
+            var listingView = listing.ToListingView(_currencyManager, currencyCode );
 
             if (logImpression)
             {
