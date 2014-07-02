@@ -14,7 +14,7 @@ namespace classy.Manager.Search
 {
     public interface ISearchSuggestionsProvider
     {
-        List<SearchSuggestion> GetListingsSuggestions(string q, string appId);
+        List<SearchSuggestion> GetListingsSuggestions(string q, string listingType, string appId);
         List<SearchSuggestion> GetProfilesSuggestions(string q, string appId);
         List<SearchSuggestion> KeywordSuggestions(string s, string language, string appId);
     }
@@ -32,7 +32,7 @@ namespace classy.Manager.Search
             _keywordsCollection = db.GetCollection<Keyword>();
         }
 
-        public List<SearchSuggestion> GetListingsSuggestions(string q, string appId)
+        public List<SearchSuggestion> GetListingsSuggestions(string q, string listingType, string appId)
         {
             // We're using a regular search here with an ngram tokenizer
             // since using the elasticsearch 'suggest' endpoint will always
@@ -46,7 +46,9 @@ namespace classy.Manager.Search
             var searchDescriptor = new SearchDescriptor<ListingIndexDto>()
                 .Query(
                     qq => qq.QueryString(
-                        qs => qs.OnField(f => f.AnalyzedTitle).Query(q)));
+                        qs => qs.OnField(f => f.AnalyzedTitle).Query(q)))
+                .Filter(
+                    f => f.Term(t => t.ListingType, listingType));
 
             var response = client.Search<ListingIndexDto>(_ => searchDescriptor);
 
@@ -57,7 +59,7 @@ namespace classy.Manager.Search
             foreach (var suggestion in response.Documents)
             {
                 suggestions.Add(new SearchSuggestion {
-                    Key = suggestion.Title,
+                    Key = suggestion.Id,
                     Value = suggestion.Title
                 });
             }

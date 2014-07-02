@@ -122,8 +122,8 @@ namespace classy.Services
         public object Get(SearchSuggestionsRequest request)
         {
             var suggestions = new List<SearchSuggestion>();
-            if (request.EntityType == "listing")
-                suggestions = SearchSuggestionsProvider.GetListingsSuggestions(request.q, request.Environment.AppId);
+            if (request.EntityType == "listing" || request.EntityType == "product")
+                suggestions = SearchSuggestionsProvider.GetListingsSuggestions(request.q, request.EntityType, request.Environment.AppId);
             else if (request.EntityType == "profile")
                 suggestions = SearchSuggestionsProvider.GetProfilesSuggestions(request.q, request.Environment.AppId);
 
