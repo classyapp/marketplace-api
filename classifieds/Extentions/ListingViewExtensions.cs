@@ -18,7 +18,7 @@ namespace classy
             to.HasPricingInfo = from.PricingInfo != null;
             if (to.HasPricingInfo)
             {
-                to.PricingInfo = from.PricingInfo.ToPricingInfoView(currencyManager.GetRate(from.PricingInfo.CurrencyCode, currencyCode, 0.035));
+                to.PricingInfo = from.PricingInfo.ToPricingInfoView(currencyManager.GetRate(from.PricingInfo.CurrencyCode, currencyCode, (decimal) 0.035));
             }
             to.HasContactInfo = from.ContactInfo != null;
             if (to.HasContactInfo)

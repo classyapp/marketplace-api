@@ -8,14 +8,14 @@ namespace Classy.Models
     public class SubTransaction
     {
         public DateTime Created { get; set; }
-        public double Amount { get; set; }
+        public decimal Amount { get; set; }
         public string GatewayRefId { get; set; }
     }
 
     [MongoCollection(Name = "transactions")]
     public class Transaction : BaseObject
     {
-        public double Amount { get; set; }
+        public decimal Amount { get; set; }
         public string Currency { get; set; }
         public string GatewayRefId { get; set; }
         public SubTransaction Capture { get; set; }

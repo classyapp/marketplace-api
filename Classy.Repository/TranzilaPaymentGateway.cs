@@ -1,8 +1,5 @@
 ﻿using Classy.Models;
-using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Web;
 
 namespace Classy.Repository
 {
@@ -26,7 +23,7 @@ namespace Classy.Repository
             else return true;
         }
 
-        public Transaction Charge(string appId, double amount, string currency, PaymentMethod paymentMethod, bool doCapture)
+        public Transaction Charge(string appId, decimal amount, string currency, PaymentMethod paymentMethod, bool doCapture)
         {
             // authorize the amount in tranzilla
             var gatewayResponse =  new PaymentGatewayResponse
@@ -68,7 +65,7 @@ namespace Classy.Repository
             return transaction;
         }
 
-        public Transaction Refund(string appId, string transactionId, double amount)
+        public Transaction Refund(string appId, string transactionId, decimal amount)
         {
             var transaction = TransactionRepository.GetById(appId, transactionId);
             if (transaction == null) throw new KeyNotFoundException("invalid transaction");

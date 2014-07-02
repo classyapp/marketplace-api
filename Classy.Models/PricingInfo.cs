@@ -15,7 +15,7 @@ namespace Classy.Models
         public string CurrencyCode { get; set; }
         public PurchaseOption BaseOption { get; set; }
 
-        public double GetPriceForSKU(string sku)
+        public decimal GetPriceForSKU(string sku)
         {
             var option = PurchaseOptions.SingleOrDefault(x => x.SKU == sku);
             if (option != null) return option.Price;

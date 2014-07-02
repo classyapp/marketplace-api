@@ -1,14 +1,12 @@
 ﻿﻿using System;
 using System.Collections.Generic;
-using System.Diagnostics;
-using System.IO;
+﻿using System.IO;
 using System.Linq;
 using classy.Manager;
 using Classy.Models;
 using Classy.Repository;
 using Classy.Interfaces.Managers;
-using System.Net;
-using System.Threading;
+﻿using System.Threading;
 
 namespace Classy.CatalogImportWorker
 {
@@ -233,7 +231,7 @@ namespace Classy.CatalogImportWorker
                 ValidateStyle(productData[0]);
                 ValidateCategories(productData[0]);
 
-                Dictionary<string, int> variationKeys = new Dictionary<string, int>();
+                var variationKeys = new Dictionary<string, int>();
                 for (int i = 1; i < productData.Count; i++)
                 {
                     ValidateMandatoryFields(productData[i], new Columns[] { 
@@ -349,10 +347,10 @@ namespace Classy.CatalogImportWorker
                 listing.PricingInfo.BaseOption.Title = productFields[(int)Columns.Title_6];
                 listing.PricingInfo.BaseOption.ProductUrl = productFields[(int)Columns.ProductUrl_7];
                 listing.PricingInfo.BaseOption.Content = productFields[(int)Columns.Description_8];
-                listing.PricingInfo.BaseOption.Quantity = double.Parse(productFields[(int)Columns.Quantity_11]);
-                listing.PricingInfo.BaseOption.Price = double.Parse(productFields[(int)Columns.Price_12]);
+                listing.PricingInfo.BaseOption.Quantity = Int32.Parse(productFields[(int)Columns.Quantity_11]);
+                listing.PricingInfo.BaseOption.Price = Int32.Parse(productFields[(int)Columns.Price_12]);
                 if (!string.IsNullOrWhiteSpace(productFields[(int)Columns.MSRP_13]))
-                    listing.PricingInfo.BaseOption.CompareAtPrice = double.Parse(productFields[(int)Columns.MSRP_13]);
+                    listing.PricingInfo.BaseOption.CompareAtPrice = Decimal.Parse(productFields[(int)Columns.MSRP_13]);
                 listing.PricingInfo.BaseOption.Width = productFields[(int)Columns.Width_21];
                 listing.PricingInfo.BaseOption.Depth = productFields[(int)Columns.Depth_22];
                 listing.PricingInfo.BaseOption.Height = productFields[(int)Columns.Height_23];
@@ -370,9 +368,9 @@ namespace Classy.CatalogImportWorker
                     {
                         listing.PricingInfo.BaseOption.SKU = productFields[(int)Columns.SKU_0];
                         if (!string.IsNullOrWhiteSpace(productFields[(int)Columns.Price_12]))
-                            listing.PricingInfo.BaseOption.Price = double.Parse(productFields[(int)Columns.Price_12]);
+                            listing.PricingInfo.BaseOption.Price = Int32.Parse(productFields[(int)Columns.Price_12]);
                         if (!string.IsNullOrWhiteSpace(productFields[(int)Columns.MSRP_13]))
-                            listing.PricingInfo.BaseOption.CompareAtPrice = double.Parse(productFields[(int)Columns.MSRP_13]);
+                            listing.PricingInfo.BaseOption.CompareAtPrice = Int32.Parse(productFields[(int)Columns.MSRP_13]);
                         if (!string.IsNullOrWhiteSpace(productFields[(int)Columns.Width_21]))
                             listing.PricingInfo.BaseOption.Width = productFields[(int)Columns.Width_21];
                         if (!string.IsNullOrWhiteSpace(productFields[(int)Columns.Depth_22]))
@@ -383,15 +381,16 @@ namespace Classy.CatalogImportWorker
                     }
                     else
                     {
-                        PurchaseOption option = new PurchaseOption();
-                        option.UID = Guid.NewGuid().ToString();
-                        option.SKU = productFields[(int)Columns.SKU_0];
-                        option.Title = productFields[(int)Columns.Title_6];
-                        option.ProductUrl = productFields[(int)Columns.ProductUrl_7];
-                        option.Content = productFields[(int)Columns.Description_8];
-                        option.Price = double.Parse(productFields[(int)Columns.Price_12]);
+                        var option = new PurchaseOption {
+                            UID = Guid.NewGuid().ToString(),
+                            SKU = productFields[(int) Columns.SKU_0],
+                            Title = productFields[(int) Columns.Title_6],
+                            ProductUrl = productFields[(int) Columns.ProductUrl_7],
+                            Content = productFields[(int) Columns.Description_8],
+                            Price = Int32.Parse(productFields[(int) Columns.Price_12])
+                        };
                         if (!string.IsNullOrWhiteSpace(productFields[(int)Columns.MSRP_13]))
-                            option.CompareAtPrice = double.Parse(productFields[(int)Columns.MSRP_13]);
+                            option.CompareAtPrice = Int32.Parse(productFields[(int)Columns.MSRP_13]);
                         option.Width = productFields[(int)Columns.Width_21];
                         option.Depth = productFields[(int)Columns.Depth_22];
                         option.Height = productFields[(int)Columns.Height_23];
@@ -408,10 +407,10 @@ namespace Classy.CatalogImportWorker
                             option.VariantProperties.Add("Size", productFields[(int)Columns.Size_19]);
 
                         // Images
-                        List<MediaFile> mediaFiles = new List<MediaFile>();
-                        for (int j = (int)Columns.Image_27; j <= (int)Columns.Image5_31; j++)
+                        var mediaFiles = new List<MediaFile>();
+                        for (var j = (int)Columns.Image_27; j <= (int)Columns.Image5_31; j++)
                         {
-                            string url = productFields[j];
+                            var url = productFields[j];
                             if (!string.IsNullOrWhiteSpace(url))
                             {
                                 mediaFiles.Add(new MediaFile { ContentType = "image/jpeg", Key = Guid.NewGuid().ToString(), Type = MediaFileType.Image, Url = url });
@@ -427,7 +426,7 @@ namespace Classy.CatalogImportWorker
 
         private void UploadProductImages(Listing product)
         {
-            for (int i = 0; i < product.ExternalMedia.Count; i++)
+            for (var i = 0; i < product.ExternalMedia.Count; i++)
             {
                 SaveImageFromUrl(product.ExternalMedia[i].Url, product.ExternalMedia[i].Key, i);
             }
@@ -450,7 +449,7 @@ namespace Classy.CatalogImportWorker
         {
             WebClientWithTimeout wc = null;
             byte[] content;
-            bool errorOccured = false;
+            var errorOccured = false;
 
             try
             {

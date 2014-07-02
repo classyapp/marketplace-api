@@ -33,9 +33,9 @@ namespace Classy.Models
     {
         public string SKU { get; set; }
         public int Quantity { get; set; }
-        public double Price { get; set; }
-        public double Shipping { get; set; }
-        public double Tax { get; set; }
+        public decimal Price { get; set; }
+        public decimal Shipping { get; set; }
+        public decimal Tax { get; set; }
     }
 
     [MongoCollection(Name = "orders")]
@@ -52,10 +52,10 @@ namespace Classy.Models
         public PhysicalAddress ShippingAddress { get; set; }
         public IList<OrderItem> OrderItems { get; set; }
         public string TransactionId { get; set; }
-        public double TotalItemPrice { get; set; }
-        public double TotalShipping { get; set; }
-        public double TotalTax { get; set; }
-        public double TotalAmount { get; set; }
+        public decimal TotalItemPrice { get; set; }
+        public decimal TotalShipping { get; set; }
+        public decimal TotalTax { get; set; }
+        public decimal TotalAmount { get; set; }
         public bool IsCancelled { get; set; }
         public ShippingStatus ShippingStatus { get; set; }
         public SettlementStatus SettlementStatus { get; set; }
