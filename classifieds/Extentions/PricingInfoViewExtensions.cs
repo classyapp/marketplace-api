@@ -1,4 +1,5 @@
-﻿using Classy.Models;
+﻿using classy.Extentions;
+using Classy.Models;
 using Classy.Models.Response;
 using System.Collections.Generic;
 using System.Linq;
@@ -14,7 +15,7 @@ namespace classy
             to.BaseOption = from.BaseOption.TranslateTo<PurchaseOptionView>();
             if (to.BaseOption.CompareAtPrice.HasValue) to.BaseOption.CompareAtPrice = to.BaseOption.CompareAtPrice *= adjustRate;
             to.BaseOption.Price *= adjustRate;
-            to.BaseOption.MediaFiles = from.BaseOption.MediaFiles.Select(m => m.TranslateTo<MediaFileView>()).ToArray();
+            to.BaseOption.MediaFiles = from.BaseOption.MediaFiles.EmptyIfNull().Select(m => m.TranslateTo<MediaFileView>()).ToArray();
             if (from.PurchaseOptions != null)
             {
                 if (to.PurchaseOptions == null) to.PurchaseOptions = new List<PurchaseOptionView>();
