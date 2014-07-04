@@ -189,6 +189,7 @@ namespace Classy.Repository
                     );
                 var update = new UpdateBuilder<Collection>();
                 if (counters.HasFlag(CollectionCounters.Comments)) update.Inc(x => x.CommentCount, value);
+                if (counters.HasFlag(CollectionCounters.Views)) update.Inc(x => x.ViewCount, value);
                 CollectionsCollection.Update(query, update);
             }
             catch (MongoException mex)

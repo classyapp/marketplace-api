@@ -774,15 +774,14 @@ namespace classy.Manager
                 if (increaseViewCounter)
                 {
                     int count = 0;
-                    TripleStore.LogActivity(appId, SecurityContext.AuthenticatedProfileId, ActivityPredicate.VIEW_COLLECTION, collectionId, null, ref count);
-                    //CollectionRepository.IncreaseCounter(appId, collectionId);
+                    TripleStore.LogActivity(appId, SecurityContext.IsAuthenticated ? SecurityContext.AuthenticatedProfileId : "guest", ActivityPredicate.VIEW_COLLECTION, collectionId, null, ref count);
+                    CollectionRepository.IncreaseCounter(collectionId, appId, CollectionCounters.Views, 1);
+
                     if (increaseViewCounterOnListings)
                     {
                         ListingRepository.IncreaseCounter(listingIds, appId, ListingCounters.Views, 1);
                         _listingIndexer.Increment(listingIds, appId, l => l.ViewCount);
                     }
-                    //    var update = Update<Listing>.Inc(x => x.ViewCount, 1);
-                    //    ListingsCollection.Update(query, update, new MongoUpdateOptions { Flags = UpdateFlags.Multi });
                 }
 
                 if (includeComments)

@@ -11,7 +11,8 @@ namespace Classy.Repository
     public enum CollectionCounters
     {
         None = 0,
-        Comments = 1
+        Comments = 1,
+        Views = 2
     }
 
     /// <summary>
