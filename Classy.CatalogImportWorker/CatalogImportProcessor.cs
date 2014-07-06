@@ -190,8 +190,8 @@ namespace Classy.CatalogImportWorker
             if (allLines.Length <= 1)
                 return null;
 
-            List<List<string>> data = new List<List<string>>();
-            List<string> currentProduct = new List<string>();
+            var data = new List<List<string>>();
+            var currentProduct = new List<string>();
             for (int i = 1; i < allLines.Length; i++)
             {
                 string[] lineData = allLines[i].Split(';');
@@ -302,12 +302,12 @@ namespace Classy.CatalogImportWorker
 
         private Listing BuildListing(List<string> productData, Job job, string culture, string currency)
         {
-            Listing listing = new Listing();
+            var listing = new Listing();
             listing.ListingType = "Product";
             listing.AppId = job.AppId;
             listing.ProfileId = job.ProfileId;
             listing.DefaultCulture = culture;
-            listing.PricingInfo = new PricingInfo() { CurrencyCode = currency };
+            listing.PricingInfo = new PricingInfo { CurrencyCode = currency };
             listing.IsPublished = true;
             listing.Metadata.Add("JobId", job.Id);
 
@@ -348,7 +348,7 @@ namespace Classy.CatalogImportWorker
                 listing.PricingInfo.BaseOption.ProductUrl = productFields[(int)Columns.ProductUrl_7];
                 listing.PricingInfo.BaseOption.Content = productFields[(int)Columns.Description_8];
                 listing.PricingInfo.BaseOption.Quantity = Int32.Parse(productFields[(int)Columns.Quantity_11]);
-                listing.PricingInfo.BaseOption.Price = Int32.Parse(productFields[(int)Columns.Price_12]);
+                listing.PricingInfo.BaseOption.Price = Decimal.Parse(productFields[(int)Columns.Price_12]);
                 if (!string.IsNullOrWhiteSpace(productFields[(int)Columns.MSRP_13]))
                     listing.PricingInfo.BaseOption.CompareAtPrice = Decimal.Parse(productFields[(int)Columns.MSRP_13]);
                 listing.PricingInfo.BaseOption.Width = productFields[(int)Columns.Width_21];
@@ -368,7 +368,7 @@ namespace Classy.CatalogImportWorker
                     {
                         listing.PricingInfo.BaseOption.SKU = productFields[(int)Columns.SKU_0];
                         if (!string.IsNullOrWhiteSpace(productFields[(int)Columns.Price_12]))
-                            listing.PricingInfo.BaseOption.Price = Int32.Parse(productFields[(int)Columns.Price_12]);
+                            listing.PricingInfo.BaseOption.Price = Decimal.Parse(productFields[(int)Columns.Price_12]);
                         if (!string.IsNullOrWhiteSpace(productFields[(int)Columns.MSRP_13]))
                             listing.PricingInfo.BaseOption.CompareAtPrice = Int32.Parse(productFields[(int)Columns.MSRP_13]);
                         if (!string.IsNullOrWhiteSpace(productFields[(int)Columns.Width_21]))
@@ -387,7 +387,7 @@ namespace Classy.CatalogImportWorker
                             Title = productFields[(int) Columns.Title_6],
                             ProductUrl = productFields[(int) Columns.ProductUrl_7],
                             Content = productFields[(int) Columns.Description_8],
-                            Price = Int32.Parse(productFields[(int) Columns.Price_12])
+                            Price = Decimal.Parse(productFields[(int) Columns.Price_12])
                         };
                         if (!string.IsNullOrWhiteSpace(productFields[(int)Columns.MSRP_13]))
                             option.CompareAtPrice = Int32.Parse(productFields[(int)Columns.MSRP_13]);
