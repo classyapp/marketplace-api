@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Web;
-using Classy.Interfaces.Managers;
+﻿using Classy.Interfaces.Managers;
 using Classy.Repository;
 
 namespace classy.Manager
@@ -16,16 +12,16 @@ namespace classy.Manager
             _currencyRepository = currencyRepository;
         }
 
-        public double GetRate(string fromCurrency, string toCurrency, double adjustPercentage)
+        public decimal GetRate(string fromCurrency, string toCurrency, decimal adjustPercentage)
         {
             if (fromCurrency == toCurrency)
-                return 1.0;
+                return (decimal)1.0;
 
-            double? rate = _currencyRepository.GetExchangeRate(fromCurrency, toCurrency);
+            decimal? rate = _currencyRepository.GetExchangeRate(fromCurrency, toCurrency);
             if (rate.HasValue)
                 return rate.Value * (1 + adjustPercentage);
 
-            return 1.0;
+            return (decimal) 1.0;
         }
     }
 }

@@ -1,8 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using classy.Manager;
 using Classy.Interfaces.Managers;
 using Classy.Models;
@@ -32,7 +29,7 @@ namespace Classy.CatalogImportWorker
                 {
                     System.Diagnostics.Trace.WriteLine("Checking for pending jobs.");
                     // get next job
-                    Job job = _jobsCollection.Find(Query.And(Query<Job>.EQ(j => j.AppId, "v1.0"), Query<Job>.EQ(j => j.Status, "Not Started"))).OrderBy(j => j.Created)
+                    var job = _jobsCollection.Find(Query.And(Query<Job>.EQ(j => j.AppId, "v1.0"), Query<Job>.EQ(j => j.Status, "Not Started"))).OrderBy(j => j.Created)
                         .FirstOrDefault();
 
                     // Import Code goes here

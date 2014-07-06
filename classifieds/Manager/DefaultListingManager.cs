@@ -87,12 +87,30 @@ namespace classy.Manager
             bool includeProfile,
             bool includeFavoritedByProfiles,
             string culture)
+        {
+            return GetListingById(appId, listingId, logImpression, includeDrafts, includeComments, formatCommentsAsHtml, includeCommenterProfiles, includeProfile, includeFavoritedByProfiles, culture, false);
+        }
+
+        public ListingView GetListingById(
+            string appId,
+            string listingId,
+            bool logImpression,
+            bool includeDrafts,
+            bool includeComments,
+            bool formatCommentsAsHtml,
+            bool includeCommenterProfiles,
+            bool includeProfile,
+            bool includeFavoritedByProfiles,
+            string culture,
+            bool forEdit)
             // add parameter for editor's fields and only retrieve them when needed
         {
             // TODO: cache listings
             var listing = GetVerifiedListing(appId, listingId);
             listing.Translate(culture);
-            var listingView = listing.ToListingView(_currencyManager, Environment.CurrencyCode);
+            string currencyCode = Environment.CurrencyCode;
+            if (forEdit && listing.PricingInfo != null) currencyCode = listing.PricingInfo.CurrencyCode;
+            var listingView = listing.ToListingView(_currencyManager, currencyCode );
 
             if (logImpression)
             {
@@ -756,15 +774,14 @@ namespace classy.Manager
                 if (increaseViewCounter)
                 {
                     int count = 0;
-                    TripleStore.LogActivity(appId, SecurityContext.AuthenticatedProfileId, ActivityPredicate.VIEW_COLLECTION, collectionId, null, ref count);
-                    //CollectionRepository.IncreaseCounter(appId, collectionId);
+                    TripleStore.LogActivity(appId, SecurityContext.IsAuthenticated ? SecurityContext.AuthenticatedProfileId : "guest", ActivityPredicate.VIEW_COLLECTION, collectionId, null, ref count);
+                    CollectionRepository.IncreaseCounter(collectionId, appId, CollectionCounters.Views, 1);
+
                     if (increaseViewCounterOnListings)
                     {
                         ListingRepository.IncreaseCounter(listingIds, appId, ListingCounters.Views, 1);
                         _listingIndexer.Increment(listingIds, appId, l => l.ViewCount);
                     }
-                    //    var update = Update<Listing>.Inc(x => x.ViewCount, 1);
-                    //    ListingsCollection.Update(query, update, new MongoUpdateOptions { Flags = UpdateFlags.Multi });
                 }
 
                 if (includeComments)

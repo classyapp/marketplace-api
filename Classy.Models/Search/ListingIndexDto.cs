@@ -27,7 +27,11 @@ namespace Classy.Models.Search
         public string[] Keywords { get; set; } // comes from SearchableKeywords
 
         [ElasticProperty(Index = FieldIndexOption.not_analyzed)]
+        public string[] Categories { get; set; }
+        [ElasticProperty(Index = FieldIndexOption.not_analyzed)]
         public string[] BoostedCategories { get; set; }
+
+        public decimal Price { get; set; }
 
         public int EditorRank { get; set; }
 

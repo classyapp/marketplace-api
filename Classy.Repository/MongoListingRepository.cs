@@ -22,8 +22,8 @@ namespace Classy.Repository
 
         public Listing GetById(string listingId, string appId, bool includeDrafts, string culture)
         {
-            var listings = GetById(new string[] { listingId }, appId, includeDrafts, culture);
-            if (listings == null || listings.Count() == 0) return null;
+            var listings = GetById(new[] { listingId }, appId, includeDrafts, culture);
+            if (listings == null || !listings.Any()) return null;
             return listings[0];
         }
 

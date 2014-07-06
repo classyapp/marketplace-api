@@ -1,19 +1,19 @@
 ﻿using Classy.Models;
 using Classy.Models.Response;
-using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Web;
 using ServiceStack.Common;
 
 namespace classy
 {
     public static class PricingInfoViewExtentions
     {
-        public static PricingInfoView ToPricingInfoView(this PricingInfo from, double adjustRate)
+        public static PricingInfoView ToPricingInfoView(this PricingInfo from, decimal adjustRate)
         {
             var to = from.TranslateTo<PricingInfoView>();
             to.BaseOption = from.BaseOption.TranslateTo<PurchaseOptionView>();
+            if (to.BaseOption.CompareAtPrice.HasValue) to.BaseOption.CompareAtPrice = to.BaseOption.CompareAtPrice *= adjustRate;
+            to.BaseOption.Price *= adjustRate;
             to.BaseOption.MediaFiles = from.BaseOption.MediaFiles.Select(m => m.TranslateTo<MediaFileView>()).ToArray();
             if (from.PurchaseOptions != null)
             {
