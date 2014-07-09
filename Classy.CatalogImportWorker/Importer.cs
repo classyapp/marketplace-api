@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Classy.Interfaces.Search;
 using classy.Manager;
 using Classy.Interfaces.Managers;
 using Classy.Models;
@@ -46,7 +47,8 @@ namespace Classy.CatalogImportWorker
                             _container.Resolve<ICurrencyManager>(),
                             _container.Resolve<IProfileRepository>(),
                             _container.Resolve<ILocalizationRepository>(),
-                            _container.Resolve<IAppManager>()
+                            _container.Resolve<IAppManager>(),
+                            _container.Resolve<IIndexer<Listing>>()
                             ).Process(job);
                     }
                     else

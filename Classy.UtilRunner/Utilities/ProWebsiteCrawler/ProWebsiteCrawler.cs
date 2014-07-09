@@ -1,6 +1,4 @@
-﻿using Amazon.S3;
-using Amazon.S3.Model;
-using classy.Manager;
+﻿using Classy.Interfaces.Search;
 using Classy.Models;
 using Classy.Repository;
 using Funq;
@@ -11,13 +9,10 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Net;
-using System.Text;
-using System.Threading.Tasks;
 using Abot.Crawler;
 using Abot.Poco;
 using System.Drawing;
 using System.Drawing.Imaging;
-using System.Web;
 
 namespace Classy.UtilRunner.Utilities.ProWebsiteCrawler
 {
@@ -39,6 +34,7 @@ namespace Classy.UtilRunner.Utilities.ProWebsiteCrawler
         private const string UserAgentString = "Googlebot/2.1 (+http://www.googlebot.com/bot.html)";
         private IDictionary<string, IList<ProfileImage>> ProfileImages;
         private IDictionary<string, string> Profiles;
+        private readonly IIndexer<Listing> _listingIndexer; 
 
         public ProWebsiteCrawler(Container container)
         {
@@ -49,6 +45,7 @@ namespace Classy.UtilRunner.Utilities.ProWebsiteCrawler
             _collectionRepo = container.TryResolve<ICollectionRepository>();
             ProfileImages = new Dictionary<string, IList<ProfileImage>>();
             Profiles = new Dictionary<string, string>();
+            _listingIndexer = container.Resolve<IIndexer<Listing>>();
         }
 
         public StatusCode Run(string[] args)
@@ -240,6 +237,7 @@ namespace Classy.UtilRunner.Utilities.ProWebsiteCrawler
                                 ExternalMedia = new List<MediaFile> { mediaFile }
                             };
                             var id = _listingRepo.Insert(listing);
+                            _listingIndexer.Index(new [] {listing}, AppId);
 
                             // add listing to collection
                             collection.IncludedListings.Add(new IncludedListing

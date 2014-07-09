@@ -2,7 +2,8 @@
 using System.Collections.Generic;
 ﻿using System.IO;
 using System.Linq;
-using classy.Manager;
+﻿using Classy.Interfaces.Search;
+﻿using classy.Manager;
 using Classy.Models;
 using Classy.Repository;
 using Classy.Interfaces.Managers;
@@ -60,13 +61,15 @@ namespace Classy.CatalogImportWorker
         private readonly ICurrencyManager _currencyManager; // Currencies
         private readonly IProfileRepository _profileRepository; // Profiles
         private readonly ILocalizationRepository _localizationRepository; // Localization
+        private readonly IIndexer<Listing> _listingIndexer;
         private readonly IAppManager _appManager;
 
         private App _app;
         private IList<ListItem> _styles;
 
         public CatalogImportProcessor(IStorageRepository storageRepo, IListingRepository listingRepo, IJobRepository jobRepo,
-            ICurrencyManager currencyManager, IProfileRepository profileRepository, ILocalizationRepository localizationRepo, IAppManager appManager)
+            ICurrencyManager currencyManager, IProfileRepository profileRepository, ILocalizationRepository localizationRepo, IAppManager appManager,
+            IIndexer<Listing> listingIndexer)
         {
             _storageRepository = storageRepo;
             _listingRepository = listingRepo;
@@ -75,6 +78,7 @@ namespace Classy.CatalogImportWorker
             _profileRepository = profileRepository;
             _localizationRepository = localizationRepo;
             _appManager = appManager;
+            _listingIndexer = listingIndexer;
         }
 
         public void Process(Job job)
@@ -140,6 +144,7 @@ namespace Classy.CatalogImportWorker
 
                         // Save listing
                         _listingRepository.Insert(product);
+                        _listingIndexer.Index(new[] { product }, job.AppId);
                         job.Succeeded++;
                     }
                     catch (ImportException ex)

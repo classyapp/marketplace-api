@@ -215,20 +215,6 @@ namespace Classy.Repository
             }
         }
 
-        public void IncreaseFavoriteCounter(string listingId, string appId, int value)
-        {
-            try
-            {
-                ListingsCollection.Update(Query.And(
-                    Query<Listing>.EQ(x => x.Id, listingId),
-                    Query<Listing>.EQ(x => x.AppId, appId)), Update<Listing>.Inc(x => x.FavoriteCount, value));
-            }
-            catch (MongoException mex)
-            {
-                throw;
-            }
-        }
-
         public void AddHashtags(string listingId, string appId, string[] hashtags)
         {
             try

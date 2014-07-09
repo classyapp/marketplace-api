@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using classy.DTO.Request;
 using Classy.Interfaces.Search;
+using classy.Manager.Search;
 using Classy.Models;
 using Classy.Models.Response;
 using Classy.Repository;
@@ -399,6 +400,7 @@ namespace classy.Manager
                 var profile = GetVerifiedProfile(appId, SecurityContext.AuthenticatedProfileId, null);
                 listing.DefaultCulture = profile.DefaultCulture;
                 listing.Id = ListingRepository.Insert(listing);
+                _listingIndexer.Index(listing, appId);
             }
             else
             {
@@ -1113,6 +1115,7 @@ namespace classy.Manager
                 }
                 listing.Translations[listingTranslation.Culture] = listingTranslation;
                 ListingRepository.Update(listing);
+                _listingIndexer.Index(new[] {listing}, appId);
             }
         }
 
@@ -1125,6 +1128,7 @@ namespace classy.Manager
                 {
                     listing.Translations.Remove(culture);
                     ListingRepository.Update(listing);
+                    _listingIndexer.RemoveFromIndex(listing, appId);
                 }
             }
         }
