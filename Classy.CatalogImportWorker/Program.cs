@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using classy.Extensions;
-using Classy.Repository;
+﻿using classy.Extensions;
 
 namespace Classy.CatalogImportWorker
 {
@@ -13,11 +7,11 @@ namespace Classy.CatalogImportWorker
         static void Main(string[] args)
         {
             // set up container
-            Funq.Container _container = new Funq.Container();
+            var _container = new Funq.Container();
             _container.WireUp();
 
             // import jobs
-            Importer importer = new Importer(_container);
+            var importer = new Importer(_container);
             importer.Run();
         }
     }

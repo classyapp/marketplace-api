@@ -2,12 +2,15 @@
 using System.Collections.Generic;
 using System.Linq;
 using Classy.Models.Attributes;
+using Classy.Models.Serializers;
+using MongoDB.Bson.Serialization.Attributes;
 
 namespace Classy.Models
 {
     public class SubTransaction
     {
         public DateTime Created { get; set; }
+        [BsonSerializer(typeof(MongoDbMoneyFieldSerializer))]
         public decimal Amount { get; set; }
         public string GatewayRefId { get; set; }
     }
@@ -15,6 +18,7 @@ namespace Classy.Models
     [MongoCollection(Name = "transactions")]
     public class Transaction : BaseObject
     {
+        [BsonSerializer(typeof(MongoDbMoneyFieldSerializer))]
         public decimal Amount { get; set; }
         public string Currency { get; set; }
         public string GatewayRefId { get; set; }
