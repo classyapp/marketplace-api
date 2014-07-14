@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using classy.DTO.Request;
 using Classy.Interfaces.Search;
+using classy.Manager.Search;
 using Classy.Models;
 using Classy.Models.Response;
 using Classy.Repository;
@@ -209,6 +210,7 @@ namespace classy.Manager
         public SearchResultsView<ListingView> SearchListings(
             string appId,
             string[] tags,
+            string[] categories,
             string[] listingTypes,
             IDictionary<string, string[]> metadata,
             double? priceMin,
@@ -224,7 +226,7 @@ namespace classy.Manager
             long count = 0;
 
             // TODO: cache listings
-            var listings = ListingRepository.Search(tags, listingTypes, metadata, null, priceMin, priceMax, location, appId, false, false, page, pageSize, ref count, sortMethod, culture);
+            var listings = ListingRepository.Search(tags, categories, listingTypes, metadata, null, priceMin, priceMax, location, appId, false, false, page, pageSize, ref count, sortMethod, culture);
             var comments = includeComments ?
                 CommentRepository.GetByListingIds(listings.Select(x => x.Id).AsEnumerable(), formatCommentsAsHtml) : null;
             var listingViews = new List<ListingView>();
@@ -398,6 +400,7 @@ namespace classy.Manager
                 var profile = GetVerifiedProfile(appId, SecurityContext.AuthenticatedProfileId, null);
                 listing.DefaultCulture = profile.DefaultCulture;
                 listing.Id = ListingRepository.Insert(listing);
+                _listingIndexer.Index(listing, appId);
             }
             else
             {
@@ -1111,6 +1114,7 @@ namespace classy.Manager
                 }
                 listing.Translations[listingTranslation.Culture] = listingTranslation;
                 ListingRepository.Update(listing);
+                _listingIndexer.Index(new[] {listing}, appId);
             }
         }
 
@@ -1123,6 +1127,7 @@ namespace classy.Manager
                 {
                     listing.Translations.Remove(culture);
                     ListingRepository.Update(listing);
+                    _listingIndexer.RemoveFromIndex(listing, appId);
                 }
             }
         }
@@ -1233,7 +1238,7 @@ namespace classy.Manager
             if (metadata != null || query != null)
             {
                 long count = 0;
-                data.SearchResults = ListingRepository.Search(null, new string[] { listing.ListingType }, 
+                data.SearchResults = ListingRepository.Search(null, null, new[] { listing.ListingType }, 
                     metadata, query,
                     null, null, location, appId, false, false, 0, 0, ref count, SortMethod.Popularity, culture).ToListingViewList(culture, _currencyManager, Environment.CurrencyCode);
                 if (data.SearchResults != null)

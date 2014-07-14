@@ -215,20 +215,6 @@ namespace Classy.Repository
             }
         }
 
-        public void IncreaseFavoriteCounter(string listingId, string appId, int value)
-        {
-            try
-            {
-                ListingsCollection.Update(Query.And(
-                    Query<Listing>.EQ(x => x.Id, listingId),
-                    Query<Listing>.EQ(x => x.AppId, appId)), Update<Listing>.Inc(x => x.FavoriteCount, value));
-            }
-            catch (MongoException mex)
-            {
-                throw;
-            }
-        }
-
         public void AddHashtags(string listingId, string appId, string[] hashtags)
         {
             try
@@ -248,9 +234,8 @@ namespace Classy.Repository
             throw new NotImplementedException();
         }
 
-        public IList<Listing> Search(string[] tags, string[] listingTypes, IDictionary<string, string[]> metadata,
-            IDictionary<string, string[]> objectQuery, 
-            double? priceMin, double? priceMax, Location location, string appId,
+        public IList<Listing> Search(string[] tags, string[] categories, string[] listingTypes, IDictionary<string, string[]> metadata,
+            IDictionary<string, string[]> objectQuery, double? priceMin, double? priceMax, Location location, string appId,
             bool includeDrafts, bool increaseViewCounter, int page, int pageSize, ref long count, SortMethod sortMethod, string culture)
         {
             // set sort order
@@ -295,6 +280,14 @@ namespace Classy.Repository
                 tagQueries.Add(Query.In("Hashtags", tags.Select(x => new BsonRegularExpression(new Regex(x, RegexOptions.IgnoreCase | RegexOptions.Compiled)))));
                 tagQueries.Add(Query.In("SearchableKeywords", tags.Select(x => new BsonRegularExpression(new Regex(x, RegexOptions.IgnoreCase | RegexOptions.CultureInvariant | RegexOptions.Compiled)))));
                 queries.Add(Query.Or(tagQueries));
+            }
+
+            // categories
+            if (categories != null && categories.Any())
+            {
+                queries.Add(Query.In("Categories",
+                    categories.Select(
+                        x => new BsonRegularExpression(new Regex(x, RegexOptions.IgnoreCase | RegexOptions.Compiled)))));
             }
 
             // metadata

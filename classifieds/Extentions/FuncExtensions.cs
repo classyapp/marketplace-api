@@ -35,6 +35,8 @@ namespace classy.Extensions
                 c => new ListingSearchProvider(c.TryResolve<ISearchClientFactory>()));
             container.Register<IProfileSearchProvider>(
                 c => new ProfileSearchProvider(c.TryResolve<ISearchClientFactory>()));
+            container.Register<IProductSearchProvider>(
+                c => new ProductSearchProvider(c.TryResolve<ISearchClientFactory>()));
 
             container.Register<IIndexer<Listing>>(x =>
                 new ListingIndexer(x.TryResolve<ISearchClientFactory>(), x.TryResolve<IAppManager>()));
@@ -105,17 +107,18 @@ namespace classy.Extensions
                     c.TryResolve<IListingRepository>(),
                     c.TryResolve<IBookingRepository>(),
                     c.TryResolve<IPaymentGateway>(),
-                    c.TryResolve<ITripleStore>()));
+                    c.TryResolve<ITripleStore>(),
+                    c.TryResolve<IIndexer<Listing>>()));
             container.Register<IOrderManager>(c =>
                 new DefaultOrderManager(
                     c.TryResolve<IListingRepository>(),
                     c.TryResolve<IProfileRepository>(),
                     c.TryResolve<IOrderRepository>(),
-                    c.TryResolve<ITransactionRepository>(),
                     c.TryResolve<IPaymentGateway>(),
                     c.TryResolve<ITripleStore>(),
                     c.TryResolve<ITaxCalculator>(),
-                    c.TryResolve<IShippingCalculator>()));
+                    c.TryResolve<IShippingCalculator>(),
+                    c.TryResolve<IIndexer<Listing>>()));
             container.Register<IKeywordsRepository>(c =>
                 new KeywordsRepository(c.TryResolve<MongoDatabaseProvider>()));
             container.Register<IListingManager>(c =>
@@ -143,6 +146,7 @@ namespace classy.Extensions
                     c.TryResolve<ITripleStore>(),
                     c.TryResolve<IStorageRepository>(),
                     c.TryResolve<IIndexer<Profile>>(),
+                    c.TryResolve<IIndexer<Listing>>(),
                     c.TryResolve<ICurrencyManager>()));
             container.Register<IReviewManager>(c =>
                 new DefaultProfileManager(
@@ -155,6 +159,7 @@ namespace classy.Extensions
                     c.TryResolve<ITripleStore>(),
                     c.TryResolve<IStorageRepository>(),
                     c.TryResolve<IIndexer<Profile>>(),
+                    c.TryResolve<IIndexer<Listing>>(),
                     c.TryResolve<ICurrencyManager>()));
             container.Register<ICollectionManager>(c =>
                 new DefaultListingManager(
