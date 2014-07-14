@@ -1,5 +1,4 @@
-﻿using System.Linq;
-using Classy.Models;
+﻿using Classy.Models;
 using Classy.Models.Response;
 using System.Collections.Generic;
 using ServiceStack.Common;

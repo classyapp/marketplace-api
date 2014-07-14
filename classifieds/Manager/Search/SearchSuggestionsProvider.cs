@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 using classy.DTO.Response;
 using classy.Extentions;
 using Classy.Interfaces.Search;
@@ -56,11 +57,19 @@ namespace classy.Manager.Search
             if (response.Documents.IsNullOrEmpty())
                 return suggestions;
 
+            // first add the row of thumbnails
+            suggestions.Add(new SearchSuggestion {
+                Key = string.Empty,
+                Value = string.Empty,
+                Thumbnails = response.Documents.Where(x => !string.IsNullOrEmpty(x.ImageUrl)).Select(x => x.ImageUrl).ToArray()
+            });
+
             foreach (var suggestion in response.Documents)
             {
                 suggestions.Add(new SearchSuggestion {
                     Key = suggestion.Id,
-                    Value = suggestion.Title
+                    Value = suggestion.Title,
+                    Thumbnails = new string[0]
                 });
             }
 
