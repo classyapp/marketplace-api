@@ -5,6 +5,7 @@ namespace classy.DTO.Request
 {
     public class SearchListings : BaseRequestDto
     {
+        public string Q { get; set; }
         public string[] Tags { get; set; }
         public string[] Categories { get; set; }
         public string[] ListingTypes { get; set; }

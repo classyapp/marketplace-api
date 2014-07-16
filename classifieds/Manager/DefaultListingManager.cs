@@ -209,6 +209,7 @@ namespace classy.Manager
 
         public SearchResultsView<ListingView> SearchListings(
             string appId,
+            string Q,
             string[] tags,
             string[] categories,
             string[] listingTypes,
@@ -226,7 +227,7 @@ namespace classy.Manager
             long count = 0;
 
             // TODO: cache listings
-            var listings = ListingRepository.Search(tags, categories, listingTypes, metadata, null, priceMin, priceMax, location, appId, false, false, page, pageSize, ref count, sortMethod, culture);
+            var listings = ListingRepository.Search(Q, tags, categories, listingTypes, metadata, null, priceMin, priceMax, location, appId, false, false, page, pageSize, ref count, sortMethod, culture);
             var comments = includeComments ?
                 CommentRepository.GetByListingIds(listings.Select(x => x.Id).AsEnumerable(), formatCommentsAsHtml) : null;
             var listingViews = new List<ListingView>();

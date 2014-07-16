@@ -97,6 +97,7 @@ namespace classy.Services
             ListingManager.Environment = request.Environment;
             var listingViews = ListingManager.SearchListings(
                 request.Environment.AppId,
+                request.Q,
                 request.Tags,
                 request.Categories,
                 request.ListingTypes,
