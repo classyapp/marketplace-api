@@ -1239,7 +1239,7 @@ namespace classy.Manager
             if (metadata != null || query != null)
             {
                 long count = 0;
-                data.SearchResults = ListingRepository.Search(null, null, new[] { listing.ListingType }, 
+                data.SearchResults = ListingRepository.Search(null, null, null, new[] { listing.ListingType }, 
                     metadata, query,
                     null, null, location, appId, false, false, 0, 0, ref count, SortMethod.Popularity, culture).ToListingViewList(culture, _currencyManager, Environment.CurrencyCode);
                 if (data.SearchResults != null)

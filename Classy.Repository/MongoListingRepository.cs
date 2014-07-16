@@ -234,7 +234,7 @@ namespace Classy.Repository
             throw new NotImplementedException();
         }
 
-        public IList<Listing> Search(string[] tags, string[] categories, string[] listingTypes, IDictionary<string, string[]> metadata,
+        public IList<Listing> Search(string Q, string[] tags, string[] categories, string[] listingTypes, IDictionary<string, string[]> metadata,
             IDictionary<string, string[]> objectQuery, double? priceMin, double? priceMax, Location location, string appId,
             bool includeDrafts, bool increaseViewCounter, int page, int pageSize, ref long count, SortMethod sortMethod, string culture)
         {
@@ -260,6 +260,14 @@ namespace Classy.Repository
                     else
                         queries.Add(Query.In(key, objectQuery[key].Select(v => new BsonString(v))));
                 }
+            }
+
+            // free search query
+            if (!string.IsNullOrEmpty(Q))
+            {
+                var titleQuery = Query.Matches("Title", new BsonRegularExpression("\\b" + Q + "\\w*\\b"));
+                var contentQuery = Query.Matches("Content", new BsonRegularExpression("\\b" + Q + "\\w*\\b"));
+                queries.Add(Query.Or(titleQuery, contentQuery));
             }
 
             // listing types

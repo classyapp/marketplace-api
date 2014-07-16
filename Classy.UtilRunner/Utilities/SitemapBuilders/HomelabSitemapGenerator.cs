@@ -87,6 +87,7 @@ namespace Classy.UtilRunner.Utilities.SitemapBuilders
                 _app.AppId,
                 null,
                 null,
+                null,
                 new[] { "Photo" },
                 null,
                 null,
@@ -122,6 +123,7 @@ namespace Classy.UtilRunner.Utilities.SitemapBuilders
 
                 photos = _listingService.SearchListings(
                     _app.AppId,
+                    null,
                     null,
                     null,
                     new[] { "Photo" },
