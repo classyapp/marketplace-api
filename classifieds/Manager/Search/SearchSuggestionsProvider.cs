@@ -59,8 +59,8 @@ namespace classy.Manager.Search
 
             // first add the row of thumbnails
             suggestions.Add(new SearchSuggestion {
-                Key = string.Empty,
-                Value = string.Empty,
+                Key = q,
+                Value = q,
                 Thumbnails = response.Documents.Where(x => !string.IsNullOrEmpty(x.ImageUrl)).Select(x => x.ImageUrl).ToArray()
             });
 
