@@ -161,7 +161,7 @@ namespace classy
                 .Add<DeleteExternalMedia>("/listing/{ListingId}/media", "DELETE")
                 .Add<PublishListing>("/listing/{ListingId}/publish", "POST") // publish a post to the public
                 .Add<UpdateListing>("/listing/{ListingId}", "PUT") // update listing
-                .Add<SearchListings>("/listing/search", ApplyTo.Get | ApplyTo.Post) // search listings by tag and/or metadata
+                .Add<SearchListings>("/listing/search", ApplyTo.Get | ApplyTo.Post | ApplyTo.Options) // search listings by tag and/or metadata
                 .Add<SearchListings>("/tags/{tag}", "GET") // search with a nicer url for tag
                 .Add<GetListingsByProfileId>("/profile/{ProfileId}/listing/list", "GET") // get list of listing for profile
                 .Add<SetListingTranslation>("/listing/{ListingId}/translation", "POST")
