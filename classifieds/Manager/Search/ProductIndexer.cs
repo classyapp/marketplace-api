@@ -57,6 +57,7 @@ namespace classy.Manager.Search
                         .Where(x => indexingInfo.MetadataPerListing[entity.ListingType].Contains(x.Key))
                         .Select(x => x.Value).ToArray(),
                     Categories = entity.Categories.ToArray(),
+                    AnalyzedCategories = entity.Categories.ToArray(),
                     Price = entity.PricingInfo != null && entity.PricingInfo.BaseOption != null ?
                         entity.PricingInfo.BaseOption.Price : 0m
                 });
