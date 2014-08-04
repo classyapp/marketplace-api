@@ -1,0 +1,17 @@
+db.classifieds.find({$and:[{'ListingType':'Product'},{'PricingInfo.BaseOption':{$exists:true}}]});
+db.classifieds.find(
+    {$and:[
+        {'ListingType':'Product'},
+        {'PricingInfo.PurchaseOptions':{$ne:null}}
+    ]}).forEach(function(x) {
+    //x.PricingInfo.BaseOption.Price = new NumberInt(x.PricingInfo.BaseOption.Price * 100);
+    //x.PricingInfo.BaseOption.Quantity = new NumberInt(x.PricingInfo.BaseOption.Quantity);
+    //x.PricingInfo.BaseOption.NeutralPrice = new NumberInt(x.PricingInfo.BaseOption.NeutralPrice * 100);
+    //x.PricingInfo.BaseOption.CompareAtPrice = new NumberInt(x.PricingInfo.BaseOption.CompareAtPrice * 100);
+    x.PricingInfo.PurchaseOptions.forEach(function(p) {
+        p.Price = new NumberInt(p.Price * 100);
+        p.Quantity = new NumberInt(p.Quantity);
+        p.NeutralPrice = new NumberInt(p.NeutralPrice * 100);
+    });
+    db.classifieds.save(x);
+});

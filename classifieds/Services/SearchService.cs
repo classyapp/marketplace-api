@@ -21,6 +21,7 @@ namespace classy.Services
         public IProfileManager ProfileManager { get; set; }
         public IListingSearchProvider ListingSearchProvider { get; set; }
         public IProfileSearchProvider ProfileSearchProvider { get; set; }
+        public IProductSearchProvider ProductSearchProvider { get; set; }
         public IListingManager ListingManager { get; set; }
         public ISearchSuggestionsProvider SearchSuggestionsProvider { get; set; }
 
@@ -31,6 +32,7 @@ namespace classy.Services
                 freeSearchRequest.Q, freeSearchRequest.Environment.AppId,
                 freeSearchRequest.Amount, freeSearchRequest.Page);
 
+            ListingManager.Environment = freeSearchRequest.Environment;
             var listingsFromDb = ListingManager.GetListingsByIds(
                 searchListingsResults.Results.Select(x => x.Id).ToArray(),
                 freeSearchRequest.Environment.AppId,
@@ -60,13 +62,28 @@ namespace classy.Services
             foreach (var dbResult in searchProfilesResults.Results)
                 orderedProfiles.Add(profilesFromDb.First(x => x.Id == dbResult.Id));
 
+            // get related products
+            var productsSearchResults = ProductSearchProvider.Search(freeSearchRequest.Q, freeSearchRequest.Environment.AppId);
+            var productsFromDb = ListingManager.GetListingsByIds(
+                productsSearchResults.Results.Select(x => x.Id).ToArray(),
+                freeSearchRequest.Environment.AppId, false, freeSearchRequest.Environment.CultureCode);
+            var orderedProducts = new List<ListingView>();
+            foreach (var searchResult in productsSearchResults.Results)
+            {
+                var resultFromDb = productsFromDb.FirstOrDefault(x => x.Id == searchResult.Id);
+                if (resultFromDb != null)
+                    orderedProducts.Add(resultFromDb);
+            }
+
             // build model from results
             var listingsResponse = new SearchResultsResponse<ListingView>(orderedListings, searchListingsResults.TotalResults);
             var profilesResponse = new SearchResultsResponse<ProfileView>(orderedProfiles, searchProfilesResults.TotalResults);
+            var productsRespone = new SearchResultsResponse<ListingView>(orderedProducts, productsSearchResults.TotalResults);
 
-            return new HttpResult(new FreeSearchResultsResponse() {
+            return new HttpResult(new FreeSearchResultsResponse {
                 ListingsResults = listingsResponse,
-                ProfilesResults = profilesResponse
+                ProfilesResults = profilesResponse,
+                ProductsResults = productsRespone
             }, HttpStatusCode.OK);
         }
 
@@ -80,7 +97,9 @@ namespace classy.Services
             ListingManager.Environment = request.Environment;
             var listingViews = ListingManager.SearchListings(
                 request.Environment.AppId,
+                request.Q,
                 request.Tags,
+                request.Categories,
                 request.ListingTypes,
                 request.Metadata,
                 request.PriceMin,
@@ -122,8 +141,8 @@ namespace classy.Services
         public object Get(SearchSuggestionsRequest request)
         {
             var suggestions = new List<SearchSuggestion>();
-            if (request.EntityType == "listing")
-                suggestions = SearchSuggestionsProvider.GetListingsSuggestions(request.q, request.Environment.AppId);
+            if (request.EntityType == "listing" || request.EntityType == "product")
+                suggestions = SearchSuggestionsProvider.GetListingsSuggestions(request.q, request.EntityType, request.Environment.AppId);
             else if (request.EntityType == "profile")
                 suggestions = SearchSuggestionsProvider.GetProfilesSuggestions(request.q, request.Environment.AppId);
 

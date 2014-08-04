@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+﻿using System.Diagnostics;
 
 namespace Classy.Models.Response
 {
@@ -15,7 +12,8 @@ namespace Classy.Models.Response
         public string TwitterUsername { get; set; }
         public string LinkedInProfileUrl { get; set; }
 
-        public string Name { 
+        public string Name {
+            [DebuggerStepThrough]
             get {
                 if (string.IsNullOrEmpty(FirstName) && string.IsNullOrEmpty(LastName)) return null;
                 return string.Concat(FirstName, " ", LastName); 

@@ -1,14 +1,13 @@
 ﻿﻿using System;
 using System.Collections.Generic;
-using System.Diagnostics;
-using System.IO;
+﻿using System.IO;
 using System.Linq;
-using classy.Manager;
+﻿using Classy.Interfaces.Search;
+﻿using classy.Manager;
 using Classy.Models;
 using Classy.Repository;
 using Classy.Interfaces.Managers;
-using System.Net;
-using System.Threading;
+﻿using System.Threading;
 
 namespace Classy.CatalogImportWorker
 {
@@ -62,13 +61,15 @@ namespace Classy.CatalogImportWorker
         private readonly ICurrencyManager _currencyManager; // Currencies
         private readonly IProfileRepository _profileRepository; // Profiles
         private readonly ILocalizationRepository _localizationRepository; // Localization
+        private readonly IIndexer<Listing> _listingIndexer;
         private readonly IAppManager _appManager;
 
         private App _app;
         private IList<ListItem> _styles;
 
         public CatalogImportProcessor(IStorageRepository storageRepo, IListingRepository listingRepo, IJobRepository jobRepo,
-            ICurrencyManager currencyManager, IProfileRepository profileRepository, ILocalizationRepository localizationRepo, IAppManager appManager)
+            ICurrencyManager currencyManager, IProfileRepository profileRepository, ILocalizationRepository localizationRepo, IAppManager appManager,
+            IIndexer<Listing> listingIndexer)
         {
             _storageRepository = storageRepo;
             _listingRepository = listingRepo;
@@ -77,6 +78,7 @@ namespace Classy.CatalogImportWorker
             _profileRepository = profileRepository;
             _localizationRepository = localizationRepo;
             _appManager = appManager;
+            _listingIndexer = listingIndexer;
         }
 
         public void Process(Job job)
@@ -142,6 +144,7 @@ namespace Classy.CatalogImportWorker
 
                         // Save listing
                         _listingRepository.Insert(product);
+                        _listingIndexer.Index(new[] { product }, job.AppId);
                         job.Succeeded++;
                     }
                     catch (ImportException ex)
@@ -192,8 +195,8 @@ namespace Classy.CatalogImportWorker
             if (allLines.Length <= 1)
                 return null;
 
-            List<List<string>> data = new List<List<string>>();
-            List<string> currentProduct = new List<string>();
+            var data = new List<List<string>>();
+            var currentProduct = new List<string>();
             for (int i = 1; i < allLines.Length; i++)
             {
                 string[] lineData = allLines[i].Split(';');
@@ -233,7 +236,7 @@ namespace Classy.CatalogImportWorker
                 ValidateStyle(productData[0]);
                 ValidateCategories(productData[0]);
 
-                Dictionary<string, int> variationKeys = new Dictionary<string, int>();
+                var variationKeys = new Dictionary<string, int>();
                 for (int i = 1; i < productData.Count; i++)
                 {
                     ValidateMandatoryFields(productData[i], new Columns[] { 
@@ -304,12 +307,12 @@ namespace Classy.CatalogImportWorker
 
         private Listing BuildListing(List<string> productData, Job job, string culture, string currency)
         {
-            Listing listing = new Listing();
+            var listing = new Listing();
             listing.ListingType = "Product";
             listing.AppId = job.AppId;
             listing.ProfileId = job.ProfileId;
             listing.DefaultCulture = culture;
-            listing.PricingInfo = new PricingInfo() { CurrencyCode = currency };
+            listing.PricingInfo = new PricingInfo { CurrencyCode = currency };
             listing.IsPublished = true;
             listing.Metadata.Add("JobId", job.Id);
 
@@ -349,10 +352,10 @@ namespace Classy.CatalogImportWorker
                 listing.PricingInfo.BaseOption.Title = productFields[(int)Columns.Title_6];
                 listing.PricingInfo.BaseOption.ProductUrl = productFields[(int)Columns.ProductUrl_7];
                 listing.PricingInfo.BaseOption.Content = productFields[(int)Columns.Description_8];
-                listing.PricingInfo.BaseOption.Quantity = double.Parse(productFields[(int)Columns.Quantity_11]);
-                listing.PricingInfo.BaseOption.Price = double.Parse(productFields[(int)Columns.Price_12]);
+                listing.PricingInfo.BaseOption.Quantity = Int32.Parse(productFields[(int)Columns.Quantity_11]);
+                listing.PricingInfo.BaseOption.Price = Decimal.Parse(productFields[(int)Columns.Price_12]);
                 if (!string.IsNullOrWhiteSpace(productFields[(int)Columns.MSRP_13]))
-                    listing.PricingInfo.BaseOption.CompareAtPrice = double.Parse(productFields[(int)Columns.MSRP_13]);
+                    listing.PricingInfo.BaseOption.CompareAtPrice = Decimal.Parse(productFields[(int)Columns.MSRP_13]);
                 listing.PricingInfo.BaseOption.Width = productFields[(int)Columns.Width_21];
                 listing.PricingInfo.BaseOption.Depth = productFields[(int)Columns.Depth_22];
                 listing.PricingInfo.BaseOption.Height = productFields[(int)Columns.Height_23];
@@ -370,9 +373,9 @@ namespace Classy.CatalogImportWorker
                     {
                         listing.PricingInfo.BaseOption.SKU = productFields[(int)Columns.SKU_0];
                         if (!string.IsNullOrWhiteSpace(productFields[(int)Columns.Price_12]))
-                            listing.PricingInfo.BaseOption.Price = double.Parse(productFields[(int)Columns.Price_12]);
+                            listing.PricingInfo.BaseOption.Price = Decimal.Parse(productFields[(int)Columns.Price_12]);
                         if (!string.IsNullOrWhiteSpace(productFields[(int)Columns.MSRP_13]))
-                            listing.PricingInfo.BaseOption.CompareAtPrice = double.Parse(productFields[(int)Columns.MSRP_13]);
+                            listing.PricingInfo.BaseOption.CompareAtPrice = Int32.Parse(productFields[(int)Columns.MSRP_13]);
                         if (!string.IsNullOrWhiteSpace(productFields[(int)Columns.Width_21]))
                             listing.PricingInfo.BaseOption.Width = productFields[(int)Columns.Width_21];
                         if (!string.IsNullOrWhiteSpace(productFields[(int)Columns.Depth_22]))
@@ -383,15 +386,16 @@ namespace Classy.CatalogImportWorker
                     }
                     else
                     {
-                        PurchaseOption option = new PurchaseOption();
-                        option.UID = Guid.NewGuid().ToString();
-                        option.SKU = productFields[(int)Columns.SKU_0];
-                        option.Title = productFields[(int)Columns.Title_6];
-                        option.ProductUrl = productFields[(int)Columns.ProductUrl_7];
-                        option.Content = productFields[(int)Columns.Description_8];
-                        option.Price = double.Parse(productFields[(int)Columns.Price_12]);
+                        var option = new PurchaseOption {
+                            UID = Guid.NewGuid().ToString(),
+                            SKU = productFields[(int) Columns.SKU_0],
+                            Title = productFields[(int) Columns.Title_6],
+                            ProductUrl = productFields[(int) Columns.ProductUrl_7],
+                            Content = productFields[(int) Columns.Description_8],
+                            Price = Decimal.Parse(productFields[(int) Columns.Price_12])
+                        };
                         if (!string.IsNullOrWhiteSpace(productFields[(int)Columns.MSRP_13]))
-                            option.CompareAtPrice = double.Parse(productFields[(int)Columns.MSRP_13]);
+                            option.CompareAtPrice = Int32.Parse(productFields[(int)Columns.MSRP_13]);
                         option.Width = productFields[(int)Columns.Width_21];
                         option.Depth = productFields[(int)Columns.Depth_22];
                         option.Height = productFields[(int)Columns.Height_23];
@@ -408,10 +412,10 @@ namespace Classy.CatalogImportWorker
                             option.VariantProperties.Add("Size", productFields[(int)Columns.Size_19]);
 
                         // Images
-                        List<MediaFile> mediaFiles = new List<MediaFile>();
-                        for (int j = (int)Columns.Image_27; j <= (int)Columns.Image5_31; j++)
+                        var mediaFiles = new List<MediaFile>();
+                        for (var j = (int)Columns.Image_27; j <= (int)Columns.Image5_31; j++)
                         {
-                            string url = productFields[j];
+                            var url = productFields[j];
                             if (!string.IsNullOrWhiteSpace(url))
                             {
                                 mediaFiles.Add(new MediaFile { ContentType = "image/jpeg", Key = Guid.NewGuid().ToString(), Type = MediaFileType.Image, Url = url });
@@ -427,7 +431,7 @@ namespace Classy.CatalogImportWorker
 
         private void UploadProductImages(Listing product)
         {
-            for (int i = 0; i < product.ExternalMedia.Count; i++)
+            for (var i = 0; i < product.ExternalMedia.Count; i++)
             {
                 SaveImageFromUrl(product.ExternalMedia[i].Url, product.ExternalMedia[i].Key, i);
             }
@@ -450,7 +454,7 @@ namespace Classy.CatalogImportWorker
         {
             WebClientWithTimeout wc = null;
             byte[] content;
-            bool errorOccured = false;
+            var errorOccured = false;
 
             try
             {

@@ -22,8 +22,8 @@ namespace Classy.Repository
 
         public Listing GetById(string listingId, string appId, bool includeDrafts, string culture)
         {
-            var listings = GetById(new string[] { listingId }, appId, includeDrafts, culture);
-            if (listings == null || listings.Count() == 0) return null;
+            var listings = GetById(new[] { listingId }, appId, includeDrafts, culture);
+            if (listings == null || !listings.Any()) return null;
             return listings[0];
         }
 
@@ -215,20 +215,6 @@ namespace Classy.Repository
             }
         }
 
-        public void IncreaseFavoriteCounter(string listingId, string appId, int value)
-        {
-            try
-            {
-                ListingsCollection.Update(Query.And(
-                    Query<Listing>.EQ(x => x.Id, listingId),
-                    Query<Listing>.EQ(x => x.AppId, appId)), Update<Listing>.Inc(x => x.FavoriteCount, value));
-            }
-            catch (MongoException mex)
-            {
-                throw;
-            }
-        }
-
         public void AddHashtags(string listingId, string appId, string[] hashtags)
         {
             try
@@ -248,9 +234,8 @@ namespace Classy.Repository
             throw new NotImplementedException();
         }
 
-        public IList<Listing> Search(string[] tags, string[] listingTypes, IDictionary<string, string[]> metadata,
-            IDictionary<string, string[]> objectQuery, 
-            double? priceMin, double? priceMax, Location location, string appId,
+        public IList<Listing> Search(string Q, string[] tags, string[] categories, string[] listingTypes, IDictionary<string, string[]> metadata,
+            IDictionary<string, string[]> objectQuery, double? priceMin, double? priceMax, Location location, string appId,
             bool includeDrafts, bool increaseViewCounter, int page, int pageSize, ref long count, SortMethod sortMethod, string culture)
         {
             // set sort order
@@ -277,6 +262,14 @@ namespace Classy.Repository
                 }
             }
 
+            // free search query
+            if (!string.IsNullOrEmpty(Q))
+            {
+                var titleQuery = Query.Matches("Title", new BsonRegularExpression("\\b" + Q + "\\w*\\b"));
+                var contentQuery = Query.Matches("Content", new BsonRegularExpression("\\b" + Q + "\\w*\\b"));
+                queries.Add(Query.Or(titleQuery, contentQuery));
+            }
+
             // listing types
             if (listingTypes != null && listingTypes.Any())
             {
@@ -295,6 +288,14 @@ namespace Classy.Repository
                 tagQueries.Add(Query.In("Hashtags", tags.Select(x => new BsonRegularExpression(new Regex(x, RegexOptions.IgnoreCase | RegexOptions.Compiled)))));
                 tagQueries.Add(Query.In("SearchableKeywords", tags.Select(x => new BsonRegularExpression(new Regex(x, RegexOptions.IgnoreCase | RegexOptions.CultureInvariant | RegexOptions.Compiled)))));
                 queries.Add(Query.Or(tagQueries));
+            }
+
+            // categories
+            if (categories != null && categories.Any())
+            {
+                queries.Add(Query.In("Categories",
+                    categories.Select(
+                        x => new BsonRegularExpression(new Regex(x, RegexOptions.IgnoreCase | RegexOptions.Compiled)))));
             }
 
             // metadata

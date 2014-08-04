@@ -9,12 +9,12 @@ using Classy.Models.Search;
 
 namespace classy.Manager.Search
 {
-    public class ListingIndexer : IIndexer<Listing>
+    public class ProductIndexer : IIndexer<Listing>
     {
         private readonly ISearchClientFactory _searchClientFactory;
         private readonly IAppManager _appManager;
 
-        public ListingIndexer(ISearchClientFactory searchClientFactory, IAppManager appManager)
+        public ProductIndexer(ISearchClientFactory searchClientFactory, IAppManager appManager)
         {
             _searchClientFactory = searchClientFactory;
             _appManager = appManager;
@@ -22,13 +22,13 @@ namespace classy.Manager.Search
 
         public void RemoveFromIndex(Listing entity, string appId)
         {
-            var client = _searchClientFactory.GetClient("listings", appId);
+            var client = _searchClientFactory.GetClient("products", appId);
             client.Delete<ListingIndexDto>(x => x.Id(entity.Id));
         }
 
         public void Index(Listing[] entities, string appId)
         {
-            var client = _searchClientFactory.GetClient("listings", appId);
+            var client = _searchClientFactory.GetClient("products", appId);
             var indexingInfo = _appManager.GetAppById(appId).IndexingInfo ?? new IndexingInfo();
 
             var listingsToIndex = new List<ListingIndexDto>();
@@ -55,7 +55,11 @@ namespace classy.Manager.Search
                     ViewCount = entity.ViewCount,
                     Metadata = entity.Metadata
                         .Where(x => indexingInfo.MetadataPerListing[entity.ListingType].Contains(x.Key))
-                        .Select(x => x.Value).ToArray()
+                        .Select(x => x.Value).ToArray(),
+                    Categories = entity.Categories.ToArray(),
+                    AnalyzedCategories = entity.Categories.ToArray(),
+                    Price = entity.PricingInfo != null && entity.PricingInfo.BaseOption != null ?
+                        entity.PricingInfo.BaseOption.Price : 0m
                 });
             }
 
@@ -70,7 +74,7 @@ namespace classy.Manager.Search
 
             var script = string.Format("ctx._source.{0} += {1}", elasticPropertyName, amount);
 
-            var client = _searchClientFactory.GetClient("listings", appId);
+            var client = _searchClientFactory.GetClient("products", appId);
             client.Update<ListingIndexDto>(d => d
                 .Id(id)
                 .Script(script));

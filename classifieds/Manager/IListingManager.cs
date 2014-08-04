@@ -81,7 +81,9 @@ namespace classy.Manager
         /// <returns></returns>
         SearchResultsView<ListingView> SearchListings(
             string appId,
+            string Q,
             string[] tags,
+            string[] categories,
             string[] listingTypes,
             IDictionary<string, string[]> metadata,
             double? priceMin,

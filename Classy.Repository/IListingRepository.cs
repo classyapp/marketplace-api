@@ -28,7 +28,7 @@ namespace Classy.Repository
         Listing GetById(string listingId, string appId, bool includeDrafts, string culture);
         IList<Listing> GetById(string[] listingId, string appId, bool includeDrafts, string culture);
         IList<Listing> GetByProfileId(string appId, string profileId, bool includeDrafts, string culture);
-        IList<Listing> Search(string[] tags, string[] listingTypes, IDictionary<string, string[]> metadata, IDictionary<string, string[]> query, double? priceMin,
+        IList<Listing> Search(string Q, string[] tags, string[] categories, string[] listingTypes, IDictionary<string, string[]> metadata, IDictionary<string, string[]> query, double? priceMin,
             double? priceMax, Location location, string appId, bool includeDrafts, bool increaseViewCounter,
             int page, int pageSize, ref long count, SortMethod sortMethod, string culture);
 

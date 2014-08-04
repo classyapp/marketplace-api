@@ -29,6 +29,8 @@ namespace Classy.Models.Search
         [ElasticProperty(Index = FieldIndexOption.not_analyzed)]
         public string[] Categories { get; set; }
 
+        [ElasticProperty(Index = FieldIndexOption.analyzed, OmitNorms = true, SearchAnalyzer = "standard", IndexAnalyzer = "suggest_analyzer")]
+        public string[] AnalyzedCategories { get; set; }
         [ElasticProperty(Index = FieldIndexOption.not_analyzed)]
         public string[] BoostedCategories { get; set; }
 

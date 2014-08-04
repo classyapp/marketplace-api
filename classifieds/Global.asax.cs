@@ -111,12 +111,12 @@ namespace classy
             //Register all Authentication methods you want to enable for this web app. 
             Plugins.Add(new Classy.Auth.AuthFeature(
                 () => new CustomUserSession(), // Use your own typed Custom UserSession type
-                    new Classy.Auth.IAuthProvider[] {
-                        new Classy.Auth.CredentialsAuthProvider(),      //HTML Form post of UserName/Password credentials
+                    new IAuthProvider[] {
+                        new CredentialsAuthProvider(),      //HTML Form post of UserName/Password credentials
                         new CustomFacebookAuthProvider(appSettings),    //Sign-in with Facebook
                         new GoogleOAuth2Provider(appSettings),
                         //new DigestAuthProvider(appSettings),        //Sign-in with Digest Auth
-                        new Classy.Auth.BasicAuthProvider()
+                        new BasicAuthProvider()
                 }));
 
 
@@ -124,7 +124,7 @@ namespace classy
             Plugins.Add(new Classy.Auth.RegistrationFeature());
 
             //Store User Data into the referenced MongoDB database
-            container.Register<Classy.Auth.IUserAuthRepository>(c => new Classy.Auth.MongoDBAuthRepository(c.Resolve<MongoDatabase>(), true));
+            container.Register<IUserAuthRepository>(c => new MongoDBAuthRepository(c.Resolve<MongoDatabase>(), true));
 
             //logging feature
 #if DEBUG
@@ -161,7 +161,7 @@ namespace classy
                 .Add<DeleteExternalMedia>("/listing/{ListingId}/media", "DELETE")
                 .Add<PublishListing>("/listing/{ListingId}/publish", "POST") // publish a post to the public
                 .Add<UpdateListing>("/listing/{ListingId}", "PUT") // update listing
-                .Add<SearchListings>("/listing/search", ApplyTo.Get | ApplyTo.Post) // search listings by tag and/or metadata
+                .Add<SearchListings>("/listing/search", ApplyTo.Get | ApplyTo.Post | ApplyTo.Options) // search listings by tag and/or metadata
                 .Add<SearchListings>("/tags/{tag}", "GET") // search with a nicer url for tag
                 .Add<GetListingsByProfileId>("/profile/{ProfileId}/listing/list", "GET") // get list of listing for profile
                 .Add<SetListingTranslation>("/listing/{ListingId}/translation", "POST")
@@ -193,8 +193,8 @@ namespace classy
                 .Add<DeleteCollectionTranslation>("/collection/{CollectionID}/translation/{CultureCode}", "DELETE")
 
                 // Comments
-                .Add<PostCommentForListing>("/listing/{ListingId}/comment/new", "POST") // post new comment
-                .Add<PostCommentForCollection>("/collection/{CollectionId}/comment/new", "POST") // post new comment
+                .Add<PostCommentForListing>("/listing/{ListingId}/comment/new", ApplyTo.Post | ApplyTo.Options) // post new comment
+                .Add<PostCommentForCollection>("/collection/{CollectionId}/comment/new", ApplyTo.Post | ApplyTo.Options) // post new comment
                 //.Add<PublishComment>("/listing/{ListingId}}/comment/{CommentId}/publish", "POST")
                 //.Add<DeleteComment>("/listing/{ListingId}/comment/{CommentId}", "DELETE")
 

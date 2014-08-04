@@ -52,7 +52,7 @@ namespace classy.Manager.Search
                 .Query(q => q.FunctionScore(
                     fs => fs.Query(
                         qq => q.QueryString(
-                            qs => qs.OnFields(f => f.Metadata, f => f.Title, f => f.Content, f => f.Keywords)
+                            qs => qs.OnFields(f => f.Metadata, f => f.Title, f => f.Keywords)
                                 .Query(query)))
                         .Functions(
                             ff => ff.ScriptScore(
@@ -60,6 +60,7 @@ namespace classy.Manager.Search
                                 )
                         )
                     ))
+                .Filter(f => f.Term(t => t.ListingType, "photo"))
                 .SortDescending(x => x.EditorRank)
                 .SortDescending("_score");
             
