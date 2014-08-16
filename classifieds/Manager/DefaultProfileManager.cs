@@ -26,6 +26,7 @@ namespace classy.Manager
         private ITripleStore TripleStore;
         private IStorageRepository StorageRepository;
         private readonly IIndexer<Profile> _profileIndexer;
+        private readonly IIndexer<Listing> _listingIndexer; 
         private readonly ICurrencyManager _currencyManager;
 
         public DefaultProfileManager(
@@ -38,6 +39,7 @@ namespace classy.Manager
             ITripleStore tripleStore,
             IStorageRepository storageRepository, 
             IIndexer<Profile> profileIndexer,
+            IIndexer<Listing> listingIndexer,
             ICurrencyManager currencyManager)
         {
             AppManager = appManager;
@@ -49,6 +51,7 @@ namespace classy.Manager
             TripleStore = tripleStore;
             StorageRepository = storageRepository;
             _profileIndexer = profileIndexer;
+            _listingIndexer = listingIndexer;
             _currencyManager = currencyManager;
         }
 
@@ -434,6 +437,7 @@ namespace classy.Manager
             {
                 x.ProfileId = profile.Id;
                 ListingRepository.Update(x);
+                _listingIndexer.Index(x, appId);
             });
             var proxyCollections = CollectionRepository.GetByProfileId(appId, proxyProfile.Id, profile.DefaultCulture);
             proxyCollections.ForEach(x =>

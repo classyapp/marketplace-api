@@ -19,7 +19,7 @@ namespace Classy.Models
 
         public DateRange Clone()
         {
- 	        return new DateRange(this.Start, this.End);
+ 	        return new DateRange(Start, End);
         }
     }
 
@@ -30,7 +30,7 @@ namespace Classy.Models
         public string ProfileId { get; set; }
         public DateRange DateRange { get; set; }
         public string Comment { get; set; }
-        public double Price { get; set; }
+        public decimal Price { get; set; }
         public string TransactionId { get; set; }
         public bool IsCancelled { get; set; }
     }
@@ -38,7 +38,7 @@ namespace Classy.Models
     public class TimeslotPricePoint
     {
         public int LengthInMinutes { get; set; }
-        public double Price { get; set; }
+        public decimal Price { get; set; }
         public string Currency { get; set; }
     }
 
@@ -48,16 +48,16 @@ namespace Classy.Models
         public IList<TimeslotPricePoint> PricePoints { get; set; }
         
         // 
-        public double GetTimeslotPrice(DateRange timeslot)
+        public decimal GetTimeslotPrice(DateRange timeslot)
         {
             var minutes = timeslot.End.Subtract(timeslot.Start).TotalMinutes;
 
-            var pricePoint = this.PricePoints.SingleOrDefault(x => x.LengthInMinutes >= minutes && x.LengthInMinutes <= minutes) ??
-                this.PricePoints.SingleOrDefault(x => x.LengthInMinutes <= minutes);
+            var pricePoint = PricePoints.SingleOrDefault(x => x.LengthInMinutes >= minutes && x.LengthInMinutes <= minutes) ??
+                PricePoints.SingleOrDefault(x => x.LengthInMinutes <= minutes);
 
             if (pricePoint == null) throw new ApplicationException("timeslot cannot be prices - it is below the minimum booking time allowed");
 
-            return (minutes / pricePoint.LengthInMinutes) * pricePoint.Price;
+            return Convert.ToDecimal(minutes / pricePoint.LengthInMinutes) * pricePoint.Price;
         }
     }
 }

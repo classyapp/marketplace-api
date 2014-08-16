@@ -15,12 +15,7 @@ namespace Classy.Models
         public string CurrencyCode { get; set; }
         public PurchaseOption BaseOption { get; set; }
 
-        // TODO: make this a list of shipping options? 
-        //public int? DomesticRadius { get; set; }
-        //public decimal? DomesticShippingPrice { get; set; }
-        //public decimal? InternationalShippingPrice { get; set; }
-
-        public double GetPriceForSKU(string sku)
+        public decimal GetPriceForSKU(string sku)
         {
             var option = PurchaseOptions.SingleOrDefault(x => x.SKU == sku);
             if (option != null) return option.Price;

@@ -123,6 +123,7 @@
     <Compile Include="DTO\Request\BookListing.cs" />
     <Compile Include="DTO\Request\CancelBooking.cs" />
     <Compile Include="DTO\Request\CancelSingleItemOrder.cs" />
+    <Compile Include="DTO\Request\CheckListingDuplicateSKUs.cs" />
     <Compile Include="DTO\Request\ClaimProxyProfile.cs" />
     <Compile Include="DTO\Request\AddListingToCollection.cs" />
     <Compile Include="DTO\Request\DeleteTempMediaRequest.cs" />
@@ -256,9 +257,11 @@
     <Compile Include="Manager\DefaultListingManager.cs" />
     <Compile Include="Manager\DefaultOrderManager.cs" />
     <Compile Include="Manager\DefaultProfileManager.cs" />
+    <Compile Include="Manager\Search\ProductIndexer.cs" />
     <Compile Include="Manager\Search\ProfileIndexer.cs" />
     <Compile Include="Manager\Search\ListingIndexer.cs" />
     <Compile Include="Manager\Search\ListingSearchProvider.cs" />
+    <Compile Include="Manager\Search\ProductSearchProvider.cs" />
     <Compile Include="Manager\Search\ProfileSearchProvider.cs" />
     <Compile Include="Manager\Search\SearchClientFactory.cs" />
     <Compile Include="DTO\Response\SearchSuggestion.cs" />

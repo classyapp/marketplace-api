@@ -115,12 +115,12 @@ namespace classy
             //Register all Authentication methods you want to enable for this web app. 
             Plugins.Add(new Classy.Auth.AuthFeature(
                 () => new CustomUserSession(), // Use your own typed Custom UserSession type
-                    new Classy.Auth.IAuthProvider[] {
-                        new Classy.Auth.CredentialsAuthProvider(),      //HTML Form post of UserName/Password credentials
+                    new IAuthProvider[] {
+                        new CredentialsAuthProvider(),      //HTML Form post of UserName/Password credentials
                         new CustomFacebookAuthProvider(appSettings),    //Sign-in with Facebook
                         new GoogleOAuth2Provider(appSettings),
                         //new DigestAuthProvider(appSettings),        //Sign-in with Digest Auth
-                        new Classy.Auth.BasicAuthProvider()
+                        new BasicAuthProvider()
                 }));
 
 
@@ -128,7 +128,7 @@ namespace classy
             Plugins.Add(new Classy.Auth.RegistrationFeature());
 
             //Store User Data into the referenced MongoDB database
-            container.Register<Classy.Auth.IUserAuthRepository>(c => new Classy.Auth.MongoDBAuthRepository(c.Resolve<MongoDatabase>(), true));
+            container.Register<IUserAuthRepository>(c => new MongoDBAuthRepository(c.Resolve<MongoDatabase>(), true));
 
             //logging feature
 #if DEBUG
@@ -165,7 +165,7 @@ namespace classy
                 .Add<DeleteExternalMedia>("/listing/{ListingId}/media", "DELETE")
                 .Add<PublishListing>("/listing/{ListingId}/publish", "POST") // publish a post to the public
                 .Add<UpdateListing>("/listing/{ListingId}", "PUT") // update listing
-                .Add<SearchListings>("/listing/search", ApplyTo.Get | ApplyTo.Post) // search listings by tag and/or metadata
+                .Add<SearchListings>("/listing/search", ApplyTo.Get | ApplyTo.Post | ApplyTo.Options) // search listings by tag and/or metadata
                 .Add<SearchListings>("/tags/{tag}", "GET") // search with a nicer url for tag
                 .Add<GetListingsByProfileId>("/profile/{ProfileId}/listing/list", "GET") // get list of listing for profile
                 .Add<SetListingTranslation>("/listing/{ListingId}/translation", "POST")
@@ -173,6 +173,7 @@ namespace classy
                 .Add<GetListingTranslation>("/listing/{ListingId}/translation/{CultureCode}", "GET")
                 .Add<DeleteListingTranslation>("/listing/{ListingId}/translation/{CultureCode}", "DELETE")
                 .Add<GetListingMoreInfo>("/listing/{ListingId}/more", "POST")
+                .Add<CheckListingDuplicateSKUs>("/listing/sku/check", "POST")
 
                 // Collections
                 .Add<CreateCollection>("/collection/new", "POST") // create a new collection
@@ -190,14 +191,14 @@ namespace classy
                 //.Add<RemovePermittedViewersFromCollection>("/collection/{CollectionId}/viewer", "DELETE") // remove view permissions
                 //.Add<UpdateCollection>("/collection/{CollectionId}", "PUT") // update collection details
                 .Add<GetCollectionById>("/collection/{CollectionId}", ApplyTo.Get | ApplyTo.Options) // get a collection by id
-                .Add<GetCollectionByProfileId>("/profile/{ProfileId}/collection/list/{CollectionType}", "GET") // get a collection by id
+                .Add<GetCollectionByProfileId>("/profile/{ProfileId}/collection/list/{CollectionType}", ApplyTo.Get | ApplyTo.Options) // get a collection by id
                 .Add<GetCollectionTranslation>("/collection/{CollectionID}/translation/{CultureCode}", "GET")
                 .Add<SetCollectionTranslation>("/collection/{CollectionId}/translation/{CultureCode}", "POST")
                 .Add<DeleteCollectionTranslation>("/collection/{CollectionID}/translation/{CultureCode}", "DELETE")
 
                 // Comments
-                .Add<PostCommentForListing>("/listing/{ListingId}/comment/new", "POST") // post new comment
-                .Add<PostCommentForCollection>("/collection/{CollectionId}/comment/new", "POST") // post new comment
+                .Add<PostCommentForListing>("/listing/{ListingId}/comment/new", ApplyTo.Post | ApplyTo.Options) // post new comment
+                .Add<PostCommentForCollection>("/collection/{CollectionId}/comment/new", ApplyTo.Post | ApplyTo.Options) // post new comment
                 //.Add<PublishComment>("/listing/{ListingId}}/comment/{CommentId}/publish", "POST")
                 //.Add<DeleteComment>("/listing/{ListingId}/comment/{CommentId}", "DELETE")
 

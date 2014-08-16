@@ -7,6 +7,7 @@ using ServiceStack.ServiceInterface.ServiceModel;
 using ServiceStack.ServiceInterface;
 using ServiceStack.ServiceInterface.Auth;
 using ServiceStack.Text;
+using System.Diagnostics;
 
 namespace Classy.Auth
 {
@@ -211,6 +212,12 @@ namespace Classy.Auth
                     return HttpResult.Redirect(errorReferrerUrl);
                 }
 
+                Trace.TraceError(ex.ToString());
+                throw;
+            }
+            catch(Exception ex)
+            {
+                Trace.TraceError(ex.ToString());
                 throw;
             }
         }

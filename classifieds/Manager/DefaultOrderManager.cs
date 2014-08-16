@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Web;
+using Classy.Interfaces.Search;
 using Classy.Models;
 using Classy.Repository;
 using Classy.Models.Response;
@@ -14,7 +14,7 @@ namespace classy.Manager
         private IListingRepository ListingRepository;
         private IProfileRepository ProfileRepository;
         private IOrderRepository OrderRepository;
-        private ITransactionRepository TransactionRepository;
+        private IIndexer<Listing> ListingIndexer;
         private IPaymentGateway PaymentGateway;
         private ITripleStore TripleStore;
         public ITaxCalculator TaxCalculator;
@@ -24,20 +24,20 @@ namespace classy.Manager
             IListingRepository listingRepository,
             IProfileRepository profileRepository,
             IOrderRepository orderRepository,
-            ITransactionRepository transactionRepository,
             IPaymentGateway paymentGateway,
             ITripleStore tripleStore,
             ITaxCalculator taxCalculator,
-            IShippingCalculator shippingCalculator)
+            IShippingCalculator shippingCalculator,
+            IIndexer<Listing> listingIndexer)
         {
             ListingRepository = listingRepository;
             OrderRepository = orderRepository;
-            TransactionRepository = transactionRepository;
             PaymentGateway = paymentGateway;
             TripleStore = tripleStore;
             TaxCalculator = taxCalculator;
             ShippingCalculator = shippingCalculator;
             ProfileRepository = profileRepository;
+            ListingIndexer = listingIndexer;
         }
 
         public Order PlaceSingleItemOrder(
@@ -95,6 +95,7 @@ namespace classy.Manager
 
                 // increase purchase counter
                 ListingRepository.IncreaseCounter(listingId, appId, ListingCounters.Purchases, quantity);
+                ListingIndexer.Increment(listingId, appId, x => x.PurchaseCount, quantity);
 
                 // return the order
                 return order;

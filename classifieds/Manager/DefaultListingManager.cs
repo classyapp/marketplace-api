@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using classy.DTO.Request;
 using Classy.Interfaces.Search;
+using classy.Manager.Search;
 using Classy.Models;
 using Classy.Models.Response;
 using Classy.Repository;
@@ -87,12 +88,30 @@ namespace classy.Manager
             bool includeProfile,
             bool includeFavoritedByProfiles,
             string culture)
+        {
+            return GetListingById(appId, listingId, logImpression, includeDrafts, includeComments, formatCommentsAsHtml, includeCommenterProfiles, includeProfile, includeFavoritedByProfiles, culture, false);
+        }
+
+        public ListingView GetListingById(
+            string appId,
+            string listingId,
+            bool logImpression,
+            bool includeDrafts,
+            bool includeComments,
+            bool formatCommentsAsHtml,
+            bool includeCommenterProfiles,
+            bool includeProfile,
+            bool includeFavoritedByProfiles,
+            string culture,
+            bool forEdit)
             // add parameter for editor's fields and only retrieve them when needed
         {
             // TODO: cache listings
             var listing = GetVerifiedListing(appId, listingId);
             listing.Translate(culture);
-            var listingView = listing.ToListingView(_currencyManager, Environment.CurrencyCode);
+            string currencyCode = Environment.CurrencyCode;
+            if (forEdit && listing.PricingInfo != null) currencyCode = listing.PricingInfo.CurrencyCode;
+            var listingView = listing.ToListingView(_currencyManager, currencyCode );
 
             if (logImpression)
             {
@@ -190,7 +209,9 @@ namespace classy.Manager
 
         public SearchResultsView<ListingView> SearchListings(
             string appId,
+            string Q,
             string[] tags,
+            string[] categories,
             string[] listingTypes,
             IDictionary<string, string[]> metadata,
             double? priceMin,
@@ -206,7 +227,7 @@ namespace classy.Manager
             long count = 0;
 
             // TODO: cache listings
-            var listings = ListingRepository.Search(tags, listingTypes, metadata, null, priceMin, priceMax, location, appId, false, false, page, pageSize, ref count, sortMethod, culture);
+            var listings = ListingRepository.Search(Q, tags, categories, listingTypes, metadata, null, priceMin, priceMax, location, appId, false, false, page, pageSize, ref count, sortMethod, culture);
             var comments = includeComments ?
                 CommentRepository.GetByListingIds(listings.Select(x => x.Id).AsEnumerable(), formatCommentsAsHtml) : null;
             var listingViews = new List<ListingView>();
@@ -352,6 +373,7 @@ namespace classy.Manager
                     {
                         foreach (var po in pricingInfo.PurchaseOptions)
                         {
+                            if (string.IsNullOrWhiteSpace(po.UID)) { po.UID = Guid.NewGuid().ToString(); }
                             foreach (var image in po.MediaFiles)
                             {
                                 CopyFromTempImage(appId, image);
@@ -379,6 +401,7 @@ namespace classy.Manager
                 var profile = GetVerifiedProfile(appId, SecurityContext.AuthenticatedProfileId, null);
                 listing.DefaultCulture = profile.DefaultCulture;
                 listing.Id = ListingRepository.Insert(listing);
+                _listingIndexer.Index(listing, appId);
             }
             else
             {
@@ -394,10 +417,13 @@ namespace classy.Manager
         private void CopyFromTempImage(string appId, MediaFile image)
         {
             TempMediaFile tempFile = _tempMediaFileRepository.Get(appId, image.Key);
-            image.ContentType = tempFile.ContentType;
-            image.Type = tempFile.Type;
-            image.Url = tempFile.Url;
-            _tempMediaFileRepository.Delete(appId, tempFile.Id);
+            if (tempFile != null)
+            {
+                image.ContentType = tempFile.ContentType;
+                image.Type = tempFile.Type;
+                image.Url = tempFile.Url;
+                _tempMediaFileRepository.Delete(appId, tempFile.Id);
+            }
         }
 
         public ListingView UpdateListing(
@@ -450,6 +476,7 @@ namespace classy.Manager
                     for (int i = 0; i < pricingInfo.PurchaseOptions.Count; i++)
                     {
                         var option = pricingInfo.PurchaseOptions[i];
+                        if (string.IsNullOrWhiteSpace(option.UID)) { option.UID = Guid.NewGuid().ToString(); }
                         if (option.MediaFiles != null)
                         {
                             MediaFile[] files = option.MediaFiles;
@@ -458,13 +485,25 @@ namespace classy.Manager
                                 CopyFromTempImage(appId, image);
                             }
                             // join the files
-                            List<MediaFile> allImages = new List<MediaFile>(listing.PricingInfo.PurchaseOptions[i].MediaFiles);
+                            List<MediaFile> allImages = new List<MediaFile>();
+                            if (listing.PricingInfo.PurchaseOptions != null)
+                            {
+                                PurchaseOption po = listing.PricingInfo.PurchaseOptions.FirstOrDefault(p => p.UID == option.UID);
+                                if (po != null)
+                                {
+                                    allImages.AddRange(po.MediaFiles);
+                                }
+                            }
                             allImages.AddRange(files);
                             option.MediaFiles = allImages.ToArray();
                         }
                         else
                         {
-                            option.MediaFiles = listing.PricingInfo.PurchaseOptions[i].MediaFiles;
+                            PurchaseOption po = listing.PricingInfo.PurchaseOptions.FirstOrDefault(p => p.UID == option.UID);
+                            if (po != null)
+                            {
+                                option.MediaFiles = po.MediaFiles;
+                            }
                         }
                     }
                 }
@@ -739,15 +778,14 @@ namespace classy.Manager
                 if (increaseViewCounter)
                 {
                     int count = 0;
-                    TripleStore.LogActivity(appId, SecurityContext.AuthenticatedProfileId, ActivityPredicate.VIEW_COLLECTION, collectionId, null, ref count);
-                    //CollectionRepository.IncreaseCounter(appId, collectionId);
+                    TripleStore.LogActivity(appId, SecurityContext.IsAuthenticated ? SecurityContext.AuthenticatedProfileId : "guest", ActivityPredicate.VIEW_COLLECTION, collectionId, null, ref count);
+                    CollectionRepository.IncreaseCounter(collectionId, appId, CollectionCounters.Views, 1);
+
                     if (increaseViewCounterOnListings)
                     {
                         ListingRepository.IncreaseCounter(listingIds, appId, ListingCounters.Views, 1);
                         _listingIndexer.Increment(listingIds, appId, l => l.ViewCount);
                     }
-                    //    var update = Update<Listing>.Inc(x => x.ViewCount, 1);
-                    //    ListingsCollection.Update(query, update, new MongoUpdateOptions { Flags = UpdateFlags.Multi });
                 }
 
                 if (includeComments)
@@ -1077,6 +1115,7 @@ namespace classy.Manager
                 }
                 listing.Translations[listingTranslation.Culture] = listingTranslation;
                 ListingRepository.Update(listing);
+                _listingIndexer.Index(new[] {listing}, appId);
             }
         }
 
@@ -1089,6 +1128,7 @@ namespace classy.Manager
                 {
                     listing.Translations.Remove(culture);
                     ListingRepository.Update(listing);
+                    _listingIndexer.RemoveFromIndex(listing, appId);
                 }
             }
         }
@@ -1199,7 +1239,7 @@ namespace classy.Manager
             if (metadata != null || query != null)
             {
                 long count = 0;
-                data.SearchResults = ListingRepository.Search(null, new string[] { listing.ListingType }, 
+                data.SearchResults = ListingRepository.Search(null, null, null, new[] { listing.ListingType }, 
                     metadata, query,
                     null, null, location, appId, false, false, 0, 0, ref count, SortMethod.Popularity, culture).ToListingViewList(culture, _currencyManager, Environment.CurrencyCode);
                 if (data.SearchResults != null)
@@ -1256,6 +1296,11 @@ namespace classy.Manager
 
                 listing.ExternalMedia.Remove(file);
             }
+        }
+
+        public List<string> CheckDuplicateSKUs(string appId, string profileId, string listingId, string[] skus)
+        {
+            return ListingRepository.CheckDuplicateSKUs(appId, profileId, listingId,  skus);
         }
     }
 }

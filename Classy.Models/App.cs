@@ -12,7 +12,6 @@ namespace Classy.Models
         public int PagesCount { get; set; }
         public bool AllowUnmoderatedReviews { get; set; }
         public bool AllowUnmoderatedComments { get; set; }
-        public bool EnableProxyProfiles { get; set; }
         public bool ProxyClaimNeedsVerification { get; set; }
         public string DefaultProfileImage { get; set; }
         public string DefaultCountry { get; set; }

@@ -1,10 +1,12 @@
-﻿using Classy.Models;
+﻿using System.Security.Cryptography.X509Certificates;
+using Classy.Interfaces.Search;
+using Classy.Models;
 using Classy.Models.Response;
 using Classy.Repository;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Web;
+using MongoDB.Driver.Linq;
 using ServiceStack.Common;
 
 namespace classy.Manager
@@ -15,17 +17,20 @@ namespace classy.Manager
         private IBookingRepository BookingRepository;
         private IPaymentGateway PaymentGateway;
         private ITripleStore TripleStore;
+        private IIndexer<Listing> ListingIndexer; 
 
         public DefaultBookingManager(
             IListingRepository listingRepository,
             IBookingRepository bookingRepository,
             IPaymentGateway paymentGateway,
-            ITripleStore tripleStore)
+            ITripleStore tripleStore,
+            IIndexer<Listing> listingIndexer)
         {
             ListingRepository = listingRepository;
             BookingRepository = bookingRepository;
             PaymentGateway = paymentGateway;
             TripleStore = tripleStore;
+            ListingIndexer = listingIndexer;
         }
 
         public BookedTimeslot BookListing(
@@ -65,6 +70,7 @@ namespace classy.Manager
 
                 // increase booking counter on listing
                 ListingRepository.IncreaseCounter(listingId, appId, ListingCounters.Bookings, 1);
+                ListingIndexer.Increment(listingId, appId, x => x.BookingCount);
 
                 // log the booking activity
                 int count = 1;

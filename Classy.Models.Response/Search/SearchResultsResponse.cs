@@ -17,6 +17,7 @@ namespace Classy.Models.Response.Search
     public class FreeSearchResultsResponse
     {
         public SearchResultsResponse<ListingView> ListingsResults { get; set; }
-        public SearchResultsResponse<ProfileView> ProfilesResults { get; set; } 
+        public SearchResultsResponse<ProfileView> ProfilesResults { get; set; }
+        public SearchResultsResponse<ListingView> ProductsResults { get; set; }
     }
 }

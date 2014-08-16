@@ -10,6 +10,7 @@ using System.Net;
 using System.Web;
 using ServiceStack.Common;
 using System.IO;
+using System.Diagnostics;
 
 namespace Classy.Auth
 {
@@ -33,6 +34,9 @@ namespace Classy.Auth
         public override object Authenticate(IServiceBase authService, IAuthSession session, Auth request)
         {
             var tokens = Init(authService, ref session, request);
+
+            if (request != null)
+                Trace.TraceInformation("FacebookAuthProvider.Authenticate: request.oauth_token -> " + request.oauth_token);
 
             try
             {
@@ -61,10 +65,12 @@ namespace Classy.Auth
             }
             catch (WebException ex)
             {
+                Trace.TraceError(ex.ToString());
                 throw;
             }
             catch (Exception ex)
             {
+                Trace.TraceError(ex.ToString());
                 throw;
             }
         }

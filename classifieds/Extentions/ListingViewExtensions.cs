@@ -1,9 +1,6 @@
 ﻿using Classy.Models;
 using Classy.Models.Response;
-using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Web;
 using ServiceStack.Common;
 using Classy.Interfaces.Managers;
 
@@ -15,10 +12,10 @@ namespace classy
         {
             var to = from.TranslateTo<ListingView>();
             if (from.ExternalMedia != null) to.ExternalMedia = from.ExternalMedia.ToMediaFileList();
-            to.HasPricingInfo = from.PricingInfo != null;
+            to.HasPricingInfo = from.PricingInfo != null && from.PricingInfo.BaseOption != null;
             if (to.HasPricingInfo)
             {
-                to.PricingInfo = from.PricingInfo.ToPricingInfoView(currencyManager.GetRate(from.PricingInfo.CurrencyCode, currencyCode, 0.035));
+                to.PricingInfo = from.PricingInfo.ToPricingInfoView(currencyManager.GetRate(from.PricingInfo.CurrencyCode, currencyCode, (decimal) 0.035));
             }
             to.HasContactInfo = from.ContactInfo != null;
             if (to.HasContactInfo)

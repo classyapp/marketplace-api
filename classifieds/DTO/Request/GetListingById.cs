@@ -11,6 +11,7 @@ namespace Classy.Models.Request
         public bool IncludeCommenterProfiles { get; set; }
         public bool IncludeFavoritedByProfiles { get; set; }
         public bool LogImpression { get; set; }
+        public bool ForEdit { get; set; }
     }
 
     public class GetListingByIdValidator : AbstractValidator<GetListingById>

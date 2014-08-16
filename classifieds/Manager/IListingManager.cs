@@ -36,6 +36,19 @@ namespace classy.Manager
             bool includeFavoritedByProfiles,
             string culture);
 
+        ListingView GetListingById(
+            string appId,
+            string listingId,
+            bool logImpression,
+            bool includeDrafts,
+            bool includeComments,
+            bool formatCommentsAsHtml,
+            bool includeCommenterProfiles,
+            bool includeProfile,
+            bool includeFavoritedByProfiles,
+            string culture,
+            bool forEdit);
+
         /// <summary>
         /// 
         /// </summary>
@@ -68,7 +81,9 @@ namespace classy.Manager
         /// <returns></returns>
         SearchResultsView<ListingView> SearchListings(
             string appId,
+            string Q,
             string[] tags,
+            string[] categories,
             string[] listingTypes,
             IDictionary<string, string[]> metadata,
             double? priceMin,
@@ -253,5 +268,7 @@ namespace classy.Manager
         ListingMoreInfoView GetListingMoreInfo(string appId, string listingId, Dictionary<string, string[]> metadata, Dictionary<string, string[]> query, Location location, string culture);
         
         void EditMultipleListings(string[] listingIds, int? editorsRank, Dictionary<string, string> metadata, string appId);
+
+        List<string> CheckDuplicateSKUs(string appId, string profileId, string listingId, string[] skus);
     }
 }
