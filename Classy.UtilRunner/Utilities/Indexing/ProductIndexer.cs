@@ -61,10 +61,7 @@ namespace Classy.UtilRunner.Utilities.Indexing
                         FlagCount = listing.FlagCount,
                         EditorRank = listing.EditorsRank,
                         Categories = listing.Categories.ToArray(),
-<<<<<<< HEAD
                         AnalyzedCategories = listing.Categories.ToArray(),
-=======
->>>>>>> origin/master
                         Keywords =
                             listing.SearchableKeywords != null ? listing.SearchableKeywords.Union(listing.Hashtags).ToArray() : listing.Hashtags.EmptyIfNull().ToArray(),
                         ImageUrl = 

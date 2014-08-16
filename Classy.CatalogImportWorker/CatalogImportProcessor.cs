@@ -2,13 +2,9 @@
 using System.Collections.Generic;
 ﻿using System.IO;
 using System.Linq;
-<<<<<<< HEAD
 ﻿using Classy.Interfaces.Search;
 ﻿using classy.Manager;
-=======
-using classy.Manager;
->>>>>>> origin/master
-using Classy.Models;
+﻿using Classy.Models;
 using Classy.Repository;
 using Classy.Interfaces.Managers;
 ﻿using System.Threading;
@@ -65,22 +61,15 @@ namespace Classy.CatalogImportWorker
         private readonly ICurrencyManager _currencyManager; // Currencies
         private readonly IProfileRepository _profileRepository; // Profiles
         private readonly ILocalizationRepository _localizationRepository; // Localization
-<<<<<<< HEAD
         private readonly IIndexer<Listing> _listingIndexer;
-=======
->>>>>>> origin/master
         private readonly IAppManager _appManager;
 
         private App _app;
         private IList<ListItem> _styles;
 
         public CatalogImportProcessor(IStorageRepository storageRepo, IListingRepository listingRepo, IJobRepository jobRepo,
-<<<<<<< HEAD
             ICurrencyManager currencyManager, IProfileRepository profileRepository, ILocalizationRepository localizationRepo, IAppManager appManager,
             IIndexer<Listing> listingIndexer)
-=======
-            ICurrencyManager currencyManager, IProfileRepository profileRepository, ILocalizationRepository localizationRepo, IAppManager appManager)
->>>>>>> origin/master
         {
             _storageRepository = storageRepo;
             _listingRepository = listingRepo;
@@ -89,10 +78,7 @@ namespace Classy.CatalogImportWorker
             _profileRepository = profileRepository;
             _localizationRepository = localizationRepo;
             _appManager = appManager;
-<<<<<<< HEAD
             _listingIndexer = listingIndexer;
-=======
->>>>>>> origin/master
         }
 
         public void Process(Job job)
@@ -158,10 +144,7 @@ namespace Classy.CatalogImportWorker
 
                         // Save listing
                         _listingRepository.Insert(product);
-<<<<<<< HEAD
                         _listingIndexer.Index(new[] { product }, job.AppId);
-=======
->>>>>>> origin/master
                         job.Succeeded++;
                     }
                     catch (ImportException ex)
