@@ -15,7 +15,11 @@ namespace classy
             to.BaseOption = from.BaseOption.TranslateTo<PurchaseOptionView>();
             if (to.BaseOption.CompareAtPrice.HasValue) to.BaseOption.CompareAtPrice = to.BaseOption.CompareAtPrice *= adjustRate;
             to.BaseOption.Price *= adjustRate;
+<<<<<<< HEAD
             to.BaseOption.MediaFiles = from.BaseOption.MediaFiles.EmptyIfNull().Select(m => m.TranslateTo<MediaFileView>()).ToArray();
+=======
+            to.BaseOption.MediaFiles = from.BaseOption.MediaFiles.Select(m => m.TranslateTo<MediaFileView>()).ToArray();
+>>>>>>> origin/master
             if (from.PurchaseOptions != null)
             {
                 if (to.PurchaseOptions == null) to.PurchaseOptions = new List<PurchaseOptionView>();
