@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Linq;
-using Classy.Interfaces.Search;
 using classy.Manager;
 using Classy.Interfaces.Managers;
 using Classy.Models;

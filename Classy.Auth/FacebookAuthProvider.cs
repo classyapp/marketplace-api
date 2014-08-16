@@ -1,4 +1,4 @@
-﻿using ServiceStack.Configuration;
+using ServiceStack.Configuration;
 using ServiceStack.ServiceInterface;
 using ServiceStack.ServiceInterface.Auth;
 using ServiceStack.Text;
