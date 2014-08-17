@@ -1,15 +1,10 @@
-﻿using ServiceStack.Configuration;
+using ServiceStack.Configuration;
 using ServiceStack.ServiceInterface;
 using ServiceStack.ServiceInterface.Auth;
 using ServiceStack.Text;
-using ServiceStack.WebHost.Endpoints;
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Net;
-using System.Web;
-using ServiceStack.Common;
-using System.IO;
 using System.Diagnostics;
 
 namespace Classy.Auth
@@ -111,5 +106,4 @@ namespace Classy.Auth
             userSession.Email = tokens.Email ?? userSession.PrimaryEmail ?? userSession.Email;
         }
     }
-
 }

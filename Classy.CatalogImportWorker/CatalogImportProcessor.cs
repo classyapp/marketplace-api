@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 ﻿using Classy.Interfaces.Search;
 ﻿using classy.Manager;
-using Classy.Models;
+﻿using Classy.Models;
 using Classy.Repository;
 using Classy.Interfaces.Managers;
 ﻿using System.Threading;

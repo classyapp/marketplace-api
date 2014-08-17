@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Linq;
 using System.Web;
 using classy.DTO.Request;
@@ -64,7 +64,11 @@ namespace classy
                 var originWhitelist = new[] {
                     "http://local.homelab:8080",
                     "http://myhome-3.apphb.com",
-                    "https://myhome-3.apphb.com"
+                    "https://myhome-3.apphb.com",
+                    "http://www.homelab.com", 
+                    "http://homelab.com",
+                    "https://www.homelab.com", 
+                    "https://homelab.com"
                 };
 
                 httpRes.AddHeader(HttpHeaders.AllowMethods, "GET, POST, PUT, DELETE, OPTIONS");
@@ -274,4 +278,5 @@ namespace classy
             ;
         }
     }
+
 }

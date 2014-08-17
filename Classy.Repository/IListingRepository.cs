@@ -1,9 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using classy.DTO.Request;
+﻿using classy.DTO.Request;
 using Classy.Models;
 
 namespace Classy.Repository
@@ -28,7 +25,9 @@ namespace Classy.Repository
         Listing GetById(string listingId, string appId, bool includeDrafts, string culture);
         IList<Listing> GetById(string[] listingId, string appId, bool includeDrafts, string culture);
         IList<Listing> GetByProfileId(string appId, string profileId, bool includeDrafts, string culture);
-        IList<Listing> Search(string Q, string[] tags, string[] categories, string[] listingTypes, IDictionary<string, string[]> metadata, IDictionary<string, string[]> query, double? priceMin,
+
+        IList<Listing> Search(string Q, string[] tags, string[] categories, string[] listingTypes,
+            IDictionary<string, string[]> metadata, IDictionary<string, string[]> query, double? priceMin,
             double? priceMax, Location location, string appId, bool includeDrafts, bool increaseViewCounter,
             int page, int pageSize, ref long count, SortMethod sortMethod, string culture);
 
