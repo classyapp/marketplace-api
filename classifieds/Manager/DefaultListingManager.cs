@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using classy.DTO.Request;
 using Classy.Interfaces.Search;
+using classy.Manager.Search;
 using Classy.Models;
 using Classy.Models.Response;
 using Classy.Repository;
