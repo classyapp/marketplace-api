@@ -291,10 +291,10 @@ namespace Classy.Repository
             }
 
             // categories
-            if (categories != null && categories.Any())
+            if (categories != null && categories.Any(x => !string.IsNullOrEmpty(x)))
             {
                 queries.Add(Query.In("Categories",
-                    categories.Select(
+                    categories.Where(x => !string.IsNullOrEmpty(x)).Select(
                         x => new BsonRegularExpression(new Regex(x, RegexOptions.IgnoreCase | RegexOptions.Compiled)))));
             }
 
