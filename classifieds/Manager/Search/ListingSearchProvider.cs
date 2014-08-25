@@ -60,7 +60,7 @@ namespace classy.Manager.Search
                                 )
                         )
                     ))
-                .Filter(f => f.Term(t => t.ListingType, "photo"))
+                .Filter(f => f.Term(t => t.ListingType, "Photo"))
                 .SortDescending(x => x.EditorRank)
                 .SortDescending("_score");
             
